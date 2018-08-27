@@ -1,0 +1,21 @@
+{
+    "name": "web-tp3/cal",
+    "type": "typo3-cms-extension",
+    "description" : "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
+    "license": "GPL-2.0+",
+    "version":"1.11.2",
+    "require": {
+        "php": ">=5.3 < 7.3",
+        "typo3/cms-core": "^7.6|| ^8.2 || ^9"
+    },
+    "autoload": {
+        "psr-4": {
+            "TYPO3\\CMS\\Cal\\": "Classes"
+
+        }
+    },
+    "replace": {
+        "tp3mods": "self.version"
+    }
+    
+}
