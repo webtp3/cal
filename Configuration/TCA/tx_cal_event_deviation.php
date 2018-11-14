@@ -38,7 +38,7 @@ $tx_cal_event_deviation = [
         'versioningWS' => true,
         'hideTable' => $configuration['hideDeviationRecords'],
         'searchFields' => 'title,organizer,organizer_link,location,location_link,teaser,description,image,imagecaption,imagealttext,imagetitletext,attachment,attachmentcaption',
-        'label_userFunc' => 'TYPO3\\CMS\\Cal\\Backend\\TCA\\Labels->getDeviationRecordLabel'
+        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class .'->getDeviationRecordLabel'
     ],
     'interface' => [
         'showRecordFieldList' => 'hidden,title,start_date,start_time,allday,end_date,end_time,organizer,location,description,image,attachment'
@@ -49,7 +49,7 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'parentid' => [
@@ -63,7 +63,8 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
+                'max' => 128,
+                'default' => '',
             ]
         ],
         'starttime' => [
@@ -74,8 +75,8 @@ $tx_cal_event_deviation = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'datetime',
-                'default' => '0',
-                'checkbox' => '0'
+                'default' => 0,
+                'checkbox' => 0
             ]
         ],
         'endtime' => [
@@ -86,8 +87,8 @@ $tx_cal_event_deviation = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'datetime',
-                'default' => '0',
-                'checkbox' => '0'
+                'default' => 0,
+                'checkbox' => 0
             ]
         ],
         'orig_start_date' => [
@@ -107,6 +108,7 @@ $tx_cal_event_deviation = [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
                 'size' => 12,
+                'default' => 0,
                 'eval' => 'time'
             ]
         ],
@@ -117,6 +119,7 @@ $tx_cal_event_deviation = [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
                 'size' => 12,
+                'default' => 0,
                 'eval' => 'date'
             ]
         ],
@@ -137,7 +140,7 @@ $tx_cal_event_deviation = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'time',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'end_date' => [
@@ -148,6 +151,7 @@ $tx_cal_event_deviation = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'date',
+                'default' => 0,
                 'tx_cal_event' => 'start_date'
             ]
         ],
@@ -160,7 +164,7 @@ $tx_cal_event_deviation = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'time',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'organizer' => [
@@ -181,6 +185,7 @@ $tx_cal_event_deviation = [
                 'size' => 1,
                 'minitems' => 0,
                 'maxitems' => 1,
+                'default' => 0,
                 'allowed' => $useOrganizerStructure,
                 'fieldControl' => [
                     'addRecord' => [
@@ -188,7 +193,6 @@ $tx_cal_event_deviation = [
                         'options' => [
                             'pid' => $sPid,
                             'setValue' => 'set',
-                            'pid' => $sPid,
                             'table' => $useOrganizerStructure,
                             'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_organizer.createNew',
                         ]
@@ -200,10 +204,6 @@ $tx_cal_event_deviation = [
                             'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_organizer.edit',
                         ]
                     ]
-                ],
-                'wizards' => [
-                    '_PADDING' => 2,
-                    '_VERTICAL' => 1,
                 ]
             ]
         ],
@@ -216,7 +216,8 @@ $tx_cal_event_deviation = [
                 'allowed' => 'pages',
                 'size' => 1,
                 'maxitems' => 1,
-                'minitems' => '0',
+                'minitems' => 0,
+                'default' => 0,
             ]
         ],
         'organizer_link' => [
@@ -227,11 +228,9 @@ $tx_cal_event_deviation = [
                 'size' => 25,
                 'max' => 128,
                 'checkbox' => '',
+                'default' =>'',
                 'eval' => 'trim',
-                'renderType' => 'inputLink',
-                'wizards' => [
-                    '_PADDING' => 2,
-                ]
+                'renderType' => 'inputLink'
             ]
         ],
         'location' => [
@@ -240,7 +239,8 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
+                'max' => 128,
+                'default' => '',
             ]
         ],
         'location_id' => [
@@ -252,6 +252,7 @@ $tx_cal_event_deviation = [
                 'size' => 1,
                 'minitems' => 0,
                 'maxitems' => 1,
+                'default' => 0,
                 'allowed' => $useLocationStructure,
                 'fieldControl' => [
                     'addRecord' => [
@@ -259,7 +260,6 @@ $tx_cal_event_deviation = [
                         'options' => [
                             'pid' => $sPid,
                             'setValue' => 'set',
-                            'pid' => $sPid,
                             'table' => $useLocationStructure,
                             'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.createNew',
                         ]
@@ -271,10 +271,6 @@ $tx_cal_event_deviation = [
                             'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.edit',
                         ]
                     ]
-                ],
-                'wizards' => [
-                    '_PADDING' => 2,
-                    '_VERTICAL' => 1,
                 ]
             ]
         ],
@@ -287,7 +283,8 @@ $tx_cal_event_deviation = [
                 'allowed' => 'pages',
                 'size' => 1,
                 'maxitems' => 1,
-                'minitems' => '0',
+                'minitems' => 0,
+                'default' => 0,
             ]
         ],
         'location_link' => [
@@ -298,6 +295,7 @@ $tx_cal_event_deviation = [
                 'size' => 25,
                 'max' => 128,
                 'checkbox' => '',
+                'default' => '',
                 'eval' => 'trim',
                 'renderType' => 'inputLink',
                 'wizards' => [
@@ -321,6 +319,7 @@ $tx_cal_event_deviation = [
                 'type' => 'text',
                 'cols' => 40,
                 'rows' => 6,
+                'default' => '',
                 'enableRichtext' => true,
                 'fieldControl' => [
                     'fullScreenRichtext' => [
@@ -329,9 +328,6 @@ $tx_cal_event_deviation = [
                             'title' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:bodytext.W.RTE',
                         ],
                     ]
-                ],
-                'wizards' => [
-                    '_PADDING' => 4,
                 ]
             ]
         ],
@@ -361,6 +357,7 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.images',
             'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('image', [
                 'maxitems' => 5,
+                'default' => 0,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
                 'foreign_types' => [
                     '0' => [

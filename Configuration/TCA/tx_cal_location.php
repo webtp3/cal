@@ -34,7 +34,7 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'name' => [
@@ -43,7 +43,8 @@ $tx_cal_location = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
+                'max' => 128,
+                'eval' => 'required',
             ]
         ],
         'description' => [
@@ -64,7 +65,8 @@ $tx_cal_location = [
                 ],
                 'wizards' => [
                     '_PADDING' => 2,
-                ]
+                ],
+                'default' => '',
             ]
         ],
         'street' => [
@@ -73,7 +75,8 @@ $tx_cal_location = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
+                'max' => 128,
+                'default' => '',
             ]
         ],
         'zip' => [
@@ -82,7 +85,8 @@ $tx_cal_location = [
             'config' => [
                 'type' => 'input',
                 'size' => 15,
-                'max' => 15
+                'max' => 15,
+                'default' => '',
             ]
         ],
         'city' => [
@@ -91,7 +95,8 @@ $tx_cal_location = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
+                'max' => 128,
+                'default' => '',
             ]
         ],
         'phone' => [
@@ -100,7 +105,8 @@ $tx_cal_location = [
             'config' => [
                 'type' => 'input',
                 'size' => 15,
-                'max' => 24
+                'max' => 24,
+                'default' => '',
             ]
         ],
         'fax' => [
@@ -109,7 +115,8 @@ $tx_cal_location = [
             'config' => [
                 'type' => 'input',
                 'size' => 15,
-                'max' => 24
+                'max' => 24,
+                'default' => '',
             ]
         ],
         'email' => [
@@ -119,7 +126,8 @@ $tx_cal_location = [
                 'type' => 'input',
                 'size' => 30,
                 'max' => 64,
-                'eval' => 'lower'
+                'eval' => 'lower, email',
+                'default' => '',
             ]
         ],
         'image' => [
@@ -151,6 +159,7 @@ $tx_cal_location = [
                 'max' => 128,
                 'checkbox' => '',
                 'eval' => 'trim',
+                'default' => '',
                 'renderType' => 'inputLink',
                 'wizards' => [
                     '_PADDING' => 2,
@@ -168,6 +177,7 @@ $tx_cal_location = [
                 'minitems' => 0,
                 'maxitems' => 100,
                 'MM' => 'tx_cal_location_shared_user_mm',
+                'default' => 0,
             ]
         ],
         'latitude' => [
@@ -175,7 +185,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.latitude',
             'config' => [
                 'type' => 'input',
-                'readOnly' => 1
+                'readOnly' => 1,
+                'default' => 0,
             ]
         ],
         'longitude' => [
@@ -183,7 +194,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.longitude',
             'config' => [
                 'type' => 'input',
-                'readOnly' => 1
+                'readOnly' => 1,
+                'default' => 0,
             ]
         ],
         'sys_language_uid' => [
@@ -249,6 +261,19 @@ $tx_cal_location = [
     ]
 ];
 
+$dummy = array(
+    'exclude' => 1,
+    'label' => 'dummy',
+    'config' => array(
+        'type' => 'text',
+        'default' => '',
+    )
+);
+
+$tx_cal_location['columns']['imagecaption'] = $dummy;
+$tx_cal_location['columns']['imagealttext'] = $dummy;
+$tx_cal_location['columns']['imagetitletext'] = $dummy;
+
 /* If wec_map is present, define the address fields */
 if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')) {
     $tx_cal_location['ctrl']['EXT']['wec_map'] = [
@@ -303,6 +328,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
             'size' => 1,
             'minitems' => 0,
             'maxitems' => 1,
+            'default' => 0,
         ]
     ];
     $tx_cal_location['columns']['country'] = [
@@ -323,6 +349,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
             'size' => 1,
             'minitems' => 0,
             'maxitems' => 1,
+            'default' => 0,
         ]
     ];
     $tx_cal_location['columns']['country_zone']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountryZonesSelector';

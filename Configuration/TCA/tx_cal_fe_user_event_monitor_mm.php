@@ -9,7 +9,7 @@ $tx_cal_fe_user_event_monitor_mm = [
         'label_alt' => 'tablenames,offset',
         'label_alt_force' => 1,
         'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_fe_user_event_monitor_mm.gif',
-        'label_userFunc' => 'TYPO3\\CMS\\Cal\\Backend\\TCA\\Labels->getMonitoringRecordLabel'
+        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class .'->getMonitoringRecordLabel'
     ],
     'feInterface' => [
         'fe_admin_fieldList' => ''
@@ -28,6 +28,7 @@ $tx_cal_fe_user_event_monitor_mm = [
                 'size' => 1,
                 'minitems' => 0,
                 'maxitems' => 1,
+                'default' => 0,
             ]
         ],
         'uid_local' => [
@@ -40,6 +41,7 @@ $tx_cal_fe_user_event_monitor_mm = [
                 'size' => 1,
                 'minitems' => 0,
                 'maxitems' => 1,
+                'default' => 0,
             ]
         ],
         'tablenames' => [
@@ -47,7 +49,8 @@ $tx_cal_fe_user_event_monitor_mm = [
             'label' => 'tablenames',
             'config' => [
                 'type' => 'input',
-                'size' => 12
+                'size' => 12,
+                'default' => '',
             ]
         ],
         'offset' => [
@@ -58,7 +61,7 @@ $tx_cal_fe_user_event_monitor_mm = [
                 'size' => 6,
                 'max' => 4,
                 'eval' => 'num',
-                'default' => '60'
+                'default' => 60
             ]
         ],
         'schedulerId' => [
@@ -67,7 +70,8 @@ $tx_cal_fe_user_event_monitor_mm = [
             'config' => [
                 'type' => 'input',
                 'size' => 5,
-                'readOnly' => 1
+                'readOnly' => 1,
+                'default' => 0,
             ]
         ]
     ],

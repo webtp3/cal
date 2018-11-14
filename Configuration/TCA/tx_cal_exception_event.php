@@ -31,7 +31,7 @@ $tx_cal_exception_event = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'title' => [
@@ -52,8 +52,8 @@ $tx_cal_exception_event = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'datetime',
-                'default' => '0',
-                'checkbox' => '0'
+                'default' => 0,
+                'checkbox' => 0
             ]
         ],
         'endtime' => [
@@ -64,8 +64,8 @@ $tx_cal_exception_event = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'datetime',
-                'default' => '0',
-                'checkbox' => '0'
+                'default' => 0,
+                'checkbox' => 0
             ]
         ],
         'start_date' => [
@@ -124,7 +124,7 @@ $tx_cal_exception_event = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.byday_short',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byDay'
+                'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class .'->byDay'
             ]
         ],
 
@@ -134,7 +134,7 @@ $tx_cal_exception_event = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.bymonthday_short',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byMonthDay'
+                'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class .'->byMonthDay'
             ]
         ],
 
@@ -144,7 +144,7 @@ $tx_cal_exception_event = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.bymonth_short',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byMonth'
+                'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class .'->byMonth'
             ]
         ],
 
@@ -184,7 +184,7 @@ $tx_cal_exception_event = [
             'displayCond' => 'FIELD:rdate_type:IN:date_time,date,period',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->rdate'
+                'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class .'->rdate'
             ]
         ],
 
@@ -208,7 +208,8 @@ $tx_cal_exception_event = [
                 'type' => 'input',
                 'size' => 4,
                 'eval' => 'num',
-                'checkbox' => '0'
+                'default' => 0,
+                'checkbox' => 0
             ]
         ],
 

@@ -68,7 +68,7 @@ $tx_cal_event = [
         ],
         'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events.gif',
         'searchFields' => 'title,organizer,organizer_link,location,location_link,teaser,description,ext_url,image,imagecaption,imagealttext,imagetitletext,attachment,attachmentcaption',
-        'label_userFunc' => 'TYPO3\\CMS\\Cal\\Backend\\TCA\\Labels->getEventRecordLabel'
+        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class . '->getEventRecordLabel'
     ],
     'feInterface' => [
         'fe_admin_fieldList' => 'hidden, title, starttime, endtime, start_date, start_time, end_date, end_time, relation_cnt, organizer, organizer_id, organizer_pid, location, location_id, location_pid, description, freq, byday, bymonthday, bymonth, until, count, interval, rdate_type, rdate, notify_cnt'
@@ -82,7 +82,7 @@ $tx_cal_event = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'title' => [
@@ -104,7 +104,7 @@ $tx_cal_event = [
                 'max' => 20,
                 'renderType' => 'inputDateTime',
                 'eval' => 'datetime',
-                'default' => '0',
+                'default' => 0,
                 'checkbox' => '0'
             ]
         ],
@@ -116,7 +116,7 @@ $tx_cal_event = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'datetime',
-                'default' => '0',
+                'default' => 0,
                 'checkbox' => '0'
             ]
         ],
@@ -130,7 +130,7 @@ $tx_cal_event = [
                 'size' => 1,
                 'minitems' => 1,
                 'maxitems' => 1,
-                'itemsProcFunc' => 'TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc->getRecords',
+                'itemsProcFunc' => \TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc::class .'->getRecords',
                 'itemsProcFunc_config' => [
                     'table' => 'tx_cal_calendar',
                     'orderBy' => 'tx_cal_calendar.title'
@@ -152,10 +152,6 @@ $tx_cal_event = [
                             'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.edit',
                         ]
                     ]
-                ],
-                'wizards' => [
-                    '_PADDING' => 2,
-                    '_VERTICAL' => 1,
                 ]
             ]
         ],
@@ -188,7 +184,7 @@ $tx_cal_event = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'time',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'end_date' => [
@@ -211,7 +207,7 @@ $tx_cal_event = [
                 'renderType' => 'inputDateTime',
                 'size' => 12,
                 'eval' => 'time',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'organizer' => [
@@ -754,7 +750,7 @@ $tx_cal_event = [
                     'expandSingle' => 1,
                     'useSortable' => 1
                 ],
-                'default' => ''
+                'default' => 0
             ]
         ],
         'send_invitation' => [
@@ -762,7 +758,7 @@ $tx_cal_event = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.send_invitation',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'status' => [
@@ -848,7 +844,8 @@ $tx_cal_event = [
                 ],
                 'size' => 1,
                 'minitems' => 1,
-                'maxitems' => 1
+                'maxitems' => 1,
+                'default' => 0,
             ]
         ],
         'completed' => [
@@ -858,7 +855,8 @@ $tx_cal_event = [
                 'type' => 'input',
                 'size' => 3,
                 'eval' => 'num',
-                'checkbox' => '0'
+                'checkbox' => 0,
+                'default' => 0,
             ]
         ],
         'sys_language_uid' => [

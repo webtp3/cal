@@ -24,10 +24,6 @@ $tempColumns = [
                         'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.createNew',
                     ]
                 ]
-            ],
-            'wizards' => [
-                '_PADDING' => 2,
-                '_VERTICAL' => 1,
             ]
         ]
     ],
@@ -50,10 +46,6 @@ $tempColumns = [
                         'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.createNew',
                     ]
                 ]
-            ],
-            'wizards' => [
-                '_PADDING' => 2,
-                '_VERTICAL' => 1,
             ]
         ]
     ]

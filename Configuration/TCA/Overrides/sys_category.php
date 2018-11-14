@@ -43,6 +43,7 @@ $newCalSysCategoryColumns = [
             'size' => 1,
             'maxitems' => 1,
             'minitems' => 0,
+            'default' => 0,
         ]
     ],
     'shortcut' => [
@@ -56,6 +57,7 @@ $newCalSysCategoryColumns = [
             'size' => 1,
             'maxitems' => 1,
             'minitems' => 0,
+            'default' => 0,
         ]
     ],
     'headerstyle' => [
@@ -63,7 +65,8 @@ $newCalSysCategoryColumns = [
         'label' => $ll . 'sys_category.headerstyle',
         'config' => [
             'type' => 'user',
-            'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getHeaderStyles'
+            'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class . '->getHeaderStyles',
+            'default' => '',
         ]
     ],
     'bodystyle' => [
@@ -71,7 +74,8 @@ $newCalSysCategoryColumns = [
         'label' => $ll . 'sys_category.bodystyle',
         'config' => [
             'type' => 'user',
-            'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getBodyStyles'
+            'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class . '->getBodyStyles',
+            'default' => '',
         ]
     ],
     'calendar_id' => [
@@ -80,7 +84,7 @@ $newCalSysCategoryColumns = [
         'config' => [
             'renderType' => 'selectSingle',
             'type' => 'select',
-            'itemsProcFunc' => 'TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc->getRecords',
+            'itemsProcFunc' => \TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc::class . '->getRecords',
             'itemsProcFunc_config' => [
                 'table' => 'tx_cal_calendar',
                 'orderBy' => 'tx_cal_calendar.title'
@@ -95,12 +99,14 @@ $newCalSysCategoryColumns = [
             'minitems' => 0,
             'maxitems' => 1,
             'allowed' => 'tx_cal_calendar',
+            'default' => 0,
         ]
     ],
     'shared_user_allowed' => [
         'label' => $ll . 'sys_category.shared_user_allowed',
         'config' => [
-            'type' => 'check'
+            'type' => 'check',
+            'default' => 0,
         ]
     ],
 
@@ -109,7 +115,8 @@ $newCalSysCategoryColumns = [
         'label' => $ll . 'sys_category.notification_emails',
         'config' => [
             'type' => 'input',
-            'size' => '30'
+            'size' => '30',
+            'default' => '',
         ]
     ],
 ];

@@ -29,7 +29,7 @@ $tx_cal_exception_event_group = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'title' => [
@@ -52,6 +52,7 @@ $tx_cal_exception_event_group = [
                 'size' => 6,
                 'minitems' => 0,
                 'maxitems' => 100,
+                'default' => 0,
                 'MM' => 'tx_cal_exception_event_group_mm',
             ]
         ],

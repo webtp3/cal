@@ -16,7 +16,7 @@ $tx_cal_attendee = [
         ],
         'versioningWS' => true,
         'searchFields' => 'email',
-        'label_userFunc' => 'TYPO3\\CMS\\Cal\\Backend\\TCA\\Labels->getAttendeeRecordLabel'
+        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class .'->getAttendeeRecordLabel'
     ],
     'interface' => [
         'showRecordFieldList' => 'hidden,fe_user_id,email,attendance,status'
@@ -27,7 +27,7 @@ $tx_cal_attendee = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'fe_user_id' => [
@@ -40,6 +40,7 @@ $tx_cal_attendee = [
                 'minitems' => 0,
                 'maxitems' => 1,
                 'allowed' => 'fe_users',
+                'default' => 0,
             ]
         ],
         'fe_group_id' => [
@@ -52,6 +53,7 @@ $tx_cal_attendee = [
                 'minitems' => 0,
                 'maxitems' => 1,
                 'allowed' => 'fe_groups',
+                'default' => 0,
             ]
         ],
         'email' => [
@@ -61,7 +63,8 @@ $tx_cal_attendee = [
                 'type' => 'input',
                 'size' => 30,
                 'max' => 64,
-                'eval' => 'lower'
+                'eval' => 'lower',
+                'default' => '',
             ]
         ],
         'attendance' => [
@@ -90,7 +93,8 @@ $tx_cal_attendee = [
                 ],
                 'size' => 1,
                 'minitems' => 1,
-                'maxitems' => 1
+                'maxitems' => 1,
+                'default' => 'NON',
             ]
         ],
         'status' => [
@@ -127,7 +131,8 @@ $tx_cal_attendee = [
                 ],
                 'size' => 1,
                 'minitems' => 1,
-                'maxitems' => 1
+                'maxitems' => 1,
+                'default' => 0,
             ]
         ]
     ],

@@ -20,8 +20,8 @@ $tx_cal_calendar = [
         'type' => 'type',
         'typeicon_column' => 'type',
         'typeicons' => [
-            '1' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_exturl.gif',
-            '2' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_ics.gif'
+            1 => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_exturl.gif',
+            2 => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_ics.gif'
         ],
         'versioningWS' => true,
         'origUid' => 't3_origuid',
@@ -44,7 +44,7 @@ $tx_cal_calendar = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'title' => [
@@ -69,13 +69,15 @@ $tx_cal_calendar = [
                 'autoSizeMax' => 25,
                 'maxitems' => 500,
                 'allowed' => 'fe_users,fe_groups',
+                'default' => 0,
             ]
         ],
         'activate_fnb' => [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.activate_fnb',
             'onChange' => 'reload',
             'config' => [
-                'type' => 'check'
+                'type' => 'check',
+                'default' => 0,
             ]
         ],
         'fnb_user_cnt' => [
@@ -90,12 +92,14 @@ $tx_cal_calendar = [
                 'minitems' => 0,
                 'maxitems' => 100,
                 'allowed' => 'fe_users,fe_groups',
+                'default' => 0,
             ]
         ],
         'nearby' => [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.nearby',
             'config' => [
-                'type' => 'check'
+                'type' => 'check',
+                'default' => 0,
             ]
         ],
         'type' => [
@@ -127,7 +131,7 @@ $tx_cal_calendar = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.ext_url',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->extUrl',
+                'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class .'->extUrl',
                 'default' => ''
             ]
         ],
@@ -147,7 +151,7 @@ $tx_cal_calendar = [
                 'type' => 'group',
                 'internal_type' => 'file',
                 'allowed' => 'ics', // Must be empty for disallowed to work.
-                'max_size' => '10000',
+                'max_size' => 10000,
                 'uploadfolder' => 'uploads/tx_cal/ics',
                 'size' => 1,
                 'fieldWizard' => [
@@ -157,7 +161,7 @@ $tx_cal_calendar = [
                 ],
                 'autoSizeMax' => 1,
                 'maxitems' => 1,
-                'minitems' => '0',
+                'minitems' => 0,
                 'default' => ''
             ]
         ],
@@ -170,7 +174,7 @@ $tx_cal_calendar = [
                 'size' => 6,
                 'max' => 4,
                 'eval' => 'num',
-                'default' => '60'
+                'default' => 60
             ]
         ],
         'schedulerId' => [
@@ -179,7 +183,8 @@ $tx_cal_calendar = [
             'config' => [
                 'type' => 'input',
                 'size' => 5,
-                'readOnly' => 1
+                'readOnly' => 1,
+                'default' => '',
             ]
         ],
 
@@ -193,7 +198,8 @@ $tx_cal_calendar = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:sys_category.headerstyle',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getHeaderStyles'
+                'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class .'->getHeaderStyles',
+                'default' => '',
             ]
         ],
         'bodystyle' => [
@@ -201,7 +207,8 @@ $tx_cal_calendar = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:sys_category.bodystyle',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getBodyStyles'
+                'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class .'->getBodyStyles',
+                'default' => '',
             ]
         ],
         'sys_language_uid' => [

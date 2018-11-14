@@ -35,7 +35,7 @@ $tx_cal_organizer = [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'name' => [
@@ -55,6 +55,7 @@ $tx_cal_organizer = [
                 'type' => 'text',
                 'cols' => 30,
                 'rows' => 5,
+                'default' => '',
                 'enableRichtext' => true,
                 'fieldControl' => [
                     'fullScreenRichtext' => [
@@ -63,9 +64,6 @@ $tx_cal_organizer = [
                             'title' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:bodytext.W.RTE',
                         ],
                     ]
-                ],
-                'wizards' => [
-                    '_PADDING' => 2,
                 ]
             ]
         ],
@@ -75,7 +73,8 @@ $tx_cal_organizer = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
+                'max' => 128,
+                'default' => '',
             ]
         ],
         'zip' => [
@@ -84,7 +83,8 @@ $tx_cal_organizer = [
             'config' => [
                 'type' => 'input',
                 'size' => 15,
-                'max' => 15
+                'max' => 15,
+                'default' => '',
             ]
         ],
         'city' => [
@@ -93,7 +93,8 @@ $tx_cal_organizer = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
+                'max' => 128,
+                'default' => '',
             ]
         ],
         'phone' => [
@@ -102,7 +103,8 @@ $tx_cal_organizer = [
             'config' => [
                 'type' => 'input',
                 'size' => 15,
-                'max' => 24
+                'max' => 24,
+                'default' => '',
             ]
         ],
         'fax' => [
@@ -111,7 +113,8 @@ $tx_cal_organizer = [
             'config' => [
                 'type' => 'input',
                 'size' => 15,
-                'max' => 24
+                'max' => 24,
+                'default' => '',
             ]
         ],
         'email' => [
@@ -121,7 +124,8 @@ $tx_cal_organizer = [
                 'type' => 'input',
                 'size' => 30,
                 'max' => 64,
-                'eval' => 'lower'
+                'eval' => 'lower,email',
+                'default' => '',
             ]
         ],
         'image' => [
@@ -153,6 +157,7 @@ $tx_cal_organizer = [
                 'max' => 128,
                 'checkbox' => '',
                 'eval' => 'trim',
+                'default' => '',
                 'wizards' => [
                     '_PADDING' => 2,
                     'link' => [
@@ -178,6 +183,7 @@ $tx_cal_organizer = [
                 'minitems' => 0,
                 'maxitems' => 100,
                 'MM' => 'tx_cal_organizer_shared_user_mm',
+                'default' => 0,
             ]
         ],
         'sys_language_uid' => [
@@ -188,6 +194,7 @@ $tx_cal_organizer = [
                 'type' => 'select',
                 'foreign_table' => 'sys_language',
                 'foreign_table_where' => 'ORDER BY sys_language.title',
+                'default' => 0,
                 'items' => [
                     [
                         'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.allLanguages',
@@ -262,6 +269,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
             'size' => 1,
             'minitems' => 0,
             'maxitems' => 1,
+            'default' => '',
         ]
     ];
     $tx_cal_organizer['columns']['country'] = [
@@ -282,6 +290,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
             'size' => 1,
             'minitems' => 0,
             'maxitems' => 1,
+            'default' => 0,
         ]
     ];
 
