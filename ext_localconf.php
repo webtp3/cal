@@ -1258,3 +1258,17 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_organize
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_sys_template'] = TypoScriptUpdateWizard::class;
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'][MigrateCalCategoriesToSysCategoriesUpdateWizard::class] = MigrateCalCategoriesToSysCategoriesUpdateWizard::class;
+
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('
+mod.wizards.newContentElement.wizardItems.plugins.elements.tx_cal {
+    iconIdentifier = tx-cal-wizard
+    title = LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xml:pi1_title
+    description = LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xml:pi1_plus_wiz_description
+    tt_content_defValues {
+        CType = list
+        list_type = cal_controller
+    }
+}
+
+mod.wizards.newContentElement.wizardItems.plugins.show := addToList(tx_cal)
+');

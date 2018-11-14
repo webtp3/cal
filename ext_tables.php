@@ -23,31 +23,14 @@ $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal');
 // Add Calendar Events to the "Insert Records" content element
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToInsertRecords('tx_cal_event');
 
-// initalize 'context sensitive help' (csh)
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-    'tx_cal_event',
-    'EXT:cal/Resources/Private/Help/locallang_csh_txcalevent.php'
-);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-    'tx_cal_calendar',
-    'EXT:cal/Resources/Private/Help/locallang_csh_txcalcal.php'
-);
-
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-    'tx_cal_exception_event',
-    'EXT:cal/Resources/Private/Help/locallang_csh_txcalexceptionevent.php'
-);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-    'tx_cal_exception_event_group',
-    'EXT:cal/Resources/Private/Help/locallang_csh_txcalexceptioneventgroup.php'
-);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-    'tx_cal_location',
-    'EXT:cal/Resources/Private/Help/locallang_csh_txcallocation.php'
-);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-    'tx_cal_organizer',
-    'EXT:cal/Resources/Private/Help/locallang_csh_txcalorganizer.php'
+/**
+ * Register icons
+ */
+$iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance( \TYPO3\CMS\Core\Imaging\IconRegistry::class );
+$iconRegistry->registerIcon(
+    'tx-cal-wizard',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/ce_wiz.gif' ]
 );
 
 if (TYPO3_MODE == 'BE') {
