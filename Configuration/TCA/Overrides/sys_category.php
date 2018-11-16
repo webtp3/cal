@@ -65,7 +65,10 @@ $newCalSysCategoryColumns = [
         'label' => $ll . 'sys_category.headerstyle',
         'config' => [
             'type' => 'user',
-            'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class . '->getHeaderStyles',
+            'renderType' => 'calStylesElement',
+            'parameters' => [
+                'stylesFor' => 'header',
+            ],
             'default' => '',
         ]
     ],
@@ -74,7 +77,10 @@ $newCalSysCategoryColumns = [
         'label' => $ll . 'sys_category.bodystyle',
         'config' => [
             'type' => 'user',
-            'userFunc' => \TYPO3\CMS\Cal\Backend\TCA\CustomTca::class . '->getBodyStyles',
+            'renderType' => 'calStylesElement',
+            'parameters' => [
+                'stylesFor' => 'body',
+            ],
             'default' => '',
         ]
     ],
