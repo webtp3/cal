@@ -19,9 +19,10 @@ $tx_cal_calendar = [
         ],
         'type' => 'type',
         'typeicon_column' => 'type',
-        'typeicons' => [
-            1 => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_exturl.gif',
-            2 => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_ics.gif'
+        'typeicon_classes' => [
+            0 => 'cal-calendar-standard',
+            1 => 'cal-calendar-exturl',
+            2 => 'cal-calendar-ics'
         ],
         'versioningWS' => true,
         'origUid' => 't3_origuid',

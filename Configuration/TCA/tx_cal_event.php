@@ -54,12 +54,13 @@ $tx_cal_event = [
         'languageField' => 'sys_language_uid',
         'type' => 'type',
         'typeicon_column' => 'type',
-        'typeicons' => [
-            '1' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_intlnk.gif',
-            '2' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_exturl.gif',
-            '3' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_meeting.gif',
-            '4' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_todo.gif'
-        ],
+        'typeicon_classes' => array(
+            0 => 'cal-eventtype-standard',
+            1 => 'cal-eventtype-intlnk',
+            2 => 'cal-eventtype-exturl',
+            3 => 'cal-eventtype-meeting',
+            4 => 'cal-eventtype-todo'
+        ),
         'dividers2tabs' => $configuration['noTabDividers'] ? false : true,
         'enablecolumns' => [
             'disabled' => 'hidden',

@@ -33,7 +33,61 @@ $iconRegistry->registerIcon(
     [ 'source' => 'EXT:cal/Resources/Public/icons/ce_wiz.gif' ]
 );
 
-if (TYPO3_MODE == 'BE') {
+$iconRegistry->registerIcon(
+    'cal-pagetree-root',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar.gif' ]
+);
+
+$iconRegistry->registerIcon(
+    'cal-eventtype-standard',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events.gif' ]
+);
+
+$iconRegistry->registerIcon(
+    'cal-eventtype-intlnk',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_intlnk.gif' ]
+);
+
+$iconRegistry->registerIcon(
+    'cal-eventtype-exturl',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_exturl.gif' ]
+);
+
+$iconRegistry->registerIcon(
+    'cal-eventtype-meeting',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_meeting.gif' ]
+);
+
+$iconRegistry->registerIcon(
+    'cal-eventtype-todo',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_todo.gif' ]
+);
+
+$iconRegistry->registerIcon(
+    'cal-calendar-standard',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar.gif' ]
+);
+
+$iconRegistry->registerIcon(
+    'cal-calendar-exturl',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_exturl.gif' ]
+);
+
+$iconRegistry->registerIcon(
+    'cal-calendar-ics',
+    \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_ics.gif' ]
+);
+
+if (TYPO3_MODE === 'BE') {
     $GLOBALS['TBE_MODULES_EXT']['xMOD_db_new_content_el']['addElClasses'][CalWizIcon::class] = $extPath . 'Classes/Backend/CalWizIcon.php';
     // Add module
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
