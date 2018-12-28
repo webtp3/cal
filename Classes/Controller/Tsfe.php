@@ -12,7 +12,6 @@
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 namespace TYPO3\CMS\Cal\Controller;
 
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
@@ -27,7 +26,7 @@ class Tsfe extends TypoScriptFrontendController
      * @param string $header
      * @param string $reason
      */
-    function pageNotFoundHandler($code, $header = '', $reason = '')
+    public function pageNotFoundHandler($code, $header = '', $reason = '')
     {
         // do nothing
     }
@@ -36,7 +35,7 @@ class Tsfe extends TypoScriptFrontendController
      * @param string $reason
      * @param string $header
      */
-    function pageNotFoundAndExit($reason = '', $header = '')
+    public function pageNotFoundAndExit($reason = '', $header = '')
     {
         // do nothing
     }

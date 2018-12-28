@@ -1,13 +1,15 @@
 {
-    "name": "janhelke/cal",
-    "description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
-    "type": "typo3-cms-extension",
-    "license": ["GPL-2.0-or-later"],
-    "authors": [
-        {
-            "name": "Jan Helke",
-            "email": "typo3@helke.de"
-        }
-    ],
-    "require": {}
+	"name": "janhelke/cal",
+	"description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
+	"type": "typo3-cms-extension",
+	"license": [
+		"GPL-2.0-or-later"
+	],
+	"authors": [
+		{
+			"name": "Jan Helke",
+			"email": "typo3@helke.de"
+		}
+	],
+	"require": {}
 }

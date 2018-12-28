@@ -1,4 +1,3 @@
-
 1.11.1 - TYPO3 LTS 6.2, 7, LTS 8
 --------------------------------
 
@@ -11,7 +10,7 @@
     * Bug #80252		- Call to undefined method TYPO3\CMS\Core\Utility\File\BasicFileUtility::init()
     * Bug #80253		- Accessing FeUser session var using getKey
     * Bug #80290		- Search view shows all categories
-    * Bug #80308		- Missing "renderType" in TCA of field [tx_cal_location][country] - same for tx_cal_organizer
+    * Bug #80308		- Missing "renderType" in TCA of field[tx_cal_location][country] - same for tx_cal_organizer
     * Bug #80339		- Recurring not working in TYPO3 7.6.16
     * Bug #80340		- Constrain rule not working with equal strings
     * Bug #80344		- problem with php 7.1 - warning in list view
@@ -22,7 +21,7 @@
     * Bug #80418		- Calendar selector should respect piVars as selected calendar
     * Bug #80419		- Month table cells should all be equally high
     * Bug #80458		- GeneralUtility::getUserObj is deprecated with TYPO3 8
-    * Bug #80595		- [] operator not supported for strings
+    * Bug #80595		-[] operator not supported for strings
     * Bug #80773		- DeleteEventView functions are not compatible with super class functions
     * Bug #80774		- Cancel link in fe-editing does not respect chashes
     * Bug #80775		- Weeks in month view have no style class if there is no event in the week

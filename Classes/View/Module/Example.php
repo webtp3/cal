@@ -1,5 +1,7 @@
 <?php
+
 namespace TYPO3\CMS\Cal\View\Module;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,12 +16,12 @@ namespace TYPO3\CMS\Cal\View\Module;
  */
 
 /**
- *
  * @author Mario Matzulla <mario(at)matzullas.de>
  */
-class Example extends \TYPO3\CMS\Cal\View\BaseView {
-	public function start(&$moduleCaller) {
-		return 'text from another module';
-	}
+class Example extends \TYPO3\CMS\Cal\View\BaseView
+{
+    public function start(&$moduleCaller)
+    {
+        return 'text from another module';
+    }
 }
-?>

@@ -17,26 +17,26 @@
  *
  * @author Mario Matzulla <mario(at)matzullas.de>
  */
+$MCONF['name'] = 'tools_calrecurrencegenerator';
 
-$MCONF ["name"] = "tools_calrecurrencegenerator";
-
-$MCONF ["access"] = "admin";
+$MCONF['access'] = 'admin';
 // MCONF["script"]="index.php";
-$MCONF ["script"] = "_DISPATCH";
+$MCONF['script'] = '_DISPATCH';
 
-$MLANG ["default"] ["tabs_images"] ["tab"] = "icon_tx_cal_indexer.gif";
-$MLANG ["default"] ["ll_ref"] = "LLL:EXT:cal/Resources/Private/Language/locallang_indexer_mod.xml";
+$MLANG['default']['tabs_images']['tab'] = 'icon_tx_cal_indexer.gif';
+$MLANG['default']['ll_ref'] = 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer_mod.xml';
 
+$GLOBALS['LANG']->includeLLFile('EXT:cal/Resources/Private/Language/locallang_indexer.xml');
 
-$GLOBALS ['LANG']->includeLLFile ('EXT:cal/Resources/Private/Language/locallang_indexer.xml');
-
-$GLOBALS ['BE_USER']->modAccess ($MCONF, 1); // This checks permissions and exits if the users has no permission for entry.
-                               // DEFAULT initialization of a module [END]
+$GLOBALS['BE_USER']->modAccess(
+    $MCONF,
+    1
+); // This checks permissions and exits if the users has no permission for entry.
+// DEFAULT initialization of a module[END]
 
 // Make instance:
-$SOBE = new \TYPO3\CMS\Cal\Backend\Modul\CalIndexerOld ();
-$SOBE->init ();
+$SOBE = new \TYPO3\CMS\Cal\Backend\Modul\CalIndexerOld();
+$SOBE->init();
 
-$SOBE->main ();
-$SOBE->printContent ();
-?>
+$SOBE->main();
+$SOBE->printContent();

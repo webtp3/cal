@@ -1,5 +1,7 @@
 <?php
+
 namespace TYPO3\CMS\Cal\View;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -12,7 +14,6 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
@@ -21,29 +22,29 @@ use TYPO3\CMS\Cal\Utility\Functions;
  *
  * @author Mario Matzulla <mario(at)matzullas.de>
  */
-class YearView extends \TYPO3\CMS\Cal\View\MonthView {
-	
-	public function __construct() {
-		parent::__construct();
-	}
-	
-	/**
-	 * Draws the year view
-	 * 
-	 * @param
-	 *        	array			The events to be drawn.
-	 * @return string HTML output.
-	 */
-	public function drawYear(&$master_array, $getdate) {
-		$this->_init ($master_array);
-		
-		$page = Functions::getContent ($this->conf ['view.'] ['year.'] ['yearTemplate']);
-		if ($page == '') {
-			return '<h3>calendar: no template file found:</h3>' . $this->conf ['view.'] ['year.'] ['yearTemplate'] . '<br />Please check your template record and add both cal items at "include static (from extension)"';
-		}
-		$array = Array ();
-		return $this->finish ($page, $array);
-	}
-}
+class YearView extends \TYPO3\CMS\Cal\View\MonthView
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-?>
+    /**
+     * Draws the year view
+     *
+     * @param
+     *            array            The events to be drawn.
+     * @return string HTML output.
+     */
+    public function drawYear(&$master_array, $getdate)
+    {
+        $this->_init($master_array);
+
+        $page = Functions::getContent($this->conf['view.']['year.']['yearTemplate']);
+        if ($page == '') {
+            return '<h3>calendar: no template file found:</h3>' . $this->conf['view.']['year.']['yearTemplate'] . '<br />Please check your template record and add both cal items at "include static (from extension)"';
+        }
+        $array = [];
+        return $this->finish($page, $array);
+    }
+}

@@ -1,5 +1,5 @@
 plugin.tx_cal_controller {
-	_CSS_DEFAULT_STYLE (
+    _CSS_DEFAULT_STYLE (
 		/* Styled by TYPO3 Content Rendering Group - ben@netcreators.com 2007 */
 		/* START new classes and  id's */
 		#month-header {
@@ -1221,5 +1221,5 @@ plugin.tx_cal_controller {
 	    	width: 2em !important;
 	    }
 		
-	)
+    )
 }

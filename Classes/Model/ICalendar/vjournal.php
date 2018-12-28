@@ -1,5 +1,7 @@
 <?php
+
 namespace TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vJournals.
  *
@@ -12,17 +14,21 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  *
  * @author Mike Cochrane <mike@graftonhall.co.nz>
  * @since Horde 3.0
- * @package Horde_iCalendar
  */
-class vjournal extends \TYPO3\CMS\Cal\Model\ICalendar {
-	function getType() {
-		return 'vJournal';
-	}
-	function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true) {
-		parent::parsevCalendar ($data, 'VJOURNAL');
-	}
-	function exportvCalendar() {
-		return parent::_exportvData ('VJOURNAL');
-	}
+class vjournal extends \TYPO3\CMS\Cal\Model\ICalendar
+{
+    public function getType()
+    {
+        return 'vJournal';
+    }
+
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    {
+        parent::parsevCalendar($data, 'VJOURNAL');
+    }
+
+    public function exportvCalendar()
+    {
+        return parent::_exportvData('VJOURNAL');
+    }
 }
-?>

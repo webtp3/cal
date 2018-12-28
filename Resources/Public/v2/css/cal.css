@@ -9,17 +9,17 @@
 }
 
 .tx-cal-controller .header-buttons div {
-	background-image:url(../img/calendar-icon_bg.png);
-	background-position:center bottom;
-	background-repeat:no-repeat;
+	background-image: url(../img/calendar-icon_bg.png);
+	background-position: center bottom;
+	background-repeat: no-repeat;
 	width: 40px;
 	height: 27px;
 	text-align: center;
-	float:right;
+	float: right;
 }
 
-.tx-cal-controller .header-buttons div a{
-	line-height:29px;
+.tx-cal-controller .header-buttons div a {
+	line-height: 29px;
 	font-size: xx-small;
 }
 
@@ -29,40 +29,39 @@
 }
 
 .tx-cal-controller .previous-button {
-	float:left;
+	float: left;
 }
 
 .tx-cal-controller .next-button {
-	float:right;
+	float: right;
 }
 
 .tx-cal-controller .previous-button a,
 .tx-cal-controller .next-button a {
-	padding:2px 7px 0;
+	padding: 2px 7px 0;
 }
 
 .tx-cal-controller .timeborder {
-	border-bottom:1px solid #ddd;
-	padding-right:2px;
+	border-bottom: 1px solid #ddd;
+	padding-right: 2px;
 }
 
 .tx-cal-controller .ics_link {
-	width:100%;
-	text-align:center;
+	width: 100%;
+	text-align: center;
 }
 
-.tx-cal-controller .ics_link a{
+.tx-cal-controller .ics_link a {
 	padding-left: 25px;
 	background-image: url(../img/calendar-share.png);
 	background-repeat: no-repeat;
-	font-size:small;
+	font-size: small;
 }
-
 
 /*------------ MONTH ------------*/
 
 .tx-cal-controller .month-weeknums {
-	background-color:#DCF0FA;
+	background-color: #DCF0FA;
 }
 
 .tx-cal-controller .month-large .month-weeknums {
@@ -70,8 +69,8 @@
 }
 
 .tx-cal-controller .month-weekdays {
-	border-bottom:1px solid #AAAAAA;
-	background-color:#EFEFEF;
+	border-bottom: 1px solid #AAAAAA;
+	background-color: #EFEFEF;
 }
 
 .tx-cal-controller .month-small a:link,
@@ -95,21 +94,21 @@
 
 .tx-cal-controller .month-small td,
 .tx-cal-controller .month-medium td {
-	border:1px solid #AAAAAA;
+	border: 1px solid #AAAAAA;
 }
 
 .tx-cal-controller .month-large td {
-	border-left:1px solid #AAAAAA;
-	border-right:1px solid #AAAAAA;
+	border-left: 1px solid #AAAAAA;
+	border-right: 1px solid #AAAAAA;
 	vertical-align: top;
 }
 
 .tx-cal-controller .month-large tr.days td {
-	border:1px solid #AAAAAA;
+	border: 1px solid #AAAAAA;
 }
 
 .tx-cal-controller .month-large tbody tr:last-child td {
-	border-bottom:1px solid #AAAAAA;
+	border-bottom: 1px solid #AAAAAA;
 }
 
 .tx-cal-controller .month-large td.weekday,
@@ -122,7 +121,7 @@
 .tx-cal-controller .month-large .weekday6,
 .tx-cal-controller .month-large .weekday7,
 .tx-cal-controller .month-large .currentDay {
-  font-size: 0.8em;
+	font-size: 0.8em;
 }
 
 .tx-cal-controller .month-large .eventCountIs1, .tx-cal-controller .month-large .emptyWeek .empty {
@@ -149,7 +148,6 @@
 	font-weight: normal;
 	font-size: small;
 }
-			
 
 .tx-cal-controller .month-large .weeknum {
 	width: 22px;
@@ -167,19 +165,19 @@
 
 .tx-cal-controller .month-large div.vevent,
 .tx-cal-controller .month-large div.vtodo {
-	overflow:hidden;
-	white-space:nowrap;
+	overflow: hidden;
+	white-space: nowrap;
 }
-		
+
 .tx-cal-controller .month-large .dayNum,
 .tx-cal-controller .month-medium .dayNum {
 	border-bottom: none;
 	background-color: #E8EEF7;
 	text-align: right;
-	font-size:xx-small;
-	line-height:12px;
+	font-size: xx-small;
+	line-height: 12px;
 }
-	
+
 .tx-cal-controller .monthWeekend {
 	background-color: #FFFFEF;
 }
@@ -198,10 +196,10 @@
 }
 
 .tx-cal-controller .monthView .currentDay {
-	background:#FFF7D7 none repeat scroll 0% !important;
-	border-color:#556677 rgb(170, 187, 204) rgb(170, 187, 204) rgb(85, 102, 119) !important;
-	border-style:solid !important;
-	border-width:1px !important;
+	background: #FFF7D7 none repeat scroll 0% !important;
+	border-color: #556677 rgb(170, 187, 204) rgb(170, 187, 204) rgb(85, 102, 119) !important;
+	border-style: solid !important;
+	border-width: 1px !important;
 }
 
 .tx-cal-controller .weekday0,
@@ -211,8 +209,8 @@
 
 .tx-cal-controller .month-medium {
 	margin: 1em auto 2em;
-	border-collapse:collapse;
-	border-spacing:0px;
+	border-collapse: collapse;
+	border-spacing: 0px;
 	width: 80%;
 }
 
@@ -225,7 +223,7 @@
 }
 
 .tx-cal-controller .month-medium td {
-	border:1px solid #A1A5A9;
+	border: 1px solid #A1A5A9;
 }
 
 #month-footer {
@@ -243,7 +241,7 @@
 .tx-cal-controller .month-large {
 	clear: both;
 	width: 100%;
-	background-color:#FFFFFF;
+	background-color: #FFFFFF;
 	table-layout: fixed;
 }
 
@@ -252,64 +250,64 @@
 	text-align: center;
 }
 
-.tx-cal-controller .year-table .year-month + .year-month + .year-month{
+.tx-cal-controller .year-table .year-month + .year-month + .year-month {
 	padding-right: 0px;
 }
 
 /*------------ SIDEBAR ------------*/
-		
+
 .tx-cal-controller .sidebar {
-	border:1px solid #CCCCCC;
-	border-collapse:collapse;
-	float:left;
-	padding:5px;
-	margin-left:5px;
+	border: 1px solid #CCCCCC;
+	border-collapse: collapse;
+	float: left;
+	padding: 5px;
+	margin-left: 5px;
 }
 
 .tx-cal-controller .month-sidebar h4 {
-	border-top:3px solid #CCCCCC;
-	margin-top:5px;
-	padding-top:6px;
+	border-top: 3px solid #CCCCCC;
+	margin-top: 5px;
+	padding-top: 6px;
 }
 
 .tx-cal-controller .sidebar h4:first-child {
-	border: none; 
-	margin-top:0px;
-	line-height:1.8em;
-	padding-top:0px;
+	border: none;
+	margin-top: 0px;
+	line-height: 1.8em;
+	padding-top: 0px;
 }
 
 .tx-cal-controller .sidebar .button {
 	padding: 1px 4px;
-	background:#EEEEEE none repeat scroll 0 0;
+	background: #EEEEEE none repeat scroll 0 0;
 	border: 1px solid #CCCCCC;
 	cursor: pointer;
 	margin-left: 3px;
 	vertical-align: sub;
-	float:right;
+	float: right;
 }
 
-.tx-cal-controller .sidebar .category-submit{
-	margin-left:11em;
+.tx-cal-controller .sidebar .category-submit {
+	margin-left: 11em;
 }
 
 /*------------ SEARCHBOX ------------*/
-		
+
 .tx-cal-controller .search-box {
 	background: transparent url(../img/bg_searchInput.gif) no-repeat scroll 0 0;
 	border: 0 none;
-	border-right:1px solid #6C6761;
-	color:#515151;
-	padding:1px 0 5px 20px;
-	width:110px;
+	border-right: 1px solid #6C6761;
+	color: #515151;
+	padding: 1px 0 5px 20px;
+	width: 110px;
 }
 
 /*------------ EVENT ------------*/
 
 .tx-cal-controller .vevent {
-	cursor:default;
-	color:#fff;
-	-moz-user-select:none;
+	cursor: default;
+	color: #fff;
+	-moz-user-select: none;
 }
 
 .tx-cal-controller .vevent .freq {
@@ -317,29 +315,29 @@
 }
 
 .tx-cal-controller .vevent dt {
-	margin-top:-1px;
-	font:bold 80%/normal Verdana,sans-serif;
-	white-space:nowrap;
-	overflow:hidden;
-	padding:0 0 1px 0;
-	text-align:left;
+	margin-top: -1px;
+	font: bold 80%/normal Verdana, sans-serif;
+	white-space: nowrap;
+	overflow: hidden;
+	padding: 0 0 1px 0;
+	text-align: left;
 }
 
 .tx-cal-controller .vevent dl {
-	margin:0;
-	padding:0 0 1px 0;
-	border-left:1px solid;
-	border-right:1px solid;
-	overflow:hidden;
+	margin: 0;
+	padding: 0 0 1px 0;
+	border-left: 1px solid;
+	border-right: 1px solid;
+	overflow: hidden;
 }
 
 .tx-cal-controller .vevent dd {
-	margin:0;
-	overflow:hidden;
-	padding:0 1px;
-	font:100%/1.3em Verdana,sans-serif;
-	text-align:left;
-	word-wrap:break-word;
+	margin: 0;
+	overflow: hidden;
+	padding: 0 1px;
+	font: 100%/1.3em Verdana, sans-serif;
+	text-align: left;
+	word-wrap: break-word;
 }
 
 .tx-cal-controller .gridcontainertop .vevent {
@@ -348,8 +346,8 @@
 
 .tx-cal-controller .weekview .vevent,
 .tx-cal-controller .dayview .vevent {
-	-moz-border-radius:3px;
-	position:absolute;
+	-moz-border-radius: 3px;
+	position: absolute;
 }
 
 .tx-cal-controller .weekview .allday .vevent,
@@ -378,22 +376,22 @@
 .tx-cal-controller .month-large div.vevent a:hover span.popup,
 .tx-cal-controller .month-medium .dayNum:hover span.popup {
 	position: absolute;
-	margin:15px 0px 0px 20px;
+	margin: 15px 0px 0px 20px;
 	background-color: #F5F5DC;
-	max-width:220px;
+	max-width: 220px;
 	border: 1px solid #C0C0C0;
 	font: normal 10px/12px verdana;
 	color: #000;
-	text-align:left;
+	text-align: left;
 	display: block;
 }
 
 /*------------ TODO ------------*/
 
 .tx-cal-controller .vtodo {
-	cursor:default;
-	color:#fff;
-	-moz-user-select:none;
+	cursor: default;
+	color: #fff;
+	-moz-user-select: none;
 }
 
 .tx-cal-controller .vtodo .freq {
@@ -401,29 +399,29 @@
 }
 
 .tx-cal-controller .vtodo dt {
-	margin-top:-1px;
-	font:bold 80%/normal Verdana,sans-serif;
-	white-space:nowrap;
-	overflow:hidden;
-	padding:0 0 1px 0;
-	text-align:left;
+	margin-top: -1px;
+	font: bold 80%/normal Verdana, sans-serif;
+	white-space: nowrap;
+	overflow: hidden;
+	padding: 0 0 1px 0;
+	text-align: left;
 }
 
 .tx-cal-controller .vtodo dl {
-	margin:0;
-	padding:0 0 1px 0;
-	border-left:1px solid;
-	border-right:1px solid;
-	overflow:hidden;
+	margin: 0;
+	padding: 0 0 1px 0;
+	border-left: 1px solid;
+	border-right: 1px solid;
+	overflow: hidden;
 }
 
 .tx-cal-controller .vtodo dd {
-	margin:0;
-	overflow:hidden;
-	padding:0 1px;
-	font:100%/1.3em Verdana,sans-serif;
-	text-align:left;
-	word-wrap:break-word;
+	margin: 0;
+	overflow: hidden;
+	padding: 0 1px;
+	font: 100%/1.3em Verdana, sans-serif;
+	text-align: left;
+	word-wrap: break-word;
 }
 
 .tx-cal-controller .gridcontainertop .vtodo {
@@ -432,8 +430,8 @@
 
 .tx-cal-controller .weekview .vtodo,
 .tx-cal-controller .dayview .vtodo {
-	-moz-border-radius:3px;
-	position:absolute;
+	-moz-border-radius: 3px;
+	position: absolute;
 }
 
 .tx-cal-controller .weekview .allday .vtodo,
@@ -462,51 +460,51 @@
 .tx-cal-controller .month-large div.vtodo a:hover span.popup,
 .tx-cal-controller .month-medium .dayNum:hover span.popup {
 	position: absolute;
-	margin:15px 0px 0px 20px;
+	margin: 15px 0px 0px 20px;
 	background-color: #F5F5DC;
-	max-width:220px;
+	max-width: 220px;
 	border: 1px solid #C0C0C0;
 	font: normal 10px/12px verdana;
 	color: #000;
-	text-align:left;
+	text-align: left;
 	display: block;
 }
 
 /*---------------- DAY & WEEK VIEW ------------------*/
 .tx-cal-controller .dayview,
 .tx-cal-controller .weekview {
-	border-left:5px solid #DCF0FA;
+	border-left: 5px solid #DCF0FA;
 	clear: both;
 }
 
 .tx-cal-controller .gridcontainer {
-	background:#f8f8f8;
-	position:relative;
-	-webkit-user-select:none;
-	-khtml-user-select:none;
+	background: #f8f8f8;
+	position: relative;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
 	overflow-y: visible;
 	height: 411px;
 	border-top: 10px solid #DCF0FA;
 }
 
 .tx-cal-controller .gridcontainertop {
-	table-layout:fixed;
-	width:100%;
-	background-color:#DCF0FA;
-	overflow:hidden;
-	font-size:11px;
-	line-height:14px;
+	table-layout: fixed;
+	width: 100%;
+	background-color: #DCF0FA;
+	overflow: hidden;
+	font-size: 11px;
+	line-height: 14px;
 	border-bottom: 10px solid #DCF0FA;
 }
 
 .tx-cal-controller .gridcontainertop .allday {
-	table-layout:fixed;
-	width:100%;
+	table-layout: fixed;
+	width: 100%;
 }
 
 .tx-cal-controller .gridcontainertop td {
-	height:20px;
-	vertical-align:top;
+	height: 20px;
+	vertical-align: top;
 	background-color: #FFFFFF;
 }
 
@@ -520,28 +518,28 @@
 
 .tx-cal-controller .gridcontainertop .daynames td {
 	width: 40px;
-	background-color:#DCF0FA;
+	background-color: #DCF0FA;
 }
 
 .tx-cal-controller .scrolltime {
-	position:relative;
-	overflow-y:scroll;
-	overflow-x:hidden;
-	border-top:1px solid #DCF0FA;
-	border-left:0 none;
-	border-bottom:1px solid #DCF0FA;
-	padding:0;
-	font-size:11px;
-	line-height:normal;
+	position: relative;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	border-top: 1px solid #DCF0FA;
+	border-left: 0 none;
+	border-bottom: 1px solid #DCF0FA;
+	padding: 0;
+	font-size: 11px;
+	line-height: normal;
 	height: 357px;
 }
 
 .tx-cal-controller .scrolltime .timetable {
-	background-color:#fff;
-	table-layout:fixed;
-	width:100%;
-	margin-top:-1px;
-	border-bottom:1px solid #bcf;
+	background-color: #fff;
+	table-layout: fixed;
+	width: 100%;
+	margin-top: -1px;
+	border-bottom: 1px solid #bcf;
 }
 
 .tx-cal-controller .scrolltime .timetable .width {
@@ -549,34 +547,34 @@
 }
 
 .tx-cal-controller .scrolltime .timetable .wrapper {
-	position:relative;
-	margin-left:1px;
-	top:3px;
+	position: relative;
+	margin-left: 1px;
+	top: 3px;
 }
 
 .tx-cal-controller .scrolltime .timetable .wrapper .hours {
-	position:absolute;
-	width:100%;
+	position: absolute;
+	width: 100%;
 }
 
 .tx-cal-controller .scrolltime .timetable .wrapper .hours .cell {
-	height:42px;
+	height: 42px;
 }
 
 .tx-cal-controller .scrolltime .timetable .wrapper .hours .cell .line {
 	border-bottom: 1px dotted #ddd;
-	border-top:1px solid #ddd;
-	font-size:1px;
-	height:20px;
-	margin-bottom:20px;
+	border-top: 1px solid #ddd;
+	font-size: 1px;
+	height: 20px;
+	margin-bottom: 20px;
 }
 
 .tx-cal-controller .scrolltime .timetable .times {
-	background-color:#f6f9fc;
-	color:#666;
-	padding:1px 0 0 0;
-	text-align:right;
-	vertical-align:top;
+	background-color: #f6f9fc;
+	color: #666;
+	padding: 1px 0 0 0;
+	text-align: right;
+	vertical-align: top;
 }
 
 .tx-cal-controller .scrolltime .timetable .times div {
@@ -588,15 +586,15 @@
 }
 
 .tx-cal-controller .scrolltime .timetable .event-column {
-	border-left:1px solid #ddd;
-	vertical-align:top;
+	border-left: 1px solid #ddd;
+	vertical-align: top;
 }
 
 .tx-cal-controller .scrolltime .timetable .event-column .wrapper {
-	position:relative;
-	cursor:default;
-	position:relative;
-	margin-right:10px;
+	position: relative;
+	cursor: default;
+	position: relative;
+	margin-right: 10px;
 }
 
 /*------------ GENERAL Category styles ------------*/
@@ -621,9 +619,9 @@
 .tx-cal-controller div.grey_catheader_allday,
 .tx-cal-controller div.fnb_header dl,
 .tx-cal-controller div.fnb_header_allday {
-	-moz-border-radius:3px;
-  padding-left: 0.2em;
-  opacity: 0.9;
+	-moz-border-radius: 3px;
+	padding-left: 0.2em;
+	opacity: 0.9;
 }
 
 .tx-cal-controller div.default_catheader dt,
@@ -636,7 +634,7 @@
 .tx-cal-controller div.brown_catheader dt,
 .tx-cal-controller div.grey_catheader dt,
 .tx-cal-controller div.fnb_header dt {
-	font-size:xx-small;
+	font-size: xx-small;
 }
 
 .tx-cal-controller div.default_catheader dd,
@@ -671,10 +669,10 @@
 .tx-cal-controller .alldays .vevent .grey_catheader_text,
 .tx-cal-controller .alldays .vtodo .grey_catheader_text,
 .tx-cal-controller .alldays .vevent .fnb_header_text,
-.tx-cal-controller .alldays .vtodo .fnb_header_text, 
+.tx-cal-controller .alldays .vtodo .fnb_header_text,
 .tx-cal-controller .allday.vevent span:first-child,
 .tx-cal-controller .allday.vtodo span:first-child {
-	color:#FFFFFF;
+	color: #FFFFFF;
 }
 
 /* available colors: yellow, orange, red, pink, blue (default), green, brown, grey
@@ -706,10 +704,10 @@
 .tx-cal-controller .vevent .default_catheader_text,
 .tx-cal-controller .vevent .blue_catheader_text,
 .tx-cal-controller .vtodo .default_catheader_text,
-.tx-cal-controller .vtodo .blue_catheader_text{
+.tx-cal-controller .vtodo .blue_catheader_text {
 	color: #668CD9;
 }
-				
+
 /*------------ GREEN ------------*/
 
 .tx-cal-controller div.green_catheader dl,
@@ -759,7 +757,7 @@
 }
 
 /*------------ PINK ------------*/
-		
+
 .tx-cal-controller div.pink_catheader dl,
 .tx-cal-controller div.pink_catheader_allday {
 	border: 1px solid #B1365F;
@@ -805,7 +803,7 @@
 .tx-cal-controller .vtodo .red_catheader_text a {
 	color: #D96666;
 }
-		
+
 /*------------ YELLOW ------------*/
 
 .tx-cal-controller div.yellow_catheader dl,
@@ -829,7 +827,7 @@
 .tx-cal-controller .vtodo .yellow_catheader_text a {
 	color: #E0C240;
 }
-		
+
 /*------------ GREY ------------*/
 
 .tx-cal-controller div.grey_catheader dl,
@@ -877,7 +875,7 @@
 .tx-cal-controller .vtodo .fnb_header_text a {
 	color: #8997A5;
 }
-		
+
 /*------------ color style package end ------------*/
 
 /*--- TODO: to be checked from here on to the end!! ---*/
@@ -894,10 +892,10 @@
 
 .tx-cal-controller .list-view .vevent .dtstart-container,
 .tx-cal-controller .list-view .vtodo .dtstart-container {
-	float:left;
-	margin-right:1em;
-	text-align:right;
-	width:12em;
+	float: left;
+	margin-right: 1em;
+	text-align: right;
+	width: 12em;
 }
 
 .tx-cal-controller .list-view .vevent .summary,
@@ -907,30 +905,28 @@
 .tx-cal-controller h1, .tx-cal-controller .found, .tx-cal-controller .pagebrowser {
 	text-align: center;
 }
-		
-/*------------- fe-editing styles ------------*/		
-		
+
+/*------------- fe-editing styles ------------*/
+
 .tx-cal-controller .cal_required {
 	color: red;
 }
 
 .tx-cal-controller .constrain {
 	color: red;
-	font-weight:bold;
+	font-weight: bold;
 }
-
 
 #editorWrap1 textarea {
 	display: block
 }
-
 
 /*Credits: By Santosh Setty (http://webdesigninfo.wordpress.com) */
 /*Posted to: Dynamic Drive CSS Library (http://www.dynamicdrive.com/style/) */
 
 .tx-cal-controller .create-edit-event .tabcontent label {
 	display: inline-block;
-	vertical-align:top;
+	vertical-align: top;
 	width: 6em;
 }
 
@@ -975,20 +971,20 @@
 
 .tx-cal-controller .tabcontainer {
 	clear: left;
-	width:95%; /*width of 2nd level sub menus*/
-	height:1.5em; /*height of 2nd level sub menus. Set to largest's sub menu's height to avoid jittering.*/
+	width: 95%; /*width of 2nd level sub menus*/
+	height: 1.5em; /*height of 2nd level sub menus. Set to largest's sub menu's height to avoid jittering.*/
 }
 
 .tx-cal-controller .tabcontent {
-	display:none;
+	display: none;
 }
 
-#tx_cal_controller_create_element input[type="text"]:not([size]) { 
-	width: 6em;    /* Desired width of input field */
+#tx_cal_controller_create_element input[type="text"]:not([size]) {
+	width: 6em; /* Desired width of input field */
 }
 
 #tx_cal_controller_create_element .treelevel0 {
-	display:block;
+	display: block;
 	margin-left: 70px;
 }
 
@@ -999,12 +995,12 @@
 #tx_cal_controller_create_element .notify,
 #tx_cal_controller_create_element .shared,
 #tx_cal_controller_create_element .exception {
-	display:block;
+	display: block;
 	margin-left: 140px;
 }
-		
+
 #allday {
-	width:10px;
+	width: 10px;
 }
 
 #until label,
@@ -1028,7 +1024,7 @@
 }
 
 .tx-cal-controller .tabcontent table > tbody > tr > td {
-	vertical-align:top;
+	vertical-align: top;
 	padding-right: 1em;
 	padding-bottom: 1em;
 	border-bottom: 1px solid #999999;

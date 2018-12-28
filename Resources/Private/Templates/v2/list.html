@@ -13,7 +13,7 @@
 					<f:for each="{entriesOfADay}" as="entriesOfAnHour">
 						<f:for each="{entriesOfAnHour}" as="event">
 							<f:render partial="List/event"
-								arguments="{event:event, settings:settings}" />
+												arguments="{event:event, settings:settings}"/>
 						</f:for>
 					</f:for>
 				</f:for>
@@ -21,7 +21,7 @@
 		</f:then>
 		<f:else>
 			<f:translate
-				key="LLL:EXT:cal/Resources/Private/Language/locallang.xml:l_no_results" />
+				key="LLL:EXT:cal/Resources/Private/Language/locallang.xml:l_no_results"/>
 		</f:else>
 	</f:if>
 </div>
