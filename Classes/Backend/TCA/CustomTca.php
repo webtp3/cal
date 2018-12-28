@@ -17,8 +17,6 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
 
 /**
  * Backend class for user-defined TCA type used in recurring event setup.
- *
- * @author Jeff Segars <jeff@webempoweredchurch.org>
  */
 class CustomTca
 {

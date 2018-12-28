@@ -12,11 +12,6 @@
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * Module 'Indexer' for the 'cal' extension.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 $MCONF['name'] = 'tools_calrecurrencegenerator';
 
 $MCONF['access'] = 'admin';

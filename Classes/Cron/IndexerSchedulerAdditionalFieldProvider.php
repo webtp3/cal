@@ -19,8 +19,6 @@ use TYPO3\CMS\Scheduler\Task\AbstractTask;
 
 /**
  * Additional BE fields for cal recurring event indexer task.
- *
- * @author Mario Matzulla <mario@matzullas.de>
  */
 class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProviderInterface
 {

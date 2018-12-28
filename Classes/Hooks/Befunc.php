@@ -18,8 +18,6 @@ namespace TYPO3\CMS\Cal\Hooks;
 /**
  * This hook extends the befunc class.
  * It changes the date values in the list view for tx_cal_event and tx_cal_exception_event
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class Befunc
 {

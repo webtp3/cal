@@ -19,8 +19,6 @@ use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
  * Extends the PEAR date class and adds a compareTo method.
- *
- * @author Mario Matzulla <mario@matzullas.de>
  */
 class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
 {

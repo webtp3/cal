@@ -18,8 +18,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This is a collection of many useful functions
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class Functions
 {

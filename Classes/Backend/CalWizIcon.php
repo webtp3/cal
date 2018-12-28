@@ -15,9 +15,6 @@ namespace TYPO3\CMS\Cal\Backend;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class CalWizIcon
 {
     public function proc($wizardItems)

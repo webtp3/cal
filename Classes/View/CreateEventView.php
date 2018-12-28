@@ -19,8 +19,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A service which renders a form to create / edit a phpicalendar event.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
 {

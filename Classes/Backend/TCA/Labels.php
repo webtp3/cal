@@ -16,9 +16,6 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 
-/**
- * @author Steffen Kamper <info(at)sk-typo3.de>
- */
 class Labels
 {
     public function getEventRecordLabel(&$params, &$pObj)

@@ -19,8 +19,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * API for calendar base (cal)
- *
- * @author Mario Matzulla <mario@matzullas.de>
  */
 class Api
 {

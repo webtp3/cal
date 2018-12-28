@@ -17,11 +17,6 @@ namespace TYPO3\CMS\Cal\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * A concrete model for the calendar.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class EventModel extends \TYPO3\CMS\Cal\Model\Model
 {
     public $location;

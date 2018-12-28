@@ -15,11 +15,6 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * Base model for the day.
- *
- * @author Mario Matzulla <mario@matzullas.de>
- */
 abstract class NewTimeView
 {
     private $day;

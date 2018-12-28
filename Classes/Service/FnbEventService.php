@@ -17,8 +17,6 @@ namespace TYPO3\CMS\Cal\Service;
 
 /**
  * A concrete model for the calendar.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
 {

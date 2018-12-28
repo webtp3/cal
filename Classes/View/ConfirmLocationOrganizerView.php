@@ -18,8 +18,6 @@ use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
  * A service which renders a form to confirm the location/organizer create/edit.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class ConfirmLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
 {

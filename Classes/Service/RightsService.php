@@ -17,8 +17,6 @@ namespace TYPO3\CMS\Cal\Service;
 
 /**
  * This class handles all cal(endar)-rights of a current logged-in user
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class RightsService extends \TYPO3\CMS\Cal\Service\BaseService
 {

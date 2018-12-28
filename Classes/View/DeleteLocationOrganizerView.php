@@ -18,8 +18,6 @@ use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
  * A service which renders a form to create / edit a location or organizer.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class DeleteLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
 {

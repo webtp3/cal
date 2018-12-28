@@ -20,8 +20,6 @@ use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
  * Base model for the calendar.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- *
- * @author Jeff Segars <jeff@webempoweredchurch.org>
  */
 class Model extends \TYPO3\CMS\Cal\Model\BaseModel
 {

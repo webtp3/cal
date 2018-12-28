@@ -26,8 +26,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Module 'Indexer' for the 'cal' extension.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 {

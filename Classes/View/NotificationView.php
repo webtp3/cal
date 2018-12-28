@@ -16,9 +16,6 @@ namespace TYPO3\CMS\Cal\View;
  */
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * @author Mario Matzulla <mario@matzullas.de>
- */
 class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
 {
     public $mailer;

@@ -18,8 +18,6 @@ use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 
 /**
  * date parser
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class DateParser
 {

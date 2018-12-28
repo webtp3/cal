@@ -20,8 +20,6 @@ namespace TYPO3\CMS\Cal\Controller;
  * Takes requests from the main
  * controller and starts rendering in the appropriate calendar view by
  * utilizing TYPO3 services.
- *
- * @author Jeff Segars <jeff@webempoweredchurch.org>
  */
 class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
 {

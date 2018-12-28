@@ -17,9 +17,6 @@ namespace TYPO3\CMS\Cal\View\Module;
 use TYPO3\CMS\Cal\Service\AbstractModul;
 use TYPO3\CMS\Cal\Utility\Functions;
 
-/**
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class OrganizerLoader extends AbstractModul
 {
 

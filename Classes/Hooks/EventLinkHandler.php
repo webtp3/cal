@@ -15,11 +15,6 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * TODO
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class EventLinkHandler
 {
     public function main($linktxt, $conf, $linkHandlerKeyword, $linkHandlerValue, $link_param, & $pObj)

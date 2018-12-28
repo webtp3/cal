@@ -15,9 +15,6 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * @author Mario Matzulla <mario@matzullas.de>
- */
 class BaseController
 {
     public $cObj;

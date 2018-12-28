@@ -20,8 +20,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Base model for the calendar organizer.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- *
- * @author Mario Matzulla <mario@matzullas.de>
  */
 class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
 {

@@ -18,8 +18,6 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
 /**
  * This function displays a selector with nested categories.
  * The original code is borrowed from the extension "Digital Asset Management" (tx_dam) author: Rene© Fritz <r.fritz@colorcube.de>
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 
 /**

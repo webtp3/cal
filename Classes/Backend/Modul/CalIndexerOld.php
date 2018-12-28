@@ -18,11 +18,6 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Module 'Indexer' for the 'cal' extension.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 {
     public $pageinfo;

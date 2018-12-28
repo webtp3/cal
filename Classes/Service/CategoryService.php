@@ -19,8 +19,6 @@ namespace TYPO3\CMS\Cal\Service;
  * Base model for the category.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- *
- * @author Mario Matzulla <mario@matzullas.de>
  */
 class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
 {

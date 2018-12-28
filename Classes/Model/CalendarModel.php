@@ -15,9 +15,6 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * * @author Mario Matzulla <mario@matzullas.de>
- */
 class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
 {
     public $row = [];

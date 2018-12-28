@@ -17,11 +17,6 @@ namespace TYPO3\CMS\Cal\Service;
 use TYPO3\CMS\Cal\Controller\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * A base service.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
 {
     public $cObj; // The backReference to the mother cObj object set at call time

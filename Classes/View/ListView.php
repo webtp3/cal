@@ -19,8 +19,6 @@ use TYPO3\CMS\Cal\Utility\Functions;
 /**
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class ListView extends \TYPO3\CMS\Cal\View\BaseView
 {

@@ -16,11 +16,6 @@ namespace TYPO3\CMS\Cal\Model;
  */
 use TYPO3\CMS\Cal\Utility\Functions;
 
-/**
- * A concrete model for the calendar.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class TodoRecModel extends \TYPO3\CMS\Cal\Model\EventRecModel
 {
     public function __construct($todo, $start, $end)

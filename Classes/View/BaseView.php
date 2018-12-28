@@ -18,11 +18,6 @@ use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * TODO
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
 {
     public $tempATagParam;

@@ -18,8 +18,6 @@ use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 
 /**
  * This class combines all the time related functions
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class Calendar
 {

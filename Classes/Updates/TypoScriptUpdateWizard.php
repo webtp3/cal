@@ -17,8 +17,6 @@ namespace TYPO3\CMS\Cal\Updates;
 
 /**
  * Update wizzard after move of typoscript templates from EXT:cal/static/ to EXT:cal/Configuration/TypoScript/
- *
- * @author Mario Matzulla <mario@matzullas.de>
  */
 class TypoScriptUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate
 {

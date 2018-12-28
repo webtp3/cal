@@ -18,9 +18,6 @@ use OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * @author Jeff Segars <jeff@webempoweredchurch.org>
- */
 class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
 {
     public function __construct()

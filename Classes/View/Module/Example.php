@@ -15,9 +15,6 @@ namespace TYPO3\CMS\Cal\View\Module;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class Example extends \TYPO3\CMS\Cal\View\BaseView
 {
     public function start(&$moduleCaller)

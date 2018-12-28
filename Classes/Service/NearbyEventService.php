@@ -15,11 +15,6 @@ namespace TYPO3\CMS\Cal\Service;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * A concrete model for the calendar.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class NearbyEventService extends \TYPO3\CMS\Cal\Service\EventService
 {
     public function __construct()

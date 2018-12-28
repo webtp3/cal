@@ -18,8 +18,6 @@ namespace TYPO3\CMS\Cal\Updates;
 /**
  * Basic upgrade wizard which goes through all files referenced in the {defined} field
  * and creates sys_file records as well as sys_file_reference records for the individual usages.
- *
- * @author Mario Matzulla <mario@matzullas.de>
  */
 abstract class AbstractUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate
 {

@@ -18,8 +18,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A service which serves as base for all fe-editing clases.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
 {

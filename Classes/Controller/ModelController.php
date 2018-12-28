@@ -21,8 +21,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Takes requests from the main
  * controller and starts processing in the appropriate calendar models by
  * utilizing TYPO3 services.
- *
- * @author Jeff Segars <jeff@webempoweredchurch.org>
  */
 class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
 {

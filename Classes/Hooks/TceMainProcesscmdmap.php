@@ -20,8 +20,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * This hook extends the tcemain class.
  * It catches changes on tx_cal_event
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class TceMainProcesscmdmap
 {

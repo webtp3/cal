@@ -16,9 +16,6 @@ namespace TYPO3\CMS\Cal\View;
  */
 use TYPO3\CMS\Cal\Utility\Functions;
 
-/**
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class MeetingManagerView extends \TYPO3\CMS\Cal\View\BaseView
 {
     public function __construct()

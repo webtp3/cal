@@ -18,8 +18,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * URI Handling class based on TYPO3s original t3lib::htmlmail class
- *
- * @author Thomas Kowtsch
  */
 class UriHandler
 {

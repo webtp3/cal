@@ -18,11 +18,6 @@ use TYPO3\CMS\Cal\Controller\DateParser;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * A concrete model for the calendar.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class EventService extends \TYPO3\CMS\Cal\Service\BaseService
 {
     public $location;

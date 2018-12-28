@@ -22,9 +22,6 @@ define(
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'Classes/Model/ICalendar.php'
 );
 
-/**
- * @author Mario Matzulla <mario@matzullas.de>
- */
 class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
 {
     public function __construct()

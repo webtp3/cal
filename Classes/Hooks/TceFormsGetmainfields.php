@@ -19,8 +19,6 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 /**
  * This hook extends the tcemain class.
  * It catches changes on tx_cal_event
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class TceFormsGetmainfields
 {

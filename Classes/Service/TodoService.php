@@ -16,11 +16,6 @@ namespace TYPO3\CMS\Cal\Service;
  */
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * A concrete model for the calendar.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
 class TodoService extends \TYPO3\CMS\Cal\Service\EventService
 {
     public function __construct()

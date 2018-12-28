@@ -15,17 +15,6 @@ namespace TYPO3\CMS\Cal\Utility;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-/**
- * class.tx_cal_cache.php
- *
- * @author Mario Matzulla <mario@matzullas.de>
- */
-
-/**
- *[ Add description ]
- *
- * @author Mario Matzulla <mario@matzullas.de>
- */
 class Cache
 {
     public $cachingEngine;

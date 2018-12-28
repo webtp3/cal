@@ -17,8 +17,6 @@ namespace TYPO3\CMS\Cal\View;
 
 /**
  * Base model for the day.
- *
- * @author Mario Matzulla <mario@matzullas.de>
  */
 class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
 {

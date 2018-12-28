@@ -17,8 +17,6 @@ namespace TYPO3\CMS\Cal\Model;
 
 /**
  * A concrete model for the calendar.
- *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
 class EventRecDeviationModel extends EventModel
 {

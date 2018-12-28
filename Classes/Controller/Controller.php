@@ -20,8 +20,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Main controller for the calendar base.
  * All requests come through this class
  * and are routed to the model and view layers for processing.
- *
- * @author Jeff Segars <jeff@webempoweredchurch.org>
  */
 class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 {

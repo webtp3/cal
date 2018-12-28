@@ -17,9 +17,6 @@ namespace TYPO3\CMS\Cal\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * @author Mario Matzulla <mario@matzullas.de>
- */
 abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
 {
     public $prefixId = 'tx_cal_controller';

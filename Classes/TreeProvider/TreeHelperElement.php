@@ -16,10 +16,6 @@ namespace TYPO3\CMS\Cal\TreeProvider;
  */
 
 /**
- * @author Mario Matzulla <mario(at)matzullas.de>
- */
-
-/**
  * this class displays a tree selector with nested tt_news categories.
  */
 class TreeHelperElement extends \TYPO3\CMS\Backend\Form\Element\AbstractFormElement

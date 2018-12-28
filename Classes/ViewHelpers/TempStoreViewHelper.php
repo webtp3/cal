@@ -32,7 +32,6 @@ class Tx_Cal_ViewHelpers_TempStoreViewHelper extends Tx_Fluid_Core_ViewHelper_Ab
      * @param object $set The object to set
      * @param object $get The object to set
      * @return object If $get is defined an object will be returned (if found in the store)
-     * @author Mario Matzulla <mario@matzullas.de>
      */
     public function render($key = null, $set = null, $get = null)
     {
