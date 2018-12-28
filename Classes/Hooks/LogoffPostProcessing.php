@@ -16,6 +16,10 @@ namespace TYPO3\CMS\Cal\Hooks;
  */
 class LogoffPostProcessing
 {
+    /**
+     * @param $params
+     * @param $pObj
+     */
     public function clearSessionApiAfterLogin($params, &$pObj)
     {
         if ($_COOKIE['fe_typo_user']) {
@@ -34,6 +38,10 @@ class LogoffPostProcessing
         }
     }
 
+    /**
+     * @param $_params
+     * @param $pObj
+     */
     public function clearSessionApiAfterLogoff($_params, &$pObj)
     {
         if (\TYPO3\CMS\Core\Utility\GeneralUtility::_GP('logintype') === 'logout' && $_COOKIE['fe_typo_user']) {

@@ -2,6 +2,10 @@
 
 namespace TYPO3\CMS\Cal\View;
 
+use TYPO3\CMS\Cal\Controller\Calendar;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,8 +18,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
+class NewMonthView extends NewTimeView
 {
     protected $weeks;
     protected $maxWeeksInYear = 52;
@@ -32,40 +35,34 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         $this->setMonth(intval($month));
         $this->setYear(intval($year));
         $this->generateWeeks();
-        $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $controller = &Registry::Registry('basic', 'controller');
         $controller->cache->set($month . '_' . $year, serialize($this), 'month', 60 * 60 * 24 * 365 * 100);
     }
 
+    /**
+     * @param $month
+     * @param $year
+     * @return NewMonthView
+     */
     public static function getMonthView($month, $year)
     {
-        $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $controller = &Registry::Registry('basic', 'controller');
         $cache = $controller->cache->get($month . '_' . $year);
-        // 		if ($cache != '') {
-        // 			try {
-        // 				$return = unserialize ($cache);
-        // 				if ($return === FALSE) {
-        // 					// debug('could not unserialize cache for month:'.$month.'_'.$year);
-        // 				}
-        // 				return $return;
-        // 			} catch (\Exception $e){
-
-        // 			}
-        // 		}
         return new NewMonthView($month, $year);
     }
 
     private function generateWeeks()
     {
-        $date = new \TYPO3\CMS\Cal\Model\CalDate();
+        $date = new CalDate();
         $date->setDay(1);
         $date->setMonth($this->getMonth());
         $date->setYear($this->getYear());
         $this->monthStartWeekdayNum = $date->format('%w');
         $this->monthLength = $date->getDaysInMonth();
-        $monthEnd = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndMonthTime($date);
+        $monthEnd = Calendar::calculateEndMonthTime($date);
 
         $weekEnd = $monthEnd->getWeekOfYear();
-        $newDate = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartWeekTime($date);
+        $newDate = Calendar::calculateStartWeekTime($date);
 
         $this->weeks = [];
         $weekNumber = $newDate->getWeekOfYear();
@@ -73,13 +70,13 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         if ($this->getMonth() == 12 && $weekEnd == 1) {
             do {
                 if ($weekNumber == $weekEnd) {
-                    $this->weeks[($newDate->getYear() + 1) . '_' . $weekNumber] = new \TYPO3\CMS\Cal\View\NewWeekView(
+                    $this->weeks[($newDate->getYear() + 1) . '_' . $weekNumber] = new NewWeekView(
                         $weekNumber,
                         $newDate->getYear() + 1,
                         $this->getMonth()
                     );
                 } else {
-                    $this->weeks[$newDate->getYear() . '_' . $weekNumber] = new \TYPO3\CMS\Cal\View\NewWeekView(
+                    $this->weeks[$newDate->getYear() . '_' . $weekNumber] = new NewWeekView(
                         $weekNumber,
                         $newDate->getYear(),
                         $this->getMonth()
@@ -95,13 +92,13 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         } elseif ($this->getMonth() == 1) {
             do {
                 if ($weekNumber > 6) {
-                    $this->weeks[$newDate->getYear() . '_' . $weekNumber] = new \TYPO3\CMS\Cal\View\NewWeekView(
+                    $this->weeks[$newDate->getYear() . '_' . $weekNumber] = new NewWeekView(
                         $weekNumber,
                         $newDate->getYear(),
                         $this->getMonth()
                     );
                 } else {
-                    $this->weeks[$this->getYear() . '_' . $weekNumber] = new \TYPO3\CMS\Cal\View\NewWeekView(
+                    $this->weeks[$this->getYear() . '_' . $weekNumber] = new NewWeekView(
                         $weekNumber,
                         $this->getYear(),
                         $this->getMonth()
@@ -112,7 +109,7 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
             } while ($weekNumber <= $weekEnd && $newDate->year == $this->getYear());
         } else {
             do {
-                $this->weeks[$this->getYear() . '_' . $weekNumber] = new \TYPO3\CMS\Cal\View\NewWeekView(
+                $this->weeks[$this->getYear() . '_' . $weekNumber] = new NewWeekView(
                     $weekNumber,
                     $newDate->getYear(),
                     $this->getMonth()
@@ -124,6 +121,9 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         $this->maxWeeksInYear = max($this->maxWeeksInYear, $weekNumber);
     }
 
+    /**
+     * @param $event
+     */
     public function addEvent(&$event)
     {
         $eventStartWeek = $event->getStart()->getWeekOfYear();
@@ -154,6 +154,13 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         } while (!(($eventStartYear == $eventEndYear && $eventStartWeek > $eventEndWeek) || ($eventStartYear > $eventEndYear)));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getWeeksMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $content = '';
@@ -163,6 +170,13 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         $sims['###WEEKS###'] = $content;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getWeekdaysMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->setMySubpart('MONTH_WEEKDAYS_SUBPART');
@@ -173,6 +187,9 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         $this->setMySubpart('MONTH_SUBPART');
     }
 
+    /**
+     * @param $dateObject
+     */
     public function setSelected(&$dateObject)
     {
         if ($dateObject->year == $this->getYear() && $dateObject->month == $this->getMonth()) {
@@ -185,6 +202,9 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         }
     }
 
+    /**
+     * @param $dateObject
+     */
     public function setCurrent(&$dateObject)
     {
         if ($dateObject->year == $this->getYear() && $dateObject->month == $this->getMonth()) {
@@ -197,15 +217,25 @@ class NewMonthView extends \TYPO3\CMS\Cal\View\NewTimeView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getMonthTitleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $current_month = new \TYPO3\CMS\Cal\Model\CalDate();
+        $current_month = new CalDate();
         $current_month->setMonth($this->getMonth());
         $current_month->setYear($this->getYear());
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         $sims['###MONTH_TITLE###'] = $current_month->format($conf['view.'][$view . '.']['dateFormatMonth']);
     }
 
+    /**
+     * @return bool
+     */
     public function hasEvents()
     {
         return !empty($this->getEvents()) || $this->getHasAlldayEvents();

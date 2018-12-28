@@ -2,6 +2,10 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Utility\Functions;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -18,12 +22,20 @@ namespace TYPO3\CMS\Cal\Service;
 /**
  * A concrete model for the calendar.
  */
-class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
+class FnbEventService extends EventService
 {
     protected $fnbCalendarSearchString;
     protected $calendarIds;
     protected $calendarOwner;
 
+    /**
+     * @param $start_date
+     * @param $end_date
+     * @param $pidList
+     * @param string $eventType
+     * @param string $additionalWhere
+     * @return array
+     */
     public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '0,1,2,3', $additionalWhere = '')
     {
 
@@ -40,7 +52,7 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
         $this->setStartAndEndPoint($start_date, $end_date);
         $dontShowOldEvents = (integer)$this->conf['view.'][$this->conf['view'] . '.']['dontShowOldEvents'];
         if ($dontShowOldEvents > 0) {
-            $now = new \TYPO3\CMS\Cal\Model\CalDate();
+            $now = new CalDate();
             if ($dontShowOldEvents == 2) {
                 $now->setHour(0);
                 $now->setMinute(0);
@@ -117,6 +129,12 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
         );
     }
 
+    /**
+     * @param $pidList
+     * @param $includePublic
+     * @param $linkIds
+     * @return string
+     */
     public function getFreeAndBusyCalendarSearchString($pidList, $includePublic, $linkIds)
     {
         $hash = md5($pidList . ' ' . $includePublic . ' ' . $linkIds);
@@ -203,6 +221,14 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
         return $this->calendarOwner;
     }
 
+    /**
+     * @param $list
+     * @param $pidList
+     * @param $includePublic
+     * @param bool $includeData
+     * @param bool $onlyPublic
+     * @return array
+     */
     public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false)
     {
         $this->calendarIds = [];
@@ -231,7 +257,7 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
             $select = 'tx_cal_calendar.uid';
         }
 
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('tx_cal_calendar');
+        $orderBy = Functions::getOrderBy('tx_cal_calendar');
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
             'tx_cal_calendar_fnb_user_group_mm.uid_local',
             'tx_cal_calendar_fnb_user_group_mm LEFT JOIN tx_cal_calendar ON tx_cal_calendar.uid=tx_cal_calendar_fnb_user_group_mm.uid_local',
@@ -287,9 +313,14 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
         return $this->calendarIds;
     }
 
+    /**
+     * @param $row
+     * @param $isException
+     * @return EventModel
+     */
     public function createEvent($row, $isException)
     {
-        $event = new \TYPO3\CMS\Cal\Model\EventModel($row, $isException, $this->getServiceKey());
+        $event = new EventModel($row, $isException, $this->getServiceKey());
         $event->row['isFreeAndBusyEvent'] = 1;
         return $event;
     }

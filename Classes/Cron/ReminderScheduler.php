@@ -15,7 +15,10 @@
 namespace TYPO3\CMS\Cal\Cron;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Error\Http\PageNotFoundException;
+use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\FailedExecutionException;
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
@@ -28,15 +31,10 @@ class ReminderScheduler extends AbstractTask
     public $uid;
 
     /**
-     * PHP4 wrapper for constructor,
-     * have to be here evne though the constructor is not defined in the derived class,
-     * else the constructor of the parent class will not be called in PHP4
+     * @return bool
+     * @throws PageNotFoundException
+     * @throws ServiceUnavailableException
      */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function execute()
     {
         $event = BackendUtility::getRecord('tx_cal_event', $this->uid);
@@ -96,8 +94,8 @@ class ReminderScheduler extends AbstractTask
         $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
         if ($page['doktype'] != 254) {
-            /** @var \TYPO3\CMS\Cal\Controller\Api $calAPI */
-            $calAPI = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\Api');
+            /** @var Api $calAPI */
+            $calAPI = GeneralUtility::makeInstance(Api::class);
             $calAPI = &$calAPI->tx_cal_api_without($pageIDForPlugin);
 
             $eventObject = $calAPI->modelObj->findEvent(
@@ -120,11 +118,17 @@ class ReminderScheduler extends AbstractTask
         throw new FailedExecutionException($message, 1250596541);
     }
 
+    /**
+     * @return mixed
+     */
     public function getUID()
     {
         return $this->uid;
     }
 
+    /**
+     * @param $uid
+     */
     public function setUID($uid)
     {
         $this->uid = $uid;

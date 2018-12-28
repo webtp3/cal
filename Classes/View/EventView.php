@@ -20,13 +20,8 @@ use TYPO3\CMS\Cal\Utility\Functions;
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class EventView extends \TYPO3\CMS\Cal\View\BaseView
+class EventView extends BaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Draws a single event.
      *

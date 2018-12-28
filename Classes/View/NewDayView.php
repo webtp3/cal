@@ -2,6 +2,9 @@
 
 namespace TYPO3\CMS\Cal\View;
 
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -18,7 +21,7 @@ namespace TYPO3\CMS\Cal\View;
 /**
  * Base model for the day.
  */
-class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
+class NewDayView extends NewTimeView
 {
     private $hasAlldayEvents = false;
     private $Ymd;
@@ -27,6 +30,10 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
 
     /**
      * Constructor.
+     * @param $day
+     * @param $month
+     * @param $year
+     * @param int $parentMonth
      */
     public function __construct($day, $month, $year, $parentMonth = -1)
     {
@@ -35,7 +42,7 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         $this->setDay(intval($day));
         $this->setMonth(intval($month));
         $this->setYear(intval($year));
-        $date = new \TYPO3\CMS\Cal\Model\CalDate();
+        $date = new CalDate();
         $date->setDay($this->getDay());
         $date->setMonth($this->getMonth());
         $date->setYear($this->getYear());
@@ -49,14 +56,21 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         }
     }
 
+    /**
+     * @param $event
+     */
     public function addEvent(&$event)
     {
-        // if (($event->isAllday())&&($event->getStart()->format('%Y%m%d')!=$this->Ymd) ) {
-        // } else {
         $this->events[$event->getStart()->format('%H%M')][$event->getUid()] = &$event;
-        // }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $content = '';
@@ -73,11 +87,18 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         $sims['###EVENTS###'] = $content;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventsColumnMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $content = '';
 
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         $dayStart = $conf['view.']['day.']['dayStart']; // '0700'; // Start time for day grid
         $dayEnd = $conf['view.']['day.']['dayEnd']; // '2300'; // End time for day grid
         $gridLength = $conf['view.']['day.']['gridLength']; // '15'; // Grid distance in minutes for day view, multiples of 15 preferred
@@ -92,13 +113,13 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
             $gridLength = 15;
         }
 
-        $d_start = new \TYPO3\CMS\Cal\Model\CalDate($this->getYmd() . $dayStart);
+        $d_start = new CalDate($this->getYmd() . $dayStart);
         $d_start->setTZbyId('UTC');
-        $d_end = new \TYPO3\CMS\Cal\Model\CalDate($this->getYmd() . $dayEnd);
+        $d_end = new CalDate($this->getYmd() . $dayEnd);
         $d_end->setTZbyId('UTC');
 
         // splitting the events into H:M, to find out if events run in parallel
-        $i = new \TYPO3\CMS\Cal\Model\CalDate();
+        $i = new CalDate();
         $eventArray = [];
         $viewArray = [];
         $positionArray = [];
@@ -117,7 +138,7 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
                     $i->copy($this->events[$timeKey][$eventKey]->getStart());
                     $time = $i->getTime();
                     $time = $time - ($time % ($gridLength * 60));
-                    $i = new \TYPO3\CMS\Cal\Model\CalDate($time);
+                    $i = new CalDate($time);
                     if ($i->before($d_start)) {
                         $i->copy($d_start);
                     }
@@ -207,12 +228,21 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         );
     }
 
+    /**
+     * @param $eventArray
+     * @param $d_start
+     * @param $d_end
+     * @param $view_array
+     * @param $t_array
+     * @param $positionArray
+     * @return string
+     */
     private function renderEventsColumn(&$eventArray, &$d_start, &$d_end, &$view_array, &$t_array, &$positionArray)
     {
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         $gridLength = $conf['day.']['gridLength'];
 
-        $cal_time_obj = new \TYPO3\CMS\Cal\Model\CalDate($this->getYmd() . '000000');
+        $cal_time_obj = new CalDate($this->getYmd() . '000000');
         $cal_time_obj->setTZbyId('UTC');
         $eventCounter = 0;
         foreach ($t_array as $cal_time => $val) {
@@ -273,6 +303,13 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         return $daydisplay;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDayClassesMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $classes = 'day weekday' . $this->getWeekdayNumber();
@@ -292,20 +329,40 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         $sims['###DAY_CLASSES###'] = $classes;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDayTitleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###DAY_TITLE###'] = $this->getWeekdayString($this->time, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDayLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###DAY_LINK###'] = $this->getDayLink($view, $this->time);
     }
 
+    /**
+     * @param $view
+     * @param $value
+     * @param bool $hasEvent
+     * @return mixed
+     */
     public function getDayLink($view, $value, $hasEvent = false)
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $conf = &Registry::Registry('basic', 'conf');
         $dayLinkViewTarget = $conf['view.']['dayLinkTarget'];
         $isAllowedToCreateEvent = $rightsObj->isAllowedToCreateEvent();
 
@@ -313,7 +370,7 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         $local_cObj->setCurrentVal($value);
         $local_cObj->data['view'] = $dayLinkViewTarget;
         $local_cObj->data['link_timestamp'] = $value;
-        $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $controller = &Registry::Registry('basic', 'controller');
 
         if (($rightsObj->isViewEnabled($dayLinkViewTarget) || $conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid']) && (!empty($this->events) || $hasEvent || $this->hasAlldayEvents || $isAllowedToCreateEvent)) {
             $controller->getParametersForTyposcriptLink(
@@ -334,6 +391,13 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAlldayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $content = '';
@@ -352,6 +416,9 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         $sims['###ALLDAY###'] = $content;
     }
 
+    /**
+     * @param $dateObject
+     */
     public function setCurrent(&$dateObject)
     {
         if ($this->getDay() == $dateObject->day && $this->getMonth() == $dateObject->month && $this->getYear() == $dateObject->year) {
@@ -359,6 +426,9 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         }
     }
 
+    /**
+     * @param $dateObject
+     */
     public function setSelected(&$dateObject)
     {
         if ($this->getDay() == $dateObject->day && $this->getMonth() == $dateObject->month && $this->getYear() == $dateObject->year) {
@@ -366,41 +436,65 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         }
     }
 
+    /**
+     * @return int
+     */
     public function getTime()
     {
         return $this->time;
     }
 
+    /**
+     * @return mixed
+     */
     public function getYmd()
     {
         return $this->Ymd;
     }
 
+    /**
+     * @param $ymd
+     */
     public function setYmd($ymd)
     {
         $this->Ymd = $ymd;
     }
 
+    /**
+     * @return array
+     */
     public function getEvents()
     {
         return $this->events;
     }
 
+    /**
+     * @param $events
+     */
     public function setEvents($events)
     {
         $this->events = $events;
     }
 
+    /**
+     * @return bool
+     */
     public function getHasAlldayEvents()
     {
         return $this->hasAlldayEvents;
     }
 
+    /**
+     * @param $hasAlldayEvents
+     */
     public function setHasAlldayEvents($hasAlldayEvents)
     {
         $this->hasAlldayEvents = $hasAlldayEvents;
     }
 
+    /**
+     * @return bool
+     */
     public function hasEvents()
     {
         return !empty($this->getEvents()) || $this->getHasAlldayEvents();

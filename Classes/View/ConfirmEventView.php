@@ -14,19 +14,16 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A service which renders a form to confirm the phpicalendar event create/edit.
  */
-class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class ConfirmEventView extends FeEditingBaseView
 {
     public $confArr = [];
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a confirm event form.
@@ -79,18 +76,23 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###ACTION_URL###'] = htmlspecialchars($this->cObj->lastTypoLinkUrl);
 
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $sims = [];
         $rems = [];
         $wrapped = [];
         $this->getTemplateSingleMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTitleMarker(& $template, & $sims, & $rems)
     {
         $sims['###TITLE###'] = '';
@@ -100,6 +102,12 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @return string|void
+     */
     public function getCalendarIdMarker(& $template, & $sims, & $rems)
     {
         $sims['###CALENDAR_ID###'] = '';
@@ -112,6 +120,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEventTypeMarker(& $template, & $sims, & $rems)
     {
         $sims['###EVENT_TYPE###'] = '';
@@ -124,6 +137,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCategoryMarker(& $template, & $sims, & $rems)
     {
         $sims['###CATEGORY###'] = '';
@@ -149,6 +167,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAlldayMarker(& $template, & $sims, & $rems)
     {
         $sims['###ALLDAY###'] = '';
@@ -164,32 +187,47 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getStartdateMarker(& $template, & $sims, & $rems)
     {
         $sims['###STARTDATE###'] = '';
         if ($this->isAllowed('startdate')) {
             $startDate = $this->object->getStart();
             $split = $this->conf['dateConfig.']['splitSymbol'];
-            $startDateFormatted = $startDate->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf));
+            $startDateFormatted = $startDate->format(Functions::getFormatStringFromConf($this->conf));
             $dateFormatArray = explode($this->conf['dateConfig.']['splitSymbol'], $startDateFormatted);
             $sims['###STARTDATE###'] = $this->applyStdWrap($startDateFormatted, 'startdate_stdWrap');
             $sims['###STARTDATE_VALUE###'] = htmlspecialchars($dateFormatArray[$this->conf['dateConfig.']['yearPosition']] . $dateFormatArray[$this->conf['dateConfig.']['monthPosition']] . $dateFormatArray[$this->conf['dateConfig.']['dayPosition']]);
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEnddateMarker(& $template, & $sims, & $rems)
     {
         $sims['###ENDDATE###'] = '';
         if ($this->isAllowed('enddate')) {
             $endDate = $this->object->getEnd();
             $split = $this->conf['dateConfig.']['splitSymbol'];
-            $endDateFormatted = $endDate->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf));
+            $endDateFormatted = $endDate->format(Functions::getFormatStringFromConf($this->conf));
             $dateFormatArray = explode($this->conf['dateConfig.']['splitSymbol'], $endDateFormatted);
             $sims['###ENDDATE###'] = $this->applyStdWrap($endDateFormatted, 'enddate_stdWrap');
             $sims['###ENDDATE_VALUE###'] = htmlspecialchars($dateFormatArray[$this->conf['dateConfig.']['yearPosition']] . $dateFormatArray[$this->conf['dateConfig.']['monthPosition']] . $dateFormatArray[$this->conf['dateConfig.']['dayPosition']]);
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getStarttimeMarker(& $template, & $sims, & $rems)
     {
         $sims['###STARTTIME###'] = '';
@@ -203,6 +241,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEndtimeMarker(& $template, & $sims, & $rems)
     {
         $sims['###ENDTIME###'] = '';
@@ -216,6 +259,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getOrganizerMarker(& $template, & $sims, & $rems)
     {
         $sims['###ORGANIZER###'] = '';
@@ -225,6 +273,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalOrganizerMarker(& $template, & $sims, & $rems)
     {
         $sims['###CAL_ORGANIZER###'] = '';
@@ -251,6 +304,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getLocationMarker(& $template, & $sims, & $rems)
     {
         $sims['###LOCATION###'] = '';
@@ -260,6 +318,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalLocationMarker(& $template, & $sims, & $rems)
     {
         $sims['###CAL_LOCATION###'] = '';
@@ -286,6 +349,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getDescriptionMarker(& $template, & $sims, & $rems)
     {
         $sims['###DESCRIPTION###'] = '';
@@ -295,6 +363,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTeaserMarker(& $template, & $sims, & $rems)
     {
         $sims['###TEASER###'] = '';
@@ -306,6 +379,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getFrequencyMarker(& $template, & $sims, & $rems)
     {
         $sims['###FREQUENCY###'] = '';
@@ -318,6 +396,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByDayMarker(& $template, & $sims, & $rems)
     {
         $sims['###BY_DAY###'] = '';
@@ -328,6 +411,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByMonthDayMarker(& $template, & $sims, & $rems)
     {
         $sims['###BY_MONTHDAY###'] = '';
@@ -338,6 +426,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByMonthMarker(& $template, & $sims, & $rems)
     {
         $sims['###BY_MONTH###'] = '';
@@ -348,6 +441,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getUntilMarker(& $template, & $sims, & $rems)
     {
         $sims['###UNTIL###'] = '';
@@ -358,7 +456,7 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
                 $sims['###UNTIL_VALUE###'] = '';
                 if ($untilDate->getYear() > 0) {
                     $split = $this->conf['dateConfig.']['splitSymbol'];
-                    $untilDateFormatted = $untilDate->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf));
+                    $untilDateFormatted = $untilDate->format(Functions::getFormatStringFromConf($this->conf));
                     $dateFormatArray = explode($this->conf['dateConfig.']['splitSymbol'], $untilDateFormatted);
                     $sims['###UNTIL_VALUE###'] = htmlspecialchars($dateFormatArray[$this->conf['dateConfig.']['yearPosition']] . $dateFormatArray[$this->conf['dateConfig.']['monthPosition']] . $dateFormatArray[$this->conf['dateConfig.']['dayPosition']]);
                 }
@@ -367,6 +465,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCountMarker(& $template, & $sims, & $rems)
     {
         $sims['###COUNT###'] = '';
@@ -376,6 +479,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getIntervalMarker(& $template, & $sims, & $rems)
     {
         $sims['###INTERVAL###'] = '';
@@ -385,6 +493,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getRdateTypeMarker(& $template, & $sims, & $rems)
     {
         $sims['###RDATE_TYPE###'] = '';
@@ -397,6 +510,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getNotifyMarker(& $template, & $sims, & $rems)
     {
         $sims['###NOTIFY###'] = '';
@@ -416,6 +534,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getSharedMarker(& $template, & $sims, & $rems)
     {
         $sims['###SHARED###'] = '';
@@ -434,6 +557,11 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getExceptionMarker(& $template, & $sims, & $rems)
     {
         $sims['###EXCEPTION###'] = '';
@@ -452,12 +580,17 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAttendeeMarker(& $template, & $sims, & $rems)
     {
         $sims['###ATTENDEE###'] = '';
-        if ($this->isAllowed('attendee') && $this->object->getEventType() == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_MEETING) {
+        if ($this->isAllowed('attendee') && $this->object->getEventType() == Model::EVENT_TYPE_MEETING) {
             $attendee = '';
-            $allowedUsers = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+            $allowedUsers = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['allowedUsers'],
                 1
@@ -499,6 +632,12 @@ class ConfirmEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getSendoutInvitationMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###SENDOUT_INVITATION###'] = '';

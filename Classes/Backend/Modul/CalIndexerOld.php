@@ -14,11 +14,21 @@ namespace TYPO3\CMS\Cal\Backend\Modul;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Backend\Module\BaseScriptClass;
+use TYPO3\CMS\Backend\Template\DocumentTemplate;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\DateParser;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
+/**
+ * Class CalIndexerOld
+ */
+class CalIndexerOld extends BaseScriptClass
 {
     public $pageinfo;
 
@@ -48,10 +58,10 @@ class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 
         // Access check!
         // The page will show only if there is a valid page and if this page may be viewed by the user
-        $this->pageinfo = \TYPO3\CMS\Backend\Utility\BackendUtility::readPageAccess($this->id, $this->perms_clause);
+        $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
         $access = is_array($this->pageinfo) ? 1 : 0;
 
-        $this->doc = GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\Template\\DocumentTemplate');
+        $this->doc = GeneralUtility::makeInstance(DocumentTemplate::class);
         $this->doc->backPath = $GLOBALS['BACK_PATH'];
 
         if (($this->id && $access) || ($GLOBALS['BE_USER']->user['admin'] && !$this->id)) {
@@ -76,20 +86,20 @@ class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 			';
 
             $headerSection = $this->doc->getHeader(
-                'pages',
-                $this->pageinfo,
+                    'pages',
+                    $this->pageinfo,
                     $this->pageinfo['_thePath']
-            ) . '<br>' . $GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_core.php:labels.path') . ': ' . GeneralUtility::fixed_lgd_cs(
-                        $this->pageinfo['_thePath'],
+                ) . '<br>' . $GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_core.php:labels.path') . ': ' . GeneralUtility::fixed_lgd_cs(
+                    $this->pageinfo['_thePath'],
                     -50
-                    );
+                );
 
             $this->content .= $this->doc->startPage($GLOBALS['LANG']->getLL('title'));
             $this->content .= $this->doc->header($GLOBALS['LANG']->getLL('title'));
             $this->content .= $this->doc->spacer(5);
             $this->content .= $this->doc->section('', $this->doc->funcMenu(
                 $headerSection,
-                \TYPO3\CMS\Backend\Utility\BackendUtility::getFuncMenu(
+                BackendUtility::getFuncMenu(
                     $this->id,
                     'SET[function]',
                     $this->MOD_SETTINGS['function'],
@@ -104,13 +114,13 @@ class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
             // ShortCut
             if ($GLOBALS['BE_USER']->mayMakeShortcut()) {
                 $this->content .= $this->doc->spacer(20) . $this->doc->section(
-                    '',
+                        '',
                         $this->doc->makeShortcutIcon(
                             'id',
                             implode(',', array_keys($this->MOD_MENU)),
                             $this->MCONF['name']
                         )
-                );
+                    );
             }
 
             $this->content .= $this->doc->spacer(10);
@@ -153,13 +163,6 @@ class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
                 if (isset($postVarArray['pageIds']) && empty($pageIds)) {
                     $content = self::getMessage($GLOBALS['LANG']->getLL('atLeastOne'), FlashMessage::ERROR);
                 }
-// 				foreach ($postVarArray as $name => $value) {
-// 					if (strpos ($name, 'pageId') === 0) {
-// 						$valuePageArray = explode ('_', $value);
-// 						preg_match ('/pageId([0-9]*)_list/', $name, $matches);
-// 						$pageIds[intval ($matches[1])] = intval ($valuePageArray[1]);
-// 					}
-// 				}
 
                 $starttime = GeneralUtility::_POST('starttime');
                 if ($starttime) {
@@ -172,9 +175,9 @@ class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 
                 if (count($pageIds) > 0 && is_int($starttime) && is_int($endtime)) {
                     $content = $GLOBALS['LANG']->getLL('indexing') . '<br/>';
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
+                    /** @var RecurrenceGenerator $rgc */
                     $rgc = GeneralUtility::makeInstance(
-                        'TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator',
+                        RecurrenceGenerator::class,
                         0,
                         $starttime,
                         $endtime
@@ -197,63 +200,50 @@ class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
                     }
                 } else {
                     $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-                    // 					$this->content .= '<script type="text/javascript">' . $this->getJScode () . '</script>';
-                    // 					if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger (TYPO3_version) > 4004999) {
-                    // 						$this->content .= '<script type="text/javascript" src="jsfunc.tbe_editor.js"></script>';
-                    // 					}
+                }
 
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                    $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator');
-                    $pages = $rgc->getRecurringEventPages();
-                    $selectFieldIds = [];
-                    // 					$content .= '<table><tbody>';
-                    // 					$content .= '<tr><td>';
-                    // 					$content .= '"' . $GLOBALS['LANG']->getLL ('tableHeader2') . ' :';
-                    // 					$content .= '</td><td>';
-                    // 					$content .= '<select id="pageId' . $pid . '" class="formField3 tceforms-multiselect" style="width: 150px;" name="pageId' . $pid . '_list" multiple="multiple" size="1"></select>';
-                    // 					$content .= '<a href="#" onclick="setFormValueOpenBrowser(\'db\',\'pageId' . $pid . '|||pages\'); return false;"><img src="sysext/t3skin/icons/gfx/insert3.gif" alt="' . $GLOBALS['LANG']->getLL ('browse') . '" title="' . $GLOBALS['LANG']->getLL ('browse') . '" border="0" height="15" width="15"></a>';
-                    // 					$content .= '</td></tr>';
-                    // 					$selectFieldIds[] = 'pageId' . $pid;
-                    // 					$content .= '<tbody></table>';
+                /** @var RecurrenceGenerator $rgc */
+                $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
+                $pages = $rgc->getRecurringEventPages();
+                $selectFieldIds = [];
 
-                    if (!empty($pages)) {
-                        $content .= '<style>.calIndexerTable th { background-color: #EEEEEE;} .calIndexerTable td, .calIndexerTable th { border: 1px solid #999999; padding:5px; text-align: center;}</style>';
-                        $content .= '<table class="calIndexerTable"><thead>';
-                        $content .= '<tr><th>' . $GLOBALS['LANG']->getLL('tableHeader1') . '</th><th>' . $GLOBALS['LANG']->getLL('tableHeader2') . '</th></tr></thead><tbody>';
+                if (!empty($pages)) {
+                    $content .= '<style>.calIndexerTable th { background-color: #EEEEEE;} .calIndexerTable td, .calIndexerTable th { border: 1px solid #999999; padding:5px; text-align: center;}</style>';
+                    $content .= '<table class="calIndexerTable"><thead>';
+                    $content .= '<tr><th>' . $GLOBALS['LANG']->getLL('tableHeader1') . '</th><th>' . $GLOBALS['LANG']->getLL('tableHeader2') . '</th></tr></thead><tbody>';
 
-                        foreach ($pages as $pageId => $pageTitle) {
-                            $content .= '<tr><td>';
-                            $content .= $pageTitle . '[' . $pageId . ']<input name="pageIds" id="pageId[' . $pageId . ']" type="hidden" value="' . $pageId . '"><br />';
-                            $content .= '</td><td>';
-                            $content .= '<input name="tsPage" id="tsPageId[' . $pageId . ']" type="text" value="" size="15" maxlength="5"><br />';
-                            $content .= '</td></tr>';
-                        }
-
-                        $content .= '<tbody></table>';
-
-                        $selectFields = '';
-                        foreach ($selectFieldIds as $selectFieldId) {
-                            $selectFields .= ' var o' . $selectFieldId . ' = document.getElementById("' . $selectFieldId . '");if(o' . $selectFieldId . '.options.length > 0){o' . $selectFieldId . '.options[0].selected = "selected";} else {notComplete = 1;}';
-                        }
-                        $content .= '<script type="text/javascript">function markSelections(){ var notComplete = 0;' . $selectFields . ' if(notComplete == 1){alert("' . $GLOBALS['LANG']->getLL('notAllPagesAssigned') . '");return false;}return true;}</script>';
-
-                        $this->content .= $this->doc->section($GLOBALS['LANG']->getLL('selectPage'), $content, 0, 1);
-                        $this->content .= $this->doc->section(
-                            $GLOBALS['LANG']->getLL('indexStart'),
-                            '<input name="starttime" type="text" value="' . $extConf['recurrenceStart'] . '" size="8" maxlength="8">',
-                            0,
-                            1
-                        );
-                        $this->content .= $this->doc->section(
-                            $GLOBALS['LANG']->getLL('indexEnd'),
-                            '<input name="endtime" type="text" value="' . $extConf['recurrenceEnd'] . '" size="8" maxlength="8">',
-                            0,
-                            1
-                        );
-                        $this->content .= '<br /><br /><input type="submit" value="' . $GLOBALS['LANG']->getLL('startIndexing') . '" onclick="return markSelections();"/>';
-                    } else {
-                        $this->content .= self::getMessage($GLOBALS['LANG']->getLL('nothingToDo'), FlashMessage::INFO);
+                    foreach ($pages as $pageId => $pageTitle) {
+                        $content .= '<tr><td>';
+                        $content .= $pageTitle . '[' . $pageId . ']<input name="pageIds" id="pageId[' . $pageId . ']" type="hidden" value="' . $pageId . '"><br />';
+                        $content .= '</td><td>';
+                        $content .= '<input name="tsPage" id="tsPageId[' . $pageId . ']" type="text" value="" size="15" maxlength="5"><br />';
+                        $content .= '</td></tr>';
                     }
+
+                    $content .= '<tbody></table>';
+
+                    $selectFields = '';
+                    foreach ($selectFieldIds as $selectFieldId) {
+                        $selectFields .= ' var o' . $selectFieldId . ' = document.getElementById("' . $selectFieldId . '");if(o' . $selectFieldId . '.options.length > 0){o' . $selectFieldId . '.options[0].selected = "selected";} else {notComplete = 1;}';
+                    }
+                    $content .= '<script type="text/javascript">function markSelections(){ var notComplete = 0;' . $selectFields . ' if(notComplete == 1){alert("' . $GLOBALS['LANG']->getLL('notAllPagesAssigned') . '");return false;}return true;}</script>';
+
+                    $this->content .= $this->doc->section($GLOBALS['LANG']->getLL('selectPage'), $content, 0, 1);
+                    $this->content .= $this->doc->section(
+                        $GLOBALS['LANG']->getLL('indexStart'),
+                        '<input name="starttime" type="text" value="' . $extConf['recurrenceStart'] . '" size="8" maxlength="8">',
+                        0,
+                        1
+                    );
+                    $this->content .= $this->doc->section(
+                        $GLOBALS['LANG']->getLL('indexEnd'),
+                        '<input name="endtime" type="text" value="' . $extConf['recurrenceEnd'] . '" size="8" maxlength="8">',
+                        0,
+                        1
+                    );
+                    $this->content .= '<br /><br /><input type="submit" value="' . $GLOBALS['LANG']->getLL('startIndexing') . '" onclick="return markSelections();"/>';
+                } else {
+                    $this->content .= self::getMessage($GLOBALS['LANG']->getLL('nothingToDo'), FlashMessage::INFO);
                 }
                 break;
             default:
@@ -273,31 +263,35 @@ class CalIndexerOld extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         }
     }
 
-    private function getJScode()
-    {
-        $forms = new \TYPO3\CMS\Backend\Form\FormEngine();
-        $forms->backPath = $GLOBALS['BACK_PATH'];
-    }
-
+    /**
+     * @param $timeString
+     * @return CalDate
+     */
     private function getTimeParsed($timeString)
     {
-        $dp = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\DateParser');
+        $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }
 
+    /**
+     * @param $message
+     * @param $type
+     * @return string
+     * @throws Exception
+     */
     public static function getMessage($message, $type)
     {
         /** @var $flashMessage FlashMessage */
         $flashMessage = GeneralUtility::makeInstance(
-            'TYPO3\\CMS\\Core\\Messaging\\FlashMessage',
+            FlashMessage::class,
             htmlspecialchars($message),
             '',
             $type,
             true
         );
-        /** @var $flashMessageService \TYPO3\CMS\Core\Messaging\FlashMessageService */
-        $flashMessageService = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessageService');
+        /** @var $flashMessageService FlashMessageService */
+        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
         return $defaultFlashMessageQueue->renderFlashMessages();

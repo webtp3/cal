@@ -14,11 +14,24 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\DateParser;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Model\EventRecDeviationModel;
+use TYPO3\CMS\Cal\Model\EventRecModel;
+use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class EventService extends \TYPO3\CMS\Cal\Service\BaseService
+/**
+ * Class EventService
+ */
+class EventService extends BaseService
 {
     public $location;
     public $calnumber = 1;
@@ -27,11 +40,17 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
     public $internalAdditionWhere = ' AND tx_cal_calendar.nearby = 0';
     public $internalAdditionTable = '';
 
+    /**
+     * @return int
+     */
     public function getCalNumber()
     {
         return $this->calnumber;
     }
 
+    /**
+     * @param $calnumber
+     */
     public function setCalNumber($calnumber)
     {
         $this->calnumber = $calnumber;
@@ -40,6 +59,11 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
     /**
      * Finds all events within a given range.
      *
+     * @param $start_date
+     * @param $end_date
+     * @param $pidList
+     * @param string $eventType
+     * @param string $additionalWhere
      * @return array array of events represented by the model.
      */
     public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '0,1,2,3', $additionalWhere = '')
@@ -58,7 +82,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $this->setStartAndEndPoint($start_date, $end_date);
         $dontShowOldEvents = (integer)$this->conf['view.'][$this->conf['view'] . '.']['dontShowOldEvents'];
         if ($dontShowOldEvents > 0) {
-            $now = new \TYPO3\CMS\Cal\Model\CalDate();
+            $now = new CalDate();
             if ($dontShowOldEvents == 2) {
                 $now->setHour(0);
                 $now->setMinute(0);
@@ -144,11 +168,13 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
      *            available categories
      * @param $includeRecurring boolean
      *            recurring events should be included
-     * @param $categoryIds String
-     *            ids to search events for
      * @param $additionalWhere String
      *            string; will be added to the where-clause
      *
+     * @param string $serviceKey
+     * @param bool $addCategoryWhere
+     * @param bool $onlyMeetingsWithoutStatus
+     * @param string $eventType
      * @return array array of tx_cal_phpcalendar_model events
      */
     public function getEventsFromTable(
@@ -212,7 +238,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
 
         $limit = '';
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_event_service',
             'eventServiceClass',
             'service'
@@ -331,12 +357,12 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             $ex_events_group = [];
 
             if (!$includeRecurring) {
-                $tmp_starttime = new \TYPO3\CMS\Cal\Model\CalDate();
+                $tmp_starttime = new CalDate();
                 $tmp_starttime->copy($this->starttime);
-                $tmp_endtime = new \TYPO3\CMS\Cal\Model\CalDate();
+                $tmp_endtime = new CalDate();
                 $tmp_endtime->copy($this->endtime);
                 $this->starttime->copy($event->getStart());
-                $this->endtime->copy(new  \TYPO3\CMS\Cal\Model\CalDate($this->conf['view.'][$this->conf['view'] . '.']['maxDate'] . '000000'));
+                $this->endtime->copy(new  CalDate($this->conf['view.'][$this->conf['view'] . '.']['maxDate'] . '000000'));
             }
 
             $result3 = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query(
@@ -487,6 +513,8 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
     /**
      * Finds all events.
      *
+     * @param $pidList
+     * @param string $eventType
      * @return array array of events represented by the model.
      */
     public function findAll($pidList, $eventType = '0,1,2,3')
@@ -496,17 +524,17 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         // 2nd get categories specified
         // 3rd get all related events
         // make an array out of the list, so we can handle it better
-        $start_date = new  \TYPO3\CMS\Cal\Model\CalDate('00000001000000');
+        $start_date = new  CalDate('00000001000000');
         if (isset($this->conf['view.'][$this->conf['view'] . '.']['minDate'])) {
             $start_date = $this->getTimeParsed($this->conf['view.'][$this->conf['view'] . '.']['minDate']);
         }
-        $start_date->setTZbyId('UTC');
+        $start_date->setTZbyID('UTC');
 
         $end_date = $this->getTimeParsed('+2 years');
         if (isset($this->conf['view.'][$this->conf['view'] . '.']['maxDate'])) {
             $end_date = $this->getTimeParsed($this->conf['view.'][$this->conf['view'] . '.']['maxDate']);
         }
-        $end_date->setTZbyId('UTC');
+        $end_date->setTZbyID('UTC');
         $this->setStartAndEndPoint($start_date, $end_date);
 
         $this->endtime->setHour(0);
@@ -571,19 +599,32 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
     protected function getTimeParsed($timeString)
     {
         /** @var DateParser $dp */
-        $dp = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\DateParser');
+        $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }
 
+    /**
+     * @param $row
+     * @param $isException
+     * @return EventModel
+     */
     public function createEvent($row, $isException)
     {
-        return new \TYPO3\CMS\Cal\Model\EventModel($row, $isException, $this->getServiceKey());
+        return new EventModel($row, $isException, $this->getServiceKey());
     }
 
     /**
      * Finds a single event.
      *
+     * @param $uid
+     * @param $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
      * @return object event represented by the model.
      */
     public function find(
@@ -598,20 +639,20 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
     ) {
         $uid = intval($uid);
         if ($getAllInstances) {
-            $start_date = new  \TYPO3\CMS\Cal\Model\CalDate($this->conf['view.'][$this->conf['view'] . '.']['minDate'] . '000000');
-            $start_date->setTZbyId('UTC');
-            $end_date = new  \TYPO3\CMS\Cal\Model\CalDate($this->conf['view.'][$this->conf['view'] . '.']['maxDate'] . '000000');
-            $end_date->setTZbyId('UTC');
+            $start_date = new  CalDate($this->conf['view.'][$this->conf['view'] . '.']['minDate'] . '000000');
+            $start_date->setTZbyID('UTC');
+            $end_date = new  CalDate($this->conf['view.'][$this->conf['view'] . '.']['maxDate'] . '000000');
+            $end_date->setTZbyID('UTC');
             $this->setStartAndEndPoint($start_date, $end_date);
 
             $this->endtime->setHour(0);
             $this->endtime->setMinute(0);
         } else {
-            $this->starttime = new \TYPO3\CMS\Cal\Model\CalDate();
+            $this->starttime = new CalDate();
             if ($this->controller->getDateTimeObject) {
                 $this->starttime->copy($this->controller->getDateTimeObject);
             }
-            $this->endtime = new \TYPO3\CMS\Cal\Model\CalDate();
+            $this->endtime = new CalDate();
             if ($this->controller->getDateTimeObject) {
                 $this->endtime->copy($this->controller->getDateTimeObject);
             }
@@ -702,6 +743,10 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         return array_pop(array_pop(array_pop($events)));
     }
 
+    /**
+     * @param $pid
+     * @return object
+     */
     public function saveEvent($pid)
     {
         $object = $this->modelObj->createEvent('tx_cal_phpicalendar');
@@ -751,28 +796,33 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $this->unsetPiVars();
         $insertFields['uid'] = $uid;
         $insertFields['category'] = $this->controller->piVars['category_ids'];
-        $this->_notify($insertFields);
+        self::_notify($insertFields);
         if ($object->getSendoutInvitation()) {
             $this->_invite($object);
         }
 
-        $this->_scheduleReminder($uid);
+        self::_scheduleReminder($uid);
 
-        /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $GLOBALS['TSFE']->id);
+        /** @var RecurrenceGenerator $rgc */
+        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
         $rgc->generateIndexForUid($uid, 'tx_cal_event');
 
         // Hook: saveEvent
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_event_service',
             'eventServiceClass'
         );
-        \TYPO3\CMS\Cal\Utility\Functions::executeHookObjectsFunction($hookObjectsArr, 'saveEvent', $this, $object);
+        Functions::executeHookObjectsFunction($hookObjectsArr, 'saveEvent', $this, $object);
 
-        \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+        Functions::clearCache();
         return $this->find($uid, $pid);
     }
 
+    /**
+     * @param $eventData
+     * @param $object
+     * @return mixed
+     */
     public function _saveEvent(&$eventData, $object)
     {
         $tempValues = [];
@@ -808,10 +858,10 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($tempValues['notify_ids'] != '') {
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
+                self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
                 foreach ($user as $u) {
                     $userOffsetArray = GeneralUtility::trimExplode('_', $u, 1);
-                    $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
+                    self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
                         $userOffsetArray[0]
                     ], $uid, 'fe_users', [
                         'offset' => isset($userOffsetArray[1]) ? $userOffsetArray[1] : $this->conf['view.']['event.']['remind.']['time'],
@@ -826,7 +876,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 foreach ($group as $g) {
                     $groupOffsetArray = GeneralUtility::trimExplode('_', $g, 1);
                     if (!in_array($groupOffsetArray[0], $ignore)) {
-                        $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
+                        self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
                             $groupOffsetArray[0]
                         ], $uid, 'fe_groups', [
                             'offset' => isset($groupOffsetArray[1]) ? $groupOffsetArray[1] : $this->conf['view.']['event.']['remind.']['time'],
@@ -844,7 +894,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($this->conf['rights.']['create.']['event.']['addFeUserToNotify']) {
                 $idArray[] = $this->rightsObj->getUserId();
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_fe_user_event_monitor_mm',
                 array_unique($idArray),
                 $uid,
@@ -862,7 +912,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($this->conf['rights.']['create.']['event.']['addFeGroupToNotify']) {
                 $idArray = array_merge($idArray, $this->rightsObj->getUserGroups());
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_fe_user_event_monitor_mm',
                 array_unique($idArray),
                 $uid,
@@ -873,7 +923,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 ]
             );
         } elseif ($this->rightsObj->isLoggedIn() && $this->conf['rights.']['create.']['event.']['addFeUserToNotify']) {
-            $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
+            self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
                 $this->rightsObj->getUserId()
             ], $uid, 'fe_users', [
                 'offset' => $this->conf['view.']['event.']['remind.']['time'],
@@ -881,7 +931,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             ]);
         }
         if ($this->conf['rights.']['create.']['event.']['public']) {
-            $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', GeneralUtility::trimExplode(
+            self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['create.']['event.']['notifyUsersOnPublicCreate'],
                 1
@@ -893,9 +943,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         if ($this->rightsObj->isAllowedToCreateEventException() && $tempValues['exception_ids'] != '') {
             $user = [];
             $group = [];
-            $this->splitUserAndGroupIds(explode(',', strip_tags($tempValues['exception_ids'])), $user, $group);
-            $this->insertIdsIntoTableWithMMRelation('tx_cal_exception_event_mm', $user, $uid, 'tx_cal_exception_event');
-            $this->insertIdsIntoTableWithMMRelation(
+            self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['exception_ids'])), $user, $group);
+            self::insertIdsIntoTableWithMMRelation('tx_cal_exception_event_mm', $user, $uid, 'tx_cal_exception_event');
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_exception_event_group_mm',
                 $group,
                 $uid,
@@ -909,7 +959,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($this->conf['rights.']['create.']['event.']['addFeUserToShared']) {
                 $user[] = $this->rightsObj->getUserId();
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($user),
                 $uid,
@@ -921,7 +971,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 1
             );
             $groupArray = array_diff($group, $ignore);
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($groupArray),
                 $uid,
@@ -932,7 +982,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($this->conf['rights.']['create.']['event.']['addFeUserToShared']) {
                 $idArray[] = $this->rightsObj->getUserId();
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($idArray),
                 $uid,
@@ -953,7 +1003,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 );
                 $groupArray = array_diff($idArray, $ignore);
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($groupArray),
                 $uid,
@@ -974,7 +1024,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                     $categoryIds[] = $category->getUid();
                 }
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 $category_mm_relation_table,
                 $categoryIds,
                 $uid,
@@ -983,7 +1033,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 $switchUidLocalForeign
             );
         } else {
-            $this->insertIdsIntoTableWithMMRelation($category_mm_relation_table, [
+            self::insertIdsIntoTableWithMMRelation($category_mm_relation_table, [
                 $this->conf['rights.']['create.']['event.']['fields.']['category.']['default']
             ], $uid, '', [], $switchUidLocalForeign);
         }
@@ -992,9 +1042,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             'create',
             'event',
                 'attendee'
-        ) && $object->getEventType() == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_MEETING) {
+        ) && $object->getEventType() == Model::EVENT_TYPE_MEETING) {
             $attendeeUids = [];
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $attendeeService = $modelObj->getServiceObjByKey('cal_attendee_model', 'attendee', 'tx_cal_attendee');
             foreach ($object->getAttendees() as $serviceKey => $attendees) {
                 foreach ($attendees as $attendee) {
@@ -1018,6 +1068,10 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         return $uid;
     }
 
+    /**
+     * @param $uid
+     * @return object
+     */
     public function updateEvent($uid)
     {
         $insertFields = [
@@ -1028,7 +1082,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $event = $this->find($uid, $this->conf['pidList'], true, true, false, true, true, '0,1,2,3,4');
         $event_old = $this->find($uid, $this->conf['pidList'], true, true, false, true, true, '0,1,2,3,4');
 
-        $uid = $this->checkUidForLanguageOverlay($uid, 'tx_cal_event');
+        $uid = self::checkUidForLanguageOverlay($uid, 'tx_cal_event');
 
         $this->conf['category'] = $this->conf['view.']['allowedCategories'];
         $this->conf['calendar'] = $this->conf['view.']['allowedCalendar'];
@@ -1076,27 +1130,32 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             $this->_updateEvent($uid, $insertFields, $event);
         }
 
-        $this->_notifyOfChanges($event_old, $insertFields);
+        self::_notifyOfChanges($event_old, $insertFields);
         if ($event->getSendoutInvitation()) {
             $this->_invite($event);
         }
         $this->unsetPiVars();
 
-        /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $GLOBALS['TSFE']->id);
+        /** @var RecurrenceGenerator $rgc */
+        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
         $rgc->generateIndexForUid($uid, 'tx_cal_event');
 
         // Hook: updateEvent
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_event_service',
             'eventServiceClass'
         );
-        \TYPO3\CMS\Cal\Utility\Functions::executeHookObjectsFunction($hookObjectsArr, 'updateEvent', $this, $event);
+        Functions::executeHookObjectsFunction($hookObjectsArr, 'updateEvent', $this, $event);
 
-        \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+        Functions::clearCache();
         return $event;
     }
 
+    /**
+     * @param $uid
+     * @param $eventData
+     * @param $object
+     */
     public function _updateEvent($uid, $eventData, $object)
     {
         $tempValues = [];
@@ -1152,7 +1211,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                     $categoryIds[] = $category->getUid();
                 }
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 $category_mm_relation_table,
                 $categoryIds,
                 $uid,
@@ -1170,10 +1229,10 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($tempValues['notify_ids'] != '') {
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
+                self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
                 foreach ($user as $u) {
                     $userOffsetArray = GeneralUtility::trimExplode('_', $u, 1);
-                    $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
+                    self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
                         $userOffsetArray[0]
                     ], $uid, 'fe_users', [
                         'offset' => isset($userOffsetArray[1]) ? $userOffsetArray[1] : $this->conf['view.']['event.']['remind.']['time'],
@@ -1188,7 +1247,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 foreach ($group as $g) {
                     $groupOffsetArray = GeneralUtility::trimExplode('_', $g, 1);
                     if (!in_array($groupOffsetArray[0], $ignore)) {
-                        $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
+                        self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
                             $groupOffsetArray[0]
                         ], $uid, 'fe_groups', [
                             'offset' => isset($groupOffsetArray[1]) ? $groupOffsetArray[1] : $this->conf['view.']['event.']['remind.']['time'],
@@ -1226,7 +1285,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                     'tx_cal_fe_user_event_monitor_mm',
                     'uid_local =' . $uid . ' AND tablenames in ("fe_users","fe_groups")'
                 );
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_fe_user_event_monitor_mm',
                     array_unique($userIdArray),
                     $uid,
@@ -1236,7 +1295,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                         'pid' => $object->row['pid']
                     ]
                 );
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_fe_user_event_monitor_mm',
                     array_unique($groupIdArray),
                     $uid,
@@ -1256,21 +1315,21 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(explode(',', strip_tags($tempValues['exception_ids'])), $user, $group);
-                $this->insertIdsIntoTableWithMMRelation($table, $user, $uid, 'tx_cal_exception_event');
-                $this->insertIdsIntoTableWithMMRelation($table, $group, $uid, 'tx_cal_exception_event_group');
+                self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['exception_ids'])), $user, $group);
+                self::insertIdsIntoTableWithMMRelation($table, $user, $uid, 'tx_cal_exception_event');
+                self::insertIdsIntoTableWithMMRelation($table, $group, $uid, 'tx_cal_exception_event_group');
             }
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'event', 'shared')) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_shared_user_mm', 'uid_local =' . $uid);
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($object->getSharedUsers()),
                 $uid,
                 'fe_users'
             );
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($object->getSharedGroups()),
                 $uid,
@@ -1302,13 +1361,13 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             }
             if (!empty($userIdArray) || !empty($groupIdArray)) {
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_shared_user_mm', 'uid_local =' . $uid);
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_event_shared_user_mm',
                     array_unique($userIdArray),
                     $uid,
                     'fe_users'
                 );
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_event_shared_user_mm',
                     array_unique($groupIdArray),
                     $uid,
@@ -1320,8 +1379,8 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             'edit',
             'event',
                 'attendee'
-        ) && $object->getEventType() == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_MEETING) {
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        ) && $object->getEventType() == Model::EVENT_TYPE_MEETING) {
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $attendeeServices = $modelObj->findEventAttendees($uid);
 
             $attendeeIndex = [];
@@ -1381,6 +1440,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $uid
+     */
     public function removeEvent($uid)
     {
         $event = $this->find($uid, $this->conf['pidList'], true, true);
@@ -1408,24 +1470,28 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             $fields['deleted'] = 1;
             $fields['tstamp'] = $updateFields['tstamp'];
 
-            $this->_notify($fields);
-            $this->stopReminder($uid);
+            self::_notify($fields);
+            self::stopReminder($uid);
 
-            /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator');
+            /** @var RecurrenceGenerator $rgc */
+            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
             $rgc->cleanIndexTableOfUid($uid, $table);
 
             // Hook: removeEvent
-            $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+            $hookObjectsArr = Functions::getHookObjectsArray(
                 'tx_cal_event_service',
                 'eventServiceClass'
             );
-            \TYPO3\CMS\Cal\Utility\Functions::executeHookObjectsFunction($hookObjectsArr, 'removeEvent', $this, $event);
-            \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+            Functions::executeHookObjectsFunction($hookObjectsArr, 'removeEvent', $this, $event);
+            Functions::clearCache();
             $this->unsetPiVars();
         }
     }
 
+    /**
+     * @param $insertFields
+     * @param $object
+     */
     public function filterDataToBeSaved(&$insertFields, &$object)
     {
         $hidden = 0;
@@ -1437,7 +1503,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $insertFields['hidden'] = $hidden;
         $insertFields['type'] = $object->getEventType();
         if ($insertFields['type'] == null) {
-            $insertFields['type'] = \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_DEFAULT;
+            $insertFields['type'] = Model::EVENT_TYPE_DEFAULT;
         }
 
         $insertFields['allday'] = $object->isAllday() ? '1' : '0';
@@ -1512,7 +1578,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
 
         $eventArray = ['calendar_id' => $object->getCalendarUid(), 'uid' => $object->getUid()];
-        $insertFields['icsUid'] = \TYPO3\CMS\Cal\Utility\Functions::getIcsUid($this->conf, $eventArray);
+        $insertFields['icsUid'] = Functions::getIcsUid($this->conf, $eventArray);
 
         // Hook initialization:
         $hookObjectsArr = [];
@@ -1529,6 +1595,10 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $insertFields
+     * @param $object
+     */
     public function filterDataToBeUpdated(&$insertFields, &$object)
     {
         $hidden = 0;
@@ -1624,6 +1694,16 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param string $pidList
+     * @param $start_date
+     * @param $end_date
+     * @param $searchword
+     * @param string $locationIds
+     * @param string $organizerIds
+     * @param string $eventType
+     * @return array
+     */
     public function search(
         $pidList = '',
         $start_date,
@@ -1636,8 +1716,8 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $start_date->subtractSeconds($this->conf['view.'][$this->conf['view'] . '.']['startPointCorrection']);
         $end_date->addSeconds($this->conf['view.'][$this->conf['view'] . '.']['endPointCorrection']);
 
-        $this->starttime = new \TYPO3\CMS\Cal\Model\CalDate();
-        $this->endtime = new \TYPO3\CMS\Cal\Model\CalDate();
+        $this->starttime = new CalDate();
+        $this->endtime = new CalDate();
 
         $this->starttime->copy($start_date);
         $this->endtime->copy($end_date);
@@ -1651,10 +1731,6 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
 
         $linkIds = $this->conf['calendar'] ? $this->conf['calendar'] : '';
-        // Lets see if we shall display the public calendar too
-        /*
-         * if(!$linkIds || in_array('public',explode(',',$linkIds))){ $includePublic = 1; }else{ $includePublic = 0; }
-         */
 
         /**
          * @fixme Always include public events.
@@ -1720,6 +1796,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
      *
      * @param $event object
      *            this class (tx_cal_model)
+     * @return array
      */
     public function recurringEvent($event)
     {
@@ -1727,7 +1804,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $select = '*';
         $table = 'tx_cal_event_deviation';
         if (TYPO3_MODE === 'BE') {
-            $where = 'parentid = ' . $event->getUid() . \TYPO3\CMS\Backend\Utility\BackendUtility::BEenableFields('tx_cal_event_deviation');
+            $where = 'parentid = ' . $event->getUid() . BackendUtility::BEenableFields('tx_cal_event_deviation');
         } else {
             $where = 'parentid = ' . $event->getUid() . $this->cObj->enableFields('tx_cal_event_deviation');
         }
@@ -1737,7 +1814,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 if ($deviationRow['deleted']) {
                     continue;
                 }
-                $origStartDate = new \TYPO3\CMS\Cal\Model\CalDate($deviationRow['orig_start_date']);
+                $origStartDate = new CalDate($deviationRow['orig_start_date']);
                 $origStartDate->addSeconds($deviationRow['orig_start_time']);
                 $deviations[$origStartDate->format('%Y%m%d%H%M%S')] = $deviationRow;
             }
@@ -1751,7 +1828,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $this->checkRecurringSettings($event);
 
         $master_array = [];
-        $until = new \TYPO3\CMS\Cal\Model\CalDate();
+        $until = new CalDate();
         $until->copy($event->getUntil());
         $until->addSeconds(86399);
         $rrule_array = $event->getRecurringRule();
@@ -1761,7 +1838,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
             $until->copy($this->endtime);
         }
         $byyear = [];
-        $eventStart = new \TYPO3\CMS\Cal\Model\CalDate();
+        $eventStart = new CalDate();
         $eventStart->copy($event->getStart());
         $i = $eventStart->getYear();
         if ($event->getFreq() == 'year') {
@@ -1792,7 +1869,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
 
         // if the 'parent' event is still in future, set $added to 1 (true), because we already have one instance of this event
         $added = (int)$eventStart->isFuture();
-        $nextOccuranceTime = new \TYPO3\CMS\Cal\Model\CalDate();
+        $nextOccuranceTime = new CalDate();
         $nextOccuranceTime->copy($event->getStart());
         $nextOccuranceTime->addSeconds(86400);
 
@@ -1849,7 +1926,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                                     $nextOccuranceTime->setYear($year);
 
                                     if ($counter < $count && ($until->after($nextOccuranceTime) || $until->equals($nextOccuranceTime)) && $added < $maxRecurringEvents) {
-                                        $currentUntil = new \TYPO3\CMS\Cal\Model\CalDate();
+                                        $currentUntil = new CalDate();
                                         $currentUntil->copy($nextOccuranceTime);
                                         $currentUntil->addSeconds(86399);
                                         if (intval($nextOccuranceTime->getMonth()) == $month && ($eventStart->before($nextOccuranceTime)) || $eventStart->equals($nextOccuranceTime)) {
@@ -1883,6 +1960,11 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         return $master_array;
     }
 
+    /**
+     * @param $event
+     * @param array $ex_event_dates
+     * @return array
+     */
     public function getRecurringEventsFromIndex($event, $ex_event_dates = [])
     {
         $maxRecurringEvents = (int)$this->conf['view.'][$this->conf['view'] . '.']['maxRecurringEvents'];
@@ -1892,7 +1974,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $startDate = $event->getStart();
         $dontShowOldEvents = (integer)$this->conf['view.'][$this->conf['view'] . '.']['dontShowOldEvents'];
         if ($dontShowOldEvents > 0) {
-            $now = new \TYPO3\CMS\Cal\Model\CalDate();
+            $now = new CalDate();
             if ($dontShowOldEvents == 2) {
                 $now->setHour(0);
                 $now->setMinute(0);
@@ -1910,7 +1992,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
 
         $added = 0;
         // if the 'parent' event is still in future, set $added to 1, because we already have one instance of this event
-        $now = new \TYPO3\CMS\Cal\Model\CalDate();
+        $now = new CalDate();
         if (intval($now->format('%Y%m%d%H%M%S')) < intval($event->getStart()->format('%Y%m%d%H%M%S'))) {
             $added = 1;
         }
@@ -1921,8 +2003,8 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($added < $maxRecurringEvents) {
-                    $nextOccuranceTime = new  \TYPO3\CMS\Cal\Model\CalDate($row['start_datetime']);
-                    $nextOccuranceEndTime = new  \TYPO3\CMS\Cal\Model\CalDate($row['end_datetime']);
+                    $nextOccuranceTime = new  CalDate($row['start_datetime']);
+                    $nextOccuranceEndTime = new  CalDate($row['end_datetime']);
                     $new_event = null;
                     if ($row['event_deviation_uid'] > 0) {
                         $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -1932,7 +2014,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                         );
                         if ($result2) {
                             while ($row2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2)) {
-                                $new_event = new \TYPO3\CMS\Cal\Model\EventRecDeviationModel(
+                                $new_event = new EventRecDeviationModel(
                                     $event,
                                     $row2,
                                     $nextOccuranceTime,
@@ -1941,7 +2023,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                             }
                         }
                     } else {
-                        $new_event = new \TYPO3\CMS\Cal\Model\EventRecModel(
+                        $new_event = new EventRecModel(
                             $event,
                             $nextOccuranceTime,
                             $nextOccuranceEndTime
@@ -1962,6 +2044,11 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         return $master_array;
     }
 
+    /**
+     * @param $master_array
+     * @param $event
+     * @param $addedCount
+     */
     public function getRecurringDate(&$master_array, &$event, &$addedCount)
     {
         switch ($event->getRdateType()) {
@@ -2158,10 +2245,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
      * This function removes an array of events from another array of events.
      * The structure is:[date][time][event]
      *
-     * @param $events array
-     *            the events should be deleted from
      * @param $events_tmp array
      *            is supposed to be deleted
+     * @param $ex_events
      */
     public function removeEvents(&$events_tmp, &$ex_events)
     {
@@ -2188,6 +2274,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         ];
     }
 
+    /**
+     * @param $pid
+     */
     public function saveExceptionEvent($pid)
     {
         $crdate = time();
@@ -2228,66 +2317,21 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
         $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
 
-        $this->insertIdsIntoTableWithMMRelation('tx_cal_exception_event_mm', [
+        self::insertIdsIntoTableWithMMRelation('tx_cal_exception_event_mm', [
             $uid
         ], intval($this->controller->piVars['event_uid']), 'tx_cal_exception_event');
         $this->unsetPiVars();
-        \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+        Functions::clearCache();
     }
 
     public function unsetPiVars()
     {
-        unset($this->controller->piVars['hidden']);
-        unset($this->controller->piVars['_TRANSFORM_description']);
-        unset($this->controller->piVars['uid']);
-        unset($this->controller->piVars['calendar_id']);
-        unset($this->controller->piVars['calendar']);
-        unset($this->controller->piVars['switch_calendar']);
-        unset($this->controller->piVars['type']);
-        unset($this->controller->piVars['allday']);
-        unset($this->controller->piVars['startdate']);
-        unset($this->controller->piVars['starttime']);
-        unset($this->controller->piVars['startminutes']);
-        unset($this->controller->piVars['enddate']);
-        unset($this->controller->piVars['endtime']);
-        unset($this->controller->piVars['endminutes']);
-        unset($this->controller->piVars['gettime']);
-        unset($this->controller->piVars['title']);
-        unset($this->controller->piVars['organizer']);
-        unset($this->controller->piVars['organizer_id']);
-        unset($this->controller->piVars['location']);
-        unset($this->controller->piVars['location_id']);
-        unset($this->controller->piVars['description']);
-        unset($this->controller->piVars['frequency_id']);
-        unset($this->controller->piVars['by_day']);
-        unset($this->controller->piVars['by_monthday']);
-        unset($this->controller->piVars['by_month']);
-        unset($this->controller->piVars['until']);
-        unset($this->controller->piVars['count']);
-        unset($this->controller->piVars['interval']);
-        unset($this->controller->piVars['category']);
-        unset($this->controller->piVars['category_ids']);
-        unset($this->controller->piVars['category_display_ids']);
-        unset($this->controller->piVars['user_ids']);
-        unset($this->controller->piVars['group_ids']);
-        unset($this->controller->piVars['single_exception_ids']);
-        unset($this->controller->piVars['group_exception_ids']);
-        unset($this->controller->piVars['gettime']);
-        unset($this->controller->piVars['notify']);
-        unset($this->controller->piVars['notify_ids']);
-        unset($this->controller->piVars['teaser']);
-        unset($this->controller->piVars['image']);
-        unset($this->controller->piVars['image_caption']);
-        unset($this->controller->piVars['image_title']);
-        unset($this->controller->piVars['image_alt']);
-        unset($this->controller->piVars['image_old']);
-        unset($this->controller->piVars['remove_image']);
-        unset($this->controller->piVars['cal_location']);
-        unset($this->controller->piVars['cal_organizer']);
-        unset($this->controller->piVars['attachment']);
-        unset($this->controller->piVars['attachment_caption']);
+        unset($this->controller->piVars['hidden'], $this->controller->piVars['_TRANSFORM_description'], $this->controller->piVars['uid'], $this->controller->piVars['calendar_id'], $this->controller->piVars['calendar'], $this->controller->piVars['switch_calendar'], $this->controller->piVars['type'], $this->controller->piVars['allday'], $this->controller->piVars['startdate'], $this->controller->piVars['starttime'], $this->controller->piVars['startminutes'], $this->controller->piVars['enddate'], $this->controller->piVars['endtime'], $this->controller->piVars['endminutes'], $this->controller->piVars['gettime'], $this->controller->piVars['title'], $this->controller->piVars['organizer'], $this->controller->piVars['organizer_id'], $this->controller->piVars['location'], $this->controller->piVars['location_id'], $this->controller->piVars['description'], $this->controller->piVars['frequency_id'], $this->controller->piVars['by_day'], $this->controller->piVars['by_monthday'], $this->controller->piVars['by_month'], $this->controller->piVars['until'], $this->controller->piVars['count'], $this->controller->piVars['interval'], $this->controller->piVars['category'], $this->controller->piVars['category_ids'], $this->controller->piVars['category_display_ids'], $this->controller->piVars['user_ids'], $this->controller->piVars['group_ids'], $this->controller->piVars['single_exception_ids'], $this->controller->piVars['group_exception_ids'], $this->controller->piVars['gettime'], $this->controller->piVars['notify'], $this->controller->piVars['notify_ids'], $this->controller->piVars['teaser'], $this->controller->piVars['image'], $this->controller->piVars['image_caption'], $this->controller->piVars['image_title'], $this->controller->piVars['image_alt'], $this->controller->piVars['image_old'], $this->controller->piVars['remove_image'], $this->controller->piVars['cal_location'], $this->controller->piVars['cal_organizer'], $this->controller->piVars['attachment'], $this->controller->piVars['attachment_caption']);
     }
 
+    /**
+     * @param $event
+     */
     public function checkRecurringSettings(&$event)
     {
         $this->checkFrequency($event);
@@ -2309,6 +2353,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $this->checkWkst($event);
     }
 
+    /**
+     * @param $event
+     */
     public function filterFalseCombinations(&$event)
     {
         switch ($event->getFreq()) {
@@ -2348,6 +2395,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkFrequency(&$event)
     {
         $allowedValues = [
@@ -2364,6 +2414,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkInterval(&$event)
     {
         if (!$event->getInterval() || $event->getInterval() < 1) {
@@ -2371,6 +2424,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkCount(&$event)
     {
         if (!$event->getCount() || $event->getCount() < 1) {
@@ -2378,6 +2434,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkUntil(&$event)
     {
         if (!$event->row['until']) {
@@ -2385,6 +2444,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkBySecond(&$event)
     {
         if (intval($event->getBySecond()) < 0 || intval($event->getBySecond()) > 59) {
@@ -2393,6 +2455,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkByMinute(&$event)
     {
         if (intval($event->getByMinute()) < 0 || intval($event->getByMinute()) > 59) {
@@ -2401,6 +2466,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkByHour(&$event)
     {
         if (intval($event->getByHour()) < 0 || intval($event->getByHour()) > 23) {
@@ -2409,6 +2477,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkByDay(&$event)
     {
         $byday_arr = [];
@@ -2438,8 +2509,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 }
                 if (!($byDaySplit[2] > 0 && ($event->getFreq() == 'month' || $event->getFreq() == 'year'))) {
                     // n-th values are not allowed for monthly and yearly
-                    unset($byDaySplit[1]);
-                    unset($byDaySplit[2]);
+                    unset($byDaySplit[1], $byDaySplit[2]);
                 }
                 unset($byDaySplit[0]);
                 $allowedValues[] = implode('', $byDaySplit);
@@ -2461,6 +2531,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $event->setByDay(implode(',', $allowedValues));
     }
 
+    /**
+     * @param $event
+     */
     public function checkByMonth(&$event)
     {
         $byMonth = $event->getByMonth();
@@ -2483,6 +2556,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $event->setByMonth(implode(',', $allowedValues));
     }
 
+    /**
+     * @param $event
+     */
     public function checkByMonthday(&$event)
     {
         /* If there's not a monthday set, pick a default value */
@@ -2515,6 +2591,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkByYearday(&$event)
     {
         if (count($event->getByYearDay()) == 0) {
@@ -2533,6 +2612,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkByWeekno(&$event)
     {
         if ($event->getFreq() == 'yearly') {
@@ -2551,6 +2633,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     */
     public function checkWkst(&$event)
     {
         $allowedWeekdayValues = [
@@ -2569,11 +2654,26 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         $event->setWkst($wkst);
     }
 
+    /**
+     * @param $event
+     */
     public function checkBySetpos(&$event)
     {
         $event->setBySetpos(intval($event->getBySetpos()));
     }
 
+    /**
+     * @param $master_array
+     * @param $event
+     * @param $startRange
+     * @param $endRange
+     * @param $weekdays
+     * @param $maxCount
+     * @param $currentCount
+     * @param $totalCount
+     * @param $addedCount
+     * @param $maxRecurringEvents
+     */
     public function findDailyWithin(
         &$master_array,
         $event,
@@ -2590,7 +2690,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         while ($currentCount < $maxCount && ($nextOccuranceTime->before($endRange) || $nextOccuranceTime->equals($endRange)) && $addedCount < $maxRecurringEvents) {
             if (!$nextOccuranceTime->equals($event->getStart())) {
                 if (($totalCount % $event->getInterval()) == 0) {
-                    $nextOccuranceEndTime = new \TYPO3\CMS\Cal\Model\CalDate();
+                    $nextOccuranceEndTime = new CalDate();
                     $nextOccuranceEndTime->copy($nextOccuranceTime);
                     $nextOccuranceEndTime->addSeconds($event->getLengthInSeconds());
                     if ($this->starttime->before($nextOccuranceEndTime) || $this->starttime->equals($nextOccuranceTime)) {
@@ -2619,22 +2719,26 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     * @param $eventData
+     */
     private function updateEventDataWithDeviations($event, &$eventData)
     {
         $deviationDates = $event->getDeviationDates();
         if (array_key_exists($eventData['start_datetime'], $deviationDates)) {
             $startDate = null;
             if ($deviationDates[$eventData['start_datetime']]['start_date']) {
-                $startDate = new  \TYPO3\CMS\Cal\Model\CalDate($deviationDates[$eventData['start_datetime']]['start_date']);
+                $startDate = new  CalDate($deviationDates[$eventData['start_datetime']]['start_date']);
             } else {
-                $startDate = new \TYPO3\CMS\Cal\Model\CalDate();
+                $startDate = new CalDate();
                 $startDate->copy($nextOccuranceTime);
             }
             $endDate = null;
             if ($deviationDates[$eventData['start_datetime']]['end_date']) {
-                $endDate = new  \TYPO3\CMS\Cal\Model\CalDate($deviationDates[$eventData['start_datetime']]['end_date']);
+                $endDate = new  CalDate($deviationDates[$eventData['start_datetime']]['end_date']);
             } else {
-                $endDate = new \TYPO3\CMS\Cal\Model\CalDate();
+                $endDate = new CalDate();
                 $endDate->copy($nextOccuranceEndTime);
             }
 
@@ -2649,6 +2753,12 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     * @param $month
+     * @param $year
+     * @return array
+     */
     public function getMonthDaysAccordingly(&$event, $month, $year)
     {
         $byDayArray = $event->getByDay();
@@ -2692,16 +2802,16 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
         for ($i = 0; $i < count($byDayArray); $i++) {
             if (preg_match('/([-\+]{0,1})?([0-9]{1})?([A-Z]{2})/', $byDayArray[$i], $byDaySplit)) {
-                $dayOfWeekday = \TYPO3\CMS\Cal\Controller\Calendar::two2threeCharDays($byDaySplit[3], false);
-                $monthStartTime = new  \TYPO3\CMS\Cal\Model\CalDate($year . '-' . sprintf(
+                $dayOfWeekday = Calendar::two2threeCharDays($byDaySplit[3], false);
+                $monthStartTime = new  CalDate($year . '-' . sprintf(
                     '%02d',
                         $month
                 ) . '-01 00:00:00');
-                $monthStartTime->setTZbyId('UTC');
-                $monthEndTime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndMonthTime($monthStartTime);
+                $monthStartTime->setTZbyID('UTC');
+                $monthEndTime = Calendar::calculateEndMonthTime($monthStartTime);
                 if ($byDaySplit[2] > 0) {
                     if ($byDaySplit[1] == '-') {
-                        $monthTime = new  \TYPO3\CMS\Cal\Model\CalDate(Calc::prevDayOfWeek(
+                        $monthTime = new  CalDate(Calc::prevDayOfWeek(
                             $dayOfWeekday,
                             $monthEndTime->getDay(),
                             $monthEndTime->getMonth(),
@@ -2709,10 +2819,10 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                             '%Y%m%d',
                             true
                         ));
-                        $monthTime->setTZbyId('UTC');
+                        $monthTime->setTZbyID('UTC');
                         $monthTime->subtractSeconds(($byDaySplit[2] - 1) * 604800);
                     } else {
-                        $monthTime = new  \TYPO3\CMS\Cal\Model\CalDate(Calc::nextDayOfWeek(
+                        $monthTime = new  CalDate(Calc::nextDayOfWeek(
                             $dayOfWeekday,
                             $monthStartTime->getDay(),
                             $monthStartTime->getMonth(),
@@ -2720,14 +2830,14 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                             '%Y%m%d',
                             true
                         ));
-                        $monthTime->setTZbyId('UTC');
+                        $monthTime->setTZbyID('UTC');
                         $monthTime->addSeconds(($byDaySplit[2] - 1) * 604800);
                     }
                     if (($monthTime->getMonth() == $month) && in_array($monthTime->getDay(), $byMonthDays)) {
                         $resultDays[] = $monthTime->getDay();
                     }
                 } else {
-                    $monthTime = new  \TYPO3\CMS\Cal\Model\CalDate(Calc::prevDayOfWeek(
+                    $monthTime = new  CalDate(Calc::prevDayOfWeek(
                         $dayOfWeekday,
                         $monthStartTime->getDay(),
                         $monthStartTime->getMonth(),
@@ -2735,7 +2845,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                         '%Y%m%d',
                         true
                     ));
-                    $monthTime->setTZbyId('UTC');
+                    $monthTime->setTZbyID('UTC');
                     if ($monthTime->before($monthStartTime)) {
                         $monthTime->addSeconds(604800);
                     }
@@ -2753,6 +2863,10 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         return $resultDays;
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     */
     public function createTranslation($uid, $overlay)
     {
         $languageFlag = $GLOBALS['TSFE']->sys_language_content;
@@ -2779,13 +2893,17 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $start_date
+     * @param $end_date
+     */
     public function setStartAndEndPoint(&$start_date, &$end_date)
     {
         $start_date->subtractSeconds($this->conf['view.'][$this->conf['view'] . '.']['startPointCorrection']);
         $end_date->addSeconds($this->conf['view.'][$this->conf['view'] . '.']['endPointCorrection']);
 
-        $this->starttime = new \TYPO3\CMS\Cal\Model\CalDate();
-        $this->endtime = new \TYPO3\CMS\Cal\Model\CalDate();
+        $this->starttime = new CalDate();
+        $this->endtime = new CalDate();
 
         $this->starttime->copy($start_date);
         $this->endtime->copy($end_date);
@@ -2795,12 +2913,16 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pidList
+     * @return array
+     */
     public function findMeetingEventsWithEmptyStatus($pidList)
     {
         if ($this->rightsObj->isLoggedIn()) {
-            $start_date = new \TYPO3\CMS\Cal\Model\CalDate();
-            $start_date->setTZById('UTC');
-            $end_date = new \TYPO3\CMS\Cal\Model\CalDate();
+            $start_date = new CalDate();
+            $start_date->setTZbyID('UTC');
+            $end_date = new CalDate();
             $end_date->copy($start_date);
             $end_date->addSeconds($this->conf['view.'][$this->conf['view'] . '.']['event.']['meeting.']['lookingAhead']);
             $this->setStartAndEndPoint($start_date, $end_date);
@@ -2849,6 +2971,9 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $eventUid
+     */
     public function updateAttendees($eventUid)
     {
         $select = 'tx_cal_event.*';
@@ -2886,7 +3011,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 if ($result) {
                     while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                         // found private calendar of attendee
-                        $eventService = &\TYPO3\CMS\Cal\Utility\Functions::getEventService();
+                        $eventService = &Functions::getEventService();
                         $eventData = $eventRow;
                         $uid = $eventData['uid'];
                         $this->cleanEventData($eventData);
@@ -2918,7 +3043,7 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
                 if ($result) {
                     while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                         // found private calendar of attendee
-                        $eventService = &\TYPO3\CMS\Cal\Utility\Functions::getEventService();
+                        $eventService = &Functions::getEventService();
                         $eventData = $eventRow;
                         $this->cleanEventData($eventData);
                         $eventData['pid'] = $row['pid'];
@@ -2961,21 +3086,18 @@ class EventService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $eventData
+     */
     public function cleanEventData(&$eventData)
     {
-        unset($eventData['uid']);
-        unset($eventData['deleted']);
-        unset($eventData['hidden']);
-        unset($eventData['categories']);
-        unset($eventData['category_id']);
-        unset($eventData['category_string']);
-        unset($eventData['category_headerstyle']);
-        unset($eventData['category_bodystyle']);
-        unset($eventData['exception_single_ids']);
-        unset($eventData['exceptionGroupIds']);
-        unset($eventData['event_owner']);
+        unset($eventData['uid'], $eventData['deleted'], $eventData['hidden'], $eventData['categories'], $eventData['category_id'], $eventData['category_string'], $eventData['category_headerstyle'], $eventData['category_bodystyle'], $eventData['exception_single_ids'], $eventData['exceptionGroupIds'], $eventData['event_owner']);
     }
 
+    /**
+     * @param string $where
+     * @return array
+     */
     public function findAllWithAdditionalWhere($where = '')
     {
         $categoryService = &$this->modelObj->getServiceObjByKey(

@@ -2,6 +2,9 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use JBartels\WecMap\Utility\Cache;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,19 +17,18 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-class NearbyEventService extends \TYPO3\CMS\Cal\Service\EventService
+class NearbyEventService extends EventService
 {
     public function __construct()
     {
         parent::__construct();
 
         // Lets see if the user is logged in
-        if ($this->rightsObj->isLoggedIn() && !$this->rightsObj->isCalAdmin() && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map') && $this->conf['view.']['calendar.']['nearbyDistance'] > 0 && class_exists('\JBartels\WecMap\Utility\Cache')) {
+        if ($this->rightsObj->isLoggedIn() && !$this->rightsObj->isCalAdmin() && ExtensionManagementUtility::isLoaded('wec_map') && $this->conf['view.']['calendar.']['nearbyDistance'] > 0 && class_exists('\JBartels\WecMap\Utility\Cache')) {
             $user = $GLOBALS['TSFE']->fe_user->user;
 
             /* Geocode the address */
-            $latlong = \JBartels\WecMap\Utility\Cache::lookup(
+            $latlong = Cache::lookup(
                 $user['street'],
                 $user['city'],
                 $user['state'],

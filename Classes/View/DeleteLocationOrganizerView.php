@@ -19,15 +19,10 @@ use TYPO3\CMS\Cal\Utility\Functions;
 /**
  * A service which renders a form to create / edit a location or organizer.
  */
-class DeleteLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class DeleteLocationOrganizerView extends FeEditingBaseView
 {
     public $isLocation = true;
     public $objectString = 'location';
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a delete form for a location or an organizer.
@@ -72,13 +67,13 @@ class DeleteLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             'view' => 'remove_' . $this->objectString
         ]));
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $sims = [];
         $rems = [];
         $wrapped = [];
         $this->object->getMarker($page, $sims, $rems, $wrapped);
 
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
     }
 }

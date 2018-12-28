@@ -14,6 +14,10 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use JBartels\WecMap\MapService\Google\Map;
+use SJBR\StaticInfoTables\Utility\LocalizationUtility;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -21,7 +25,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
+class LocationModel extends BaseModel
 {
     public $row;
     public $name;
@@ -42,66 +46,97 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
     public $sharedUsers = [];
     public $sharedGroups = [];
 
-    public function __construct($serviceKey)
-    {
-        parent::__construct($serviceKey);
-    }
-
+    /**
+     * @return mixed
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @param $t
+     */
     public function setName($t)
     {
         $this->name = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDescription()
     {
         return $this->description;
     }
 
+    /**
+     * @param $d
+     */
     public function setDescription($d)
     {
         $this->description = $d;
     }
 
+    /**
+     * @return mixed
+     */
     public function getStreet()
     {
         return $this->street;
     }
 
+    /**
+     * @param $t
+     */
     public function setStreet($t)
     {
         $this->street = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getZip()
     {
         return $this->zip;
     }
 
+    /**
+     * @param $t
+     */
     public function setZip($t)
     {
         $this->zip = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCity()
     {
         return $this->city;
     }
 
+    /**
+     * @param $t
+     */
     public function setCity($t)
     {
         $this->city = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCountryZone()
     {
         return $this->countryzone;
     }
 
+    /**
+     * @param $t
+     */
     public function setCountryZone($t)
     {
         if ($t) {
@@ -109,11 +144,17 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getCountry()
     {
         return $this->country;
     }
 
+    /**
+     * @param $t
+     */
     public function setCountry($t)
     {
         if ($t) {
@@ -121,76 +162,121 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getPhone()
     {
         return $this->phone;
     }
 
+    /**
+     * @param $t
+     */
     public function setPhone($t)
     {
         $this->phone = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getMobilephone()
     {
         return $this->mobilephone;
     }
 
+    /**
+     * @param $t
+     */
     public function setMobilephone($t)
     {
         $this->mobilephone = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getFax()
     {
         return $this->fax;
     }
 
+    /**
+     * @param $t
+     */
     public function setFax($t)
     {
         $this->fax = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLink()
     {
         return $this->link;
     }
 
+    /**
+     * @param $t
+     */
     public function setLink($t)
     {
         $this->link = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getEmail()
     {
         return $this->email;
     }
 
+    /**
+     * @param $t
+     */
     public function setEmail($t)
     {
         $this->email = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLongitude()
     {
         return $this->longitude;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLatitude()
     {
         return $this->latitude;
     }
 
+    /**
+     * @param $l
+     */
     public function setLongitude($l)
     {
         $this->longitude = $l;
     }
 
+    /**
+     * @param $l
+     */
     public function setLatitude($l)
     {
         $this->latitude = $l;
     }
 
+    /**
+     * @param $row
+     */
     public function createLocation($row)
     {
         $this->row = $row;
@@ -210,10 +296,17 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         $this->setLongitude($row['longitude']);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getMapMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###MAP###'] = '';
-        if ($this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['showMap'] && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')) {
+        if ($this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['showMap'] && ExtensionManagementUtility::isLoaded('wec_map')) {
             $apiKey = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['apiKey'];
             $width = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['mapWidth'];
             $height = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['mapHeight'];
@@ -231,9 +324,9 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
             $prefillAddress = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['prefillAddress'];
 
             $mapName = 'map' . $this->getUid();
-            /** @var \JBartels\WecMap\MapService\Google\Map $map */
-            $map = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-                \JBartels\WecMap\MapService\Google\Map::class,
+            /** @var Map $map */
+            $map = GeneralUtility::makeInstance(
+                Map::class,
                 null,
                 $width,
                 $height,
@@ -290,13 +383,20 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCountryMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->initLocalCObject();
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-            $staticInfo = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+        if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+            $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
             $staticInfo->init();
-            $current = \SJBR\StaticInfoTables\Utility\LocalizationUtility::translate(
+            $current = LocalizationUtility::translate(
                 ['uid' => $this->getCountry()],
                 'static_countries',
                 false
@@ -316,13 +416,20 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCountryZoneMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->initLocalCObject();
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-            $staticInfo = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+        if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+            $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
             $staticInfo->init();
-            $current = \SJBR\StaticInfoTables\Utility\LocalizationUtility::translate(
+            $current = LocalizationUtility::translate(
                 ['uid' => $this->getCountryzone()],
                 'static_country_zones',
                 false
@@ -342,16 +449,37 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getLocationLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $wrapped['###LOCATION_LINK###'] = explode('$5&xs2', $this->getLinkToLocation('$5&xs2'));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getOrganizerLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $wrapped['###ORGANIZER_LINK###'] = explode('$5&xs2', $this->getLinkToOrganizer('$5&xs2'));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###EDIT_LINK###'] = '';
@@ -413,21 +541,36 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @param $key
+     * @param $link
+     */
     public function addEventLink($key, $link)
     {
         $this->eventLinks[$key] = $link;
     }
 
+    /**
+     * @return array
+     */
     public function getEventLinks()
     {
         return $this->eventLinks;
     }
 
+    /**
+     * @param $linktext
+     * @return string
+     */
     public function getLinkToOrganizer($linktext)
     {
         return $this->getLinkToLocation($linktext);
     }
 
+    /**
+     * @param $linktext
+     * @return string
+     */
     public function getLinkToLocation($linktext)
     {
         if ($linktext == '') {
@@ -450,6 +593,9 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $linktext;
     }
 
+    /**
+     * @param $piVars
+     */
     public function updateWithPIVars(&$piVars)
     {
         $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelController');
@@ -552,41 +698,67 @@ class LocationModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return get_class($this) . ': ' . implode(', ', $this->row);
     }
 
+    /**
+     * @param $id
+     */
     public function addSharedUser($id)
     {
         $this->sharedUsers[] = $id;
     }
 
+    /**
+     * @param $id
+     */
     public function addSharedGroup($id)
     {
         $this->sharedGroups[] = $id;
     }
 
+    /**
+     * @return array
+     */
     public function getSharedUsers()
     {
         return $this->sharedUsers;
     }
 
+    /**
+     * @return array
+     */
     public function getSharedGroups()
     {
         return $this->sharedGroups;
     }
 
+    /**
+     * @param $userIds
+     */
     public function setSharedUsers($userIds)
     {
         $this->sharedUsers = $userIds;
     }
 
+    /**
+     * @param $groupIds
+     */
     public function setSharedGroups($groupIds)
     {
         $this->sharedGroups = $groupIds;
     }
 
+    /**
+     * @param $userId
+     * @param $groupIdArray
+     * @return bool
+     */
     public function isSharedUser($userId, $groupIdArray)
     {
         if (is_array($this->getSharedUsers()) && in_array($userId, $this->getSharedUsers())) {

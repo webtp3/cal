@@ -16,19 +16,35 @@ namespace TYPO3\CMS\Cal\Model;
  */
 use TYPO3\CMS\Cal\Utility\Functions;
 
-class TodoRecModel extends \TYPO3\CMS\Cal\Model\EventRecModel
+/**
+ * Class TodoRecModel
+ */
+class TodoRecModel extends EventRecModel
 {
+    /**
+     * TodoRecModel constructor.
+     * @param $todo
+     * @param $start
+     * @param $end
+     */
     public function __construct($todo, $start, $end)
     {
         parent::__construct($todo, $start, $end);
-        $this->setEventType(\TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO);
+        $this->setEventType(Model::EVENT_TYPE_TODO);
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEvent()
     {
         return $this->fillTemplate('###TEMPLATE_TODO###');
     }
 
+    /**
+     * @param $viewType
+     * @return string|processed
+     */
     public function renderEventFor($viewType)
     {
         if ($this->parentEvent->conf['view.']['freeAndBusy.']['enable'] == 1) {
@@ -41,18 +57,28 @@ class TodoRecModel extends \TYPO3\CMS\Cal\Model\EventRecModel
         return $this->fillTemplate('###TEMPLATE_TODO_' . strtoupper($viewType) . '###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventPreview()
     {
         $this->parentEvent->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_TODO_PREVIEW###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderTomorrowsEvent()
     {
         $this->parentEvent->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_TODO_TOMORROW###');
     }
 
+    /**
+     * @param $subpartMarker
+     * @return string|processed
+     */
     public function fillTemplate($subpartMarker)
     {
         $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
@@ -75,7 +101,7 @@ class TodoRecModel extends \TYPO3\CMS\Cal\Model\EventRecModel
         $sims = [];
         $wrapped = [];
         $this->getMarker($page, $sims, $rems, $wrapped, $this->parentEvent->conf['view']);
-        return $this->parentEvent->finish(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        return $this->parentEvent->finish(Functions::substituteMarkerArrayNotCached(
             $page,
             $sims,
             $rems,
@@ -83,16 +109,37 @@ class TodoRecModel extends \TYPO3\CMS\Cal\Model\EventRecModel
         ));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStatusMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getStatusMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getPriorityMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getPriorityMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCompletedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getCompletedMarker($template, $sims, $rems, $wrapped, $view);

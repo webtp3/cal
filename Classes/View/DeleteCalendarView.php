@@ -19,14 +19,9 @@ use TYPO3\CMS\Cal\Utility\Functions;
 /**
  * A service which renders a form to create / edit a phpicalendar event.
  */
-class DeleteCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class DeleteCalendarView extends FeEditingBaseView
 {
     public $calendar;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a delete form for a calendar.
@@ -69,17 +64,22 @@ class DeleteCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             'view' => 'remove_calendar'
         ]));
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $sims = [];
         $rems = [];
         $wrapped = [];
         $this->getTemplateSingleMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalendarTypeMarker(& $template, & $sims, & $rems)
     {
         $calendarTypeArray = [
@@ -93,6 +93,11 @@ class DeleteCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getExtUrlMarker(& $template, & $sims, & $rems)
     {
         $sims['###EXTURL###'] = '';
@@ -104,6 +109,11 @@ class DeleteCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getRefreshMarker(& $template, & $sims, & $rems)
     {
         $sims['###REFRESH_LABEL###'] = '';
@@ -112,6 +122,11 @@ class DeleteCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getIcsFileMarker(& $template, & $sims, & $rems)
     {
         $sims['###ICSFILE###'] = '';
@@ -120,11 +135,21 @@ class DeleteCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTitleMarker(& $template, & $sims, & $rems)
     {
         $sims['###TITLE###'] = $this->applyStdWrap($this->object->getTitle(), 'title_stdWrap');
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getActivateFreeAndBusyMarker(& $template, & $sims, & $rems)
     {
         $sims['###ACTIVATE_FREEANDBUSY###'] = $this->applyStdWrap(
@@ -133,6 +158,11 @@ class DeleteCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getFreeAndBusyUserMarker(& $template, & $sims, & $rems)
     {
         $displaylist = [];
@@ -163,6 +193,11 @@ class DeleteCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###FREEANDBUSYUSER###'] = $this->applyStdWrap(implode(',', $displaylist), 'freeAndBusyUser_stdWrap');
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getOwnerMarker(& $template, & $sims, & $rems)
     {
         $displaylist = [];

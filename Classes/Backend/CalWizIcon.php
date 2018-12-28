@@ -2,6 +2,11 @@
 
 namespace TYPO3\CMS\Cal\Backend;
 
+use TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,7 +19,6 @@ namespace TYPO3\CMS\Cal\Backend;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 class CalWizIcon
 {
     public function proc($wizardItems)
@@ -22,7 +26,7 @@ class CalWizIcon
         $LL = $this->includeLocalLang();
 
         $wizardItems['plugins_tx_cal'] = [
-            'icon' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/icons/ce_wiz.gif',
+            'icon' => ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/icons/ce_wiz.gif',
             'title' => $GLOBALS['LANG']->getLLL('pi1_title', $LL),
             'description' => $GLOBALS['LANG']->getLLL('pi1_plus_wiz_description', $LL),
             'params' => '&defVals[tt_content][CType]=list&defVals[tt_content][list_type]=cal_controller'
@@ -33,12 +37,12 @@ class CalWizIcon
 
     public function includeLocalLang()
     {
-        $llFile = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_plugin.xml';
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-            $localizationParser = new \TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser();
+        $llFile = ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_plugin.xml';
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+            $localizationParser = new LocallangXmlParser();
             $LOCAL_LANG = $localizationParser->getParsedData($llFile, $GLOBALS['LANG']->lang);
         } else {
-            $LOCAL_LANG = \TYPO3\CMS\Core\Utility\GeneralUtility::readLLfile($llFile, $GLOBALS['LANG']->lang);
+            $LOCAL_LANG = GeneralUtility::readLLfile($llFile, $GLOBALS['LANG']->lang);
         }
 
         return $LOCAL_LANG;

@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Frontend;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -27,7 +29,7 @@ namespace TYPO3\CMS\Cal\Frontend;
  */
 function IsCalNotAllowedToBeCached()
 {
-    $postVars = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('tx_cal_controller');
+    $postVars = GeneralUtility::_GP('tx_cal_controller');
     $view = $postVars['view'];
 
     /* FRONTEND EDITING */

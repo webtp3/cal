@@ -16,7 +16,12 @@ namespace TYPO3\CMS\Cal\Ajax;
  */
 
 // Exit, if script is called directly (must be included via eID in index_ts.php)
+use TYPO3\CMS\Cal\Controller\Api;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\Utility\EidUtility;
 
 if (!defined('PATH_typo3conf')) {
     die('Could not access this script directly!');
@@ -27,9 +32,9 @@ if ($_COOKIE['fe_typo_user']) {
     session_start();
 }
 // Initialize FE user object:
-$feUserObj = \TYPO3\CMS\Frontend\Utility\EidUtility::initFeUser();
+$feUserObj = EidUtility::initFeUser();
 // Connect to database:
-\TYPO3\CMS\Frontend\Utility\EidUtility::connectDB();
+EidUtility::connectDB();
 $controllerPiVarsGET = GeneralUtility::_GET('tx_cal_controller');
 $controllerPiVarsPOST = GeneralUtility::_POST('tx_cal_controller');
 $controllerPiVars = [];
@@ -44,10 +49,10 @@ if (is_array($controllerPiVarsPOST) && is_array($controllerPiVarsGET)) {
 $pid = intval($controllerPiVars['pid']);
 $view = $controllerPiVars['view'];
 
-/** @var \TYPO3\CMS\Cal\Controller\Api $calAPI */
-$calAPI = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\Api');
+/** @var Api $calAPI */
+$calAPI = GeneralUtility::makeInstance(Api::class);
 if (is_array($_SESSION['cal_api_' . $pid . '_conf'])) {
-    $cObj = new \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer();
+    $cObj = new ContentObjectRenderer();
     $GLOBALS['TSFE'] = &$_SESSION['cal_api_' . $pid . '_tsfe'];
     $GLOBALS['TCA'] = &$_SESSION['cal_api_' . $pid . '_tca'];
     $calAPI = $calAPI->tx_cal_api_with($cObj, $_SESSION['cal_api_' . $pid . '_conf']);
@@ -73,10 +78,10 @@ if ($controllerPiVars['translations']) {
             $returnValue = [
                 'timeSeparator' => ' ' . $calAPI->controller->pi_getLL('l_to') . ' ',
                 'newEventText' => $calAPI->controller->pi_getLL('l_new_event'),
-                'shortMonths' => \TYPO3\CMS\Cal\Utility\Functions::getMonthNames('%b'),
-                'longMonths' => \TYPO3\CMS\Cal\Utility\Functions::getMonthNames('%B'),
-                'shortDays' => \TYPO3\CMS\Cal\Utility\Functions::getWeekdayNames('%a'),
-                'longDays' => \TYPO3\CMS\Cal\Utility\Functions::getWeekdayNames('%A'),
+                'shortMonths' => Functions::getMonthNames('%b'),
+                'longMonths' => Functions::getMonthNames('%B'),
+                'shortDays' => Functions::getWeekdayNames('%a'),
+                'longDays' => Functions::getWeekdayNames('%A'),
                 'buttonText' => [
                     'today' => $calAPI->controller->pi_getLL('l_today'),
                     'lastWeek' => $calAPI->controller->pi_getLL('l_prev'),
@@ -104,7 +109,7 @@ if ($controllerPiVars['translations']) {
     $ajax_return_data = json_encode($translationArray);
     $htmlheader_contenttype = 'Content-Type: application/json';
 } else {
-    $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+    $rightsObj = &Registry::Registry('basic', 'rightscontroller');
     $checkedView = $rightsObj->checkView($view);
     $res = '';
     $error = true;

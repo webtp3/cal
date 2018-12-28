@@ -2,6 +2,9 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Cal\Model\OrganizerAddress;
+use TYPO3\CMS\Cal\Utility\Functions;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +23,7 @@ namespace TYPO3\CMS\Cal\Service;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
+class OrganizerAddressService extends BaseService
 {
     public $keyId = 'tx_tt_address';
     public $tableId = 'tt_address';
@@ -89,7 +92,7 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
     public function getOrganizerFromTable($pidList = '', $additionalWhere = '')
     {
         $organizers = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->tableId);
+        $orderBy = Functions::getOrderBy($this->tableId);
         if ($pidList != '') {
             $additionalWhere .= ' AND ' . $this->tableId . '.pid IN (' . $pidList . ')';
         }
@@ -98,10 +101,10 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         $table = $this->tableId;
         $where = 'tx_cal_controller_isorganizer = 1 AND l18n_parent = 0 ' . $additionalWhere . $this->cObj->enableFields($this->tableId);
         $groupBy = '';
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->tableId);
+        $orderBy = Functions::getOrderBy($this->tableId);
         $limit = '';
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_organizer_address_service',
             'organizerServiceClass',
             'service'
@@ -117,7 +120,7 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
 
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $organizers[] = new \TYPO3\CMS\Cal\Model\OrganizerAddress($row, $pidList);
+                $organizers[] = new OrganizerAddress($row, $pidList);
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
@@ -143,6 +146,10 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return $where;
     }
 
+    /**
+     * @param $uid
+     * @return object
+     */
     public function updateOrganizer($uid)
     {
         $insertFields = [
@@ -159,6 +166,9 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $uid
+     */
     public function removeOrganizer($uid)
     {
         if (!$this->isAllowedService()) {
@@ -175,6 +185,9 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $insertFields
+     */
     public function retrievePostData(&$insertFields)
     {
         if (!$this->isAllowedService()) {
@@ -226,6 +239,10 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pid
+     * @return object
+     */
     public function saveOrganizer($pid)
     {
         if (!$this->isAllowedService()) {
@@ -278,6 +295,10 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $insertFields
+     * @return mixed
+     */
     public function _saveOrganizer(&$insertFields)
     {
         $table = $this->tableId;
@@ -292,6 +313,9 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return $uid;
     }
 
+    /**
+     * @return bool
+     */
     public function isAllowedService()
     {
         $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
@@ -302,6 +326,10 @@ class OrganizerAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return false;
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     */
     public function createTranslation($uid, $overlay)
     {
         $table = $this->tableId;

@@ -20,6 +20,7 @@ use TYPO3\CMS\Cal\Controller\DateParser;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Service\EventService;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
@@ -385,6 +386,7 @@ class RecurrenceGenerator
      * Get the event service
      *
      * @return EventService
+     * @throws Exception
      */
     public function getEventService()
     {
@@ -396,7 +398,7 @@ class RecurrenceGenerator
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             if (!$modelObj) {
                 /** @var Api $calAPI */
-                $calAPI = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\Api');
+                $calAPI = GeneralUtility::makeInstance(Api::class);
                 $calAPI = &$calAPI->tx_cal_api_without($this->pageIDForPlugin);
                 $modelObj = $calAPI->modelObj;
             }
@@ -423,7 +425,7 @@ class RecurrenceGenerator
     protected function getTimeParsed($timeString)
     {
         /** @var DateParser $dp */
-        $dp = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\DateParser');
+        $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }

@@ -19,14 +19,9 @@ use TYPO3\CMS\Cal\Utility\Functions;
 /**
  * A service which renders a form to create / edit an EventModel.
  */
-class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class DeleteEventView extends FeEditingBaseView
 {
     public $event;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a delete event form.
@@ -71,18 +66,24 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             'category' => null
         ]));
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $sims = [];
         $rems = [];
         $wrapped = [];
         $this->getTemplateSingleMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @return string|void
+     */
     public function getCalendarIdMarker(& $template, & $sims, & $rems)
     {
         $sims['###CALENDAR_ID###'] = '';
@@ -100,6 +101,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $GLOBALS['TYPO3_DB']->sql_free_result($result);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCategoryMarker(& $template, & $sims, & $rems)
     {
         $sims['###CATEGORY###'] = '';
@@ -120,6 +126,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAlldayMarker(& $template, & $sims, & $rems)
     {
         $label = $this->controller->pi_getLL('l_false');
@@ -132,6 +143,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getStartdateMarker(& $template, & $sims, & $rems)
     {
         $startDate = $this->object->getStart();
@@ -143,6 +159,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEnddateMarker(& $template, & $sims, & $rems)
     {
         $endDate = $this->object->getEnd();
@@ -154,6 +175,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getStarttimeMarker(& $template, & $sims, & $rems)
     {
         $startDate = $this->object->getStart();
@@ -163,6 +189,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEndtimeMarker(& $template, & $sims, & $rems)
     {
         $endDate = $this->object->getEnd();
@@ -172,6 +203,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTitleMarker(& $template, & $sims, & $rems)
     {
         $sims['###TITLE###'] = $this->cObj->stdWrap(
@@ -180,6 +216,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getOrganizerMarker(& $template, & $sims, & $rems)
     {
         $sims['###ORGANIZER###'] = '';
@@ -191,6 +232,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalOrganizerMarker(& $template, & $sims, & $rems)
     {
         $sims['###CAL_ORGANIZER###'] = '';
@@ -202,6 +248,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getLocationMarker(& $template, & $sims, & $rems)
     {
         $sims['###LOCATION###'] = '';
@@ -213,6 +264,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalLocationMarker(& $template, & $sims, & $rems)
     {
         $sims['###CAL_LOCATION###'] = '';
@@ -224,16 +280,31 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getDescriptionMarker(& $template, & $sims, & $rems)
     {
         $this->object->getDescriptionMarker($template, $sims, $rems, $wrapped, $this->conf['view']);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTeaserMarker(& $template, & $sims, & $rems)
     {
         $this->object->getTeaserMarker($template, $sims, $rems, $wrapped, $this->conf['view']);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getFrequencyMarker(& $template, & $sims, & $rems)
     {
         $sims['###FREQUENCY###'] = $this->cObj->stdWrap(
@@ -242,6 +313,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByDayMarker(& $template, & $sims, & $rems)
     {
         $by_day = [
@@ -268,6 +344,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByMonthDayMarker(& $template, & $sims, & $rems)
     {
         $sims['###BY_MONTHDAY###'] = $this->cObj->stdWrap(
@@ -276,6 +357,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByMonthMarker(& $template, & $sims, & $rems)
     {
         $sims['###BY_MONTH###'] = $this->cObj->stdWrap(
@@ -284,6 +370,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getUntilMarker(& $template, & $sims, & $rems)
     {
         $sims['###UNTIL###'] = '';
@@ -298,6 +389,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCountMarker(& $template, & $sims, & $rems)
     {
         $sims['###COUNT###'] = $this->cObj->stdWrap(
@@ -306,6 +402,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getIntervalMarker(& $template, & $sims, & $rems)
     {
         $sims['###INTERVAL###'] = $this->cObj->stdWrap(
@@ -314,6 +415,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getRdateTypeMarker(& $template, & $sims, & $rems)
     {
         $sims['###RDATE_TYPE###'] = $this->cObj->stdWrap(
@@ -322,6 +428,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getRdateMarker(& $template, & $sims, & $rems)
     {
         $sims['###RDATE###'] = $this->cObj->stdWrap(
@@ -330,6 +441,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getNotifyMarker(& $template, & $sims, & $rems)
     {
         $sims['###NOTIFY###'] = '';
@@ -351,6 +467,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getExceptionMarker(& $template, & $sims, & $rems)
     {
         $exception = [];
@@ -380,6 +501,11 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCreateExceptionMarker(& $template, & $sims, & $rems)
     {
         if ($this->object->isClone() && $this->rightsObj->isAllowedToCreateExceptionEvent()) {
@@ -398,7 +524,7 @@ class DeleteEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             $local_sims['###EVENT_END_TIME###'] = $eventEnd->format('%H%M');
             $local_sims['###EVENT_UID###'] = $this->object->getUid();
             $rems['###CREATE_EXCEPTION###'] = $this->cObj->getSubpart($template, '###CREATE_EXCEPTION###');
-            $rems['###CREATE_EXCEPTION###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+            $rems['###CREATE_EXCEPTION###'] = Functions::substituteMarkerArrayNotCached(
                 $rems['###CREATE_EXCEPTION###'],
                 $local_sims,
                 [],

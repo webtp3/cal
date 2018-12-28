@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Controller;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -21,9 +23,9 @@ namespace TYPO3\CMS\Cal\Controller;
  * controller and starts rendering in the appropriate calendar view by
  * utilizing TYPO3 services.
  */
-class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
+class ViewController extends BaseController
 {
-    public function ViewController()
+    public function __construct()
     {
         $this->BaseController();
     }
@@ -31,8 +33,8 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the day view.
      *
-     * @param
-     *            object        The event to be drawn.
+     * @param $master_array
+     * @param $getdate
      * @return string HTML output of the specified view.
      */
     public function drawDay(&$master_array, $getdate)
@@ -48,8 +50,8 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the week view.
      *
-     * @param
-     *            object        The event to be drawn.
+     * @param $master_array
+     * @param $getdate
      * @return string HTML output of the specified view.
      */
     public function drawWeek(&$master_array, $getdate)
@@ -64,8 +66,8 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the month view.
      *
-     * @param
-     *            object        The event to be drawn.
+     * @param $master_array
+     * @param $getdate
      * @return string HTML output of the specified view.
      */
     public function drawMonth(&$master_array, $getdate)
@@ -80,8 +82,8 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the year view.
      *
-     * @param
-     *            object        The event to be drawn.
+     * @param $master_array
+     * @param $getdate
      * @return string HTML output of the specified view.
      */
     public function drawYear(&$master_array, $getdate)
@@ -96,8 +98,9 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the list view.
      *
-     * @param
-     *            object        The events to be drawn.
+     * @param $master_array
+     * @param $starttime
+     * @param $endtime
      * @return string HTML output of the specified view.
      */
     public function drawList(&$master_array, $starttime, $endtime)
@@ -112,8 +115,8 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the ics list view.
      *
-     * @param
-     *            object        The categories to be shown.
+     * @param $master_array
+     * @param $getdate
      * @return string HTML output of the specified view.
      */
     public function drawIcsList(&$master_array, $getdate)
@@ -170,8 +173,9 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the month view.
      *
-     * @param
-     *            object        The event to be drawn.
+     * @param $event
+     * @param $getdate
+     * @param array $relatedEvents
      * @return string HTML output of the specified view.
      */
     public function drawEvent(&$event, $getdate, $relatedEvents = [])
@@ -186,8 +190,10 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the ics view.
      *
-     * @param
-     *            object        The event to be drawn.
+     * @param $master_array
+     * @param $getdate
+     * @param bool $sendHeaders
+     * @param string $limitAttendeeToThisEmail
      * @return string HTML output of the specified view.
      */
     public function drawIcs(&$master_array, $getdate, $sendHeaders = true, $limitAttendeeToThisEmail = '')
@@ -202,8 +208,8 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the rss view.
      *
-     * @param
-     *            object        The event to be drawn.
+     * @param $master_array
+     * @param $getdate
      * @return string HTML output of the specified view.
      */
     public function drawRss(&$master_array, $getdate)
@@ -218,8 +224,12 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the search view.
      *
-     * @param
-     *            object        The events to be drawn.
+     * @param $master_array
+     * @param $starttime
+     * @param $endtime
+     * @param $searchword
+     * @param string $locationIds
+     * @param string $organizerIds
      * @return string HTML output of the specified view.
      */
     public function drawSearchAllResult(
@@ -248,8 +258,12 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the search view.
      *
-     * @param
-     *            object        The events to be drawn.
+     * @param $master_array
+     * @param $starttime
+     * @param $endtime
+     * @param $searchword
+     * @param string $locationIds
+     * @param string $organizerIds
      * @return string HTML output of the specified view.
      */
     public function drawSearchEventResult(
@@ -278,8 +292,8 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the search view.
      *
-     * @param
-     *            object        The events to be drawn.
+     * @param $master_array
+     * @param $searchword
      * @return string HTML output of the specified view.
      */
     public function drawSearchLocationResult(&$master_array, $searchword)
@@ -295,8 +309,8 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the search view.
      *
-     * @param
-     *            object        The events to be drawn.
+     * @param $master_array
+     * @param $searchword
      * @return string HTML output of the specified view.
      */
     public function drawSearchOrganizerResult(&$master_array, $searchword)
@@ -314,6 +328,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The event to be drawn.
+     * @param array $relatedEvents
      * @return string HTML output of the specified view.
      */
     public function drawLocation(&$location, $relatedEvents = [])
@@ -330,6 +345,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The event to be drawn.
+     * @param array $relatedEvents
      * @return string HTML output of the specified view.
      */
     public function drawOrganizer(&$organizer, $relatedEvents = [])
@@ -346,6 +362,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The event to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawCreateEvent($getdate, $pidList = '')
@@ -360,8 +377,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the confirm event view.
      *
-     * @param
-     *            object        The event to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawConfirmEvent($pidList = '')
@@ -378,6 +394,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The event to be edited.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawEditEvent(&$event, $pidList = '')
@@ -394,6 +411,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The event to be deleted.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawDeleteEvent(&$event, $pidList = '')
@@ -410,6 +428,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The location to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawCreateLocation($getdate, $pidList = '')
@@ -423,8 +442,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the confirm location view.
      *
-     * @param
-     *            object        The location to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawConfirmLocation($pidList = '')
@@ -441,6 +459,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The location to be edited.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawEditLocation(&$location, $pidList = '')
@@ -457,6 +476,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The location to be deleted.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawDeleteLocation(&$location, $pidList = '')
@@ -473,6 +493,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The organizer to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawCreateOrganizer($getdate, $pidList = '')
@@ -487,8 +508,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the confirm organizer view.
      *
-     * @param
-     *            object        The organizer to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawConfirmOrganizer($pidList = '')
@@ -505,6 +525,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The event to be edited.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawEditOrganizer(&$organizer, $pidList = '')
@@ -521,6 +542,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The organizer to be deleted.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawDeleteOrganizer(&$organizer, $pidList = '')
@@ -537,6 +559,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The calendar to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawCreateCalendar($getdate, $pidList = '')
@@ -551,8 +574,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the confirm calendar view.
      *
-     * @param
-     *            object        The calendar to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawConfirmCalendar($pidList = '')
@@ -569,6 +591,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The event to be edited.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawEditCalendar(&$calendar, $pidList = '')
@@ -585,6 +608,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The calendar to be deleted.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawDeleteCalendar(&$calendar, $pidList = '')
@@ -601,6 +625,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The category to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawCreateCategory($getdate, $pidList = '')
@@ -615,8 +640,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Draws the confirm category view.
      *
-     * @param
-     *            object        The category to be drawn.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawConfirmCategory($pidList = '')
@@ -633,6 +657,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The event to be edited.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawEditCategory(&$category, $pidList = '')
@@ -649,6 +674,7 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
      *
      * @param
      *            object        The category to be deleted.
+     * @param string $pidList
      * @return string HTML output of the specified view.
      */
     public function drawDeleteCategory(&$category, $pidList = '')
@@ -663,19 +689,16 @@ class ViewController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Helper function to return a service object with the given type, subtype, and serviceKey
      *
-     * @param
-     *            string    The type of the service.
-     * @param
-     *            string    The subtype of the service.
-     * @param
-     *            string    The serviceKey.
+     * @param $type
+     * @param string $subtype
+     * @param $key
      * @return object service object.
      */
     public function getServiceObjByKey($type, $subtype = '', $key)
     {
         $serviceChain = '';
         /* Loop over all services providign the specified service type and subtype */
-        while (is_object($obj = &\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstanceService(
+        while (is_object($obj = &GeneralUtility::makeInstanceService(
             $type,
             $subtype,
             $serviceChain

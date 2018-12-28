@@ -14,29 +14,40 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Controller\Registry;
+use TYPO3\CMS\Cal\Model\ModelController;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Service\AbstractService;
+use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
+/**
+ * Class BaseService
+ */
+abstract class BaseService extends AbstractService
 {
     public $cObj; // The backReference to the mother cObj object set at call time
     /**
      * The rights service object
      *
-     * @var \TYPO3\CMS\Cal\Service\RightsService
+     * @var RightsService
      */
     public $rightsObj;
     /**
      * The model controller object
      *
-     * @var \TYPO3\CMS\Cal\Model\ModelController
+     * @var ModelController
      */
     public $modelObj;
 
     /**
      * The main controller object
      *
-     * @var \TYPO3\CMS\Cal\Controller\Controller
+     * @var Controller
      */
     public $controller;
     public $conf;
@@ -45,63 +56,63 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
     /**
      * The calendar service object
      *
-     * @var \TYPO3\CMS\Cal\Service\CalendarService
+     * @var CalendarService
      */
     public $calendarService;
 
     /**
      * The category service object
      *
-     * @var \TYPO3\CMS\Cal\Service\CategoryService
+     * @var CategoryService
      */
     public $categoryService;
 
     /**
      * The event service object
      *
-     * @var \TYPO3\CMS\Cal\Service\EventService
+     * @var EventService
      */
     public $eventService;
 
     /**
      * The location service object
      *
-     * @var \TYPO3\CMS\Cal\Service\LocationService
+     * @var LocationService
      */
     public $locationService;
 
     /**
      * The locationAddress service object
      *
-     * @var \TYPO3\CMS\Cal\Service\LocationAddressService
+     * @var LocationAddressService
      */
     public $locationAddressService;
 
     /**
      * The locationPartner service object
      *
-     * @var \TYPO3\CMS\Cal\Service\LocationPartnerService
+     * @var LocationPartnerService
      */
     public $locationPartnerService;
 
     /**
      * The organizer service object
      *
-     * @var \TYPO3\CMS\Cal\Service\OrganizerService
+     * @var OrganizerService
      */
     public $organizerService;
 
     /**
      * The organizerAddress service object
      *
-     * @var \TYPO3\CMS\Cal\Service\OrganizerAddressService
+     * @var OrganizerAddressService
      */
     public $organizerAddressService;
 
     /**
      * The organizerPartner service object
      *
-     * @var \TYPO3\CMS\Cal\Service\OrganizerPartnerService
+     * @var OrganizerPartnerService
      */
     public $organizerPartnerService;
     public $fileFunc;
@@ -120,6 +131,14 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         }
     }
 
+    /**
+     * @param $mm_table
+     * @param $idArray
+     * @param $uid
+     * @param $tablename
+     * @param array $additionalParams
+     * @param bool $switchUidLocalForeign
+     */
     protected static function insertIdsIntoTableWithMMRelation(
         $mm_table,
         $idArray,
@@ -153,6 +172,11 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         }
     }
 
+    /**
+     * @param $allIds
+     * @param $userArray
+     * @param $groupArray
+     */
     protected static function splitUserAndGroupIds($allIds, &$userArray, &$groupArray)
     {
         foreach ($allIds as $value) {
@@ -165,23 +189,33 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         }
     }
 
+    /**
+     * @param $event
+     * @param $insertFields
+     */
     protected static function _notifyOfChanges(&$event, &$insertFields)
     {
         $valueArray = $event->getValuesAsArray();
-        $notificationService = &\TYPO3\CMS\Cal\Utility\Functions::getNotificationService();
+        $notificationService = &Functions::getNotificationService();
         $notificationService->notifyOfChanges($valueArray, $insertFields);
         self::_scheduleReminder($event->getUid());
     }
 
+    /**
+     * @param $insertFields
+     */
     protected static function _notify(&$insertFields)
     {
-        $notificationService = &\TYPO3\CMS\Cal\Utility\Functions::getNotificationService();
+        $notificationService = &Functions::getNotificationService();
         $notificationService->notify($insertFields);
     }
 
+    /**
+     * @param $event
+     */
     protected function _invite(&$event)
     {
-        $notificationService = &\TYPO3\CMS\Cal\Utility\Functions::getNotificationService();
+        $notificationService = &Functions::getNotificationService();
         $oldView = $this->conf['view'];
         $this->conf['view'] = 'ics';
         $eventValues = [];
@@ -190,18 +224,29 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         $this->conf['view'] = $oldView;
     }
 
+    /**
+     * @param $eventUid
+     */
     protected static function _scheduleReminder($eventUid)
     {
-        $reminderService = &\TYPO3\CMS\Cal\Utility\Functions::getReminderService();
+        $reminderService = &Functions::getReminderService();
         $reminderService->scheduleReminder($eventUid);
     }
 
+    /**
+     * @param $uid
+     */
     protected static function stopReminder($uid)
     {
-        $reminderService = &\TYPO3\CMS\Cal\Utility\Functions::getReminderService();
+        $reminderService = &Functions::getReminderService();
         $reminderService->deleteReminderForEvent($uid);
     }
 
+    /**
+     * @param $insertFields
+     * @param $object
+     * @param bool $isSave
+     */
     protected function searchForAdditionalFieldsToAddFromPostData(&$insertFields, $object, $isSave = true)
     {
         $fields = GeneralUtility::trimExplode(
@@ -227,6 +272,12 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         }
     }
 
+    /**
+     * @param $objectType
+     * @param $type
+     * @param $insertFields
+     * @param $uid
+     */
     protected function checkOnNewOrDeletableFiles($objectType, $type, &$insertFields, $uid)
     {
         if ($this->conf['view.']['enableAjax'] || $this->conf['view.']['dontShowConfirmView'] == 1) {
@@ -238,7 +289,7 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
                 }
 
                 if (!$this->fileFunc) {
-                    $this->fileFunc = new \TYPO3\CMS\Core\Utility\File\BasicFileUtility();
+                    $this->fileFunc = new BasicFileUtility();
                     $all_files = [];
                     $all_files['webspace']['allow'] = '*';
                     $all_files['webspace']['deny'] = '';
@@ -305,17 +356,23 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         }
     }
 
+    /**
+     * @param $type
+     * @param $insertFields
+     * @param $objectType
+     * @param $uid
+     */
     protected function checkOnTempFile($type, &$insertFields, $objectType, $uid)
     {
         $fileadminDirectory = rtrim($GLOBALS['TYPO3_CONF_VARS']['BE']['fileadminDir'], '/') . '/';
-        /** @var $storageRepository \TYPO3\CMS\Core\Resource\StorageRepository */
-        $storageRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\StorageRepository');
+        /** @var $storageRepository StorageRepository */
+        $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
         $storages = $storageRepository->findAll();
         foreach ($storages as $tmpStorage) {
             $storageRecord = $tmpStorage->getStorageRecord();
             $configuration = $tmpStorage->getConfiguration();
             $isLocalDriver = $storageRecord['driver'] === 'Local';
-            $isOnFileadmin = !empty($configuration['basePath']) && \TYPO3\CMS\Core\Utility\GeneralUtility::isFirstPartOfStr(
+            $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
                 $configuration['basePath'],
                     $fileadminDirectory
             );
@@ -327,8 +384,8 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         if (!isset($storage)) {
             throw new \RuntimeException('Local default storage could not be initialized - might be due to missing sys_file* tables.');
         }
-        $fileFactory = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\ResourceFactory');
-        $fileIndexRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Index\\FileIndexRepository');
+        $fileFactory = GeneralUtility::makeInstance(ResourceFactory::class);
+        $fileIndexRepository = GeneralUtility::makeInstance(FileIndexRepository::class);
         $targetDirectory = PATH_site . $fileadminDirectory . 'user_upload/';
         if (is_array($insertFields[$type])) {
             foreach ($insertFields[$type] as $file) {
@@ -370,6 +427,16 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         unset($insertFields[$type]);
     }
 
+    /**
+     * @param $storage
+     * @param $fileIndexRepository
+     * @param $targetDirectory
+     * @param $type
+     * @param $insertFields
+     * @param $objectType
+     * @param $fileOrig
+     * @param $uid
+     */
     private function _checkOnTempFile(
         &$storage,
         &$fileIndexRepository,
@@ -387,7 +454,7 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         if (substr($fileOrig, 0, 7) == '__NEW__') {
             $file = substr($fileOrig, 7);
             if (file_exists(PATH_site . 'typo3temp/' . $file)) {
-                \TYPO3\CMS\Core\Utility\GeneralUtility::upload_copy_move(
+                GeneralUtility::upload_copy_move(
                     PATH_site . 'typo3temp/' . $file,
                     $targetDirectory . $file
                 );
@@ -450,6 +517,10 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         }
     }
 
+    /**
+     * @param $table
+     * @return string
+     */
     protected function getAdditionalWhereForLocalizationAndVersioning($table)
     {
         $localizationPrefix = 'l18n';
@@ -514,6 +585,11 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         return ' AND ' . $selectConf['where'];
     }
 
+    /**
+     * @param $uid
+     * @param $table
+     * @return mixed
+     */
     protected static function checkUidForLanguageOverlay($uid, $table)
     {
         $select = $table . '.*';
@@ -544,6 +620,9 @@ abstract class BaseService extends \TYPO3\CMS\Core\Service\AbstractService
         return $uid;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return get_class($this);

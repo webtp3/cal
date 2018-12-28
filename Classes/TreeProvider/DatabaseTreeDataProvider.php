@@ -14,8 +14,16 @@ namespace TYPO3\CMS\Cal\TreeProvider;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Backend\Tree\SortedTreeNodeCollection;
+use TYPO3\CMS\Backend\Tree\TreeNode;
+use TYPO3\CMS\Backend\Tree\TreeNodeCollection;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * TCA tree data provider which considers
@@ -24,7 +32,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
 {
 
     /**
-     * @var \TYPO3\CMS\Core\Authentication\BackendUserAuthentication
+     * @var BackendUserAuthentication
      */
     protected $backendUserAuthentication;
 
@@ -47,6 +55,9 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
      * Required constructor
      *
      * @param array $configuration TCA configuration
+     * @param $table
+     * @param $field
+     * @param $currentValue
      */
     public function __construct(array $configuration, $table, $field, $currentValue)
     {
@@ -87,7 +98,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $level = 1;
 
         if ($this->levelMaximum >= $level) {
-            $childNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+            $childNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
             $this->appendGlobalCategories($level, $childNodes);
             $this->appendCalendarCategories($level, $childNodes);
@@ -98,12 +109,16 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         }
     }
 
+    /**
+     * @param $level
+     * @param $parentChildNodes
+     */
     protected function appendGlobalCategories($level, $parentChildNodes)
     {
-        $node = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
+        $node = GeneralUtility::makeInstance(TreeNode::class);
         $node->setId(GLOBAL_PREFIX);
 
-        $childNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+        $childNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
         $where = 'l18n_parent = 0 and deleted = 0 and parent_category = 0 and calendar_id = 0';
         $this->appendCategories($level, $childNodes, $where);
@@ -114,10 +129,14 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $parentChildNodes->append($node);
     }
 
+    /**
+     * @param $level
+     * @param $childNodes
+     */
     protected function appendCalendarCategories($level, $childNodes)
     {
         $calendarId = 0;
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) > 8000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) > 8000000) {
             if (isset($this->currentValue['calendar_id'])) {
                 $calendarId = $this->currentValue['calendar_id'];
             }
@@ -134,12 +153,12 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
             );
             if ($calres) {
                 while ($calrow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($calres)) {
-                    $node = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
+                    $node = GeneralUtility::makeInstance(TreeNode::class);
                     $node->setId(CALENDAR_PREFIX . $calrow['uid']);
 
                     if ($level < $this->levelMaximum) {
                         $where = 'l18n_parent = 0 and tx_cal_category.deleted = 0 and tx_cal_category.calendar_id = ' . $calrow['uid'];
-                        $calendarChildNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+                        $calendarChildNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
                         $this->appendCategories($level + 1, $calendarChildNodes, $where);
                         if ($calendarChildNodes !== null) {
@@ -153,6 +172,11 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         }
     }
 
+    /**
+     * @param $level
+     * @param $childNodes
+     * @param $where
+     */
     protected function appendCategories($level, $childNodes, $where)
     {
         $categoryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -163,7 +187,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $usedCategories = [];
         if ($categoryResult) {
             while ($categoryRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($categoryResult)) {
-                $categoryNode = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
+                $categoryNode = GeneralUtility::makeInstance(TreeNode::class);
                 $categoryNode->setId($categoryRow['uid']);
                 if ($level < $this->levelMaximum) {
                     $children = $this->getChildrenOf($categoryNode, $level + 1);
@@ -183,6 +207,10 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         }
     }
 
+    /**
+     * @param $calendarId
+     * @return string
+     */
     protected function getCalendarWhere($calendarId)
     {
         $calWhere = 'l18n_parent = 0  AND tx_cal_calendar.uid = ' . $calendarId;
@@ -196,20 +224,20 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     /**
      * Builds a complete node including children
      *
-     * @param \TYPO3\CMS\Backend\Tree\TreeNode|\TYPO3\CMS\Backend\Tree\TreeNode $basicNode
-     * @param \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode|null $parent
+     * @param TreeNode|TreeNode $basicNode
+     * @param DatabaseTreeNode|null $parent
      * @param int $level
      * @param bool $restriction
-     * @return \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode node
+     * @return DatabaseTreeNode node
      */
     protected function buildRepresentationForNode(
-        \TYPO3\CMS\Backend\Tree\TreeNode $basicNode,
-        \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode $parent = null,
+        TreeNode $basicNode,
+        DatabaseTreeNode $parent = null,
         $level = 0,
         $restriction = false
     ) {
-        /**@param $node \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode */
-        $node = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Tree\\TableConfiguration\\DatabaseTreeNode');
+        /**@param $node DatabaseTreeNode */
+        $node = GeneralUtility::makeInstance(DatabaseTreeNode::class);
         $row = [];
         $node->setSelected(false);
         $node->setExpanded(true);
@@ -218,8 +246,8 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         if (strrpos($basicNode->getId(), CALENDAR_PREFIX, -strlen($basicNode->getId())) !== false) {
             $id = intval(substr($basicNode->getId(), strlen(CALENDAR_PREFIX)));
             $row = BackendUtility::getRecordWSOL('tx_cal_calendar', $id, '*', '', false);
-            $iconFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Imaging\\IconFactory');
-            $icon = $iconFactory->getIconForRecord('tx_cal_calendar', $row, \TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL);
+            $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+            $icon = $iconFactory->getIconForRecord('tx_cal_calendar', $row, Icon::SIZE_SMALL);
             $node->setIcon($icon);
             $node->setLabel($row['title']);
             $node->setSortValue($id);
@@ -239,8 +267,8 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
             $node->setSelected(GeneralUtility::inList($this->getSelectedList(), $basicNode->getId()));
             $node->setExpanded($this->isExpanded($basicNode));
             $node->setLabel($node->getLabel());
-            $iconFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Imaging\\IconFactory');
-            $icon = $iconFactory->getIconForRecord($this->tableName, $row, \TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL);
+            $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+            $icon = $iconFactory->getIconForRecord($this->tableName, $row, Icon::SIZE_SMALL);
             $node->setIcon($icon);
             $node->setSelectable(!GeneralUtility::inList(
                 $this->getNonSelectableLevelList(),
@@ -259,8 +287,8 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $node->setParentNode($parent);
         if ($basicNode->hasChildNodes()) {
 
-            /** @var \TYPO3\CMS\Backend\Tree\SortedTreeNodeCollection $childNodes */
-            $childNodes = GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\Tree\\SortedTreeNodeCollection');
+            /** @var SortedTreeNodeCollection $childNodes */
+            $childNodes = GeneralUtility::makeInstance(SortedTreeNodeCollection::class);
             $foundSomeChild = false;
             foreach ($basicNode->getChildNodes() as $child) {
                 // Change in custom TreeDataProvider by adding the if clause
@@ -289,7 +317,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     /**
      * Check if given category is allowed by the access rights
      *
-     * @param \TYPO3\CMS\Backend\Tree\TreeNode $child
+     * @param TreeNode $child
      * @return bool
      */
     protected function isCategoryAllowed($child)

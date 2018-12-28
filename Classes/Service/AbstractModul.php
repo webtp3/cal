@@ -14,8 +14,7 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-abstract class AbstractModul extends \TYPO3\CMS\Cal\Service\BaseService
+abstract class AbstractModul extends BaseService
 {
 
     /**

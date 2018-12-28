@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Functions;
 
@@ -21,19 +22,19 @@ use TYPO3\CMS\Cal\Utility\Functions;
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class WeekView extends \TYPO3\CMS\Cal\View\BaseView
+class WeekView extends BaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * @param $master_array
+     * @param $getdate
+     * @return mixed
+     */
     public function newDrawWeek(&$master_array, $getdate)
     {
         if (!isset($getdate) || $getdate == '') {
-            $getdate = new  \TYPO3\CMS\Cal\Model\CalDate();
+            $getdate = new  CalDate();
         } else {
-            $getdate = new  \TYPO3\CMS\Cal\Model\CalDate($getdate);
+            $getdate = new  CalDate($getdate);
         }
 
         $week = $getdate->getWeekOfYear();
@@ -41,8 +42,8 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
         if ($getdate->month == 12 && $week == 1) {
             $year++;
         }
-        $weekModel = new \TYPO3\CMS\Cal\View\NewWeekView($week, $year);
-        $today = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $weekModel = new NewWeekView($week, $year);
+        $today = new  CalDate();
         $weekModel->setCurrent($today);
         $weekModel->setSelected($getdate);
 
@@ -104,7 +105,7 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
         $gridLength = $this->conf['view.']['day.']['gridLength']; // '15'; // Grid distance in minutes for day view, multiples of 15 preferred
 
         if (!isset($getdate) || $getdate == '') {
-            $getdate_obj = new  \TYPO3\CMS\Cal\Model\CalDate();
+            $getdate_obj = new  CalDate();
             $getdate = $getdate_obj->format('%Y%m%d');
         }
 
@@ -113,12 +114,12 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
         $this_day = $day_array2[3];
         $this_month = $day_array2[2];
         $this_year = $day_array2[1];
-        $unix_time = new  \TYPO3\CMS\Cal\Model\CalDate($getdate . '000000');
-        $today = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $unix_time = new  CalDate($getdate . '000000');
+        $today = new  CalDate();
         $todayFormatted = $today->format('%Y%m%d');
 
-        $now = new  \TYPO3\CMS\Cal\Model\CalDate($getdate . '000000');
-        $endOfNextMonth = new  \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfNextMonth($this_day, $this_month, $this_year));
+        $now = new  CalDate($getdate . '000000');
+        $endOfNextMonth = new  CalDate(Calc::endOfNextMonth($this_day, $this_month, $this_year));
         $now->addSeconds(60 * 60 * 24 * 31);
 
         $next_month = $now->format('%Y%m%d');
@@ -126,8 +127,8 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
             $next_month = $endOfNextMonth->format('%Y%m%d');
         }
 
-        $now = new  \TYPO3\CMS\Cal\Model\CalDate($getdate . '000000');
-        $startOfPrevMonth = new  \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfPrevMonth($this_day, $this_month, $this_year));
+        $now = new  CalDate($getdate . '000000');
+        $startOfPrevMonth = new  CalDate(Calc::endOfPrevMonth($this_day, $this_month, $this_year));
         $startOfPrevMonth->setDay(1);
         $now->subtractSeconds(60 * 60 * 24 * 31);
 
@@ -137,13 +138,13 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
         }
 
         $dateOfMonth = Calc::beginOfWeek(1, $this_month, $this_year);
-        $start_month_day = new  \TYPO3\CMS\Cal\Model\CalDate($dateOfMonth . '000000');
+        $start_month_day = new  CalDate($dateOfMonth . '000000');
 
         $thisday2 = $unix_time->format($this->conf['view.']['week.']['dateFormatWeekList']);
 
         $num_of_events2 = 0;
 
-        $next_week_obj = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $next_week_obj = new  CalDate();
         $next_week_obj->copy($unix_time);
         $next_week_obj->addSeconds(60 * 60 * 24 * 7);
         $next_week = $next_week_obj->format('%Y%m%d');
@@ -157,12 +158,12 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
 
         $dateOfWeek = Calc::beginOfWeek($unix_time->getDay(), $unix_time->getMonth(), $unix_time->getYear());
 
-        $week_start_day = new  \TYPO3\CMS\Cal\Model\CalDate($dateOfWeek . '000000');
+        $week_start_day = new  CalDate($dateOfWeek . '000000');
 
         // Nasty fix to work with TS strftime
-        $start_week_time = new  \TYPO3\CMS\Cal\Model\CalDate($dateOfWeek . '000000');
+        $start_week_time = new  CalDate($dateOfWeek . '000000');
         $start_week_time->setTZbyID('UTC');
-        $end_week_time = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $end_week_time = new  CalDate();
         $end_week_time->copy($start_week_time);
         $end_week_time->addSeconds(604799);
 
@@ -198,13 +199,13 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
         $view_array = [];
         $rowspan_array = [];
 
-        $endOfDay = new  \TYPO3\CMS\Cal\Model\CalDate();
-        $startOfDay = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $endOfDay = new  CalDate();
+        $startOfDay = new  CalDate();
 
         // creating the dateObjects only once:
-        $starttime = new  \TYPO3\CMS\Cal\Model\CalDate();
-        $endtime = new  \TYPO3\CMS\Cal\Model\CalDate();
-        $j = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $starttime = new  CalDate();
+        $endtime = new  CalDate();
+        $j = new  CalDate();
 
         if (count($this->master_array) > 0) {
             $masterKeys = array_keys($this->master_array);
@@ -216,12 +217,12 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
                 preg_match('/([0-9]{2})([0-9]{2})/', $this->conf['view.']['day.']['dayEnd'], $dTimeEnd);
                 preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $ovlKey, $dDate);
 
-                $d_start = new  \TYPO3\CMS\Cal\Model\CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
+                $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
                     '%02d',
                         $dTimeStart[2]
                 ) . ':00');
                 $d_start->setTZbyID('UTC');
-                $d_end = new  \TYPO3\CMS\Cal\Model\CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
+                $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
                     '%02d',
                         $dTimeEnd[2]
                 ) . ':00');
@@ -253,7 +254,7 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
                             $endtime->addSeconds((($endtime->getMinute()) % $gridLength) * 60);
 
                             $entries = 1;
-                            $old_day = new  \TYPO3\CMS\Cal\Model\CalDate($ovlKey . '000000');
+                            $old_day = new  CalDate($ovlKey . '000000');
 
                             $endOfDay->copy($d_end);
                             $startOfDay->copy($d_start);
@@ -337,8 +338,8 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
             }
             $dayStart = substr($dayStart, 0, 2) . '00';
         }
-        $startdate = new  \TYPO3\CMS\Cal\Model\CalDate($start_week_time->format('%Y%m%d') . '000000');
-        $enddate = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $startdate = new  CalDate($start_week_time->format('%Y%m%d') . '000000');
+        $enddate = new  CalDate();
         $enddate->copy($end_week_time);
         for ($i = $startdate; $enddate->after($i); $i->addSeconds(86400)) {
             if (!empty($view_array[$i->format('%Y%m%d')])) {
@@ -357,17 +358,17 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
         preg_match('/([0-9]{2})([0-9]{2})/', $dayStart, $dTimeStart);
         preg_match('/([0-9]{2})([0-9]{2})/', $dayEnd, $dTimeEnd);
 
-        $nd = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $nd = new  CalDate();
 
         foreach (array_keys($view_array) as $week_key) {
             $week_day = &$view_array[$week_key];
             preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $week_key, $dDate);
-            $d_start = new  \TYPO3\CMS\Cal\Model\CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
+            $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
                 '%02d',
                     $dTimeStart[2]
             ) . ':00');
             $d_start->setTZbyId('UTC');
-            $d_end = new  \TYPO3\CMS\Cal\Model\CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
+            $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
                 '%02d',
                     $dTimeEnd[2]
             ) . ':00');
@@ -418,7 +419,7 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
             }
         }
 
-        $thisdate = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $thisdate = new  CalDate();
         $thisdate->copy($week_start_day);
 
         for ($i = 0; $i < 7; $i++) {
@@ -444,7 +445,7 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
                     $replace .= $eventArray[$allday]->renderEventForAllDay();
                 }
             }
-            $weekreplace .= \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($alldays, [
+            $weekreplace .= Functions::substituteMarkerArrayNotCached($alldays, [
                 '###COLSPAN###' => 'colspan="' . ($nbrGridCols[$get_date] ? $nbrGridCols[$get_date] : 1) . '"',
                 '###ALLDAY###' => $replace
             ]);
@@ -456,7 +457,7 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
         // Replaces the daysofweek
         $loop_dof = $this->cObj->getSubpart($weekTemplate, '###DAYSOFWEEK###');
 
-        $start_day = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $start_day = new  CalDate();
         $start_day->copy($week_start_day);
 
         $isAllowedToCreateEvent = $this->rightsObj->isAllowedToCreateEvent();
@@ -552,7 +553,7 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
 
         $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
 
-        $cal_time_obj = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $cal_time_obj = new  CalDate();
         $cal_time_obj->copy($week_start_day);
         $cal_time_obj->setHour(intval($dTimeStart[1]));
         $cal_time_obj->setMinute(intval($dTimeStart[2]));
@@ -663,9 +664,9 @@ class WeekView extends \TYPO3\CMS\Cal\View\BaseView
             $cal_time_obj->setDay($week_start_day->getDay());
             $cal_time_obj->addSeconds($gridLength * 60);
         }
-        $weekTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($weekTemplate, $sims, [], []);
+        $weekTemplate = Functions::substituteMarkerArrayNotCached($weekTemplate, $sims, [], []);
         $rems['###LOOPEVENTS###'] = $weekdisplay;
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], [
+        $page = Functions::substituteMarkerArrayNotCached($page, [], [
             '###WEEK_TEMPLATE###' => $weekTemplate
         ], []);
         return $this->finish($page, $rems);

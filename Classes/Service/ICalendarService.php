@@ -15,20 +15,29 @@ namespace TYPO3\CMS\Cal\Service;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\Controller;
+use TYPO3\CMS\Cal\Cron\CalendarScheduler;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\ICalendar;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
+use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Scheduler\Execution;
+use TYPO3\CMS\Scheduler\Scheduler;
 
 define(
     'ICALENDAR_PATH',
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'Classes/Model/ICalendar.php'
+    ExtensionManagementUtility::extPath('cal') . 'Classes/Model/ICalendar.php'
 );
 
-class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
+/**
+ * Class ICalendarService
+ */
+class ICalendarService extends BaseService
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Looks for an external calendar with a given uid on a certain pid-list
      *
@@ -77,7 +86,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
     public function findAll($pidList)
     {
         $enableFields = '';
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('tx_cal_calendar');
+        $orderBy = Functions::getOrderBy('tx_cal_calendar');
         if (TYPO3_MODE == 'BE') {
             $enableFields = BackendUtility::BEenableFields('tx_cal_calendar') . ' AND tx_cal_calendar.deleted = 0';
         } else {
@@ -171,9 +180,9 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         foreach ($urls as $key => $url) {
             /* If the calendar has a URL, get a checksum on the contents */
             if ($url != '') {
-                $contents = GeneralUtility::getURL($url);
+                $contents = GeneralUtility::getUrl($url);
 
-                $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+                $hookObjectsArr = Functions::getHookObjectsArray(
                     'tx_cal_icalendar_service',
                     'importIcsContent',
                     'service'
@@ -199,7 +208,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
 
             foreach ($contentArray as $contents) {
                 /* Parse the contents into ICS data structure */
-                $iCalendar = $this->getiCalendarFromICSFile($contents);
+                $iCalendar = $this->getiCalendarFromIcsFile($contents);
 
                 /* Create new events belonging to the specified calendar */
                 $notInUids = array_merge(
@@ -213,7 +222,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
             /* Delete old events, that have not been updated */
             $this->deleteTemporaryEvents($uid, $notInUids);
 
-            \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+            Functions::clearCache();
 
             return $newMD5;
         }
@@ -230,19 +239,19 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
      */
     public function scheduleUpdates($refreshInterval, $uid)
     {
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('scheduler')) {
+        if (ExtensionManagementUtility::isLoaded('scheduler')) {
             $recurring = $refreshInterval * 60;
             /* If calendar has a refresh time, schedule recurring gabriel event for refresh */
             if ($recurring) {
                 $calendarRow = BackendUtility::getRecordRaw('tx_cal_calendar', 'uid=' . $uid);
                 $taskId = $calendarRow['schedulerId'];
 
-                $scheduler = new \TYPO3\CMS\Scheduler\Scheduler();
+                $scheduler = new Scheduler();
 
                 if ($taskId > 0) {
                     try {
                         $task = $scheduler->fetchTask($taskId);
-                        $execution = new \TYPO3\CMS\Scheduler\Execution();
+                        $execution = new Execution();
                         $execution->setStart(time() + $recurring);
                         $execution->setIsNewSingleExecution(true);
                         $execution->setMultiple(true);
@@ -267,7 +276,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
     public function createSchedulerTask(&$scheduler, $offset, $calendarUid)
     {
         /* Set up the scheduler event */
-        $task = new \TYPO3\CMS\Cal\Cron\CalendarScheduler();
+        $task = new CalendarScheduler();
         $task->setUID($calendarUid);
         $taskGroup = BackendUtility::getRecordRaw('tx_scheduler_task_group', 'groupName="cal"');
         if ($taskGroup['uid']) {
@@ -294,7 +303,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
         $task->setDescription('Import of external calendar (calendar_id=' . $calendarUid . ')');
         /* Schedule the event */
-        $execution = new \TYPO3\CMS\Scheduler\Execution();
+        $execution = new Execution();
         $execution->setStart(time() + ($offset));
         $execution->setIsNewSingleExecution(true);
         $execution->setMultiple(true);
@@ -311,11 +320,11 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
      */
     public function deleteSchedulerTask($calendarUid)
     {
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('scheduler')) {
+        if (ExtensionManagementUtility::isLoaded('scheduler')) {
             $calendarRow = BackendUtility::getRecordRaw('tx_cal_calendar', 'uid=' . $calendarUid);
             $taskId = $calendarRow['schedulerId'];
             if ($taskId > 0) {
-                $scheduler = new \TYPO3\CMS\Scheduler\Scheduler();
+                $scheduler = new Scheduler();
 
                 $task = $scheduler->fetchTask($taskId);
 
@@ -332,7 +341,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
      */
     public function deleteScheduledUpdates($uid)
     {
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('gabriel')) {
+        if (ExtensionManagementUtility::isLoaded('gabriel')) {
             $eventUID = 'tx_cal_calendar:' . $uid;
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_gabriel', ' crid="' . $eventUID . '"');
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_gabriel', ' nextexecution=0');
@@ -486,42 +495,59 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
      *
      * @param string $text
      *            The ics content
-     * @return \TYPO3\CMS\Cal\Model\ICalendar
+     * @return ICalendar
      * @throws \RuntimeException
      */
     public function getiCalendarFromIcsFile($text)
     {
         require_once(ICALENDAR_PATH);
-        $iCalendar = new \TYPO3\CMS\Cal\Model\ICalendar();
+        $iCalendar = new ICalendar();
         if (!$iCalendar->parsevCalendar($text)) {
             throw new \RuntimeException('Could not parse vCalendar data ' . $text, 1451245373);
         }
         return $iCalendar;
     }
 
+    /**
+     * @param $component
+     * @return CalDate|null
+     */
     private function getDtstart($component)
     {
         return $this->getDateValue($component, 'DTSTART');
     }
 
+    /**
+     * @param $component
+     * @return CalDate|null
+     */
     private function getDtend($component)
     {
         return $this->getDateValue($component, 'DTEND');
     }
 
+    /**
+     * @param $component
+     * @return CalDate|null
+     */
     private function getTstamp($component)
     {
         return $this->getDateValue($component, 'TSTAMP');
     }
 
+    /**
+     * @param $component
+     * @param $attribute
+     * @return CalDate|null
+     */
     private function getDateValue($component, $attribute)
     {
         if ($component->getAttribute($attribute)) {
             $value = $component->getAttribute($attribute);
             if (is_array($value)) {
-                $dateTime = new \TYPO3\CMS\Cal\Model\CalDate($value['year'] . $value['month'] . $value['mday'] . '000000');
+                $dateTime = new CalDate($value['year'] . $value['month'] . $value['mday'] . '000000');
             } else {
-                $dateTime = new \TYPO3\CMS\Cal\Model\CalDate($value);
+                $dateTime = new CalDate($value);
             }
             $params = $component->getAttributeParameters($attribute);
             $timezone = $params['TZID'];
@@ -533,6 +559,13 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         return null;
     }
 
+    /**
+     * @param $component
+     * @param $insertFields
+     * @param $pid
+     * @param $calId
+     * @return array
+     */
     private function setCategories($component, $insertFields, $pid, $calId)
     {
         $categories = [];
@@ -589,6 +622,10 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         return $categoryUids;
     }
 
+    /**
+     * @param $component
+     * @param $insertFields
+     */
     private function setRecurrence($component, &$insertFields)
     {
         if ($component->getAttribute('RRULE')) {
@@ -614,9 +651,14 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $component
+     * @param $eventUid
+     * @param $insertFields
+     */
     private function setRecurrenceId($component, $eventUid, &$insertFields)
     {
-        $recurrenceIdStart = new \TYPO3\CMS\Cal\Model\CalDate($component->getAttribute('RECURRENCE-ID'));
+        $recurrenceIdStart = new CalDate($component->getAttribute('RECURRENCE-ID'));
         $params = $component->getAttributeParameters('RECURRENCE-ID');
         $timezone = $params['TZID'];
         if ($timezone) {
@@ -661,6 +703,12 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $component
+     * @param $eventUid
+     * @param $pid
+     * @param $cruserId
+     */
     private function setExceptions($component, $eventUid, $pid, $cruserId)
     {
         /* Delete the old exception relations */
@@ -727,6 +775,10 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $eventUid
+     * @param $pid
+     */
     private function generateIndexEntries($eventUid, $pid)
     {
         $pageTSConf = BackendUtility::getPagesTSconfig($pid);
@@ -735,20 +787,29 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         } else {
             $pageIDForPlugin = $pid;
         }
-        /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $pageIDForPlugin);
+        /** @var RecurrenceGenerator $rgc */
+        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
         $rgc->generateIndexForUid($eventUid, 'tx_cal_event');
     }
 
+    /**
+     * @param $eventUid
+     * @param $pid
+     * @param $insertFields
+     */
     private function sendReminders($eventUid, $pid, $insertFields)
     {
         if ($this->conf['view.']['event.']['remind']) {
             /* Schedule reminders for new and changed events */
-            $reminderService = &\TYPO3\CMS\Cal\Utility\Functions::getReminderService();
+            $reminderService = &Functions::getReminderService();
             $reminderService->scheduleReminder($eventUid);
         }
     }
 
+    /**
+     * @param $categoryUids
+     * @param $eventUid
+     */
     private function connectCategories($categoryUids, $eventUid)
     {
         /* Delete the old category relations */
@@ -770,6 +831,11 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $deleteNotUsedCategories
+     * @param $calId
+     * @param $insertedOrUpdatedCategoryUids
+     */
     private function cleanupCategories($deleteNotUsedCategories, $calId, $insertedOrUpdatedCategoryUids)
     {
         if ($deleteNotUsedCategories) {
@@ -783,6 +849,11 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $eventRow
+     * @param $insertFields
+     * @return mixed
+     */
     private function saveOrUpdate($eventRow, $insertFields)
     {
         $table = 'tx_cal_event';
@@ -800,6 +871,12 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         return $GLOBALS['TYPO3_DB']->sql_insert_id();
     }
 
+    /**
+     * @param $component
+     * @param $insertFields
+     * @param $pid
+     * @param $eventUid
+     */
     private function setAttachments($component, &$insertFields, $pid, $eventUid)
     {
         $this->clearAllImagesAndAttachments($eventUid);
@@ -813,9 +890,12 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $uid
+     */
     public function clearAllImagesAndAttachments($uid)
     {
-        $fileIndexRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Index\\FileIndexRepository');
+        $fileIndexRepository = GeneralUtility::makeInstance(FileIndexRepository::class);
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
             '*',
             'sys_file_reference',
@@ -838,10 +918,16 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         );
     }
 
+    /**
+     * @param $externalUrl
+     * @param $insertFields
+     * @param $eventUid
+     * @param $pid
+     */
     private function storeAttachment($externalUrl, $insertFields, $eventUid, $pid)
     {
         if (!$this->fileFunc) {
-            $this->fileFunc = new \TYPO3\CMS\Core\Utility\File\BasicFileUtility();
+            $this->fileFunc = new BasicFileUtility();
             $all_files = [];
             $all_files['webspace']['allow'] = '*';
             $all_files['webspace']['deny'] = '';
@@ -853,8 +939,8 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         $ext = strtolower($fI['extension']);
 
         $report = [];
-        GeneralUtility::getURL($externalUrl, 1, false, $report);
-        $content = GeneralUtility::getURL($externalUrl);
+        GeneralUtility::getUrl($externalUrl, 1, false, $report);
+        $content = GeneralUtility::getUrl($externalUrl);
 
         $imageExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']);
         $type = 'attachment';
@@ -891,7 +977,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         $insertFields['pid'] = $pid;
         if (!isset($this->controller->piVars)) {
             if (!isset($this->controller)) {
-                $this->controller = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\Controller');
+                $this->controller = GeneralUtility::makeInstance(Controller::class);
             }
             $this->controller->piVars = [];
         }
@@ -975,7 +1061,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
 
                 if ($component->getAttribute('DURATION')) {
                     $enddate = $insertFields['start_time'] + $component->getAttribute('DURATION');
-                    $dateTime = new \TYPO3\CMS\Cal\Model\CalDate($insertFields['start_date']);
+                    $dateTime = new CalDate($insertFields['start_date']);
                     $dateTime->addSeconds($enddate);
                     $params = $component->getAttributeParameters('DURATION');
                     $timezone = $params['TZID'];
@@ -988,8 +1074,8 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
 
                 // Fix for allday events
                 if ($insertFields['start_time'] == 0 && $insertFields['end_time'] == 0 && $insertFields['start_date'] != 0) {
-                    $date = new \TYPO3\CMS\Cal\Model\CalDate($insertFields['end_date'] . '000000');
-                    $date->setTZbyId('UTC');
+                    $date = new CalDate($insertFields['end_date'] . '000000');
+                    $date->setTZbyID('UTC');
                     $date->subtractSeconds(86400);
                     $insertFields['end_date'] = $date->format('%Y%m%d');
                 }
@@ -1035,7 +1121,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
                 $insertedOrUpdatedCategoryUids = array_merge($insertedOrUpdatedCategoryUids, $categoryUids);
 
                 // Hook: insertCalEventsIntoDB
-                $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+                $hookObjectsArr = Functions::getHookObjectsArray(
                     'tx_cal_icalendar_service',
                     'iCalendarServiceClass',
                     'service'
@@ -1109,43 +1195,14 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
                 case 'INTERVAL':
                     $insertFields['intrval'] = $val;
                     break;
-                case 'BYSECOND':
-                    // $bysecond = $val;
-                    // $bysecond = explode(',', $bysecond);
-                    break;
-                case 'BYMINUTE':
-                    // $byminute = $val;
-                    // $byminute = explode(',', $byminute);
-                    break;
-                case 'BYHOUR':
-                    // $byhour = $val;
-                    // $byhour = explode(',', $byhour);
-                    break;
                 case 'BYDAY':
                     $insertFields['byday'] = strtolower($val);
                     break;
                 case 'BYMONTHDAY':
                     $insertFields['bymonthday'] = strtolower($val);
                     break;
-                case 'BYYEARDAY':
-                    // $byyearday = $val;
-                    // $byyearday = explode(',', $byyearday);
-                    break;
-                case 'BYWEEKNO':
-                    // $byweekno = $val;
-                    // $byweekno = explode(',', $byweekno);
-                    break;
                 case 'BYMONTH':
                     $insertFields['bymonth'] = strtolower($val);
-                    break;
-                case 'BYSETPOS':
-                    // $bysetpos = $val;
-                    break;
-                case 'WKST':
-                    // $wkst = $val;
-                    break;
-                case 'END':
-                    // ??
                     break;
             }
         }
@@ -1160,7 +1217,7 @@ class ICalendarService extends \TYPO3\CMS\Cal\Service\BaseService
      */
     private function createException($pid, $cruserId, $eventUid, $exceptionDescription)
     {
-        $exceptionDate = new \TYPO3\CMS\Cal\Model\CalDate($exceptionDescription);
+        $exceptionDate = new CalDate($exceptionDescription);
 
         $insertFields = [];
         $insertFields['tstamp'] = time();

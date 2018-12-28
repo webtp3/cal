@@ -19,14 +19,9 @@ use TYPO3\CMS\Cal\Utility\Functions;
 /**
  * A service which renders a form to create / edit a phpicategory event.
  */
-class DeleteCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class DeleteCategoryView extends FeEditingBaseView
 {
     public $category;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a delete form for a calendar.
@@ -64,22 +59,22 @@ class DeleteCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             'view' => 'remove_category'
         ]));
         $this->getTemplateSubpartMarker($page, $sims, $rems);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $sims = [];
         $rems = [];
         $this->getTemplateSingleMarker($page, $sims, $rems);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
     }
 
-    public function getFormStartMarker(& $template, & $sims, & $rems, & $wrapped)
-    {
-        $rems['###FORM_START###'] = $this->cObj->getSubpart($template, '###FORM_START###');
-    }
-
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getHiddenMarker(& $template, & $sims, & $rems)
     {
         $sims['###HIDDEN###'] = $this->cObj->stdWrap(
@@ -88,6 +83,11 @@ class DeleteCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTitleMarker(& $template, & $sims, & $rems)
     {
         $sims['###TITLE###'] = $this->cObj->stdWrap(
@@ -96,6 +96,11 @@ class DeleteCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalendarMarker(& $template, & $sims, & $rems)
     {
         $calendarUid = $this->category->getCalendarUid();
@@ -111,6 +116,11 @@ class DeleteCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getHeaderStyleMarker(& $template, & $sims, & $rems)
     {
         $sims['###HEADERSTYLE###'] = $this->cObj->stdWrap(
@@ -119,6 +129,11 @@ class DeleteCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getBodyStyleMarker(& $template, & $sims, & $rems)
     {
         $sims['###BODYSTYLE###'] = $this->cObj->stdWrap(
@@ -127,6 +142,11 @@ class DeleteCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getParentCategoryMarker(& $template, &$sims, & $rems)
     {
         $parentUid = $this->category->getParentUid();
@@ -144,6 +164,11 @@ class DeleteCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getSharedUserAllowedMarker(& $template, & $sims, & $rems)
     {
         $sims['###SHARED_USER_ALLOWED###'] = $this->cObj->stdWrap(

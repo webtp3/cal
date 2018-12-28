@@ -2,6 +2,10 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Cal\Model\LocationPartner;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +24,7 @@ namespace TYPO3\CMS\Cal\Service;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
+class LocationPartnerService extends BaseService
 {
     public $extensionIsNotLoaded = false;
     public $keyId = 'tx_partner_main';
@@ -34,7 +38,7 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
             $this->extensionIsNotLoaded = true;
             return;
         }
-        require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('partner') . 'api/class.tx_partner_main.php');
+        require_once ExtensionManagementUtility::extPath('partner') . 'api/class.tx_partner_main.php';
     }
 
     /**
@@ -90,7 +94,7 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
     public function getLocationFromTable($pidList = '', $additionalWhere = '')
     {
         $locations = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->keyId);
+        $orderBy = Functions::getOrderBy($this->keyId);
         if ($pidList != '') {
             $additionalWhere .= ' AND ' . $this->keyId . '.pid IN (' . $pidList . ')';
         }
@@ -99,10 +103,10 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
         $table = $this->keyId;
         $where = ' l18n_parent = 0 ' . $additionalWhere . $this->cObj->enableFields($this->keyId);
         $groupBy = '';
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->keyId);
+        $orderBy = Functions::getOrderBy($this->keyId);
         $limit = '';
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_location_partner_service',
             'locationServiceClass',
             'service'
@@ -118,7 +122,7 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
 
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $locations[] = new \TYPO3\CMS\Cal\Model\LocationPartner($row['uid'], $pidList);
+                $locations[] = new LocationPartner($row['uid'], $pidList);
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
@@ -167,6 +171,10 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
         return $where;
     }
 
+    /**
+     * @param $uid
+     * @return object|void
+     */
     public function updateLocation($uid)
     {
         if (!$this->isAllowedService()) {
@@ -189,6 +197,9 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $uid
+     */
     public function removeLocation($uid)
     {
         if (!$this->isAllowedService()) {
@@ -208,6 +219,9 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $insertFields
+     */
     public function retrievePostData(&$insertFields)
     {
         if (!$this->isAllowedService()) {
@@ -267,6 +281,10 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pid
+     * @return object
+     */
     public function saveLocation($pid)
     {
         if ($this->extensionIsNotLoaded) {
@@ -325,6 +343,10 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $insertFields
+     * @return mixed
+     */
     public function _saveLocation(&$insertFields)
     {
         $table = 'tx_partner_main';
@@ -339,6 +361,9 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
         return $uid;
     }
 
+    /**
+     * @return bool
+     */
     public function isAllowedService()
     {
         $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
@@ -349,6 +374,10 @@ class LocationPartnerService extends \TYPO3\CMS\Cal\Service\BaseService
         return false;
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     */
     public function createTranslation($uid, $overlay)
     {
         $table = 'tx_partner_main';

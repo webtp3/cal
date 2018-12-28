@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Utility;
 
+use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,7 +16,6 @@ namespace TYPO3\CMS\Cal\Utility;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 class Cache
 {
     public $cachingEngine;
@@ -23,11 +24,10 @@ class Cache
     public $ACCESS_TIME = 0;
 
     /**
-     *[Describe function...]
-     *
-     * @return[type]
+     * Cache constructor.
+     * @param $cachingEngine
      */
-    public function Cache($cachingEngine)
+    public function __construct($cachingEngine)
     {
         $this->cachingEngine = $cachingEngine;
         switch ($this->cachingEngine) {
@@ -54,7 +54,7 @@ class Cache
         try {
             $GLOBALS['typo3CacheFactory']->create(
                 'tx_cal_cache',
-                'TYPO3\\CMS\\Core\\Cache\\Frontend\\StringFrontend',
+                StringFrontend::class,
                 $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_cal_cache']['backend'],
                 $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_cal_cache']['options']
             );
@@ -65,6 +65,12 @@ class Cache
         $this->tx_cal_cache = $GLOBALS['typo3CacheManager']->getCache('tx_cal_cache');
     }
 
+    /**
+     * @param $hash
+     * @param $content
+     * @param $ident
+     * @param int $lifetime
+     */
     public function set($hash, $content, $ident, $lifetime = 0)
     {
         if ($lifetime == 0) {
@@ -98,6 +104,10 @@ class Cache
         }
     }
 
+    /**
+     * @param $hash
+     * @return bool|mixed
+     */
     public function get($hash)
     {
         $cacheEntry = false;

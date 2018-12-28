@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Controller;
 
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,7 +16,6 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 class BaseController
 {
     public $cObj;
@@ -24,15 +25,18 @@ class BaseController
     public $controller;
     public $prefixId = 'tx_cal_controller';
 
-    public function BaseController()
+    public function __construct()
     {
-        $this->cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
-        $this->local_cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'local_cobj');
-        $this->controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
-        $this->conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        $this->rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $this->cObj = &Registry::Registry('basic', 'cobj');
+        $this->local_cObj = &Registry::Registry('basic', 'local_cobj');
+        $this->controller = &Registry::Registry('basic', 'controller');
+        $this->conf = &Registry::Registry('basic', 'conf');
+        $this->rightsObj = &Registry::Registry('basic', 'rightscontroller');
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return get_class($this);

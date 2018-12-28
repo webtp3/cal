@@ -27,6 +27,11 @@ namespace TYPO3\CMS\Cal\Frontend;
  */
 class HtmlCrop
 {
+    /**
+     * @param $content
+     * @param $conf
+     * @return string
+     */
     public function html_substr2PHP4($content, $conf)
     {
 
@@ -46,6 +51,13 @@ class HtmlCrop
         return $content;
     }
 
+    /**
+     * @param $node
+     * @param $length
+     * @param int $maxLength
+     * @param string $replaceString
+     * @return string
+     */
     public function getContentAsStringPHP4($node, &$length, $maxLength = 200, $replaceString = '...')
     {
         $st = '';
@@ -88,6 +100,11 @@ class HtmlCrop
         return $st;
     }
 
+    /**
+     * @param $content
+     * @param $conf
+     * @return string
+     */
     public function html_substr2PHP5($content, $conf)
     {
 
@@ -111,6 +128,13 @@ class HtmlCrop
         }
     }
 
+    /**
+     * @param $node
+     * @param $length
+     * @param int $maxLength
+     * @param string $replaceString
+     * @return string
+     */
     public function getContentAsStringPHP5($node, &$length, $maxLength = 200, $replaceString = '...')
     {
         $st = '';

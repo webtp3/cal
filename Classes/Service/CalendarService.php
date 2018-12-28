@@ -14,17 +14,29 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Hooks\TceMainProcessdatamap;
+use TYPO3\CMS\Cal\Model\CalendarModel;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
+/**
+ * Class CalendarService
+ */
+class CalendarService extends BaseService
 {
     public $calendarSearchStringCache = [];
     public $calendarOwner;
     public $calendarIds;
 
+    /**
+     * @param $row
+     * @return CalendarModel
+     */
     public function createCalendar($row)
     {
-        return new \TYPO3\CMS\Cal\Model\CalendarModel($row, $this->getServiceKey());
+        return new CalendarModel($row, $this->getServiceKey());
     }
 
     /**
@@ -57,10 +69,15 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         );
     }
 
+    /**
+     * @param string $pidList
+     * @param string $additionalWhere
+     * @return array
+     */
     public function getCalendarFromTable($pidList = '', $additionalWhere = '')
     {
         $return = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('tx_cal_calendar');
+        $orderBy = Functions::getOrderBy('tx_cal_calendar');
         if ($pidList != '') {
             $additionalWhere .= ' AND pid IN (' . $pidList . ')';
         }
@@ -101,6 +118,10 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         return $return;
     }
 
+    /**
+     * @param $uid
+     * @return array
+     */
     public function updateCalendar($uid)
     {
         $insertFields = [
@@ -109,7 +130,7 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         // TODO: Check if all values are correct
         $this->searchForAdditionalFieldsToAddFromPostData($insertFields, 'calendar', false);
         $this->retrievePostData($insertFields);
-        $uid = $this->checkUidForLanguageOverlay($uid, 'tx_cal_calendar');
+        $uid = self::checkUidForLanguageOverlay($uid, 'tx_cal_calendar');
 
         if ($this->rightsObj->isAllowedToEditCalendarType()) {
             $this->checkOnNewOrDeletableFiles('tx_cal_calendar', 'ics_file', $insertFields, $uid);
@@ -119,22 +140,22 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         $table = 'tx_cal_calendar';
         $where = 'uid = ' . $uid;
 
-        $service = new \TYPO3\CMS\Cal\Service\ICalendarService();
+        $service = new ICalendarService();
 
         if (($insertFields['type'] == 1 && $insertFields['ext_url']) or ($insertFields['type'] == 2 && $insertFields['ics_file'])) {
-            \TYPO3\CMS\Cal\Hooks\TceMainProcessdatamap::processICS(\TYPO3\CMS\Backend\Utility\BackendUtility::getRecord(
+            TceMainProcessdatamap::processICS(BackendUtility::getRecord(
                 'tx_cal_calendar',
                 $uid
             ), $insertFields, $service);
 
-            /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $GLOBALS['TSFE']->id);
+            /** @var RecurrenceGenerator $rgc */
+            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
             $rgc->generateIndexForCalendarUid($uid);
         } else {
             $service->deleteTemporaryEvents($uid);
 
-            /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $uid);
+            /** @var RecurrenceGenerator $rgc */
+            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $uid);
             $rgc->cleanIndexTableOfCalendarUid($uid);
         }
 
@@ -144,13 +165,13 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($this->controller->piVars['owner_ids'] != '') {
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(
+                self::splitUserAndGroupIds(
                     explode(',', strip_tags($this->controller->piVars['owner_ids'])),
                     $user,
                     $group
                 );
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $user, $uid, 'fe_users');
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $group, $uid, 'fe_groups');
+                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $user, $uid, 'fe_users');
+                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $group, $uid, 'fe_groups');
             }
         }
         if ($this->rightsObj->isAllowedToEditCalendarFreeAndBusyUser()) {
@@ -158,20 +179,23 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($this->controller->piVars['freeAndBusyUser_ids'] != '') {
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(
+                self::splitUserAndGroupIds(
                     explode(',', strip_tags($this->controller->piVars['freeAndBusyUser_ids'])),
                     $user,
                     $group
                 );
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $user, $uid, 'fe_users');
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $group, $uid, 'fe_groups');
+                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $user, $uid, 'fe_users');
+                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $group, $uid, 'fe_groups');
             }
         }
         $this->unsetPiVars();
-        \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+        Functions::clearCache();
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $uid
+     */
     public function removeCalendar($uid)
     {
         if ($this->rightsObj->isAllowedToDeleteCalendar()) {
@@ -190,12 +214,15 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
             $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
         }
         $this->unsetPiVars();
-        \TYPO3\CMS\Cal\Utility\Functions::clearCache();
-        /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $uid);
+        Functions::clearCache();
+        /** @var RecurrenceGenerator $rgc */
+        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $uid);
         $rgc->cleanIndexTableOfCalendarUid($uid);
     }
 
+    /**
+     * @param $insertFields
+     */
     public function retrievePostData(&$insertFields)
     {
         $hidden = 0;
@@ -241,6 +268,10 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pid
+     * @return array
+     */
     public function saveCalendar($pid)
     {
         $crdate = time();
@@ -265,10 +296,14 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
 
         $this->unsetPiVars();
-        \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+        Functions::clearCache();
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $insertFields
+     * @return mixed
+     */
     public function _saveCalendar(&$insertFields)
     {
         $tempValues = [];
@@ -288,14 +323,14 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
 
         if ($insertFields['type'] == 1 or $insertFields['type'] == 2) {
-            $service = new \TYPO3\CMS\Cal\Service\ICalendarService();
-            \TYPO3\CMS\Cal\Hooks\TcemainProcessdatamap::processICS(\TYPO3\CMS\Backend\Utility\BackendUtility::getRecord(
+            $service = new ICalendarService();
+            TcemainProcessdatamap::processICS(BackendUtility::getRecord(
                 'tx_cal_calendar',
                 $uid
             ), $insertFields, $service);
 
-            /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $GLOBALS['TSFE']->id);
+            /** @var RecurrenceGenerator $rgc */
+            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
             $rgc->generateIndexForCalendarUid($uid);
         }
 
@@ -304,9 +339,9 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($tempValues['owner_ids'] != '') {
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(explode(',', strip_tags($tempValues['owner_ids'])), $user, $group);
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $user, $uid, 'fe_users');
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $group, $uid, 'fe_groups');
+                self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['owner_ids'])), $user, $group);
+                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $user, $uid, 'fe_users');
+                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $group, $uid, 'fe_groups');
             }
         }
         if ($this->rightsObj->isAllowedToCreateCalendarFreeAndBusyUser()) {
@@ -314,18 +349,24 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
             if ($tempValues['freeAndBusyUser_ids'] != '') {
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(
+                self::splitUserAndGroupIds(
                     explode(',', strip_tags($tempValues['freeAndBusyUser_ids'])),
                     $user,
                     $group
                 );
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $user, $uid, 'fe_users');
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $group, $uid, 'fe_groups');
+                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $user, $uid, 'fe_users');
+                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $group, $uid, 'fe_groups');
             }
         }
         return $uid;
     }
 
+    /**
+     * @param $pidList
+     * @param $includePublic
+     * @param $linkIds
+     * @return mixed|string
+     */
     public function getCalendarSearchString($pidList, $includePublic, $linkIds)
     {
         $hash = md5($pidList . ' ' . $includePublic . ' ' . $linkIds);
@@ -374,6 +415,14 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         return $calendarSearchString;
     }
 
+    /**
+     * @param $list
+     * @param $pidList
+     * @param $includePublic
+     * @param bool $includeData
+     * @param bool $onlyPublic
+     * @return array
+     */
     public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false)
     {
         $this->calendarIds = [];
@@ -404,7 +453,7 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
             $select = 'tx_cal_calendar.uid';
         }
 
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('tx_cal_calendar');
+        $orderBy = Functions::getOrderBy('tx_cal_calendar');
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
             'tx_cal_calendar_user_group_mm.uid_local',
             'tx_cal_calendar_user_group_mm LEFT JOIN tx_cal_calendar ON tx_cal_calendar.uid=tx_cal_calendar_user_group_mm.uid_local',
@@ -531,22 +580,13 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
 
     public function unsetPiVars()
     {
-        unset($this->controller->piVars['hidden']);
-        unset($this->controller->piVars['uid']);
-        unset($this->controller->piVars['calendar']);
-        unset($this->controller->piVars['type']);
-        unset($this->controller->piVars['calendarType']);
-        unset($this->controller->piVars['owner']);
-        unset($this->controller->piVars['owner_single']);
-        unset($this->controller->piVars['owner_group']);
-        unset($this->controller->piVars['freeAndBusyUser_single']);
-        unset($this->controller->piVars['freeAndBusyUser_group']);
-        unset($this->controller->piVars['freeAndBusyUser']);
-        unset($this->controller->piVars['refresh']);
-        unset($this->controller->piVars['title']);
-        unset($this->controller->piVars['activateFreeAndBusy']);
+        unset($this->controller->piVars['hidden'], $this->controller->piVars['uid'], $this->controller->piVars['calendar'], $this->controller->piVars['type'], $this->controller->piVars['calendarType'], $this->controller->piVars['owner'], $this->controller->piVars['owner_single'], $this->controller->piVars['owner_group'], $this->controller->piVars['freeAndBusyUser_single'], $this->controller->piVars['freeAndBusyUser_group'], $this->controller->piVars['freeAndBusyUser'], $this->controller->piVars['refresh'], $this->controller->piVars['title'], $this->controller->piVars['activateFreeAndBusy']);
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     */
     public function createTranslation($uid, $overlay)
     {
         $table = 'tx_cal_calendar';
@@ -568,9 +608,14 @@ class CalendarService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $calendarSearchString
+     * @param $calendarUids
+     * @param $categoryArrayByCalendarUid
+     */
     public function getCalendarsWithoutCategory($calendarSearchString, $calendarUids, &$categoryArrayByCalendarUid)
     {
-        $calendarsWithoutCategory = array_diff(\TYPO3\CMS\Core\Utility\GeneralUtility::intExplode(
+        $calendarsWithoutCategory = array_diff(GeneralUtility::intExplode(
             ',',
             $this->conf['view.']['calendar']
         ), array_unique($calendarUids));

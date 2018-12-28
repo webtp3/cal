@@ -14,15 +14,15 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Utility\Functions;
 
-class SubscriptionManagerView extends \TYPO3\CMS\Cal\View\BaseView
+/**
+ * Class SubscriptionManagerView
+ */
+class SubscriptionManagerView extends BaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Main function to draw the subscription manager view.
      *
@@ -102,9 +102,6 @@ class SubscriptionManagerView extends \TYPO3\CMS\Cal\View\BaseView
                         }
                         break;
                 }
-
-                // $event->getMarker($status, $local_rems, $local_sims, $local_wrapped);
-                // $rems['###STATUS###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($status, $local_sims, $local_rems, $local_wrapped);
             } else {
                 $noeventmessage = $this->conf['monitor'] == 'stop' ? 'l_monitor_event_unsubscribe_noevent' : 'l_monitor_event_subscribe_noevent';
                 $sims['###STATUS###'] = sprintf($this->controller->pi_getLL($noeventmessage));
@@ -145,7 +142,7 @@ class SubscriptionManagerView extends \TYPO3\CMS\Cal\View\BaseView
                     $this->conf['uid'] = $row['uid'];
                     $this->conf['type'] = $event->getType();
                     $event->getMarker($subscriptionContainer, $local_sims, $local_rems, $local_wrapped);
-                    $eventList[] = '<li>' . \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                    $eventList[] = '<li>' . Functions::substituteMarkerArrayNotCached(
                         $subscriptionContainer,
                             $local_sims,
                         $local_rems,
@@ -169,7 +166,7 @@ class SubscriptionManagerView extends \TYPO3\CMS\Cal\View\BaseView
                 $sims['###STATUS###'] = 'You must be logged in to manage your event notifications.';
             }
         }
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
         $rems = [];
         return $this->finish($page, $rems);
     }
@@ -294,12 +291,12 @@ class SubscriptionManagerView extends \TYPO3\CMS\Cal\View\BaseView
                 $eventPID
             );
 
-            $pageTSConf = \TYPO3\CMS\Backend\Utility\BackendUtility::getPagesTSconfig($eventPID);
+            $pageTSConf = BackendUtility::getPagesTSconfig($eventPID);
             $offset = is_numeric($pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time']) ? $pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time'] * 60 : 0;
-            $date = new  \TYPO3\CMS\Cal\Model\CalDate($insertFields['start_date'] . '000000');
-            $date->setTZbyId('UTC');
+            $date = new  CalDate($insertFields['start_date'] . '000000');
+            $date->setTZbyID('UTC');
             $reminderTimestamp = $date->getTime() + $insertFields['start_time'] - $offset;
-            $reminderService = &\TYPO3\CMS\Cal\Utility\Functions::getReminderService();
+            $reminderService = &Functions::getReminderService();
             $reminderService->scheduleReminder($eventUID);
 
             return true;
@@ -361,6 +358,10 @@ class SubscriptionManagerView extends \TYPO3\CMS\Cal\View\BaseView
         return $insertedRow;
     }
 
+    /**
+     * @param $email
+     * @return int
+     */
     public function getUnknownUserUid($email)
     {
         $already_exists = false;
@@ -400,6 +401,10 @@ class SubscriptionManagerView extends \TYPO3\CMS\Cal\View\BaseView
         return $user_uid;
     }
 
+    /**
+     * @param $email
+     * @return bool
+     */
     public function getFrontendUserUid($email)
     {
         $user_uid = false;

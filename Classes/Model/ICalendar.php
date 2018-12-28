@@ -1333,7 +1333,7 @@ class ICalendar
             $temp['minute'] = date('i', $value);
             $temp['second'] = date('s', $value);
         } else {
-            $dateOb = new \TYPO3\CMS\Cal\Model\CalDate($value);
+            $dateOb = new CalDate($value);
             return ICalendar::_exportDateTime($dateOb->timestamp());
         }
 

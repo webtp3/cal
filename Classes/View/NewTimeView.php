@@ -2,6 +2,12 @@
 
 namespace TYPO3\CMS\Cal\View;
 
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,7 +20,6 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 abstract class NewTimeView
 {
     private $day;
@@ -32,28 +37,26 @@ abstract class NewTimeView
     private $parentMonth;
 
     /**
-     * Constructor.
-     *
-     * @param $serviceKey String
-     *            serviceKey for this model
+     * @param $event
+     * @return mixed
      */
-    public function __construct()
-    {
-    }
-
     abstract public function addEvent(&$event);
 
+    /**
+     * @param $template
+     * @return string
+     */
     public function render(&$template)
     {
         $this->setTemplate($template);
         $rems = [];
         $sims = [];
         $wrapped = [];
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
 
         $subpart = $cObj->getSubpart($template, $this->getMySubpart());
         $this->getMarker($subpart, $sims, $rems, $wrapped);
-        return $this->finish(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        return $this->finish(Functions::substituteMarkerArrayNotCached(
             $subpart,
             $sims,
             $rems,
@@ -61,9 +64,17 @@ abstract class NewTimeView
         ));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param string $view
+     * @param string $base
+     */
     protected function getMarker(& $template, & $sims, & $rems, & $wrapped, $view = '', $base = 'view')
     {
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         if ($view == '' && $base == 'view') {
             $view = !empty($conf['alternateRenderingView']) && is_array($conf[$base . '.'][$conf['alternateRenderingView'] . '.']) ? $conf['alternateRenderingView'] : $conf['view'];
         }
@@ -74,7 +85,7 @@ abstract class NewTimeView
             switch ($marker) {
                 default:
                     if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
-                        $module = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstanceService(
+                        $module = GeneralUtility::makeInstanceService(
                             substr($marker, 8),
                             'module'
                         );
@@ -138,7 +149,7 @@ abstract class NewTimeView
                             }
                             unset($tmp);
                         }
-                        $cObj = $this->getLocalCObject(); //&\TYPO3\CMS\Cal\Utility\Registry::Registry ('basic', 'local_cObj');//
+                        $cObj = $this->getLocalCObject();
                         $cObj->setCurrentVal($current);
                         $sims['###' . $marker . '###'] = $cObj->cObjGetSingle(
                             $conf[$base . '.'][$view . '.'][strtolower($marker)],
@@ -157,7 +168,7 @@ abstract class NewTimeView
 
         if (is_array($modules)) { // ODULE-MARKER FOUND
             foreach ($modules as $themodule => $markerArray) {
-                $module = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstanceService($themodule, 'module');
+                $module = GeneralUtility::makeInstanceService($themodule, 'module');
                 if (is_object($module)) {
                     if ($markerArray[0] == '') {
                         $sims['###MODULE__' . $themodule . '###'] = $module->start($this); // ld way
@@ -171,7 +182,7 @@ abstract class NewTimeView
             }
         }
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_base_model',
             'searchForObjectMarker',
             'model'
@@ -191,7 +202,7 @@ abstract class NewTimeView
      */
     protected function finish(&$content)
     {
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_base_model',
             'finishModelRendering',
             'model'
@@ -215,6 +226,10 @@ abstract class NewTimeView
         return $content;
     }
 
+    /**
+     * @param $content
+     * @return mixed
+     */
     protected function translateLanguageMarker(&$content)
     {
         // translate leftover markers
@@ -222,7 +237,7 @@ abstract class NewTimeView
         $allLanguageMarkers = array_unique($match[2]);
 
         if (count($allLanguageMarkers)) {
-            $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+            $controller = &Registry::Registry('basic', 'controller');
             $sims = [];
             foreach ($allLanguageMarkers as $key => $marker) {
                 $wrapper = $match[1][$key];
@@ -233,7 +248,7 @@ abstract class NewTimeView
                 $sims[$wrapper . $marker . '_LABEL' . $wrapper] = $label;
             }
             if (count($sims)) {
-                $content = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($content, $sims, [], []);
+                $content = Functions::substituteMarkerArrayNotCached($content, $sims, [], []);
             }
         }
         return $content;
@@ -244,10 +259,11 @@ abstract class NewTimeView
      *
      * @param $customData array
      *            key => value pairs that should be used as fake db-values for TS rendering instead of the values of the current object
+     * @return mixed
      */
     public function getLocalCObject($customData = false)
     {
-        $local_cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'local_cObj');
+        $local_cObj = &Registry::Registry('basic', 'local_cObj');
         if ($customData && is_array($customData)) {
             $local_cObj->data = $customData;
         } else {
@@ -264,55 +280,119 @@ abstract class NewTimeView
         return $local_cObj;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getMondayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###MONDAY###'] = $this->getWeekdayString(strtotime('2001-01-01'));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTuesdayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###TUESDAY###'] = $this->getWeekdayString(strtotime('2001-01-02'));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getWednesdayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###WEDNESDAY###'] = $this->getWeekdayString(strtotime('2001-01-03'));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getThursdayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###THURSDAY###'] = $this->getWeekdayString(strtotime('2001-01-04'));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getFridayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###FRIDAY###'] = $this->getWeekdayString(strtotime('2001-01-05'));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getSaturdayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###SATURDAY###'] = $this->getWeekdayString(strtotime('2001-01-06'));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getSundayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###SUNDAY###'] = $this->getWeekdayString(strtotime('2001-01-07'));
     }
 
+    /**
+     * @param $timestamp
+     * @return mixed
+     */
     public function getWeekdayString($timestamp)
     {
         if (!is_object($this->cs_convert)) {
-            $this->cs_convert = new \TYPO3\CMS\Core\Charset\CharsetConverter();
+            $this->cs_convert = new CharsetConverter();
         }
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         return $this->cs_convert->substr(
-            \TYPO3\CMS\Cal\Utility\Functions::getCharset(),
+            Functions::getCharset(),
             strftime($this->getWeekDayFormat(), $timestamp),
             0,
             $this->getWeekDayLength()
         );
     }
 
+    /**
+     * @param $view
+     * @param $wrap
+     * @param $date
+     * @param $createOffset
+     * @param $isAllowedToCreateEvent
+     * @param $remember
+     * @param $class
+     * @param $time
+     * @return string
+     */
     public function getCreateEventLink(
         $view,
         $wrap,
@@ -325,9 +405,9 @@ abstract class NewTimeView
     ) {
         $tmp = '';
 
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $conf = &Registry::Registry('basic', 'conf');
+        $controller = &Registry::Registry('basic', 'controller');
 
         if (!$rightsObj->isViewEnabled('create_event')) {
             if ($conf['view.']['enableAjax']) {
@@ -335,11 +415,11 @@ abstract class NewTimeView
             }
             return sprintf($wrap, $remember, $class, '');
         }
-        $now = new \TYPO3\CMS\Cal\Model\CalDate();
+        $now = new CalDate();
         $now->setTZbyId('UTC');
         $now->addSeconds($createOffset);
 
-        $date = new \TYPO3\CMS\Cal\Model\CalDate();
+        $date = new CalDate();
         $date->setDay($this->day);
         $date->setMonth($this->month);
         $date->setYear($this->year);
@@ -399,9 +479,16 @@ abstract class NewTimeView
         return $tmp;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTimetableHeightMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         $gridLength = $conf['view.']['day.']['gridLength'];
         $dayStart = $conf['view.']['day.']['dayStart']; // '0700'; // Start time for day grid
         $dayEnd = $conf['view.']['day.']['dayEnd']; // '2300'; // End time for day grid
@@ -413,26 +500,33 @@ abstract class NewTimeView
             $dayEnd .= '0';
         }
 
-        $d_start = new \TYPO3\CMS\Cal\Model\CalDate('01012000' . $dayStart);
-        $d_end = new \TYPO3\CMS\Cal\Model\CalDate('01012000' . $dayEnd);
+        $d_start = new CalDate('01012000' . $dayStart);
+        $d_end = new CalDate('01012000' . $dayEnd);
 
         $sims['###TIMETABLE_HEIGHT###'] = (($d_end->getHour() * 3600 + $d_end->getMinute() * 60) - ($d_start->getHour() * 3600 + $d_start->getMinute() * 60)) / $gridLength * 0.35;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTimeCellsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $cObj = &Registry::Registry('basic', 'cobj');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $timesSubpart = $cObj->getSubpart($template, 'TIME_CELLS');
 
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
 
         $gridLength = $conf['view.']['day.']['gridLength'];
         if ($gridLength == 0) {
             $gridLength = 15;
         }
 
-        $gridTime = new \TYPO3\CMS\Cal\Model\CalDate();
+        $gridTime = new CalDate();
         $gridTime->setTZbyId('UTC');
         $gridTime->setMinute(0);
 
@@ -449,12 +543,12 @@ abstract class NewTimeView
         }
 
         if ($conf['view'] == 'day') {
-            $d_start = new \TYPO3\CMS\Cal\Model\CalDate($this->getYmd() . $dayStart);
-            $d_end = new \TYPO3\CMS\Cal\Model\CalDate($this->getYmd() . $dayEnd);
+            $d_start = new CalDate($this->getYmd() . $dayStart);
+            $d_end = new CalDate($this->getYmd() . $dayEnd);
         }
         if ($conf['view'] == 'week') {
-            $d_start = new \TYPO3\CMS\Cal\Model\CalDate($this->weekStart . $dayStart);
-            $d_end = new \TYPO3\CMS\Cal\Model\CalDate($this->weekStart . $dayEnd);
+            $d_start = new CalDate($this->weekStart . $dayStart);
+            $d_end = new CalDate($this->weekStart . $dayEnd);
         }
         $d_start->setTZbyId('UTC');
         $d_end->setTZbyId('UTC');
@@ -496,12 +590,19 @@ abstract class NewTimeView
         $rems['###TIME_CELLS###'] = $times;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getHourCellsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
         $hoursSubpart = $cObj->getSubpart($template, 'HOUR_CELLS');
 
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         $gridLength = $conf['view.']['day.']['gridLength'];
 
         if ($gridLength == 0) {
@@ -528,24 +629,39 @@ abstract class NewTimeView
 
     abstract public function hasEvents();
 
+    /**
+     * @param $dateObject
+     * @return mixed
+     */
     abstract public function setCurrent(&$dateObject);
 
+    /**
+     * @param $dateObject
+     * @return mixed
+     */
     abstract public function setSelected(&$dateObject);
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCreateEventLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###CREATE_EVENT_LINK###'] = '';
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $conf = &Registry::Registry('basic', 'conf');
+        $controller = &Registry::Registry('basic', 'controller');
         if (!$rightsObj->isViewEnabled('create_event')) {
             return;
         }
-        $than = new \TYPO3\CMS\Cal\Model\CalDate();
+        $than = new CalDate();
         $than->setTZbyId('UTC');
         $than->addSeconds($createOffset);
 
-        $date = new \TYPO3\CMS\Cal\Model\CalDate();
+        $date = new CalDate();
         $date->setDay($this->day);
         $date->setMonth($this->month);
         $date->setYear($this->year);
@@ -562,14 +678,12 @@ abstract class NewTimeView
             if ($view == 'day' || $view == 'week') {
                 $timeParams = '&tx_cal_controller[gettime]=' . $date->format('%H%M');
             } elseif ($conf['rights.']['create.']['event.']['fields.']['starttime.']['default'] == 'now') {
-                $now = new \TYPO3\CMS\Cal\Model\CalDate();
+                $now = new CalDate();
                 $than->setTZbyId('UTC');
                 $timeParams = '&tx_cal_controller[gettime]=' . $now->format('%H%M');
             }
 
             $local_cObj->setCurrentVal($conf['view.'][$view . '.']['event.']['addIcon']);
-            // linkConf = Array();
-            //$local_cObj->data['link_useCacheHash'] = 0;
             $local_cObj->data['link_no_cache'] = 1;
             $local_cObj->data['link_additionalParams'] = $timeParams . '&tx_cal_controller[startdate]=' . $date->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $controller->extendLastView() . '&tx_cal_controller[view]=create_event';
             $local_cObj->data['link_section'] = 'default';
@@ -587,6 +701,9 @@ abstract class NewTimeView
         return $this->parentMonth;
     }
 
+    /**
+     * @param $parentMonth
+     */
     public function setParentMonth($parentMonth)
     {
         $this->parentMonth = $parentMonth;
@@ -597,6 +714,9 @@ abstract class NewTimeView
         return $this->day;
     }
 
+    /**
+     * @param $day
+     */
     public function setDay($day)
     {
         $this->day = $day;
@@ -607,6 +727,9 @@ abstract class NewTimeView
         return $this->month;
     }
 
+    /**
+     * @param $month
+     */
     public function setMonth($month)
     {
         $this->month = $month;
@@ -617,6 +740,9 @@ abstract class NewTimeView
         return $this->year;
     }
 
+    /**
+     * @param $year
+     */
     public function setYear($year)
     {
         $this->year = $year;
@@ -627,6 +753,9 @@ abstract class NewTimeView
         return $this->weekdayNumber;
     }
 
+    /**
+     * @param $weekdayNumber
+     */
     public function setWeekdayNumber($weekdayNumber)
     {
         $this->weekdayNumber = $weekdayNumber;
@@ -637,6 +766,9 @@ abstract class NewTimeView
         return $this->mySubpart;
     }
 
+    /**
+     * @param $mySubpart
+     */
     public function setMySubpart($mySubpart)
     {
         $this->mySubpart = $mySubpart;
@@ -647,26 +779,41 @@ abstract class NewTimeView
         return $this->template;
     }
 
+    /**
+     * @param $template
+     */
     public function setTemplate($template)
     {
         $this->template = $template;
     }
 
+    /**
+     * @return int
+     */
     public function getWeekDayLength()
     {
         return $this->weekDayLength;
     }
 
+    /**
+     * @param $length
+     */
     public function setWeekDayLength($length)
     {
         $this->weekDayLength = $length;
     }
 
+    /**
+     * @return string
+     */
     public function getWeekDayFormat()
     {
         return $this->weekDayFormat;
     }
 
+    /**
+     * @param $format
+     */
     public function setWeekDayFormat($format)
     {
         $this->weekDayFormat = $format;

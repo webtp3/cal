@@ -15,20 +15,30 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
  * A concrete model for the calendar.
  */
-class TodoModel extends \TYPO3\CMS\Cal\Model\EventModel
+class TodoModel extends EventModel
 {
+    /**
+     * TodoModel constructor.
+     * @param $row
+     * @param $serviceKey
+     */
     public function __construct($row, $serviceKey)
     {
         parent::__construct($row, false, $serviceKey);
-        $this->setEventType(\TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO);
+        $this->setEventType(Model::EVENT_TYPE_TODO);
         $this->setType($serviceKey);
         $this->setObjectType('todo');
     }
 
+    /**
+     * @param $row
+     * @param $isException
+     */
     public function createEvent(&$row, $isException)
     {
         parent::createEvent($row, $isException);
@@ -37,21 +47,35 @@ class TodoModel extends \TYPO3\CMS\Cal\Model\EventModel
         $this->setCompleted($row['completed']);
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEvent()
     {
         return $this->fillTemplate('###TEMPLATE_TODO###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderTodo()
     {
         return $this->renderEvent();
     }
 
+    /**
+     * @param $viewType
+     * @return string|processed
+     */
     public function renderTodoFor($viewType)
     {
         return $this->renderEventFor($viewType);
     }
 
+    /**
+     * @param $viewType
+     * @return string|processed
+     */
     public function renderEventFor($viewType)
     {
         if ($this->conf['view.']['freeAndBusy.']['enable'] == 1) {
@@ -64,31 +88,47 @@ class TodoModel extends \TYPO3\CMS\Cal\Model\EventModel
         return $this->fillTemplate('###TEMPLATE_TODO_' . strtoupper($viewType) . '###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventPreview()
     {
         $this->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_TODO_PREVIEW###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderTodoPreview()
     {
         return $this->renderEventPreview();
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderTomorrowsEvent()
     {
         $this->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_TODO_TOMORROW###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderTomorrowsTodo()
     {
         return $this->renderTomorrowsEvent();
     }
 
+    /**
+     * @param $subpartMarker
+     * @return string|processed
+     */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $page = '';
         if ($confArr['todoSubtype'] == 'event') {
@@ -112,7 +152,7 @@ class TodoModel extends \TYPO3\CMS\Cal\Model\EventModel
         $sims = [];
         $wrapped = [];
         $this->getMarker($page, $sims, $rems, $wrapped, $this->conf['view']);
-        return $this->finish(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        return $this->finish(Functions::substituteMarkerArrayNotCached(
             $page,
             $sims,
             $rems,
@@ -120,10 +160,17 @@ class TodoModel extends \TYPO3\CMS\Cal\Model\EventModel
         ));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStatusMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###STATUS###'] = '';
-        if ($this->getEventType() == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO) {
+        if ($this->getEventType() == Model::EVENT_TYPE_TODO) {
             $this->initLocalCObject($this->getValuesAsArray());
             $this->local_cObj->setCurrentVal($this->getStatus());
             $sims['###STATUS###'] = $this->local_cObj->cObjGetSingle(
@@ -133,10 +180,17 @@ class TodoModel extends \TYPO3\CMS\Cal\Model\EventModel
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getPriorityMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###PRIORITY###'] = '';
-        if ($this->getEventType() == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO) {
+        if ($this->getEventType() == Model::EVENT_TYPE_TODO) {
             $this->initLocalCObject($this->getValuesAsArray());
             $this->local_cObj->setCurrentVal($this->getPriority());
             $sims['###PRIORITY###'] = $this->local_cObj->cObjGetSingle(
@@ -146,10 +200,17 @@ class TodoModel extends \TYPO3\CMS\Cal\Model\EventModel
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCompletedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###COMPLETED###'] = '';
-        if ($this->getEventType() == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO) {
+        if ($this->getEventType() == Model::EVENT_TYPE_TODO) {
             $this->initLocalCObject($this->getValuesAsArray());
             $this->local_cObj->setCurrentVal($this->getCompleted());
             $sims['###COMPLETED###'] = $this->local_cObj->cObjGetSingle(
@@ -159,6 +220,9 @@ class TodoModel extends \TYPO3\CMS\Cal\Model\EventModel
         }
     }
 
+    /**
+     * @param $piVars
+     */
     public function updateWithPIVars(&$piVars)
     {
         $this->setStatus($piVars['status']);

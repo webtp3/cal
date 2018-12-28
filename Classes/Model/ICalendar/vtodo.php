@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vTodos.
  *
@@ -15,7 +17,7 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  * @author Mike Cochrane <mike@graftonhall.co.nz>
  * @since Horde 3.0
  */
-class vtodo extends \TYPO3\CMS\Cal\Model\ICalendar
+class vtodo extends ICalendar
 {
     public function getType()
     {

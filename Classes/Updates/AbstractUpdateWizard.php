@@ -2,6 +2,16 @@
 
 namespace TYPO3\CMS\Cal\Updates;
 
+use TYPO3\CMS\Core\Resource\FileRepository;
+use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Dbal\Database\DatabaseConnection;
+use TYPO3\CMS\Install\Updates\AbstractUpdate;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -19,7 +29,7 @@ namespace TYPO3\CMS\Cal\Updates;
  * Basic upgrade wizard which goes through all files referenced in the {defined} field
  * and creates sys_file records as well as sys_file_reference records for the individual usages.
  */
-abstract class AbstractUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate
+abstract class AbstractUpdateWizard extends AbstractUpdate
 {
     const FOLDER_ContentUploads = '_migrated/cal_uploads';
 
@@ -29,22 +39,22 @@ abstract class AbstractUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractU
     protected $targetDirectory;
 
     /**
-     * @var \TYPO3\CMS\Core\Resource\ResourceFactory
+     * @var ResourceFactory
      */
     protected $fileFactory;
 
     /**
-     * @var \TYPO3\CMS\Core\Resource\Index\FileIndexRepository
+     * @var FileIndexRepository
      */
     protected $fileIndexRepository;
 
     /**
-     * @var \TYPO3\CMS\Core\Resource\FileRepository
+     * @var FileRepository
      */
     protected $fileRepository;
 
     /**
-     * @var \TYPO3\CMS\Core\Resource\ResourceStorage
+     * @var ResourceStorage
      */
     protected $storage;
 
@@ -56,14 +66,14 @@ abstract class AbstractUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractU
     protected function init()
     {
         $fileadminDirectory = rtrim($GLOBALS['TYPO3_CONF_VARS']['BE']['fileadminDir'], '/') . '/';
-        /** @var $storageRepository \TYPO3\CMS\Core\Resource\StorageRepository */
-        $storageRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\StorageRepository');
+        /** @var $storageRepository StorageRepository */
+        $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
         $storages = $storageRepository->findAll();
         foreach ($storages as $storage) {
             $storageRecord = $storage->getStorageRecord();
             $configuration = $storage->getConfiguration();
             $isLocalDriver = $storageRecord['driver'] === 'Local';
-            $isOnFileadmin = !empty($configuration['basePath']) && \TYPO3\CMS\Core\Utility\GeneralUtility::isFirstPartOfStr(
+            $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
                 $configuration['basePath'],
                     $fileadminDirectory
             );
@@ -75,17 +85,20 @@ abstract class AbstractUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractU
         if (!isset($this->storage)) {
             throw new \RuntimeException('Local default storage could not be initialized - might be due to missing sys_file* tables.');
         }
-        $this->fileFactory = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\ResourceFactory');
+        $this->fileFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         //TYPO3 >= 6.2.0
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
-            $this->fileIndexRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\Index\\FileIndexRepository');
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
+            $this->fileIndexRepository = GeneralUtility::makeInstance(FileIndexRepository::class);
         } else {
             //TYPO3 = 6.1
-            $this->fileRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+            $this->fileRepository = GeneralUtility::makeInstance(FileRepository::class);
         }
         $this->targetDirectory = PATH_site . $fileadminDirectory . self::FOLDER_ContentUploads . '/';
     }
 
+    /**
+     * @return mixed
+     */
     abstract protected function getMigrationDescription();
 
     /**
@@ -122,6 +135,9 @@ abstract class AbstractUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractU
         return $updateNeeded;
     }
 
+    /**
+     * @return mixed
+     */
     abstract protected function getRecordTableName();
 
     /**
@@ -168,6 +184,9 @@ abstract class AbstractUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractU
      */
     abstract protected function cleanRecord(array $record, $fileCount, array $collectionUids);
 
+    /**
+     * @return mixed
+     */
     abstract protected function getColumnNameArray();
 
     /**
@@ -249,7 +268,7 @@ abstract class AbstractUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractU
      */
     protected function quoteIdentifiers(array &$mapping)
     {
-        if ($GLOBALS['TYPO3_DB'] instanceof \TYPO3\CMS\Dbal\Database\DatabaseConnection) {
+        if ($GLOBALS['TYPO3_DB'] instanceof DatabaseConnection) {
             if (!$GLOBALS['TYPO3_DB']->runningNative() && !$GLOBALS['TYPO3_DB']->runningADOdbDriver('mysql')) {
                 $mapping['mapTableName'] = '"' . $mapping['mapTableName'] . '"';
                 foreach ($mapping['mapFieldNames'] as $key => &$value) {

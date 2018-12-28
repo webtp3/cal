@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Utility;
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -19,8 +21,8 @@ if (!class_exists('Date', false)) {
         define('PATH_SEPARATOR', OS_WINDOWS ? ';' : ':');
     }
 
-    $path = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'res/PEAR/';
+    $path = ExtensionManagementUtility::extPath('cal') . 'res/PEAR/';
 
     // set_include_path(get_include_path(). PATH_SEPARATOR . $path);
-    require_once($path . 'Date.php');
+    require_once $path . 'Date.php';
 }

@@ -16,13 +16,8 @@ namespace TYPO3\CMS\Cal\View;
  */
 use TYPO3\CMS\Cal\Utility\Functions;
 
-class MeetingManagerView extends \TYPO3\CMS\Cal\View\BaseView
+class MeetingManagerView extends BaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Main function to draw the meeting manager view.
      *
@@ -106,7 +101,7 @@ class MeetingManagerView extends \TYPO3\CMS\Cal\View\BaseView
         } else {
             $sims['###STATUS###'] = $this->controller->pi_getLL('l_meeting_error');
         }
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
         $rems = [];
         return $this->finish($page, $rems);
     }

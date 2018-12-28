@@ -11,10 +11,6 @@
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-// DO NOT REMOVE OR CHANGE THESE 3 LINES:
-// define('TYPO3_MOD_PATH', '../typo3conf/ext/cal/mod1/');
-// BACK_PATH='../../../../typo3/';
 $MCONF['name'] = 'tools_calrecurrencegenerator';
 
 $MCONF['access'] = 'admin';

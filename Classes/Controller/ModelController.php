@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -22,7 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * controller and starts processing in the appropriate calendar models by
  * utilizing TYPO3 services.
  */
-class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
+class ModelController extends BaseController
 {
     private $todoSubtype = 'event';
 
@@ -33,6 +34,18 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         $this->todoSubtype = $confArr['todoSubtype'];
     }
 
+    /**
+     * @param $uid
+     * @param string $type
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
+     * @return event|void
+     */
     public function findEvent(
         $uid,
         $type = '',
@@ -66,6 +79,18 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $event;
     }
 
+    /**
+     * @param $uid
+     * @param string $type
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
+     * @return event|void
+     */
     public function findTodo(
         $uid,
         $type = 'tx_cal_todo',
@@ -96,12 +121,28 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $event;
     }
 
+    /**
+     * @param $type
+     * @return event
+     */
     public function createEvent($type)
     {
         $event = $this->create('cal_event_model', $type, 'event');
         return $event;
     }
 
+    /**
+     * @param $uid
+     * @param string $type
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
+     * @return event|void
+     */
     public function findAllEventInstances(
         $uid,
         $type = '',
@@ -132,6 +173,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $event_s;
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveEvent($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_event_model', 'event', $type);
@@ -141,6 +188,10 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $service->saveEvent($pid);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeEvent($uid, $type)
     {
         $service = $this->getServiceObjByKey('cal_event_model', 'event', $type);
@@ -151,6 +202,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return;
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveTodo($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_event_model', $this->todoSubtype, $type);
@@ -160,6 +217,10 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $service->saveEvent($pid);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeTodo($uid, $type)
     {
         $service = $this->getServiceObjByKey('cal_event_model', $this->todoSubtype, $type);
@@ -170,6 +231,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return;
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveExceptionEvent($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_event_model', 'event', $type);
@@ -179,6 +246,18 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $service->saveExceptionEvent($pid);
     }
 
+    /**
+     * @param $uid
+     * @param string $type
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
+     * @return event
+     */
     public function findAllTodoInstances(
         $uid,
         $type = '',
@@ -205,6 +284,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param $uid
+     * @param string $type
+     * @param string $pidList
+     */
     public function findLocation($uid, $type = '', $pidList = '')
     {
         if ($uid == '') {
@@ -221,6 +305,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $location;
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function findAllLocations($type = '', $pidList = '')
     {
 
@@ -232,6 +321,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $locations;
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveLocation($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_location_model', 'location', $type);
@@ -241,6 +336,10 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $service->saveLocation($pid);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeLocation($uid, $type)
     {
         $service = $this->getServiceObjByKey('cal_location_model', 'location', $type);
@@ -250,6 +349,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return;
     }
 
+    /**
+     * @param $uid
+     * @param string $type
+     * @param string $pidList
+     */
     public function findOrganizer($uid, $type = '', $pidList = '')
     {
         if ($uid == '') {
@@ -265,6 +369,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $organizer;
     }
 
+    /**
+     * @param $uid
+     * @param string $type
+     * @param string $pidList
+     */
     public function findCalendar($uid, $type = 'tx_cal_calendar', $pidList = '')
     {
         if ($uid == '') {
@@ -280,6 +389,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $calendar;
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
     public function findAllCalendar($type = '', $pidList = '')
     {
         /* No key provided so return all events */
@@ -308,6 +422,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $calendar;
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function findAllOrganizer($type = '', $pidList = '')
     {
 
@@ -319,6 +438,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $organizer;
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveOrganizer($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_organizer_model', 'organizer', $type);
@@ -328,6 +453,10 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $service->saveOrganizer($pid);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeOrganizer($uid, $type)
     {
         $service = $this->getServiceObjByKey('cal_organizer_model', 'organizer', $type);
@@ -337,6 +466,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return;
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveCalendar($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_calendar_model', 'calendar', $type);
@@ -346,6 +481,10 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $service->saveCalendar($pid);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeCalendar($uid, $type)
     {
         $service = $this->getServiceObjByKey('cal_calendar_model', 'calendar', $type);
@@ -355,6 +494,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return;
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveCategory($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_category_model', 'category', $type);
@@ -364,6 +509,10 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $service->saveCategory($pid);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeCategory($uid, $type)
     {
         $service = $this->getServiceObjByKey('cal_category_model', 'category', $type);
@@ -373,6 +522,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return;
     }
 
+    /**
+     * @param $uid
+     * @param string $type
+     * @param string $pidList
+     */
     public function findAttendee($uid, $type = '', $pidList = '')
     {
         if ($uid == '') {
@@ -386,6 +540,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $attendee;
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function findAllAttendees($type = '', $pidList = '')
     {
         $service = $this->getServiceObjByKey('cal_attendee_model', 'attendee', $type);
@@ -396,6 +555,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $attendees;
     }
 
+    /**
+     * @param $eventUid
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
     public function findEventAttendees($eventUid, $type = '', $pidList = '')
     {
 
@@ -404,6 +569,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $attendees;
     }
 
+    /**
+     * @param $eventUid
+     * @param string $type
+     * @param string $pidList
+     */
     public function updateEventAttendees($eventUid, $type = '', $pidList = '')
     {
         /* Gets the model for the provided service key */
@@ -412,6 +582,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         $service->updateAttendees($eventUid);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveAttendee($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_attendee_model', 'attendee', $type);
@@ -421,6 +597,10 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $service->saveAttendee($pid);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeAttendee($uid, $type)
     {
         $service = $this->getServiceObjByKey('cal_attendee_model', 'attendee', $type);
@@ -430,34 +610,71 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return;
     }
 
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findEventsForDay(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3')
     {
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime($dateObject);
-        $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndDayTime($dateObject);
+        $starttime = Calendar::calculateStartDayTime($dateObject);
+        $endtime = Calendar::calculateEndDayTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
     }
 
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findEventsForWeek(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3')
     {
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartWeekTime($dateObject);
-        $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndWeekTime($dateObject);
+        $starttime = Calendar::calculateStartWeekTime($dateObject);
+        $endtime = Calendar::calculateEndWeekTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
     }
 
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findEventsForMonth(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3')
     {
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartMonthTime($dateObject);
-        $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndMonthTime($dateObject);
+        $starttime = Calendar::calculateStartMonthTime($dateObject);
+        $endtime = Calendar::calculateEndMonthTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
     }
 
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findEventsForYear(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3')
     {
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartYearTime($dateObject);
-        $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndYearTime($dateObject);
+        $starttime = Calendar::calculateStartYearTime($dateObject);
+        $endtime = Calendar::calculateEndYearTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
     }
 
+    /**
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @param string $additionalWhere
+     * @return array
+     */
     public function findEventsForList(
         &$startDateObject,
         &$endDateObject,
@@ -478,10 +695,17 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findTodosForDay(&$dateObject, $type = '', $pidList = '', $eventType = '4')
     {
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime($dateObject);
-        $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndDayTime($dateObject);
+        $starttime = Calendar::calculateStartDayTime($dateObject);
+        $endtime = Calendar::calculateEndDayTime($dateObject);
         return $this->findAllWithin(
             'cal_event_model',
             $starttime,
@@ -493,10 +717,17 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findTodosForWeek(&$dateObject, $type = '', $pidList = '', $eventType = '4')
     {
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartWeekTime($dateObject);
-        $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndWeekTime($dateObject);
+        $starttime = Calendar::calculateStartWeekTime($dateObject);
+        $endtime = Calendar::calculateEndWeekTime($dateObject);
         return $this->findAllWithin(
             'cal_event_model',
             $starttime,
@@ -508,10 +739,17 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findTodosForMonth(&$dateObject, $type = '', $pidList = '', $eventType = '4')
     {
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartMonthTime($dateObject);
-        $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndMonthTime($dateObject);
+        $starttime = Calendar::calculateStartMonthTime($dateObject);
+        $endtime = Calendar::calculateEndMonthTime($dateObject);
         return $this->findAllWithin(
             'cal_event_model',
             $starttime,
@@ -523,10 +761,17 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findTodosForYear(&$dateObject, $type = '', $pidList = '', $eventType = '4')
     {
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartYearTime($dateObject);
-        $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndYearTime($dateObject);
+        $starttime = Calendar::calculateStartYearTime($dateObject);
+        $endtime = Calendar::calculateEndYearTime($dateObject);
         return $this->findAllWithin(
             'cal_event_model',
             $starttime,
@@ -538,6 +783,14 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
     public function findTodosForList(&$startDateObject, &$endDateObject, $type = '', $pidList = '', $eventType = '4')
     {
         return $this->findAllWithin(
@@ -551,22 +804,44 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
     public function findCurrentTodos($type = '', $pidList = '')
     {
         /* Gets the model for the provided service key */
         return $this->findAllObjects($this->todoSubtype, $type, $pidList, 'findCurrentTodos');
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
     public function findCategoriesForList($type = '', $pidList = '')
     {
         return $this->findAllCategories('cal_category_model', $type, $pidList);
     }
 
+    /**
+     * @param string $type
+     * @param $pidList
+     * @return array
+     */
     public function findEventsForIcs($type = '', $pidList)
     {
         return $this->findAll('cal_event_model', $type, 'event', $pidList, '0,1,2,3');
     }
 
+    /**
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param string $type
+     * @param $pidList
+     * @return array
+     */
     public function findEventsForRss(&$startDateObject, &$endDateObject, $type = '', $pidList)
     {
         return $this->findAllWithin(
@@ -580,11 +855,23 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param string $type
+     * @param $pidList
+     * @return array
+     */
     public function findTodosForIcs($type = '', $pidList)
     {
         return $this->findAll('cal_event_model', $type, 'event', $pidList, '4');
     }
 
+    /**
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param string $type
+     * @param $pidList
+     * @return array
+     */
     public function findTodosForRss(&$startDateObject, &$endDateObject, $type = '', $pidList)
     {
         return $this->findAllWithin(
@@ -598,6 +885,16 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param $type
+     * @param $pidList
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param $searchword
+     * @param $locationIds
+     * @param $organizerIds
+     * @return array
+     */
     public function searchEvents(
         $type,
         $pidList,
@@ -620,6 +917,16 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param $type
+     * @param $pidList
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param $searchword
+     * @param $locationIds
+     * @param $organizerIds
+     * @return array
+     */
     public function searchTodos(
         $type,
         $pidList,
@@ -642,16 +949,35 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         );
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @param $searchword
+     * @return array
+     */
     public function searchLocation($type = '', $pidList = '', $searchword)
     {
         return $this->_searchAddress('cal_location_model', $type, 'location', $pidList, $searchword);
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @param $searchword
+     * @return array
+     */
     public function searchOrganizer($type = '', $pidList = '', $searchword)
     {
         return $this->_searchAddress('cal_organizer_model', $type, 'organizer', $pidList, $searchword);
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     * @param $serviceName
+     * @param $type
+     * @param $subtype
+     */
     public function createTranslation($uid, $overlay, $serviceName, $type, $subtype)
     {
         /* Gets the model for the provided service key */
@@ -660,6 +986,10 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         $service->createTranslation($uid, $overlay);
     }
 
+    /**
+     * @param $uid
+     * @return array
+     */
     public function findFeUser($uid)
     {
         $feUser = [];
@@ -680,8 +1010,17 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $feUser;
     }
 
-    /*
-     * Returns events from all calendar models or a specified model. @param		key		The optional service key to return events for. If no key is given, all events are returned. @return		array		Array of events.
+    /**
+     * Returns events from all calendar models or a specified model.
+     * @param $serviceName
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param string $type
+     * @param string $subtype
+     * @param string $pidList
+     * @param string $eventType
+     * @param string $additionalWhere
+     * @return array
      */
     public function findAllWithin(
         $serviceName,
@@ -772,6 +1111,14 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
     /*
      * Returns events from all calendar models or a specified model. @param		key		The optional service key to return events for. If no key is given, all events are returned. @return		array		Array of events.
      */
+    /**
+     * @param $serviceName
+     * @param $type
+     * @param $subtype
+     * @param $pidList
+     * @param string $eventTypes
+     * @return array
+     */
     public function findAll($serviceName, $type, $subtype, $pidList, $eventTypes = '0,1,2,3')
     {
         /* No key provided so return all events */
@@ -826,6 +1173,11 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $events;
     }
 
+    /**
+     * @param string $uid
+     * @param string $type
+     * @param string $pidList
+     */
     public function findCategory($uid = '', $type = '', $pidList = '')
     {
         if ($uid == '') {
@@ -838,6 +1190,12 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $category;
     }
 
+    /**
+     * @param $serviceName
+     * @param $type
+     * @param $pidList
+     * @return array
+     */
     public function findAllCategories($serviceName, $type, $pidList)
     {
         /* No key provided so return all events */
@@ -870,6 +1228,18 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $categories;
     }
 
+    /**
+     * @param $serviceName
+     * @param $type
+     * @param $pidList
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param $searchword
+     * @param string $locationIds
+     * @param string $organizerIds
+     * @param string $eventType
+     * @return array
+     */
     public function _searchEvents(
         $serviceName,
         $type,
@@ -951,6 +1321,14 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $events;
     }
 
+    /**
+     * @param string $serviceName
+     * @param string $type
+     * @param string $subtype
+     * @param string $pidList
+     * @param $searchword
+     * @return array
+     */
     public function _searchAddress($serviceName = '', $type = '', $subtype = '', $pidList = '', $searchword)
     {
         /* No key provided so return all events */
@@ -979,10 +1357,17 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Returns a specific event with a given serviceKey and UID.
      *
-     * @param
-     *            string    The serviceKey to be searched in.
-     * @param
-     *            integer    The UID to look up.
+     * @param $serviceName
+     * @param $uid
+     * @param $type
+     * @param $subtype
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
      * @return event event object matching the serviceKey and UID.
      */
     public function find(
@@ -1001,7 +1386,7 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         /* Gets the model for the provided service key */
         $service = $this->getServiceObjByKey($serviceName, $subtype, $type);
         if (!is_object($service)) {
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The object you are looking for could not be found.',
                 'Please verify your URL parameters: tx_cal_controller[type] and tx_cal_controller[uid].'
             );
@@ -1023,10 +1408,9 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Returns a specific event with a given serviceKey and UID.
      *
-     * @param
-     *            string    The serviceKey to be searched in.
-     * @param
-     *            integer    The UID to look up.
+     * @param $serviceName
+     * @param $type
+     * @param $subtype
      * @return event event object matching the serviceKey and UID.
      */
     public function create($serviceName, $type, $subtype)
@@ -1034,7 +1418,7 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         /* Gets the model for the provided service key */
         $service = $this->getServiceObjByKey($serviceName, $subtype, $type);
         if (!is_object($service)) {
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The object you are looking for could not be found.',
                 'Please verify your URL parameters: tx_cal_controller[type].'
             );
@@ -1071,11 +1455,9 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
     /**
      * Helper function to return a service object with the given type, subtype, and serviceKey
      *
-     * @param
-     *            string    The type of the service.
-     * @param
-     *            string    The subtype of the service.
-     * @return object service object.
+     * @param $type
+     * @param $subtype
+     * @return array service object.
      */
     public function getServiceTypes($type, $subtype)
     {
@@ -1090,6 +1472,14 @@ class ModelController extends \TYPO3\CMS\Cal\Controller\BaseController
         return $returnArray;
     }
 
+    /**
+     * @param $key
+     * @param $type
+     * @param $pidList
+     * @param string $functionTobeCalled
+     * @param string $paramsToBePassedOn
+     * @return array
+     */
     public function findAllObjects($key, $type, $pidList, $functionTobeCalled = '', $paramsToBePassedOn = '')
     {
         /* No key provided so return all X */

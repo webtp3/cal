@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +22,7 @@ namespace TYPO3\CMS\Cal\Model;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class LocationAddress extends \TYPO3\CMS\Cal\Model\Location
+class LocationAddress extends Location
 {
 
     /**
@@ -52,7 +54,7 @@ class LocationAddress extends \TYPO3\CMS\Cal\Model\Location
         $this->setCountry($row['country']);
         $this->setPhone($row['phone']);
         $this->setEmail($row['email']);
-        $this->setImage(\TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $row['image'], 1));
+        $this->setImage(GeneralUtility::trimExplode(',', $row['image'], 1));
         $this->setLink($row['www']);
         $this->row = $row;
     }

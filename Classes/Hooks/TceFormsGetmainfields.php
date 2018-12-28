@@ -15,6 +15,7 @@ namespace TYPO3\CMS\Cal\Hooks;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Model\CalDate;
 
 /**
  * This hook extends the tcemain class.
@@ -22,6 +23,11 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
  */
 class TceFormsGetmainfields
 {
+    /**
+     * @param $table
+     * @param $row
+     * @param $tceform
+     */
     public function getMainFields_preProcess($table, &$row, $tceform)
     {
         if ($table == 'tx_cal_event') {
@@ -38,20 +44,6 @@ class TceFormsGetmainfields
                 if (!$row['calendar_id']) {
                     $row['calendar_id'] = $eventPostData['calendar_id'];
                 }
-
-                /* Set the category if there's not already a value set (from TSConfig) */
-                /*
-                if(!$row['category_id']) {
-                    $categoriesArray = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $eventPostData['category_id'], 1);
-                    $categoryItemArray = array();
-                    foreach($categoriesArray as $category) {
-                        $categoryRow = BackendUtility::getRecord('tx_cal_category', $category);
-                        $categoryItemArray[] = $categoryRow['uid'].'|'.BackendUtility::getRecordTitle('tx_cal_category', $categoryRow, 1);
-                    }
-
-                    $row['category_id'] = implode(',', $categoryItemArray);
-                }
-                */
             } elseif (!strstr($row['uid'], 'NEW')) {
                 if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] == '1') {
                     $format = '%m-%d-%Y';
@@ -111,11 +103,16 @@ class TceFormsGetmainfields
         }
     }
 
+    /**
+     * @param $ymdDate
+     * @param $format
+     * @return int|string
+     */
     public function formatDate($ymdDate, $format)
     {
         if ($ymdDate) {
-            $dateObj = new \TYPO3\CMS\Cal\Model\CalDate(intval($ymdDate) . '000000');
-            $dateObj->setTZbyId('UTC');
+            $dateObj = new CalDate(intval($ymdDate) . '000000');
+            $dateObj->setTZbyID('UTC');
             return $dateObj->getTime();
         }
         $dateString = '';

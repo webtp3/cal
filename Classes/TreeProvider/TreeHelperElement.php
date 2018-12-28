@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\TreeProvider;
 
+use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -18,8 +20,22 @@ namespace TYPO3\CMS\Cal\TreeProvider;
 /**
  * this class displays a tree selector with nested tt_news categories.
  */
-class TreeHelperElement extends \TYPO3\CMS\Backend\Form\Element\AbstractFormElement
+class TreeHelperElement extends AbstractFormElement
 {
+    /**
+     * @param $fName
+     * @param $mode
+     * @param $allowed
+     * @param $itemArray
+     * @param string $selector
+     * @param array $params
+     * @param string $onFocus
+     * @param string $table
+     * @param string $field
+     * @param string $uid
+     * @param array $config
+     * @return mixed
+     */
     public function getDbFileIcon(
         $fName,
         $mode,
@@ -48,6 +64,18 @@ class TreeHelperElement extends \TYPO3\CMS\Backend\Form\Element\AbstractFormElem
         );
     }
 
+    /**
+     * @param $itemKinds
+     * @param $wizConf
+     * @param $table
+     * @param $row
+     * @param $field
+     * @param $PA
+     * @param $itemName
+     * @param $specConf
+     * @param bool $RTE
+     * @return mixed
+     */
     public function getRenderWizards(
         $itemKinds,
         $wizConf,

@@ -15,7 +15,9 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\QueryGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class ItemsProcFunc
 {
@@ -224,12 +226,12 @@ class ItemsProcFunc
                 $pidlist = $cache[$GLOBALS['BE_USER']->user['uid']]['pidlist'];
             } else {
                 $mounts = [];
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7001000) {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7001000) {
                     $mounts = $GLOBALS['BE_USER']->returnWebmounts();
                 } else {
                     $mounts = $GLOBALS['WEBMOUNTS'];
                 }
-                $qG = new \TYPO3\CMS\Core\Database\QueryGenerator();
+                $qG = new QueryGenerator();
                 $pidlist = '';
                 foreach ($mounts as $idx => $uid) {
                     $list = $qG->getTreeList($uid, 99, 0, $GLOBALS['BE_USER']->getPagePermsClause(1));

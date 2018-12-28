@@ -14,9 +14,18 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Service\BaseService;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Mail\MailMessage;
+use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
-class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
+/**
+ * Class NotificationView
+ */
+class NotificationView extends BaseService
 {
     public $mailer;
     public $baseUrl;
@@ -27,12 +36,13 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $this->baseUrl = ''; // GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
     }
 
+    /**
+     * @param $oldEventDataArray
+     * @param $newEventDataArray
+     */
     public function notifyOfChanges($oldEventDataArray, $newEventDataArray)
     {
-        unset($oldEventDataArray['starttime']);
-        unset($oldEventDataArray['endtime']);
-        unset($newEventDataArray['starttime']);
-        unset($newEventDataArray['endtime']);
+        unset($oldEventDataArray['starttime'], $oldEventDataArray['endtime'], $newEventDataArray['starttime'], $newEventDataArray['endtime']);
 
         $pidArray = GeneralUtility::trimExplode(',', $this->conf['pidList'], 1);
         if (!in_array($oldEventDataArray['pid'], $pidArray)) {
@@ -230,6 +240,16 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event_old
+     * @param $event_new
+     * @param $email
+     * @param $templatePath
+     * @param $titleText
+     * @param $unsubscribeLink
+     * @param string $acceptLink
+     * @param string $declineLink
+     */
     public function sendNotificationOfChanges(
         &$event_old,
         &$event_new,
@@ -241,7 +261,7 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $declineLink = ''
     ) {
         $absFile = GeneralUtility::getFileAbsFileName($templatePath);
-        $template = GeneralUtility::getURL($absFile);
+        $template = GeneralUtility::getUrl($absFile);
         $htmlTemplate = $this->cObj->getSubpart($template, '###HTML###');
         $oldEventHTMLSubpart = $this->cObj->getSubpart($htmlTemplate, '###OLD_EVENT###');
         $newEventHTMLSubpart = $this->cObj->getSubpart($htmlTemplate, '###NEW_EVENT###');
@@ -260,11 +280,11 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
 
         $switch['###CURRENT_USER###'] = $this->getModifyingUser($template);
 
-        $htmlTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($htmlTemplate, $switch, [
+        $htmlTemplate = Functions::substituteMarkerArrayNotCached($htmlTemplate, $switch, [
             '###OLD_EVENT###' => $oldEventHTMLSubpart,
             '###NEW_EVENT###' => $newEventHTMLSubpart
         ], []);
-        $plainTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($plainTemplate, $switch, [
+        $plainTemplate = Functions::substituteMarkerArrayNotCached($plainTemplate, $switch, [
             '###OLD_EVENT###' => $oldEventPlainSubpart,
             '###NEW_EVENT###' => $newEventPlainSubpart
         ], []);
@@ -276,15 +296,15 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $rems = [];
         $wrapped = [];
         $event_new->getMarker($titleText, $switch, $rems, $wrapped, 'title');
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
-            $this->mailer->subject = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
+            $this->mailer->subject = Functions::substituteMarkerArrayNotCached(
                 $titleText,
                 $switch,
                 $rems,
                 $wrapped
             );
         } else {
-            $this->mailer->setSubject(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+            $this->mailer->setSubject(Functions::substituteMarkerArrayNotCached(
                 $titleText,
                 $switch,
                 $rems,
@@ -324,13 +344,18 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         return $modifyingUser;
     }
 
+    /**
+     * @param $event
+     * @param $eventHTMLSubpart
+     * @param $eventPlainSubpart
+     */
     public function fillTemplate(&$event, &$eventHTMLSubpart, &$eventPlainSubpart)
     {
         $switch = [];
         $rems = [];
         $wrapped = [];
         $event->getMarker($eventHTMLSubpart, $switch, $rems, $wrapped, 'notification');
-        $eventHTMLSubpart = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $eventHTMLSubpart = Functions::substituteMarkerArrayNotCached(
             $eventHTMLSubpart,
             $switch,
             $rems,
@@ -341,7 +366,7 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $rems = [];
         $wrapped = [];
         $event->getMarker($eventPlainSubpart, $switch, $rems, $wrapped, 'notification');
-        $eventPlainSubpart = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $eventPlainSubpart = Functions::substituteMarkerArrayNotCached(
             $eventPlainSubpart,
             $switch,
             $rems,
@@ -349,6 +374,10 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         );
     }
 
+    /**
+     * @param $newEventDataArray
+     * @param int $forceDeletionMode
+     */
     public function notify(&$newEventDataArray, $forceDeletionMode = 0)
     {
         $event = $this->modelObj->findEvent(
@@ -530,6 +559,16 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $event
+     * @param $email
+     * @param $templatePath
+     * @param $titleText
+     * @param $unsubscribeLink
+     * @param string $acceptLink
+     * @param string $declineLink
+     * @param string $ics
+     */
     public function sendNotification(
         &$event,
         $email,
@@ -541,7 +580,7 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $ics = ''
     ) {
         $absFile = GeneralUtility::getFileAbsFileName($templatePath);
-        $template = GeneralUtility::getURL($absFile);
+        $template = GeneralUtility::getUrl($absFile);
         $htmlTemplate = $this->cObj->getSubpart($template, '###HTML###');
         $plainTemplate = $this->cObj->getSubpart($template, '###PLAIN###');
 
@@ -555,7 +594,7 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $switch['###UNSUBSCRIBE_LINK###'] = $unsubscribeLink;
         $switch['###ACCEPT_LINK###'] = $acceptLink;
         $switch['###DECLINE_LINK###'] = $declineLink;
-        $htmlTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $htmlTemplate = Functions::substituteMarkerArrayNotCached(
             $htmlTemplate,
             $switch,
             $rems,
@@ -569,7 +608,7 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $switch['###UNSUBSCRIBE_LINK###'] = $unsubscribeLink;
         $switch['###ACCEPT_LINK###'] = $acceptLink;
         $switch['###DECLINE_LINK###'] = $declineLink;
-        $plainTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $plainTemplate = Functions::substituteMarkerArrayNotCached(
             $plainTemplate,
             $switch,
             $rems,
@@ -584,15 +623,15 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $wrapped = [];
         $event->getMarker($titleText, $switch, $rems, $wrapped, 'title');
 
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
-            $this->mailer->subject = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
+            $this->mailer->subject = Functions::substituteMarkerArrayNotCached(
                 $titleText,
                 $switch,
                 $rems,
                 $wrapped
             );
         } else {
-            $this->mailer->setSubject(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+            $this->mailer->setSubject(Functions::substituteMarkerArrayNotCached(
                 $titleText,
                 $switch,
                 $rems,
@@ -603,12 +642,13 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         $this->sendEmail($email, $htmlTemplate, $plainTemplate);
     }
 
+    /**
+     * @param $oldEventDataArray
+     * @param array $newEventDataArray
+     */
     public function invite($oldEventDataArray, $newEventDataArray = [])
     {
-        unset($oldEventDataArray['starttime']);
-        unset($oldEventDataArray['endtime']);
-        unset($newEventDataArray['starttime']);
-        unset($newEventDataArray['endtime']);
+        unset($oldEventDataArray['starttime'], $oldEventDataArray['endtime'], $newEventDataArray['starttime'], $newEventDataArray['endtime']);
 
         $event_new = $event_old = $this->modelObj->findEvent(
             $oldEventDataArray['uid'],
@@ -628,14 +668,14 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
 
         $this->startMailer();
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $globalAttendeeArray = $modelObj->findEventAttendees($event_new->getUid());
 
         $eventService = $modelObj->getServiceObjByKey('cal_event_model', 'event', $event_new->getType());
 
         $this->setChairmanAsMailer($globalAttendeeArray);
         $template = $this->conf['view.']['event.']['meeting.']['onChangeTemplate'];
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $eventArray = [
             $event_new
         ];
@@ -679,7 +719,7 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
                         ',' => '_'
                     ]);
                     $icsAttachmentFile = $this->createTempIcsFile($ics, $title);
-                    if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
+                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
                         $this->mailer->addAttachment($icsAttachmentFile);
                     } else {
                         $attachment = \Swift_Attachment::fromPath($icsAttachmentFile, 'text/calendar');
@@ -709,7 +749,7 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
                         );
                     }
                     unlink($icsAttachmentFile);
-                    if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
+                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
                         $this->mailer->theParts['attach'] = [];
                     }
                 }
@@ -717,13 +757,16 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $globalAttendeeArray
+     */
     public function setChairmanAsMailer(&$globalAttendeeArray)
     {
         foreach (array_keys($globalAttendeeArray) as $serviceType) {
             foreach (array_keys($globalAttendeeArray[$serviceType]) as $uid) {
                 $attendee = &$globalAttendeeArray[$serviceType][$uid];
                 if ($attendee->getAttendance() == 'CHAIR') {
-                    if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
+                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
                         $this->mailer->from_email = $attendee->getEmail();
                         $this->mailer->from_name = $attendee->getName();
                         $this->mailer->replyto_email = $attendee->getEmail();
@@ -747,7 +790,7 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
 
     public function startMailer()
     {
-        $this->mailer = $mail = new \TYPO3\CMS\Core\Mail\MailMessage();
+        $this->mailer = $mail = new MailMessage();
 
         if (GeneralUtility::validEmail($this->conf['view.']['event.']['notify.']['emailAddress'])) {
             $this->mailer->setFrom([
@@ -766,13 +809,18 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
         );
     }
 
+    /**
+     * @param $email
+     * @param $htmlTemplate
+     * @param $plainTemplate
+     */
     public function sendEmail($email, $htmlTemplate, $plainTemplate)
     {
         $this->controller->finish($htmlTemplate);
         $this->controller->finish($plainTemplate);
         $plainTemplate = str_replace('&nbsp;', ' ', strip_tags($plainTemplate));
 
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
             $this->mailer->theParts['html']['content'] = $htmlTemplate;
             $this->mailer->theParts['html']['path'] = '';
             $this->mailer->extractMediaLinks();
@@ -795,14 +843,19 @@ class NotificationView extends \TYPO3\CMS\Cal\Service\BaseService
                 $email
             ]);
             $this->mailer->setBody(strip_tags($plainTemplate), 'text/plain');
-            $this->mailer->addPart(\TYPO3\CMS\Cal\Utility\Functions::fixURI($htmlTemplate), 'text/html');
+            $this->mailer->addPart(Functions::fixURI($htmlTemplate), 'text/html');
             $this->mailer->send();
         }
     }
 
+    /**
+     * @param $content
+     * @param $filename
+     * @return string
+     */
     public function createTempIcsFile($content, $filename)
     {
-        $fileFunc = new \TYPO3\CMS\Core\Utility\File\BasicFileUtility();
+        $fileFunc = new BasicFileUtility();
         $all_files = [];
         $all_files['webspace']['allow'] = '*';
         $all_files['webspace']['deny'] = '';

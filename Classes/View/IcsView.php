@@ -14,21 +14,26 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventRecDeviationModel;
+use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class IcsView extends \TYPO3\CMS\Cal\View\BaseView
+class IcsView extends BaseView
 {
     public $limitAttendeeToThisEmail = '';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * @param $master_array
+     * @param $getdate
+     * @return mixed
+     */
     public function drawIcsList(&$master_array, $getdate)
     {
         $this->_init($master_array);
@@ -115,7 +120,7 @@ class IcsView extends \TYPO3\CMS\Cal\View\BaseView
         $sims = [];
         $sims['###CALENDAR_LABEL###'] = $this->controller->pi_getLL('l_calendar');
         $sims['###CATEGORY_LABEL###'] = $this->controller->pi_getLL('l_category');
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $a = [
             '###CATEGORYLINK_LOOP###' => $categoryReturn,
             '###CALENDARLINK_LOOP###' => $calendarReturn
@@ -123,12 +128,19 @@ class IcsView extends \TYPO3\CMS\Cal\View\BaseView
         return $this->finish($page, $a);
     }
 
+    /**
+     * @param $master_array
+     * @param $getdate
+     * @param bool $sendHeaders
+     * @param string $limitAttendeeToThisEmail
+     * @return string|string[]|null
+     */
     public function drawIcs(&$master_array, $getdate, $sendHeaders = true, $limitAttendeeToThisEmail = '')
     {
         $this->_init($master_array);
         $this->limitAttendeeToThisEmail = $limitAttendeeToThisEmail;
-        $absFile = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($this->conf['view.']['ics.']['icsTemplate']);
-        $page = \TYPO3\CMS\Core\Utility\GeneralUtility::getURL($absFile);
+        $absFile = GeneralUtility::getFileAbsFileName($this->conf['view.']['ics.']['icsTemplate']);
+        $page = GeneralUtility::getURL($absFile);
 
         if ($page == '') {
             // return '<h3>calendar: no ics template file found:</h3>'.$this->conf['view.']['ics.']['icsTemplate'];
@@ -163,7 +175,7 @@ END:VCALENDAR
                             $deviationResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
                             if ($deviationResult) {
                                 while ($deviationRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($deviationResult)) {
-                                    $start = new  \TYPO3\CMS\Cal\Model\CalDate(substr(
+                                    $start = new  CalDate(substr(
                                         $deviationRow['start_datetime'],
                                         0,
                                         8
@@ -171,7 +183,7 @@ END:VCALENDAR
                                     $start->setHour(substr($deviationRow['start_datetime'], 8, 2));
                                     $start->setMinute(substr($deviationRow['start_datetime'], 10, 2));
                                     $start->setTZbyId('UTC');
-                                    $end = new  \TYPO3\CMS\Cal\Model\CalDate(substr(
+                                    $end = new  CalDate(substr(
                                         $deviationRow['end_datetime'],
                                         0,
                                         8
@@ -181,7 +193,7 @@ END:VCALENDAR
                                     $end->setTZbyId('UTC');
                                     unset($deviationRow['start_datetime']);
                                     unset($deviationRow['end_datetime']);
-                                    $new_event = new \TYPO3\CMS\Cal\Model\EventRecDeviationModel(
+                                    $new_event = new EventRecDeviationModel(
                                         $event,
                                         $deviationRow,
                                         $start,
@@ -202,7 +214,7 @@ END:VCALENDAR
         $rems['###EVENT###'] = strip_tags($ics_events);
         $title = '';
         if (!empty($this->master_array)) {
-            if (is_subclass_of($this->master_array[0], 'TYPO3\CMS\Cal\Model\Model')) {
+            if (is_subclass_of($this->master_array[0], Model::class)) {
                 $title = $this->master_array[0]->getTitle();
             } else {
                 $title = $this->appendCalendarTitle($title);
@@ -229,14 +241,14 @@ END:VCALENDAR
             header('Pragma: ');
             header('Cache-Control:');
         }
-        include(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'ext_emconf.php');
+        include ExtensionManagementUtility::extPath('cal') . 'ext_emconf.php';
         $myem_conf = array_pop($EM_CONF);
         $method = 'PUBLISH';
         if ($this->limitAttendeeToThisEmail) {
             $method = 'REQUEST';
         }
 
-        $return = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [
+        $return = Functions::substituteMarkerArrayNotCached($page, [
             '###CAL_VERSION###' => $myem_conf['version'],
             '###METHOD###' => $method,
             '###TIMEZONE###' => $this->cObj->cObjGetSingle(
@@ -244,9 +256,13 @@ END:VCALENDAR
                 $this->conf['view.']['ics.']['timezone.']
             )
         ], $rems, []);
-        return \TYPO3\CMS\Cal\Utility\Functions::removeEmptyLines($return);
+        return Functions::removeEmptyLines($return);
     }
 
+    /**
+     * @param $title
+     * @return string
+     */
     private function appendCalendarTitle($title)
     {
         if ($this->controller->piVars['calendar']) {
@@ -263,6 +279,10 @@ END:VCALENDAR
         return $title;
     }
 
+    /**
+     * @param $title
+     * @return string
+     */
     private function appendCategoryTitle($title)
     {
         if ($this->controller->piVars['category']) {

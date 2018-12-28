@@ -14,18 +14,28 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Model\Model;
+use TYPO3\CMS\Cal\Model\TodoModel;
+use TYPO3\CMS\Cal\Model\TodoRecModel;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class TodoService extends \TYPO3\CMS\Cal\Service\EventService
+/**
+ * Class TodoService
+ */
+class TodoService extends EventService
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Finds all todos within a given range.
      *
+     * @param $start_date
+     * @param $end_date
+     * @param $pidList
+     * @param string $eventType
+     * @param string $additionalWhere
      * @return array array of events represented by the model.
      */
     public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '4', $additionalWhere = '')
@@ -36,6 +46,8 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
     /**
      * Finds all events.
      *
+     * @param $pidList
+     * @param string $eventType
      * @return array array of todos represented by the model.
      */
     public function findAll($pidList, $eventType = '4')
@@ -43,14 +55,27 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         return parent::findAll($pidList, '4');
     }
 
+    /**
+     * @param $row
+     * @param $isException
+     * @return EventModel|TodoModel
+     */
     public function createEvent($row, $isException)
     {
-        return new \TYPO3\CMS\Cal\Model\TodoModel($row, $this->getServiceKey());
+        return new TodoModel($row, $this->getServiceKey());
     }
 
     /**
      * Finds a single event.
      *
+     * @param $uid
+     * @param $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
      * @return object todo represented by the model.
      */
     public function find(
@@ -75,11 +100,16 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         );
     }
 
+    /**
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @return array
+     */
     public function findCurrentTodos($disableCalendarSearchString = false, $disableCategorySearchString = false)
     {
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        $this->starttime = new \TYPO3\CMS\Cal\Model\CalDate($confArr['recurrenceStart']);
-        $this->endtime = new \TYPO3\CMS\Cal\Model\CalDate($confArr['recurrenceEnd']);
+        $this->starttime = new CalDate($confArr['recurrenceStart']);
+        $this->endtime = new CalDate($confArr['recurrenceEnd']);
         $categories = &$this->modelObj->findAllCategories('cal_category_model', '', $this->conf['pidList']);
         $categories = [];
 
@@ -103,7 +133,7 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         // putting everything together
         $additionalWhere = $calendarSearchString . ' AND tx_cal_event.completed < 100 AND tx_cal_event.pid IN (' . $this->conf['pidList'] . ') ' . $this->cObj->enableFields('tx_cal_event');
         $getAllInstances = true;
-        $eventType = \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO;
+        $eventType = Model::EVENT_TYPE_TODO;
 
         return $this->getEventsFromTable(
             $categories[0][0],
@@ -116,6 +146,10 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         );
     }
 
+    /**
+     * @param $pid
+     * @return object
+     */
     public function saveEvent($pid)
     {
         $object = $this->modelObj->createEvent('tx_cal_todo');
@@ -164,28 +198,33 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         $this->unsetPiVars();
         $insertFields['uid'] = $uid;
         $insertFields['category'] = $this->controller->piVars['category_ids'];
-        $this->_notify($insertFields);
+        self::_notify($insertFields);
         if ($object->getSendoutInvitation()) {
             $object->setUid($uid);
             $this->_invite($object);
         }
-        $this->_scheduleReminder($uid);
+        self::_scheduleReminder($uid);
 
-        /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $GLOBALS['TSFE']->id);
+        /** @var RecurrenceGenerator $rgc */
+        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
         $rgc->generateIndexForUid($uid, 'tx_cal_event');
 
         // Hook: saveEvent
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_todo_service',
             'todoServiceClass'
         );
-        \TYPO3\CMS\Cal\Utility\Functions::executeHookObjectsFunction($hookObjectsArr, 'saveTodo', $this, $object);
+        Functions::executeHookObjectsFunction($hookObjectsArr, 'saveTodo', $this, $object);
 
-        \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+        Functions::clearCache();
         return $this->find($uid, $pid);
     }
 
+    /**
+     * @param $eventData
+     * @param $object
+     * @return mixed
+     */
     public function _saveEvent(&$eventData, $object)
     {
         $tempValues = [];
@@ -220,15 +259,15 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             if ($tempValues['notify_ids'] != '') {
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $user, $uid, 'fe_users');
+                self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
+                self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $user, $uid, 'fe_users');
                 $ignore = GeneralUtility::trimExplode(
                     ',',
                     $this->conf['rights.']['create.']['todo.']['addFeGroupToNotify.']['ignore'],
                     1
                 );
                 $groupArray = array_diff($group, $ignore);
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_fe_user_event_monitor_mm',
                     array_unique($groupArray),
                     $uid,
@@ -244,7 +283,7 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             if ($this->conf['rights.']['create.']['event.']['addFeUserToNotify']) {
                 $idArray[] = $this->rightsObj->getUserId();
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_fe_user_event_monitor_mm',
                 array_unique($idArray),
                 $uid,
@@ -258,19 +297,19 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             if ($this->conf['rights.']['create.']['todo.']['addFeGroupToNotify']) {
                 $idArray = array_merge($idArray, $this->rightsObj->getUserGroups());
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_fe_user_event_monitor_mm',
                 array_unique($idArray),
                 $uid,
                 'fe_groups'
             );
         } elseif ($this->rightsObj->isLoggedIn() && $this->conf['rights.']['create.']['todo.']['addFeUserToNotify']) {
-            $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
+            self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
                 $this->rightsObj->getUserId()
             ], $uid, 'fe_users');
         }
         if ($this->conf['rights.']['create.']['todo.']['public']) {
-            $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', GeneralUtility::trimExplode(
+            self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['create.']['todo.']['notifyUsersOnPublicCreate'],
                 1
@@ -283,7 +322,7 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             if ($this->conf['rights.']['create.']['todo.']['addFeUserToShared']) {
                 $user[] = $this->rightsObj->getUserId();
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($user),
                 $uid,
@@ -295,7 +334,7 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
                 1
             );
             $groupArray = array_diff($group, $ignore);
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($groupArray),
                 $uid,
@@ -306,7 +345,7 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             if ($this->conf['rights.']['create.']['todo.']['addFeUserToShared']) {
                 $idArray[] = $this->rightsObj->getUserId();
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($idArray),
                 $uid,
@@ -327,7 +366,7 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
                 );
                 $groupArray = array_diff($idArray, $ignore);
             }
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($groupArray),
                 $uid,
@@ -342,9 +381,9 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
                     $categoryIds[] = $category->getUid();
                 }
             }
-            $this->insertIdsIntoTableWithMMRelation('tx_cal_event_category_mm', $categoryIds, $uid, '');
+            self::insertIdsIntoTableWithMMRelation('tx_cal_event_category_mm', $categoryIds, $uid, '');
         } else {
-            $this->insertIdsIntoTableWithMMRelation('tx_cal_event_category_mm', [
+            self::insertIdsIntoTableWithMMRelation('tx_cal_event_category_mm', [
                 $this->conf['rights.']['create.']['todo.']['fields.']['category.']['default']
             ], $uid, '');
         }
@@ -352,6 +391,10 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         return $uid;
     }
 
+    /**
+     * @param $uid
+     * @return object
+     */
     public function updateEvent($uid)
     {
         $insertFields = [
@@ -369,7 +412,7 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
 
         $this->filterDataToBeUpdated($insertFields, $event);
 
-        $uid = $this->checkUidForLanguageOverlay($uid, 'tx_cal_event');
+        $uid = self::checkUidForLanguageOverlay($uid, 'tx_cal_event');
 
         if (isset($this->controller->piVars['notify_ids'])) {
             $insertFields['notify_ids'] = strip_tags($this->controller->piVars['notify_ids']);
@@ -386,27 +429,32 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
 
         $this->_updateEvent($uid, $insertFields, $event);
 
-        $this->_notifyOfChanges($event_old, $insertFields);
+        self::_notifyOfChanges($event_old, $insertFields);
         if ($event->getSendoutInvitation()) {
             $this->_invite($event);
         }
         $this->unsetPiVars();
 
-        /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', $GLOBALS['TSFE']->id);
+        /** @var RecurrenceGenerator $rgc */
+        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
         $rgc->generateIndexForUid($uid, 'tx_cal_event');
 
         // Hook: updateEvent
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_todo_service',
             'todoServiceClass'
         );
-        \TYPO3\CMS\Cal\Utility\Functions::executeHookObjectsFunction($hookObjectsArr, 'updateTodo', $this, $event);
+        Functions::executeHookObjectsFunction($hookObjectsArr, 'updateTodo', $this, $event);
 
-        \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+        Functions::clearCache();
         return $event;
     }
 
+    /**
+     * @param $uid
+     * @param $eventData
+     * @param $object
+     */
     public function _updateEvent($uid, $eventData, $object)
     {
         $tempValues = [];
@@ -450,7 +498,7 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             $table = 'tx_cal_event_category_mm';
             $where = 'uid_local = ' . $uid;
             $GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
-            $this->insertIdsIntoTableWithMMRelation($table, $categoryIds, $uid, '');
+            self::insertIdsIntoTableWithMMRelation($table, $categoryIds, $uid, '');
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'todo', 'notify') && !is_null($tempValues['notify_ids'])) {
@@ -461,9 +509,9 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             if ($tempValues['notify_ids'] != '') {
                 $user = [];
                 $group = [];
-                $this->splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $user, $uid, 'fe_users');
-                $this->insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $group, $uid, 'fe_groups');
+                self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
+                self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $user, $uid, 'fe_users');
+                self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $group, $uid, 'fe_groups');
             }
         } else {
             $userIdArray = GeneralUtility::trimExplode(
@@ -494,13 +542,13 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
                     'tx_cal_fe_user_event_monitor_mm',
                     'uid_local =' . $uid . ' AND tablenames in ("fe_users","fe_groups")'
                 );
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_fe_user_event_monitor_mm',
                     array_unique($userIdArray),
                     $uid,
                     'fe_users'
                 );
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_fe_user_event_monitor_mm',
                     array_unique($groupIdArray),
                     $uid,
@@ -511,13 +559,13 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
 
         if ($this->rightsObj->isAllowedTo('edit', 'todo', 'shared')) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_shared_user_mm', 'uid_local =' . $uid);
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($object->getSharedUsers()),
                 $uid,
                 'fe_users'
             );
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_event_shared_user_mm',
                 array_unique($object->getSharedGroups()),
                 $uid,
@@ -549,13 +597,13 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             }
             if (!empty($userIdArray) || !empty($groupIdArray)) {
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_shared_user_mm', 'uid_local =' . $uid);
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_event_shared_user_mm',
                     array_unique($userIdArray),
                     $uid,
                     'fe_users'
                 );
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_event_shared_user_mm',
                     array_unique($groupIdArray),
                     $uid,
@@ -565,6 +613,9 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         }
     }
 
+    /**
+     * @param $uid
+     */
     public function removeEvent($uid)
     {
         $event = $this->find($uid, $this->conf['pidList'], true, true);
@@ -591,24 +642,28 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
             $fields = $event->getValuesAsArray();
             $fields['deleted'] = 1;
             $fields['tstamp'] = $updateFields['tstamp'];
-            $this->_notify($fields);
-            $this->stopReminder($uid);
+            self::_notify($fields);
+            self::stopReminder($uid);
 
-            /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator');
+            /** @var RecurrenceGenerator $rgc */
+            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
             $rgc->cleanIndexTableOfUid($uid, $table);
 
             // Hook: removeEvent
-            $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+            $hookObjectsArr = Functions::getHookObjectsArray(
                 'tx_cal_todo_service',
                 'todoServiceClass'
             );
-            \TYPO3\CMS\Cal\Utility\Functions::executeHookObjectsFunction($hookObjectsArr, 'removeTodo', $this, $event);
-            \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+            Functions::executeHookObjectsFunction($hookObjectsArr, 'removeTodo', $this, $event);
+            Functions::clearCache();
             $this->unsetPiVars();
         }
     }
 
+    /**
+     * @param $insertFields
+     * @param $object
+     */
     public function filterDataToBeSaved(&$insertFields, &$object)
     {
         $hidden = 0;
@@ -717,6 +772,10 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         }
     }
 
+    /**
+     * @param $insertFields
+     * @param $object
+     */
     public function filterDataToBeUpdated(&$insertFields, &$object)
     {
         $hidden = 0;
@@ -829,6 +888,16 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         }
     }
 
+    /**
+     * @param string $pidList
+     * @param $start_date
+     * @param $end_date
+     * @param $searchword
+     * @param string $locationIds
+     * @param string $organizerIds
+     * @param string $eventType
+     * @return array
+     */
     public function search(
         $pidList = '',
         $start_date,
@@ -841,6 +910,11 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         return parent::search($pidList, $start_date, $end_date, $searchword, $locationIds, $organizerIds, '4');
     }
 
+    /**
+     * @param $event
+     * @param array $ex_event_dates
+     * @return array
+     */
     public function getRecurringEventsFromIndex($event, $ex_event_dates = [])
     {
         $master_array = [];
@@ -852,9 +926,9 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $nextOccuranceTime = new \TYPO3\CMS\Cal\Model\CalDate($row['start_datetime']);
-                $nextOccuranceEndTime = new \TYPO3\CMS\Cal\Model\CalDate($row['end_datetime']);
-                $new_event = new \TYPO3\CMS\Cal\Model\TodoRecModel($event, $nextOccuranceTime, $nextOccuranceEndTime);
+                $nextOccuranceTime = new CalDate($row['start_datetime']);
+                $nextOccuranceEndTime = new CalDate($row['end_datetime']);
+                $new_event = new TodoRecModel($event, $nextOccuranceTime, $nextOccuranceEndTime);
                 if ($new_event->isAllday()) {
                     $master_array[$nextOccuranceTime->format('%Y%m%d')]['-1'][$event->getUid()] = $new_event;
                 } else {
@@ -869,8 +943,6 @@ class TodoService extends \TYPO3\CMS\Cal\Service\EventService
     public function unsetPiVars()
     {
         parent::unsetPivars();
-        unset($this->controller->piVars['priority']);
-        unset($this->controller->piVars['completed']);
-        unset($this->controller->piVars['status']);
+        unset($this->controller->piVars['priority'], $this->controller->piVars['completed'], $this->controller->piVars['status']);
     }
 }

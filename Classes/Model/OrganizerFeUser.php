@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +22,7 @@ namespace TYPO3\CMS\Cal\Model;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class OrganizerFeUser extends \TYPO3\CMS\Cal\Model\Organizer
+class OrganizerFeUser extends Organizer
 {
 
     /**
@@ -40,6 +42,9 @@ class OrganizerFeUser extends \TYPO3\CMS\Cal\Model\Organizer
         $this->templatePath = $this->conf['view.']['organizer.']['organizerModelTemplate4FEUser'];
     }
 
+    /**
+     * @param $row
+     */
     public function createOrganizer($row)
     {
         $this->setUid($row['uid']);
@@ -50,7 +55,7 @@ class OrganizerFeUser extends \TYPO3\CMS\Cal\Model\Organizer
         $this->setCountry($row['country']);
         $this->setPhone($row['telephone']);
         $this->setEmail($row['email']);
-        $this->setImage(\TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $row['image'], 1));
+        $this->setImage(GeneralUtility::trimExplode(',', $row['image'], 1));
         $this->setLink($row['www']);
         $this->row = $row;
     }

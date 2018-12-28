@@ -14,19 +14,17 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\Location;
+use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * A service which renders a form to create / edit an event location / organizer.
  */
-class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class CreateLocationOrganizerView extends FeEditingBaseView
 {
     public $isLocation;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a create location or organizer form.
@@ -88,9 +86,9 @@ class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             $this->object = $object;
         } else {
             if ($isLocation) {
-                $this->object = new \TYPO3\CMS\Cal\Model\Location(null, '');
+                $this->object = new Location(null, '');
             } else {
-                $this->object = new \TYPO3\CMS\Cal\Model\Organizer(null, '');
+                $this->object = new Organizer(null, '');
             }
             $allValues = array_merge($this->getDefaultValues(), $this->controller->piVars);
             $this->object->updateWithPIVars($allValues);
@@ -103,8 +101,8 @@ class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###TYPE###'] = $this->object->getType();
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped, $this->conf['view']);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
 
         $sims = [];
         $rems = [];
@@ -116,18 +114,24 @@ class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             'view' => $this->conf['view'],
             'formCheck' => '1'
         ]));
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $requiredFieldsSims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $requiredFieldsSims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCountryMarker(& $template, & $sims, & $rems, $view)
     {
         // Initialise static info library
         $sims['###COUNTRY###'] = '';
         if ($this->isAllowed('country')) {
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+            if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+                $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
                 $staticInfo->init();
                 $sims['###COUNTRY###'] = $this->applyStdWrap($staticInfo->buildStaticInfoSelector(
                     'COUNTRIES',
@@ -142,13 +146,19 @@ class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCountryzoneMarker(& $template, & $sims, & $rems, $view)
     {
         // Initialise static info library
         $sims['###COUNTRYZONE###'] = '';
         if ($this->isAllowed('countryzone')) {
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+            if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+                $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
                 $staticInfo->init();
                 $sims['###COUNTRYZONE###'] = $this->applyStdWrap(
                     $staticInfo->buildStaticInfoSelector(

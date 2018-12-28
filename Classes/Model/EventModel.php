@@ -14,10 +14,17 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Mail\MailMessage;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class EventModel extends \TYPO3\CMS\Cal\Model\Model
+/**
+ * Class EventModel
+ */
+class EventModel extends Model
 {
     public $location;
     public $isException;
@@ -31,6 +38,12 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
     public $sendOutInvitation = false;
     public $markerCache = [];
 
+    /**
+     * EventModel constructor.
+     * @param $row
+     * @param $isException
+     * @param $serviceKey
+     */
     public function __construct($row, $isException, $serviceKey)
     {
         parent::__construct($serviceKey);
@@ -44,9 +57,12 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $this->setObjectType('event');
     }
 
+    /**
+     * @param $piVars
+     */
     public function updateWithPIVars(&$piVars)
     {
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelController');
+        $modelObj = &Registry::Registry('basic', 'modelController');
         $cObj = &$this->controller->cObj;
         $startDateIsSet = false;
         $endDateIsSet = false;
@@ -101,16 +117,15 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                     $categoryService->getCategoryArray($this->conf['pidList'], $categories);
                     $piVarsCaregoryArray = explode(
                         ',',
-                        \TYPO3\CMS\Cal\Controller\Controller::convertLinkVarArrayToList($piVars[$key])
+                        Controller::convertLinkVarArrayToList($piVars[$key])
                     );
                     if (!empty($piVarsCaregoryArray)) {
                         foreach ($piVarsCaregoryArray as $categoryId) {
                             $this->addCategory($categories[0][0][$categoryId]);
                         }
                     }
-                    unset($piVars['category']);
-                    unset($piVars['category_ids']);
-                    break;
+                unset($piVars['category'], $piVars['category_ids']);
+                break;
                 case 'allday_checkbox':
                 case 'allday':
                     if (intval($piVars[$key]) == 1) {
@@ -122,18 +137,17 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                 case 'start_date':
                 case 'start_time':
                     if (!$startDateIsSet) {
-                        $start = new \TYPO3\CMS\Cal\Model\CalDate($piVars['start_date'] . '000000');
+                        $start = new CalDate($piVars['start_date'] . '000000');
                         $start->addSeconds($piVars['start_time']);
                         $this->setStart($start);
                     }
-                    unset($piVars['start_date']);
-                    unset($piVars['start_time']);
+                    unset($piVars['start_date'], $piVars['start_time']);
                     break;
                 case 'startdate':
                 case 'starttime':
                 case 'startminutes':
                     if (!$startDateIsSet) {
-                        $start = new \TYPO3\CMS\Cal\Model\CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
+                        $start = new CalDate(Functions::getYmdFromDateString(
                             $this->conf,
                                 strip_tags($piVars['startdate'] ? $piVars['startdate'] : $piVars['getdate'])
                         ) . '000000');
@@ -147,29 +161,26 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                             $start->setMinute(intval($piVars['startminutes']));
                         }
                         $start->setSecond(0);
-                        $start->setTZbyId('UTC');
+                        $start->setTZbyID('UTC');
                         $this->setStart($start);
                         $startDateIsSet = true;
                     }
-                    unset($piVars['startdate']);
-                    unset($piVars['starttime']);
-                    unset($piVars['startminutes']);
+                    unset($piVars['startdate'], $piVars['starttime'], $piVars['startminutes']);
                     break;
                 case 'end_date':
                 case 'end_time':
                     if (!$endDateIsSet) {
-                        $end = new \TYPO3\CMS\Cal\Model\CalDate($piVars['end_date'] . '000000');
+                        $end = new CalDate($piVars['end_date'] . '000000');
                         $end->addSeconds($piVars['end_time']);
                         $this->setEnd($end);
                     }
-                    unset($piVars['end_date']);
-                    unset($piVars['end_time']);
+                    unset($piVars['end_date'], $piVars['end_time']);
                     break;
                 case 'enddate':
                 case 'endtime':
                 case 'endminutes':
                     if (!$endDateIsSet) {
-                        $end = new \TYPO3\CMS\Cal\Model\CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
+                        $end = new CalDate(Functions::getYmdFromDateString(
                             $this->conf,
                                 strip_tags($piVars['enddate'] ? $piVars['enddate'] : $piVars['getdate'])
                         ) . '000000');
@@ -183,12 +194,10 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                             $end->setMinute(intval($piVars['endminutes']));
                         }
                         $end->setSecond(0);
-                        $end->setTzById('UTC');
+                        $end->setTZbyID('UTC');
                         $this->setEnd($end);
                     }
-                    unset($piVars['enddate']);
-                    unset($piVars['endtime']);
-                    unset($piVars['endminutes']);
+                    unset($piVars['enddate'], $piVars['endtime'], $piVars['endminutes']);
                     $endDateIsSet = true;
                     break;
                 case 'organizer':
@@ -213,8 +222,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                     break;
                 case 'description':
                     $this->setDescription($cObj->removeBadHTML($piVars['description'], []));
-                    unset($piVars['description']);
-                    unset($piVars['_TRANSFORM_description']);
+                    unset($piVars['description'], $piVars['_TRANSFORM_description']);
                     break;
                 case 'teaser':
                     $this->setTeaser($cObj->removeBadHTML($piVars['teaser'], []));
@@ -255,7 +263,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                     unset($piVars['by_day']);
                     break;
                 case 'by_monthday':
-                    $this->setByMonthDay(strtolower(strip_tags($piVars['by_monthday'])));
+                    $this->setByMonthday(strtolower(strip_tags($piVars['by_monthday'])));
                     unset($piVars['by_monthday']);
                     break;
                 case 'by_month':
@@ -264,14 +272,14 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                     break;
                 case 'until':
                     if ($piVars['until'] != 0) {
-                        $until = new \TYPO3\CMS\Cal\Model\CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
+                        $until = new CalDate(Functions::getYmdFromDateString(
                             $this->conf,
                                 strip_tags($piVars['until'])
                         ) . '000000');
                     } else {
-                        $until = new \TYPO3\CMS\Cal\Model\CalDate('00000000000000');
+                        $until = new CalDate('00000000000000');
                     }
-                    $until->setTzById('UTC');
+                    $until->setTZbyID('UTC');
                     $this->setUntil($until);
                     unset($piVars['until']);
                     break;
@@ -364,7 +372,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                             $this->addAttendee($attendeeIndex[$serviceKey . '_' . $idname[2]]);
                         } else {
                             $initRow = [];
-                            $attendee = new \TYPO3\CMS\Cal\Model\AttendeeModel($initRow, 'cal_attendee_model');
+                            $attendee = new AttendeeModel($initRow, 'cal_attendee_model');
                             if ($idname[1] == 'u') {
                                 $attendee->setFeUserId($idname[2]);
                                 $attendee->setAttendance($attendance[$entry]);
@@ -382,17 +390,16 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                             $this->addAttendee($attendeeIndex[$serviceKey . '_' . $emailAddress]);
                         } else {
                             $initRow = [];
-                            $attendee = new \TYPO3\CMS\Cal\Model\AttendeeModel($initRow, 'cal_attendee_model');
+                            $attendee = new AttendeeModel($initRow, 'cal_attendee_model');
                             $attendee->setEmail($emailAddress);
                             $attendee->setAttendance('OPT-PARTICIPANT');
                             $this->addAttendee($attendee);
                         }
                     }
-                    unset($piVars['attendee']);
-                    unset($piVars['attendance']);
+                    unset($piVars['attendee'], $piVars['attendance']);
                     break;
                 case 'sendout_invitation':
-                    $this->setSendoutInvitation($piVars['sendout_invitation'] == 1);
+                    $this->setSendOutInvitation($piVars['sendout_invitation'] == 1);
                     unset($piVars['sendout_invitation']);
                     break;
                 default:
@@ -402,13 +409,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
             }
         }
 
-        if ($this->getEventType() != \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_MEETING) {
+        if ($this->getEventType() != Model::EVENT_TYPE_MEETING) {
             $newAttendeeArray = [];
             $this->setAttendees($newAttendeeArray);
         }
 
         if ($this->conf['rights.']['create.']['event.']['fields.']['dynamicStarttimeOffset']) {
-            $now = new \TYPO3\CMS\Cal\Model\CalDate();
+            $now = new CalDate();
 
             $now->addSeconds(intval($this->conf['rights.']['create.']['event.']['fields.']['dynamicStarttimeOffset']));
 
@@ -428,18 +435,22 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                 $startMinutes = substr(strip_tags($piVars['gettime']), 2, 2);
             }
 
-            $start = new \TYPO3\CMS\Cal\Model\CalDate($startDay . ' ' . $startHour . ':' . $startMinutes . ':00');
-            $start->setTzById('UTC');
+            $start = new CalDate($startDay . ' ' . $startHour . ':' . $startMinutes . ':00');
+            $start->setTZbyID('UTC');
             $this->setStart($start);
         }
         if (!$endDateIsSet && $piVars['mygetdate']) {
-            $end = new \TYPO3\CMS\Cal\Model\CalDate();
+            $end = new CalDate();
             $end->copy($start);
             $end->addSeconds($this->conf['view.']['event.']['event.']['defaultEventLength']);
             $this->setEnd($end);
         }
     }
 
+    /**
+     * @param $row
+     * @param $isException
+     */
     public function createEvent(&$row, $isException)
     {
         $this->row = &$row;
@@ -461,12 +472,12 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         } elseif ($row['start_time'] == 0 && $row['end_time'] == 0) {
             $row['allday'] = 1;
         }
-        $tempDate = new \TYPO3\CMS\Cal\Model\CalDate($row['start_date'] . '000000');
-        $tempDate->setTZbyId('UTC');
+        $tempDate = new CalDate($row['start_date'] . '000000');
+        $tempDate->setTZbyID('UTC');
         $tempDate->addSeconds($row['start_time']);
         $this->setStart($tempDate);
-        $tempDate = new \TYPO3\CMS\Cal\Model\CalDate($row['end_date'] . '000000');
-        $tempDate->setTZbyId('UTC');
+        $tempDate = new CalDate($row['end_date'] . '000000');
+        $tempDate->setTZbyID('UTC');
         $tempDate->addSeconds($row['end_time']);
         $this->setEnd($tempDate);
 
@@ -474,8 +485,8 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
         if (!$this->isAllday() && $eventStart->equals($this->getEnd()) || $eventStart->after($this->getEnd())) {
-            $tempDate = new \TYPO3\CMS\Cal\Model\CalDate($row['start_date']);
-            $tempDate->setTZbyId('UTC');
+            $tempDate = new CalDate($row['start_date']);
+            $tempDate->setTZbyID('UTC');
             $tempDate->addSeconds($row['start_time'] + $this->conf['view.']['event.']['event.']['defaultEventLength']);
             $this->setEnd($tempDate);
         }
@@ -490,11 +501,11 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
 
         $this->setFreq($row['freq']);
         $this->setByDay($row['byday']);
-        $this->setByMonthDay($row['bymonthday']);
+        $this->setByMonthday($row['bymonthday']);
         $this->setByMonth($row['bymonth']);
 
-        $tempDate = new \TYPO3\CMS\Cal\Model\CalDate($row['until'] . '000000');
-        $tempDate->setTZbyId('UTC');
+        $tempDate = new CalDate($row['until'] . '000000');
+        $tempDate->setTZbyID('UTC');
         $this->setUntil($tempDate);
 
         $cnt = $row['cnt'];
@@ -512,7 +523,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $this->setEventType($row['type']);
 
         if ($row['type'] == 3) { // meeting
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $this->setAttendees($modelObj->findEventAttendees($this->getUid()));
         }
 
@@ -602,6 +613,9 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function cloneEvent()
     {
         $thisClass = get_class($this);
@@ -609,31 +623,6 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $event->markerCache = $this->markerCache;
         $event->setIsClone(true);
         return $event;
-    }
-
-    /**
-     * Gets the location of the event.
-     * Location does not exist in the default
-     * model, only in calexample.
-     *
-     * @return string location.
-     */
-    public function getLocation()
-    {
-        return $this->location;
-    }
-
-    /**
-     * Sets the location of the event.
-     * Location does not exist in the default
-     * model, only in calexample.
-     *
-     * @param
-     *            string        The location.
-     */
-    public function setLocation($location)
-    {
-        $this->location = $location;
     }
 
     /**
@@ -657,6 +646,10 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $this->teaser = $teaser;
     }
 
+    /**
+     * @param $view
+     * @return string
+     */
     public function getLocationLink($view)
     {
         $locationLink = '';
@@ -676,7 +669,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                     $this->local_cObj->data['link_parameter'] = $this->getLocationPage();
                 } else {
                     /* If location view is allowed, link to it */
-                    $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+                    $rightsObj = &Registry::Registry('basic', 'rightscontroller');
                     if ($rightsObj->isViewEnabled($this->conf['view.']['locationLinkTarget']) || $this->conf['view.']['location.']['locationViewPid']) {
                         $location->getLinkToLocation('|');
                         $this->local_cObj->data['link_parameter'] = $this->controller->cObj->lastTypoLinkUrl;
@@ -697,6 +690,10 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $locationLink;
     }
 
+    /**
+     * @param $view
+     * @return string
+     */
     public function getOrganizerLink($view)
     {
         $organizerLink = '';
@@ -717,7 +714,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                     $this->local_cObj->data['link_parameter'] = $this->getOrganizerPage();
                 } else {
                     /* If organizer view is allowed, link to it */
-                    $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+                    $rightsObj = &Registry::Registry('basic', 'rightscontroller');
                     if ($rightsObj->isViewEnabled($this->conf['view.']['organizerLinkTarget']) || $this->conf['view.']['organizer.']['organizerViewPid']) {
                         $organizer->getLinkToOrganizer('|');
                         $this->local_cObj->data['link_parameter'] = $this->controller->cObj->lastTypoLinkUrl;
@@ -743,7 +740,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
      */
     public function getHeaderStyle()
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if ($this->row['isFreeAndBusyEvent'] == 1) {
             return $this->conf['view.']['freeAndBusy.']['headerStyle'];
         }
@@ -763,7 +760,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
      */
     public function getBodyStyle()
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if ($this->row['isFreeAndBusyEvent'] == 1) {
             return $this->conf['view.']['freeAndBusy.']['bodyStyle'];
         }
@@ -789,16 +786,6 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->createUserId;
     }
 
-    public function getTimezone()
-    {
-        return $this->timezone;
-    }
-
-    public function setTimezone($timezone)
-    {
-        $this->timezone = $timezone;
-    }
-
     /**
      * Sets the createUserId of the event.
      *
@@ -810,31 +797,49 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $this->createUserId = $createUserId;
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForOrganizer()
     {
         return $this->renderEventFor('ORGANIZER');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForLocation()
     {
         return $this->renderEventFor('LOCATION');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForDay()
     {
         return $this->renderEventFor('DAY');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForWeek()
     {
         return $this->renderEventFor('WEEK');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForAllDay()
     {
         return $this->renderEventFor('ALLDAY');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForMonth()
     {
         if ($this->isAllday()) {
@@ -843,6 +848,9 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->renderEventFor('MONTH');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForMiniMonth()
     {
         if ($this->isAllday()) {
@@ -851,6 +859,9 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->renderEventFor('MONTH_MINI');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForMediumMonth()
     {
         if ($this->isAllday()) {
@@ -859,21 +870,36 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->renderEventFor('MONTH_MEDIUM');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForYear()
     {
         return $this->renderEventFor('year');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEvent()
     {
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT###');
     }
 
+    /**
+     * @param string $subpartSuffix
+     * @return string|processed
+     */
     public function renderEventForList($subpartSuffix = 'LIST_ODD')
     {
         return $this->renderEventFor($subpartSuffix);
     }
 
+    /**
+     * @param $viewType
+     * @param string $subpartSuffix
+     * @return string|processed
+     */
     public function renderEventFor($viewType, $subpartSuffix = '')
     {
         if ($this->row['isFreeAndBusyEvent'] == 1) {
@@ -885,7 +911,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         ) != 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('%Y%m%d') != $this->getEnd()->format('%Y%m%d'))) {
             $subpartSuffix .= 'ALLDAY';
         }
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_phpicalendar_model',
             'eventModelClass',
             'model'
@@ -900,9 +926,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }
 
+    /**
+     * @param $subpartMarker
+     * @return string|processed
+     */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
 
         $templatePath = $this->conf['view.']['event.']['eventModelTemplate'];
 
@@ -923,7 +953,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $sims = [];
         $wrapped = [];
         $this->getMarker($page, $sims, $rems, $wrapped);
-        return $this->finish(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        return $this->finish(Functions::substituteMarkerArrayNotCached(
             $page,
             $sims,
             $rems,
@@ -931,18 +961,31 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         ));
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventPreview()
     {
         $this->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_PREVIEW###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderTomorrowsEvent()
     {
         $this->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_TOMORROW###');
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getSubscriptionMarker(& $template, & $sims, & $rems, &$wrapped, $view)
     {
         $uid = $this->conf['uid'];
@@ -959,7 +1002,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $sims_temp['L_CAPTCHA_STOP_SUCCESS'] = '';
 
         // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         // cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','cobj');
         $cObj = &$this->controller->cObj;
         if (($this->conf['allowSubscribe'] == 1 || ($this->conf['subscribeFeUser'] == 1 && $rightsObj->isLoggedIn())) && $uid) {
@@ -988,13 +1031,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
 
                                 $pageTSConf = \TYPO3\CMS\Backend\Utility\BackendUtility::getPagesTSconfig($this->conf['rights.']['create.']['event.']['saveEventToPid']);
                                 $offset = is_numeric($pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time']) ? $pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time'] * 60 : 0;
-                                $date = new \TYPO3\CMS\Cal\Model\CalDate($insertFields['start_date'] . '000000');
-                                $date->setTZbyId('UTC');
+                                $date = new CalDate($insertFields['start_date'] . '000000');
+                                $date->setTZbyID('UTC');
                                 $reminderTimestamp = $date->getTime() + $insertFields['start_time'] - $offset;
-                                $reminderService = &\TYPO3\CMS\Cal\Utility\Functions::getReminderService();
+                                $reminderService = &Functions::getReminderService();
                                 $reminderService->scheduleReminder($uid);
                             } else {
-                                if ($this->conf['subscribeWithCaptcha'] == 1 && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('captcha')) {
+                                if ($this->conf['subscribeWithCaptcha'] == 1 && ExtensionManagementUtility::isLoaded('captcha')) {
                                     session_start();
                                     $captchaStr = $_SESSION['tx_captcha_string'];
                                     $_SESSION['tx_captcha_string'] = '';
@@ -1006,7 +1049,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                                     // send confirm email!!
                                     $email = $this->controller->piVars['email'];
 
-                                    $mailer = $mail = new \TYPO3\CMS\Core\Mail\MailMessage();
+                                    $mailer = $mail = new MailMessage();
 
                                     if (GeneralUtility::validEmail($this->conf['view.']['event.']['notify.']['emailAddress'])) {
                                         $mailer->setFrom([
@@ -1070,20 +1113,20 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                                                 'tx_cal_controller[getdate]' => $this->getStart()->format('%Y%m%d')
                                             ]
                                     );
-                                    $htmlTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                                    $htmlTemplate = Functions::substituteMarkerArrayNotCached(
                                         $htmlTemplate,
                                         $local_switch,
                                         $local_rems,
                                         $local_wrapped
                                     );
 
-                                    $htmlTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                                    $htmlTemplate = Functions::substituteMarkerArrayNotCached(
                                         $htmlTemplate,
                                         $local_switch,
                                         $local_rems,
                                         $local_wrapped
                                     );
-                                    $plainTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                                    $plainTemplate = Functions::substituteMarkerArrayNotCached(
                                         $plainTemplate,
                                         $local_switch,
                                         $local_rems,
@@ -1098,7 +1141,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                                     $mailer->setTo([$email]);
                                     $mailer->setBody(strip_tags($plainTemplate), 'text/plain');
                                     $mailer->addPart(
-                                        \TYPO3\CMS\Cal\Utility\Functions::fixURI($htmlTemplate),
+                                        Functions::fixURI($htmlTemplate),
                                         'text/html'
                                     );
                                     $mailer->send();
@@ -1116,7 +1159,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                                 $where = 'uid_foreign = ' . $user_uid . ' AND uid_local = ' . $uid . ' AND tablenames = "fe_users"';
                                 $GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
                             } else {
-                                if ($this->conf['subscribeWithCaptcha'] == 1 && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('captcha')) {
+                                if ($this->conf['subscribeWithCaptcha'] == 1 && ExtensionManagementUtility::isLoaded('captcha')) {
                                     session_start();
                                     $captchaStr = $_SESSION['tx_captcha_string'];
                                     $_SESSION['tx_captcha_string'] = '';
@@ -1139,7 +1182,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                                         $GLOBALS['TYPO3_DB']->sql_free_result($result);
                                     }
 
-                                    $mailer = $mail = new \TYPO3\CMS\Core\Mail\MailMessage();
+                                    $mailer = $mail = new MailMessage();
                                     $mailer->setFrom([
                                         $this->conf['view.']['event.']['notify.']['emailAddress'] => $this->conf['view.']['event.']['notify.']['fromName']
                                     ]);
@@ -1177,7 +1220,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                                                 'tx_cal_controller[sid]' => md5($this->getUid() . $email . $crdate)
                                             ]
                                     );
-                                    $htmlTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                                    $htmlTemplate = Functions::substituteMarkerArrayNotCached(
                                         $htmlTemplate,
                                         $local_switch,
                                         $local_rems,
@@ -1205,7 +1248,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                                                 'tx_cal_controller[sid]' => md5($this->getUid() . $email . $crdate)
                                             ]
                                     );
-                                    $plainTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                                    $plainTemplate = Functions::substituteMarkerArrayNotCached(
                                         $plainTemplate,
                                         $local_switch,
                                         $local_rems,
@@ -1223,7 +1266,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                                     ]);
                                     $mailer->setBody(strip_tags($plainTemplate), 'text/plain');
                                     $mailer->addPart(
-                                        \TYPO3\CMS\Cal\Utility\Functions::fixURI($htmlTemplate),
+                                        Functions::fixURI($htmlTemplate),
                                         'text/html'
                                     );
                                     $mailer->send();
@@ -1288,8 +1331,8 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
             } else { /* Not a logged in user */
 
                 /* If a CAPTCHA is required to subscribe, add a couple extra markers */
-                if ($this->conf['subscribeWithCaptcha'] == 1 && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('captcha')) {
-                    $sims_temp['CAPTCHA_SRC'] = '<img src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('captcha') . 'captcha/captcha.php' . '" alt="" />';
+                if ($this->conf['subscribeWithCaptcha'] == 1 && ExtensionManagementUtility::isLoaded('captcha')) {
+                    $sims_temp['CAPTCHA_SRC'] = '<img src="' . ExtensionManagementUtility::siteRelPath('captcha') . 'captcha/captcha.php' . '" alt="" />';
                     $sims_temp['L_CAPTCHA_TEXT'] = $this->controller->pi_getLL('l_captcha_text');
                     $sims_temp['CAPTCHA_TEXT'] = '<input type="text" size=10 name="tx_cal_controller[captcha]" value="">';
                 } else {
@@ -1320,7 +1363,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                 $sims_temp['NOTLOGGEDIN_NOMONITORING_SUBMIT'] = $this->controller->pi_getLL('l_submit');
                 $sims_temp['L_ENTER_EMAIL'] = $this->controller->pi_getLL('l_enter_email');
                 $sims_temp['ACTIONURL'] = $actionUrl;
-                $monitor = \TYPO3\CMS\Cal\Controller\Controller::replace_tags($sims_temp, $notLoggedinNoMonitoring);
+                $monitor = Controller::replace_tags($sims_temp, $notLoggedinNoMonitoring);
 
                 $sims_temp['ACTIONURL'] = $actionUrl2;
                 $notLoggedinMonitoring = $cObj->getSubpart($template, '###NOTLOGGEDIN_MONITORING###');
@@ -1328,7 +1371,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
                 $sims_temp['NOTLOGGEDIN_MONITORING_SUBMIT'] = $this->controller->pi_getLL('l_submit');
                 $sims_temp['L_ENTER_EMAIL'] = $this->controller->pi_getLL('l_enter_email');
 
-                $monitor .= \TYPO3\CMS\Cal\Controller\Controller::replace_tags($sims_temp, $notLoggedinMonitoring);
+                $monitor .= Controller::replace_tags($sims_temp, $notLoggedinMonitoring);
                 $rems['###SUBSCRIPTION###'] = $monitor;
             }
         } else {
@@ -1336,6 +1379,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStartAndEndMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
@@ -1411,6 +1461,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTitleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->initLocalCObject();
@@ -1438,11 +1495,25 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTitleFnbMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###TITLE_FNB###'] = $this->conf['view.']['freeAndBusy.']['eventTitle'];
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getOrganizerMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if ($this->getOrganizerId() > 0) {
@@ -1461,10 +1532,17 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
             );
         }
         if ($view == 'ics' || $view == 'ics_single') {
-            $sims['###ORGANIZER###'] = \TYPO3\CMS\Cal\Utility\Functions::replaceLineFeed($sims['###ORGANIZER###']);
+            $sims['###ORGANIZER###'] = Functions::replaceLineFeed($sims['###ORGANIZER###']);
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getLocationMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if ($this->getLocationId() > 0) {
@@ -1483,10 +1561,17 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
             );
         }
         if ($view == 'ics' || $view == 'ics_single') {
-            $sims['###LOCATION###'] = \TYPO3\CMS\Cal\Utility\Functions::replaceLineFeed($sims['###LOCATION###']);
+            $sims['###LOCATION###'] = Functions::replaceLineFeed($sims['###LOCATION###']);
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTeaserMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
@@ -1502,6 +1587,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getIcsLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if ($this->conf['view.']['ics.']['showIcsLinks'] == 1) {
@@ -1527,6 +1619,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCategoryMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->initLocalCObject();
@@ -1537,6 +1636,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCategoryLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->initLocalCObject();
@@ -1547,11 +1653,25 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getHeaderstyleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###HEADERSTYLE###'] = $this->getHeaderStyle();
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getBodystyleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###BODYSTYLE###'] = $this->getBodyStyle();
@@ -1570,6 +1690,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getMapMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###MAP###'] = '';
@@ -1577,7 +1704,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
             /* Pull values from Flexform object into individual variables */
             $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             $useLocationStructure = ($this->confArr['useLocationStructure'] ? $this->confArr['useLocationStructure'] : 'tx_cal_location');
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $location = $modelObj->findLocation($this->getLocationId(), $useLocationStructure);
             $local_sims = [];
             $local_rems = [];
@@ -1587,6 +1714,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAttachmentMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###ATTACHMENT###'] = '';
@@ -1598,6 +1732,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAttachmentUrlMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###ATTACHMENT_URL###'] = '';
@@ -1609,6 +1750,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -1618,6 +1766,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventUrlMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -1629,6 +1784,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         ));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAbsoluteEventLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -1638,18 +1800,31 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @return mixed
+     */
     public function getStartdate()
     {
         $start = $this->getStart();
-        return $start->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf));
+        return $start->format(Functions::getFormatStringFromConf($this->conf));
     }
 
+    /**
+     * @return mixed
+     */
     public function getEnddate()
     {
         $end = $this->getEnd();
-        return $end->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf));
+        return $end->format(Functions::getFormatStringFromConf($this->conf));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -1705,6 +1880,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getMoreLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###MORE_LINK###'] = '';
@@ -1727,26 +1909,61 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStartdateMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->getStartAndEndMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEnddateMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->getStartdateMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStarttimeMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->getStartdateMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEndtimeMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->getStartdateMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDescriptionStriptagsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->striptags = true;
@@ -1754,6 +1971,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $this->striptags = false;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getIconMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $event_status = strtolower($this->getStatus());
@@ -1766,6 +1990,9 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         $sims['###ICON###'] = $confirmed;
     }
 
+    /**
+     * @return array
+     */
     public function getAdditionalValuesAsArray()
     {
         $values = parent::getAdditionalValuesAsArray();
@@ -1782,9 +2009,14 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $values;
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
 
         if (!$rightsObj->isViewEnabled('edit_event')) {
             return false;
@@ -1806,8 +2038,8 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         if ($rightsObj->isAllowedToEditStartedEvent()) {
             $eventHasntStartedYet = true;
         } else {
-            $temp = new \TYPO3\CMS\Cal\Model\CalDate();
-            $temp->setTZbyId('UTC');
+            $temp = new CalDate();
+            $temp->setTZbyID('UTC');
             $temp->addSeconds($editOffset);
             $eventStart = $this->getStart();
             $eventHasntStartedYet = $eventStart->after($temp);
@@ -1822,9 +2054,14 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $isAllowedToEditEvent && ($isEventOwner || $isSharedUser || $isPublicAllowed) && ($eventHasntStartedYet || $rightsObj->isAllowedToEditEventInPast());
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_event')) {
             return false;
         }
@@ -1843,8 +2080,8 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         if ($rightsObj->isAllowedToDeleteStartedEvents()) {
             $eventHasntStartedYet = true;
         } else {
-            $temp = new \TYPO3\CMS\Cal\Model\CalDate();
-            $temp->setTZbyId('UTC');
+            $temp = new CalDate();
+            $temp->setTZbyID('UTC');
             $temp->addSeconds($editOffset);
             $eventStart = $this->getStart();
             $eventHasntStartedYet = $eventStart->after($temp);
@@ -1858,21 +2095,34 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $isAllowedToDeleteEvents && ($isEventOwner || $isSharedUser) && ($eventHasntStartedYet || $rightsObj->isAllowedToDeleteEventInPast());
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return 'Phpicalendar ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(',', $this->row);
     }
 
+    /**
+     * @return array
+     */
     public function getAttendees()
     {
         return $this->attendees;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAttendeeMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###ATTENDEE###'] = '';
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $cObj = &Registry::Registry('basic', 'cobj');
         $globalAttendeeArray = $this->getAttendees();
 
         $isChairMan = false;
@@ -2026,6 +2276,12 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $linktext
+     * @param $view
+     * @param $date
+     * @param bool $urlOnly
+     */
     public function getLinkToEvent($linktext, $view, $date, $urlOnly = false)
     {
         /* new */
@@ -2033,9 +2289,9 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         if ($linktext == '') {
             $linktext = $this->controller->pi_getLL('l_no_title');
         }
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
 
-        if ($this->getEventType() == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_SHORTCUT || $this->getEventType() == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_EXTERNAL || $rightsObj->isViewEnabled($this->getObjectType()) || $this->conf['view.'][$this->getObjectType() . '.'][$this->getObjectType() . 'ViewPid']) {
+        if ($this->getEventType() == Model::EVENT_TYPE_SHORTCUT || $this->getEventType() == Model::EVENT_TYPE_EXTERNAL || $rightsObj->isViewEnabled($this->getObjectType()) || $this->conf['view.'][$this->getObjectType() . '.'][$this->getObjectType() . 'ViewPid']) {
             $this->initLocalCObject($this->getValuesAsArray());
             $this->local_cObj->setCurrentVal($linktext);
 
@@ -2052,11 +2308,11 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
             // determine the link type
             switch ($this->getEventType()) {
                 // shortcut to page - create the link
-                case \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_SHORTCUT:
+                case Model::EVENT_TYPE_SHORTCUT:
                     $this->local_cObj->data['link_parameter'] = $this->page;
                     break;
                 // external url
-                case \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_EXTERNAL:
+                case Model::EVENT_TYPE_EXTERNAL:
                     $this->local_cObj->data['link_parameter'] = $this->ext_url;
                     $param = $this->page;
                     break;
@@ -2118,22 +2374,43 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $linktext;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventIdMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $start = $this->getStart();
         $sims['###EVENT_ID###'] = $this->getType() . $this->getUid() . $start->format('%Y%m%d%H%M');
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getGuidMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if ($this->row['icsUid'] != '') {
             $sims['###GUID###'] = $this->row['icsUid'];
         } else {
             $eventArray = ['calendar_id' => $this->getCalendarUid(), 'uid' => $this->getUid()];
-            $sims['###GUID###'] = \TYPO3\CMS\Cal\Utility\Functions::getIcsUid($this->conf, $eventArray);
+            $sims['###GUID###'] = Functions::getIcsUid($this->conf, $eventArray);
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDtstampMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###DTSTAMP###'] = 'DTSTAMP:' . gmdate('Ymd', $this->getCreationDate()) . 'T' . gmdate(
@@ -2142,6 +2419,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDtstartYearMonthDayHourMinuteMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -2150,13 +2434,20 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         } elseif ($this->conf['view.']['ics.']['timezoneId'] != '') {
             $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('%Y%m%dT%H%M%S');
         } else {
-            $offset = \TYPO3\CMS\Cal\Utility\Functions::strtotimeOffset($eventStart->getTime());
+            $offset = Functions::strtotimeOffset($eventStart->getTime());
             $eventStart->subtractSeconds($offset);
             $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART:' . $eventStart->format('%Y%m%dT%H%M%SZ');
             $eventStart->addSeconds($offset);
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDtendYearMonthDayHourMinuteMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -2167,13 +2458,20 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         } elseif ($this->conf['view.']['ics.']['timezoneId'] != '') {
             $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventEnd->format('%Y%m%dT%H%M%S');
         } else {
-            $offset = \TYPO3\CMS\Cal\Utility\Functions::strtotimeOffset($eventEnd->getTime());
+            $offset = Functions::strtotimeOffset($eventEnd->getTime());
             $eventEnd->subtractSeconds($offset);
             $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND:' . $eventEnd->format('%Y%m%dT%H%M%SZ');
             $eventEnd->addSeconds($offset);
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getRRuleMarker(&$template, &$sims, &$rems, &$wrapped, $view)
     {
         $sims['###RRULE###'] = '';
@@ -2183,6 +2481,10 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $event
+     * @return string
+     */
     public function getRRule(&$event)
     {
         $rrule = '';
@@ -2248,7 +2550,7 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
             $until = $event->getUntil();
             if (is_object($until) && $until->format('%Y%m%d') > 19700101) {
                 $eventEnd = $this->getEnd();
-                $offset = \TYPO3\CMS\Cal\Utility\Functions::strtotimeOffset($eventEnd->getTime());
+                $offset = Functions::strtotimeOffset($eventEnd->getTime());
                 $eventEnd->subtractSeconds($offset);
                 $rruleConfiguration['UNTIL'] = 'UNTIL=' . $until->format('%Y%m%dT') . $eventEnd->format('%H%M%SZ');
                 $eventEnd->addSeconds($offset);
@@ -2258,6 +2560,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return strtoupper($rrule);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getRdateMarker(&$template, &$sims, &$rems, &$wrapped, $view)
     {
         $sims['###RDATE###'] = '';
@@ -2266,13 +2575,20 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getExdateMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###EXDATE###'] = '';
         $exceptionDates = [];
         $daySeconds = $this->getStart()->getHour() * 3600 + $this->getStart()->getMinute() * 60;
-        $offset = $daySeconds - \TYPO3\CMS\Cal\Utility\Functions::strtotimeOffset($this->getStart()->getTime());
-        $exceptionEventStart = new \TYPO3\CMS\Cal\Model\CalDate();
+        $offset = $daySeconds - Functions::strtotimeOffset($this->getStart()->getTime());
+        $exceptionEventStart = new CalDate();
         foreach ($this->getExceptionEvents() as $exceptionEvent) {
             // if ($exceptionEvent->getFreq() == 'none') {
             $exceptionEventStart->copy($exceptionEvent->getStart());
@@ -2286,6 +2602,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getExruleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###EXRULE###'] = '';
@@ -2302,6 +2625,10 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $eventFreq
+     * @return string
+     */
     public function getIcsFreqLabel($eventFreq)
     {
         $freq_type = '';
@@ -2331,9 +2658,16 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         return $freq_type;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCruserNameMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $sims['###CRUSER_NAME###'] = '';
         $feUser = $modelObj->findFeUser($this->getCreateUserId());
         if (is_array($feUser)) {
@@ -2346,6 +2680,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCalendarTitleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###CALENDAR_TITLE###'] = '';
@@ -2358,6 +2699,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTopMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###TOP###'] = '';
@@ -2369,6 +2717,9 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @return float|int
+     */
     public function getStartOffset()
     {
         if (!isset($this->startOffset)) {
@@ -2376,12 +2727,19 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
             while (strlen($dayStart) < 6) {
                 $dayStart .= '0';
             }
-            $d_start = new \TYPO3\CMS\Cal\Model\CalDate('01012000' . $dayStart);
+            $d_start = new CalDate('01012000' . $dayStart);
             $this->startOffset = $d_start->getHour() + $d_start->getMinute() / 60;
         }
         return $this->startOffset;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getLengthMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###LENGTH###'] = '';
@@ -2393,33 +2751,52 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @return CalDate
+     */
     public function getNow()
     {
-        $now = new \TYPO3\CMS\Cal\Model\CalDate();
-        $now->setTZbyId('UTC');
+        $now = new CalDate();
+        $now->setTZbyID('UTC');
         return $now;
     }
 
+    /**
+     * @return CalDate
+     */
     public function getToday()
     {
-        $today = new \TYPO3\CMS\Cal\Model\CalDate();
-        $today->setTZbyId('UTC');
+        $today = new CalDate();
+        $today->setTZbyID('UTC');
         $today->setHour(0);
         $today->setMinute(0);
         $today->setSecond(0);
         return $today;
     }
 
+    /**
+     * @param $sendOut
+     */
     public function setSendOutInvitation($sendOut)
     {
         $this->sendOutInvitation = $sendOut;
     }
 
+    /**
+     * @return bool
+     */
     public function getSendOutInvitation()
     {
         return $this->sendOutInvitation;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCreatedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###CREATED###'] = 'CREATED:' . gmdate('Ymd', $this->getCreationDate()) . 'T' . gmdate(
@@ -2428,6 +2805,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         ) . 'Z';
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getLastModifiedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###LAST_MODIFIED###'] = 'LAST_MODIFIED:' . gmdate('Ymd', $this->getTstamp()) . 'T' . gmdate(
@@ -2436,6 +2820,9 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         ) . 'Z';
     }
 
+    /**
+     * @return string
+     */
     public function getAjaxEditLink()
     {
         if ($this->isUserAllowedToEdit() && $this->conf['view.']['enableAjax']) {
@@ -2443,6 +2830,13 @@ class EventModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCategoryIconMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->initLocalCObject();

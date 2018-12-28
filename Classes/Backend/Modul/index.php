@@ -11,6 +11,7 @@
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Backend\Modul\CalIndexerOld;
 
 $MCONF['name'] = 'tools_calrecurrencegenerator';
 
@@ -30,7 +31,7 @@ $GLOBALS['BE_USER']->modAccess(
 // DEFAULT initialization of a module[END]
 
 // Make instance:
-$SOBE = new \TYPO3\CMS\Cal\Backend\Modul\CalIndexerOld();
+$SOBE = new CalIndexerOld();
 $SOBE->init();
 
 $SOBE->main();

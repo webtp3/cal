@@ -14,11 +14,20 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Controller\Calendar;
+use TYPO3\CMS\Cal\Controller\Controller;
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
+use TYPO3\CMS\Cal\Service\BaseService;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
-class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
+/**
+ * Class BaseView
+ */
+class BaseView extends BaseService
 {
     public $tempATagParam;
     public $master_array;
@@ -33,15 +42,24 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $this->pointerName = $this->controller->getPointerName();
     }
 
+    /**
+     * @param $master_array
+     */
     public function _init(&$master_array)
     {
         //store cs_convert-object
-        $this->cs_convert = new \TYPO3\CMS\Core\Charset\CharsetConverter();
+        $this->cs_convert = new CharsetConverter();
         $this->master_array = &$master_array;
         $this->initLocalCObject();
         $this->pointerName = $this->controller->getPointerName();
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getAdminLinkMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###ADMIN_LINK###'] = '';
@@ -60,6 +78,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getTomorrowsEventsMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###TOMORROWS_EVENTS###'] = '';
@@ -71,12 +95,18 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getTodoMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###TODO###'] = '';
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         if ($this->rightsObj->isViewEnabled('todo') && $confArr['todoSubtype'] == 'todo') {
-            $dateObject = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate']);
+            $dateObject = new CalDate($this->conf['getdate']);
             $pidList = $this->conf['pidList'];
             $todos = [];
             switch ($this->conf['view']) {
@@ -123,7 +153,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             }
 
             $todoTemplate = $this->cObj->getSubpart($page, '###TODO###');
-            $rems['###TODO###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+            $rems['###TODO###'] = Functions::substituteMarkerArrayNotCached(
                 $todoTemplate,
                 [],
                 ['###TODO_ENTRIES###' => $todoContent]
@@ -131,6 +161,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getUserLoginMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###USER_LOGIN###'] = '';
@@ -159,13 +195,19 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             }
             $local_sims['###USER_FOLDER###'] = $this->conf['view.']['other.']['userFolderId'];
             $local_sims['###REDIRECT_URL###'] = $this->controller->pi_linkTP_keepPIvars_url();
-            $rems['###USER_LOGIN###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
+            $rems['###USER_LOGIN###'] = Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
                 $page,
                 '###USER_LOGIN###'
             ), $local_sims, $local_rems, []);
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getIcsLinkMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###ICS_LINK###'] = '';
@@ -190,25 +232,33 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getSearchMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###SEARCH###'] = '';
         if ($this->conf['view.']['other.']['showSearch'] == 1) {
             $local_sims = [];
             $page = $this->replace_files($page, ['search_box' => $this->conf['view.']['other.']['searchBoxTemplate']]);
-            /* obsolete as of version 1.1.0
-                        $local_sims['###L_SEARCH###'] = $this->controller->pi_getLL('l_search');
-                        $local_sims['###L_DOSEARCH###'] = $this->controller->pi_getLL('l_dosearch');
-            */
             $local_sims['###GETDATE###'] = $this->conf['getdate'];
 
-            $rems['###SEARCH###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
+            $rems['###SEARCH###'] = Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
                 $page,
                 '###SEARCH###'
             ), $local_sims, [], []);
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getSearchActionURLMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $parameter = ['view' => 'search_all', 'getdate' => $this->conf['getdate']];
@@ -219,6 +269,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         ));
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getJumpsMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###JUMPS###'] = '';
@@ -243,7 +299,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
                 $this->conf['view.']['other.']['dateFormatWeekJump']
             );
 
-            $rems['###JUMPS###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
+            $rems['###JUMPS###'] = Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
                 $page,
                 '###JUMPS###'
             ), $temp_sims, [], []);
@@ -261,6 +317,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return preg_replace('/(["\'\\\\])/', '\\\\$1', $s);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getCalendarSelectorMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###CALENDAR_SELECTOR###'] = '';
@@ -268,7 +330,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             $temp_sims = [];
             $selectedCalendars = explode(
                 ',',
-                \TYPO3\CMS\Cal\Controller\Controller::convertLinkVarArrayToList($this->controller->piVars['calendar'])
+                Controller::convertLinkVarArrayToList($this->controller->piVars['calendar'])
             );
             $calendarService = $this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
             $calendarArray = $calendarService->getCalendarFromTable(
@@ -295,13 +357,19 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             );
             $temp_sims['###CHANGE_CALENDAR_ACTION_URL###'] = htmlspecialchars($change_calendar_action_url);
             $temp_sims['###CHANGE_CALENDAR_ACTION_URL_JS###'] = $this->escapeForJS($change_calendar_action_url);
-            $rems['###CALENDAR_SELECTOR###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
+            $rems['###CALENDAR_SELECTOR###'] = Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
                 $page,
                 '###CALENDAR_SELECTOR###'
             ), $temp_sims, [], []);
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getBackLinkMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $sims['###BACK_LINK###'] = '';
@@ -330,16 +398,28 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getLegendMarker(&$page, &$sims, &$rems, $view)
     {
         $this->list_legend($sims['###LEGEND###']);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getListMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###LIST###'] = '';
-        $starttime = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate'] . '000000');
-        $starttime->setTZbyId('UTC');
+        $starttime = new CalDate($this->conf['getdate'] . '000000');
+        $starttime->setTZbyID('UTC');
         $tx_cal_listview = GeneralUtility::makeInstanceService('cal_view', 'list', 'list');
         // set alternate rendering view, so that the rendering of the attached listView can be customized
         $tempAlternateRenderingView = $tx_cal_listview->conf['alternateRenderingView'];
@@ -348,26 +428,32 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $listSubpart = $this->cObj->getSubpart($page, '###LIST###');
 
         if ($this->conf['view'] == 'month' && $this->conf['view.']['month.']['showListInMonthView']) {
-            $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartMonthTime($starttime);
-            $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndMonthTime($starttime);
+            $starttime = Calendar::calculateStartMonthTime($starttime);
+            $endtime = Calendar::calculateEndMonthTime($starttime);
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listSubpart, $starttime, $endtime);
         } elseif ($this->conf['view'] == 'day') {
-            $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime($starttime);
-            $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndDayTime($starttime);
+            $starttime = Calendar::calculateStartDayTime($starttime);
+            $endtime = Calendar::calculateEndDayTime($starttime);
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listSubpart, $starttime, $endtime);
         } elseif ($this->conf['view'] == 'week') {
-            $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartWeekTime($starttime);
-            $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndWeekTime($starttime);
+            $starttime = Calendar::calculateStartWeekTime($starttime);
+            $endtime = Calendar::calculateEndWeekTime($starttime);
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listSubpart, $starttime, $endtime);
         } elseif ($this->conf['view'] == 'year') {
-            $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartYearTime($starttime);
-            $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndYearTime($starttime);
+            $starttime = Calendar::calculateStartYearTime($starttime);
+            $endtime = Calendar::calculateEndYearTime($starttime);
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listSubpart, $starttime, $endtime);
         }
 
         $tx_cal_listview->conf['alternateRenderingView'] = $tempAlternateRenderingView;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getRelatedListMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###RELATED_LIST###'] = '';
@@ -387,21 +473,27 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCreateEventLinkMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###CREATE_EVENT_LINK###'] = '';
         if ($this->rightsObj->isAllowedToCreateEvent()) {
             $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
 
-            $now = new \TYPO3\CMS\Cal\Model\CalDate();
-            $now->setTZbyId('UTC');
+            $now = new CalDate();
+            $now->setTZbyID('UTC');
 
             if ($this->conf['getdate'] != $now->format('%Y%m%d')) {
-                $cal_time_obj = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate'] . '000000');
-                $cal_time_obj->setTZbyId('UTC');
+                $cal_time_obj = new CalDate($this->conf['getdate'] . '000000');
+                $cal_time_obj->setTZbyID('UTC');
             } else {
-                $cal_time_obj = new \TYPO3\CMS\Cal\Model\CalDate();
-                $cal_time_obj->setTZbyId('UTC');
+                $cal_time_obj = new CalDate();
+                $cal_time_obj->setTZbyID('UTC');
                 $cal_time_obj->addSeconds($createOffset + 10);
             }
 
@@ -418,6 +510,17 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $view
+     * @param $wrap
+     * @param $cal_time_obj
+     * @param $createOffset
+     * @param $isAllowedToCreateEvent
+     * @param $remember
+     * @param $class
+     * @param $time
+     * @return string
+     */
     public function getCreateEventLink(
         $view,
         $wrap,
@@ -435,8 +538,8 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             }
             return sprintf($wrap, $remember, $class, '');
         }
-        $now = new \TYPO3\CMS\Cal\Model\CalDate();
-        $now->setTZbyId('UTC');
+        $now = new CalDate();
+        $now->setTZbyID('UTC');
         $now->addSeconds($createOffset);
         if ($this->rightsObj->isAllowedToCreateEventForTodayAndFuture()) {
             $now->setHour(23);
@@ -498,51 +601,111 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $tmp;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getQueryMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###QUERY###'] = strip_tags($this->controller->piVars['query']);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getLastviewMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###LASTVIEW###'] = $this->controller->extendLastView();
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getThisViewMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###THIS_VIEW###'] = $this->conf['view'];
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getTypeMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###TYPE###'] = $this->conf['type'];
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getOptionMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###OPTION###'] = $this->conf['option'];
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCalendarMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###CALENDAR###'] = $this->conf['calendar'];
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getPageIdMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###PAGE_ID###'] = $this->conf['page_id'];
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getAjaxUrlMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###AJAX_URL###'] = $this->controller->pi_linkTP_keepPIvars_url([], 0, 1);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getAjax2UrlMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###AJAX2_URL###'] = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getAvailableCalendarMarker(&$page, &$sims, &$rems, $view)
     {
         $ajaxString = '';
@@ -579,21 +742,45 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $sims['###AVAILABLE_CALENDAR###'] = $ajaxString;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getPidMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###PID###'] = $GLOBALS['TSFE']->id;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getImgPathMarker(&$page, &$sims, &$rems, $view)
     {
-        $sims['###IMG_PATH###'] = \TYPO3\CMS\Cal\Utility\Functions::expandPath($this->conf['view.']['imagePath']);
+        $sims['###IMG_PATH###'] = Functions::expandPath($this->conf['view.']['imagePath']);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getJsPathMarker(&$page, &$sims, &$rems, $view)
     {
-        $sims['###JS_PATH###'] = \TYPO3\CMS\Cal\Utility\Functions::expandPath($this->conf['view.']['javascriptPath']);
+        $sims['###JS_PATH###'] = Functions::expandPath($this->conf['view.']['javascriptPath']);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCategoryurlMarker(&$page, &$sims, &$rems, $view)
     {
         $categoryOverrule = [];
@@ -608,11 +795,24 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         ], $this->conf['cache'], $this->conf['clear_anyway']));
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getMonthMenuMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###MONTH_MENU###'] = $this->getMonthMenu($this->conf['view.']['other.']['monthMenu.']);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param string $view
+     */
     public function getMarker(& $template, & $sims, & $rems, & $wrapped, $view = '')
     {
         if ($view == '') {
@@ -722,7 +922,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             }
         }
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_base_view',
             'searchForViewMarker',
             'view'
@@ -735,6 +935,11 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $page
+     * @param $rems
+     * @return mixed
+     */
     public function finish(&$page, &$rems)
     {
         $sims = [];
@@ -747,31 +952,35 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
 
         $this->getMarker($page, $sims, $rems, $wrapped);
         $sims['###VIEW###'] = $this->conf['view'];
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
 
         $sims = [];
         $rems = [];
         $this->getImgPathMarker($page, $sims, $rems, $this->conf['view']);
 
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
     }
 
+    /**
+     * @param $page
+     * @return string
+     */
     public function replaceViewMarker($page)
     {
-        $next_day = new \TYPO3\CMS\Cal\Model\CalDate();
+        $next_day = new CalDate();
         $next_day->copy($this->controller->getDateTimeObject);
         $next_day->addSeconds(86400);
 
-        $prev_day = new \TYPO3\CMS\Cal\Model\CalDate();
+        $prev_day = new CalDate();
         $prev_day->copy($this->controller->getDateTimeObject);
         $prev_day->subtractSeconds(86400);
 
-        $next_week = new \TYPO3\CMS\Cal\Model\CalDate(Calc::beginOfNextWeek(
+        $next_week = new CalDate(Calc::beginOfNextWeek(
             $this->conf['day'],
             $this->conf['month'],
             $this->conf['year']
         ));
-        $prev_week = new \TYPO3\CMS\Cal\Model\CalDate(Calc::beginOfPrevWeek(
+        $prev_week = new CalDate(Calc::beginOfPrevWeek(
             $this->conf['day'],
             $this->conf['month'],
             $this->conf['year']
@@ -786,14 +995,14 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
                 $this->conf['day']
         );
 
-        $endOfNextMonth = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfNextMonth(
+        $endOfNextMonth = new CalDate(Calc::endOfNextMonth(
             $this->conf['day'],
             $this->conf['month'],
             $this->conf['year']
         ));
         $endOfNextMonth->setDay($this->conf['day']);
 
-        $startOfPrevMonth = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfPrevMonth(
+        $startOfPrevMonth = new CalDate(Calc::endOfPrevMonth(
             $this->conf['day'],
             $this->conf['month'],
             $this->conf['year']
@@ -803,12 +1012,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $next_month = $endOfNextMonth->format('%Y%m%d');
         $prev_month = $startOfPrevMonth->format('%Y%m%d');
 
-        $startOfThisWeek = new \TYPO3\CMS\Cal\Model\CalDate(Calc::beginOfWeek(
+        $startOfThisWeek = new CalDate(Calc::beginOfWeek(
             $this->conf['day'],
             $this->conf['month'],
             $this->conf['year']
         ));
-        $endOfThisWeek = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfWeek(
+        $endOfThisWeek = new CalDate(Calc::endOfWeek(
             $this->conf['day'],
             $this->conf['month'],
             $this->conf['year']
@@ -943,7 +1152,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         );
 
         $wrapped = [];
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_base_model',
             'searchForObjectMarker',
             'model'
@@ -955,7 +1164,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             }
         }
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, $rems, []);
 
         $languageArray = [
             'getdate' => $this->conf['getdate'],
@@ -967,9 +1176,13 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             'prev_year' => $prev_year
         ];
 
-        return \TYPO3\CMS\Cal\Controller\Controller::replace_tags($languageArray, $page);
+        return Controller::replace_tags($languageArray, $page);
     }
 
+    /**
+     * @param $page
+     * @return mixed
+     */
     public function checkForMonthMarker($page)
     {
         $match = [];
@@ -1002,6 +1215,11 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $page;
     }
 
+    /**
+     * @param $page
+     * @param array $tags
+     * @return mixed|string|string[]|null
+     */
     public function replace_files($page, $tags = [])
     {
         if (count($tags) > 0) {
@@ -1028,6 +1246,13 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $page;
     }
 
+    /**
+     * @param $view
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getViewLinkMarker($view, &$template, &$sims, &$rems, &$wrapped)
     {
         $viewMarker = '###' . strtoupper($view) . 'VIEWLINK###';
@@ -1044,7 +1269,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             ));
             $this->local_cObj->data['view'] = $viewTarget;
             if ($viewTarget == 'week' && DATE_CALC_BEGIN_WEEKDAY == 0) {
-                $date = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate']);
+                $date = new CalDate($this->conf['getdate']);
                 if ($date->format('%w') == 0) {
                     $date->addSeconds(86400);
                 }
@@ -1071,38 +1296,68 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getDayviewlinkMarker(&$template, &$sims, &$rems, &$wrapped)
     {
         $this->getViewLinkMarker('day', $template, $sims, $rems, $wrapped);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getWeekviewlinkMarker(&$template, &$sims, &$rems, &$wrapped)
     {
         $this->getViewLinkMarker('week', $template, $sims, $rems, $wrapped);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getMonthviewlinkMarker(&$template, &$sims, &$rems, &$wrapped)
     {
         $this->getViewLinkMarker('month', $template, $sims, $rems, $wrapped);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getYearviewlinkMarker(&$template, &$sims, &$rems, &$wrapped)
     {
         $this->getViewLinkMarker('year', $template, $sims, $rems, $wrapped);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getListviewlinkMarker(&$template, &$sims, &$rems, &$wrapped)
     {
         $this->getViewLinkMarker('list', $template, $sims, $rems, $wrapped);
     }
 
+    /**
+     * @return string
+     */
     public function list_jumps()
     {
         $day_array2 = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $getdate, $day_array2);
-        $this_day = $day_array2[3];
-        $this_month = $day_array2[2];
-        $this_year = $day_array2[1];
 
         // gmdate is ok.
         $return = sprintf(
@@ -1117,6 +1372,10 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $return;
     }
 
+    /**
+     * @param $view
+     * @return string
+     */
     public function createJumpEntry($view)
     {
         $viewTarget = $this->conf['view.'][strtolower($view) . 'LinkTarget'];
@@ -1145,6 +1404,9 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         );
     }
 
+    /**
+     * @param $return
+     */
     public function list_legend(&$return)
     {
         $this->conf['view.']['category.']['tree.']['category'] = $this->conf['category'];
@@ -1163,15 +1425,17 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $return = $this->cObj->stdWrap($return, $this->conf['view.']['other.']['legend_stdWrap.']);
     }
 
+    /**
+     * @param $conf
+     * @return string
+     */
     public function getMonthMenu($conf)
     {
         // gmdate is ok.
-        $month = gmdate('m');
-        $year = gmdate('Y');
         if ($conf['monthStart.']['thisMonth']) {
-            $month_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartMonthTime();
+            $month_time = Calendar::calculateStartMonthTime();
         } else {
-            $month_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime();
+            $month_time = Calendar::calculateStartDayTime();
             $month_time->setDay(1);
             $this->initLocalCObject();
             $month_time->setMonth($this->local_cObj->cObjGetSingle($conf['monthStart'], $conf['monthStart.']));
@@ -1183,7 +1447,6 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
 
         for ($i = 0; $i < $conf['count']; $i++) {
             $monthdate = $month_time->format('%Y%m%d');
-            $month_month = $month_time->getMonth();
             $select_month = $month_time->format($conf['format']);
 
             $this->initLocalCObject();
@@ -1205,20 +1468,25 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             $return .= $this->cObj->stdWrap($link, $conf['month_stdWrap.']);
 
             $month_time->addSeconds(86400 * 32);
-            $month_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartMonthTime($month_time);
+            $month_time = Calendar::calculateStartMonthTime($month_time);
         }
         return $return;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getYearMenuMarker(&$page, &$sims, &$rems, $view)
     {
         // gmdate is ok.
         $conf = $this->conf['view.']['other.']['yearMenu.'];
-        $year = gmdate('Y');
         if ($conf['yearStart.']['thisYear']) {
-            $year_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartYearTime();
+            $year_time = Calendar::calculateStartYearTime();
         } else {
-            $year_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartYearTime();
+            $year_time = Calendar::calculateStartYearTime();
             $this->initLocalCObject();
             $year_time->setYear($this->local_cObj->cObjGetSingle($conf['yearStart'], $conf['yearStart.']));
             $year = $conf['yearStart'];
@@ -1251,6 +1519,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $sims['###YEAR_MENU###'] = $return;
     }
 
+    /**
+     * @param $treeConf
+     * @param $categoryArray
+     * @param bool $renderAsForm
+     * @return string
+     */
     public function getCategorySelectionTree($treeConf, $categoryArray, $renderAsForm = false)
     {
         $treeHtml = '';
@@ -1315,6 +1589,14 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $treeHtml;
     }
 
+    /**
+     * @param $treeConf
+     * @param $parentCategoryArray
+     * @param $parentCategory
+     * @param $level
+     * @param $renderAsForm
+     * @return mixed|string
+     */
     public function addSubCategory(&$treeConf, &$parentCategoryArray, &$parentCategory, $level, $renderAsForm)
     {
         $level++;
@@ -1353,7 +1635,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $wrapper = [];
         $parentCategory->getMarker($treeHtml, $sims, $rems, $wrapper);
         $sims['###LEVEL###'] = $level;
-        $treeHtml = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($treeHtml, $sims, $rems, $wrapper);
+        $treeHtml = Functions::substituteMarkerArrayNotCached($treeHtml, $sims, $rems, $wrapper);
 
         $categoryArray = $parentCategoryArray[$parentCategory->getUid()];
         if (is_array($categoryArray)) {
@@ -1363,7 +1645,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             $wrapper = [];
             $parentCategory->getMarker($tempHtml, $sims, $rems, $wrapper);
             $sims['###LEVEL###'] = $level;
-            $treeHtml .= \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+            $treeHtml .= Functions::substituteMarkerArrayNotCached(
                 $tempHtml,
                 $sims,
                 $rems,
@@ -1384,6 +1666,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $treeHtml;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCreateCalendarLinkMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###CREATE_CALENDAR_LINK###'] = '';
@@ -1407,6 +1695,11 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $this_year
+     * @param $dateFormat_month
+     * @return string
+     */
     public function list_months($this_year, $dateFormat_month)
     {
         if ($this->conf['view.']['other.']['listMonth_referenceToday'] == 1) {
@@ -1436,7 +1729,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             }
         }
 
-        $month_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime();
+        $month_time = Calendar::calculateStartDayTime();
         $month_time->setDay(1);
         $month_time->setMonth($month);
         $month_time->setYear($this_year);
@@ -1474,11 +1767,16 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
                 $return .= str_replace('###MONTH###', $select_month, $tmp);
             }
             $month_time->addSeconds(86400 * 32);
-            $month_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartMonthTime($month_time);
+            $month_time = Calendar::calculateStartMonthTime($month_time);
         }
         return $return;
     }
 
+    /**
+     * @param $this_year
+     * @param $dateFormat
+     * @return string
+     */
     public function list_years($this_year, $dateFormat)
     {
         $viewTarget = $this->conf['view.']['yearLinkTarget'];
@@ -1535,6 +1833,11 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $return;
     }
 
+    /**
+     * @param $this_year
+     * @param $dateFormat_week_jump
+     * @return string
+     */
     public function list_weeks($this_year, $dateFormat_week_jump)
     {
         $viewTarget = $this->conf['view.']['weekLinkTarget'];
@@ -1542,8 +1845,8 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         if ($this->conf['view.']['other.']['listWeek_onlyShowCurrentYear']) {
             $weekSize = 52;
 
-            $start_week_time = new \TYPO3\CMS\Cal\Model\CalDate($this->controller->getDateTimeObject->getYear() . '0101000000');
-            $start_week_time->setTZbyId('UTC');
+            $start_week_time = new CalDate($this->controller->getDateTimeObject->getYear() . '0101000000');
+            $start_week_time->setTZbyID('UTC');
         } else {
             $weekSize = intval($this->conf['view.']['other.']['listWeek_totalWeekCount']);
             $weekSize = $weekSize ? $weekSize : 10; // ensure valid data
@@ -1551,13 +1854,13 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             $weekOffset = intval($this->conf['view.']['other.']['listWeek_previousWeekCount']);
             $weekOffset = ($weekOffset < $weekSize) ? $weekOffset : intval($weekSize / 2);
 
-            $start_week_time = new \TYPO3\CMS\Cal\Model\CalDate();
+            $start_week_time = new CalDate();
             $start_week_time->copy($this->controller->getDateTimeObject);
             $start_week_time->subtractSeconds(604800 * $weekOffset);
         }
 
-        $start_week_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartWeekTime($start_week_time);
-        $end_week_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndWeekTime($start_week_time);
+        $start_week_time = Calendar::calculateStartWeekTime($start_week_time);
+        $end_week_time = Calendar::calculateEndWeekTime($start_week_time);
         $formattedGetdate = intval($this->conf['getdate']);
         for ($i = 0; $i < $weekSize; $i++) {
             $weekdate = $start_week_time->format('%Y%m%d');
@@ -1601,10 +1904,14 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $return;
     }
 
+    /**
+     * @param $template
+     * @return mixed
+     */
     public function tomorrows_events($template)
     {
-        $starttime = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate'] . '000000');
-        $starttime->setTZbyId('UTC');
+        $starttime = new CalDate($this->conf['getdate'] . '000000');
+        $starttime->setTZbyID('UTC');
 
         $starttime->addSeconds(86400);
         $next_day = $starttime->format('%Y%m%d');
@@ -1613,8 +1920,6 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $match2 = $this->cObj->getSubpart($template, '###T_EVENT_SWITCH###');
         $loop_t_ad = trim($match1);
         $loop_t_e = trim($match2);
-        $return_adtmp = '';
-        $return_etmp = '';
 
         if (is_array($this->master_array[$next_day]) && count($this->master_array[$next_day]) > 0) {
             $replace_ad = '';
@@ -1642,13 +1947,17 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
 
             $rems['###T_ALLDAY_SWITCH###'] = str_replace('###T_ALLDAY###', $replace_ad, $loop_t_ad);
             $rems['###T_EVENT_SWITCH###'] = str_replace('###T_EVENT###', $replace_e, $loop_t_e);
-            return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($template, [], $rems, []);
+            return Functions::substituteMarkerArrayNotCached($template, [], $rems, []);
         }
         $rems['###T_ALLDAY_SWITCH###'] = '';
         $rems['###T_EVENT_SWITCH###'] = '';
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($template, [], $rems, []);
+        return Functions::substituteMarkerArrayNotCached($template, [], $rems, []);
     }
 
+    /**
+     * @param $eventFreq
+     * @return string
+     */
     public function getFreq($eventFreq)
     {
         $freq_type = '';
@@ -1678,10 +1987,15 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $freq_type;
     }
 
+    /**
+     * @param string $offset
+     * @param $type
+     * @return string
+     */
     public function _draw_month_new($offset = '+0', $type)
     {
         if (preg_match('![+|-][0-9]{1,2}!is', $offset)) { // new one
-            $monthDate = new \TYPO3\CMS\Cal\Model\CalDate();
+            $monthDate = new CalDate();
             $monthDate->copy($this->controller->getDateTimeObject);
             $monthDate->setDay(15);
             if (intval($offset) < 0) {
@@ -1690,7 +2004,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
                 $monthDate->addSeconds(intval($offset) * 2592000);
             }
         } else {
-            $monthDate = new \TYPO3\CMS\Cal\Model\CalDate();
+            $monthDate = new CalDate();
             $monthDate->copy($this->controller->getDateTimeObject);
             $monthDate->setDay(15);
             if (intval($offset) > 12) {
@@ -1703,12 +2017,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
 
         $page = Functions::getContent($this->conf['view.']['month.']['new' . ucwords($type) . 'MonthTemplate']);
 
-        $monthModel = \TYPO3\CMS\Cal\View\NewMonthView::getMonthView($monthDate->month, $monthDate->year);
+        $monthModel = NewMonthView::getMonthView($monthDate->month, $monthDate->year);
 
-        $today = new \TYPO3\CMS\Cal\Model\CalDate();
+        $today = new CalDate();
         $monthModel->setCurrent($today);
 
-        $selected = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate']);
+        $selected = new CalDate($this->conf['getdate']);
         $monthModel->setSelected($selected);
 
         $monthModel->setWeekDayFormat($this->conf['view.'][$this->conf['view'] . '.']['weekdayFormat' . ucwords($type) . 'Month']);
@@ -1758,7 +2072,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             */
             //if ($type != 'medium') {  // old one
             if (preg_match('![+|-][0-9]{1,2}!is', $offset)) { // new one
-                $fake_getdate_time = new \TYPO3\CMS\Cal\Model\CalDate();
+                $fake_getdate_time = new CalDate();
                 $fake_getdate_time->copy($this->controller->getDateTimeObject);
                 $fake_getdate_time->setDay(15);
                 if (intval($offset) < 0) {
@@ -1767,7 +2081,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
                     $fake_getdate_time->addSeconds(intval($offset) * 2592000);
                 }
             } else {
-                $fake_getdate_time = new \TYPO3\CMS\Cal\Model\CalDate();
+                $fake_getdate_time = new CalDate();
                 $fake_getdate_time->copy($this->controller->getDateTimeObject);
                 $fake_getdate_time->setDay(15);
                 $fake_getdate_time->setMonth($offset);
@@ -1775,7 +2089,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
 
             $minical_month = $fake_getdate_time->getMonth();
             $minical_year = $fake_getdate_time->getYear();
-            $today = new \TYPO3\CMS\Cal\Model\CalDate();
+            $today = new CalDate();
 
             $month_title = $fake_getdate_time->format($this->conf['view.'][$viewTarget . '.']['dateFormatMonth']);
             $this->initLocalCObject();
@@ -1811,14 +2125,14 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
                                 $event = &$arrayOfEvents[$eventKey];
                                 $eventReferenceKey = $dateKey . '_' . $event->getType() . '_' . $event->getUid() . '_' . $event->getStart()->format('%Y%m%d%H%M%S');
                                 $this->eventArray[$eventReferenceKey] = &$event;
-                                $starttime = new \TYPO3\CMS\Cal\Model\CalDate();
+                                $starttime = new CalDate();
                                 $starttime->copy($event->getStart());
-                                $endtime = new \TYPO3\CMS\Cal\Model\CalDate();
+                                $endtime = new CalDate();
                                 $endtime->copy($event->getEnd());
                                 if ($timeKey == '-1') {
                                     $endtime->addSeconds(1); // needed to let allday events show up
                                 }
-                                $j = new \TYPO3\CMS\Cal\Model\CalDate();
+                                $j = new CalDate();
                                 $j->copy($starttime);
                                 $j->setHour(0);
                                 $j->setMinute(0);
@@ -1839,7 +2153,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             $typeSize = intval($this->conf['view.']['month.']['weekdayLength' . ucwords($type) . 'Month']);
 
             $dateOfWeek = Calc::beginOfWeek(15, $fake_getdate_time->getMonth(), $fake_getdate_time->getYear());
-            $start_day = new \TYPO3\CMS\Cal\Model\CalDate($dateOfWeek . '000000');
+            $start_day = new CalDate($dateOfWeek . '000000');
 
             // backwardscompatibility with old templates
             if (!empty($corner)) {
@@ -1857,7 +2171,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
                 $weekdayLong = $start_day->format('%A');
                 if ($typeSize) {
                     $weekday = $this->cs_convert->substr(
-                        \TYPO3\CMS\Cal\Utility\Functions::getCharset(),
+                        Functions::getCharset(),
                         $weekday,
                         0,
                         $typeSize
@@ -1880,9 +2194,8 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             $weekday_loop .= $endweek;
 
             $dateOfWeek = Calc::beginOfWeek(1, $fake_getdate_time->getMonth(), $fake_getdate_time->getYear());
-            $endOfMonth = $this->controller->getListViewTime('monthend', $start_day);
 
-            $start_day = new \TYPO3\CMS\Cal\Model\CalDate($dateOfWeek . '000000');
+            $start_day = new CalDate($dateOfWeek . '000000');
             $start_day->setTZbyID('UTC');
 
             $i = 0;
@@ -1891,15 +2204,15 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
 
             $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
 
-            $getdate = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate']);
+            $getdate = new CalDate($this->conf['getdate']);
             $getdate->setTZbyID('UTC');
-            $startWeekTime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartWeekTime($getdate);
-            $endWeekTime = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndWeekTime($getdate);
+            $startWeekTime = Calendar::calculateStartWeekTime($getdate);
+            $endWeekTime = Calendar::calculateEndWeekTime($getdate);
 
             $formattedWeekStartTime = $startWeekTime->format('%Y%m%d');
             $formattedWeekEndTime = $endWeekTime->format('%Y%m%d');
             do {
-                $daylink = new \TYPO3\CMS\Cal\Model\CalDate();
+                $daylink = new CalDate();
                 $daylink->copy($start_day);
 
                 $formatedGetdate = $daylink->format('%Y%m%d');
@@ -2107,7 +2420,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
                     }
                 }
 
-                $middle .= \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                $middle .= Functions::substituteMarkerArrayNotCached(
                     $temp,
                     $switch,
                     [],
@@ -2130,14 +2443,14 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             $rems['###LOOPMONTHWEEKS_DAYS###'] = '';
             $rems['###LOOPWEEK_NUMS###'] = '';
             $rems['###CORNER###'] = '';
-            $monthTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+            $monthTemplate = Functions::substituteMarkerArrayNotCached(
                 $monthTemplate,
                 [],
                 $rems,
                 []
             );
             $monthTemplate .= $ajaxEvents;
-            $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+            $page = Functions::substituteMarkerArrayNotCached(
                 $page,
                 [],
                 ['###MONTH_TEMPLATE###' => $monthTemplate],
@@ -2153,7 +2466,7 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listTemplate, $starttime, $endtime);
         }
 
-        $return = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $return = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
 
         if ($this->rightsObj->isViewEnabled($viewTarget) || $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']) {
             $this->initLocalCObject();
@@ -2179,11 +2492,17 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $return;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getMeetingInformationMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###MEETING_INFORMATION###'] = '';
         $foundEvents = [];
-        $eventService = &\TYPO3\CMS\Cal\Utility\Functions::getEventService();
+        $eventService = &Functions::getEventService();
         $eventDateArray = $eventService->findMeetingEventsWithEmptyStatus($this->conf['pidList']);
         if (!empty($eventDateArray)) {
             $foundEvents[] = 'These meetings require your action:';
@@ -2204,6 +2523,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         $sims['###MEETING_INFORMATION###'] = implode('<br/>', $foundEvents);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getSidebarMarker(&$page, &$sims, &$rems, $view)
     {
         $page = $this->replace_files(
@@ -2214,6 +2539,12 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         );
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCalendarNavMarker(&$page, &$sims, &$rems, $view)
     {
         if ($this->conf['view.']['month.']['navigation'] == 0) {
@@ -2256,26 +2587,39 @@ class BaseView extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->cachedValueArray;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getAllowedToCreateEventsMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###ALLOWED_TO_CREATE_EVENTS###'] = $this->rightsObj->isAllowedToCreateEvent();
     }
 
+    /**
+     * @param null $object
+     * @return string
+     */
     public function renderWithFluid($object = null)
     {
         $templateFile = GeneralUtility::getFileAbsFileName($this->conf['view.'][$this->conf['view'] . '.'][$this->conf['view'] . 'TemplateFluid']);
-        /** @var $view \TYPO3\CMS\Fluid\View\StandaloneView */
-        $view = new \TYPO3\CMS\Fluid\View\StandaloneView();
+        /** @var $view StandaloneView */
+        $view = new StandaloneView();
         $view->setTemplatePathAndFilename($templateFile);
         $view->setPartialRootPaths([GeneralUtility::getFileAbsFileName($this->conf['fluidPartialsPath'])]);
         $view->assign($this->conf['view'] . 'View', $this);
         if (is_object($object)) {
             $view->assign($this->conf['view'], $object);
         }
-        $view->assign('settings', \TYPO3\CMS\Cal\Utility\Functions::getTsSetupAsPlainArray($this->conf));
+        $view->assign('settings', Functions::getTsSetupAsPlainArray($this->conf));
         return $view->render();
     }
 
+    /**
+     * @return int
+     */
     public function getCount()
     {
         $count = 0;

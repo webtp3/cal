@@ -2,6 +2,10 @@
 
 namespace TYPO3\CMS\Cal\Updates;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Dbal\Database\DatabaseConnection;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -19,7 +23,7 @@ namespace TYPO3\CMS\Cal\Updates;
  * Upgrade wizard which goes through all files referenced in the tx_cal_event.image filed
  * and creates sys_file records as well as sys_file_reference records for the individual usages.
  */
-abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractUpdateWizard
+abstract class AbstractImagesUpdateWizard extends AbstractUpdateWizard
 {
 
     /**
@@ -31,6 +35,9 @@ abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\Abstrac
         return ['uid', 'pid', 'image', 'imagecaption', 'imagetitletext'];
     }
 
+    /**
+     * @return string
+     */
     protected function getColumnName()
     {
         return 'image';
@@ -45,21 +52,21 @@ abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\Abstrac
     {
         $collections = [];
 
-        $files = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $record['image'], true);
-        $descriptions = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('
+        $files = GeneralUtility::trimExplode(',', $record['image'], true);
+        $descriptions = GeneralUtility::trimExplode('
 ', $record['imagecaption']);
-        $titleText = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('
+        $titleText = GeneralUtility::trimExplode('
 ', $record['imagetitletext']);
         $i = 0;
         foreach ($files as $file) {
             if (file_exists(PATH_site . 'uploads/tx_cal/pics/' . $file)) {
-                \TYPO3\CMS\Core\Utility\GeneralUtility::upload_copy_move(
+                GeneralUtility::upload_copy_move(
                     PATH_site . 'uploads/tx_cal/pics/' . $file,
                     $this->targetDirectory . $file
                 );
                 $fileObject = $this->storage->getFile(self::FOLDER_ContentUploads . '/' . $file);
                 //TYPO3 >= 6.2.0
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
                     $this->fileIndexRepository->add($fileObject);
                 } else {
                     //TYPO3 6.1.0
@@ -123,7 +130,7 @@ abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\Abstrac
             ]
         ];
 
-        if ($GLOBALS['TYPO3_DB'] instanceof \TYPO3\CMS\Dbal\Database\DatabaseConnection) {
+        if ($GLOBALS['TYPO3_DB'] instanceof DatabaseConnection) {
             if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['dbal']['mapping'][$this->getRecordTableName()])) {
                 $mapping = array_merge_recursive(
                     $mapping,

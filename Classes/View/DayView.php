@@ -14,6 +14,8 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Controller\Calendar;
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Functions;
 
@@ -21,23 +23,18 @@ use TYPO3\CMS\Cal\Utility\Functions;
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class DayView extends \TYPO3\CMS\Cal\View\BaseView
+class DayView extends BaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function newDrawDay(&$master_array, $getdate)
     {
         if (!isset($getdate) || $getdate == '') {
-            $getdate = new  \TYPO3\CMS\Cal\Model\CalDate();
+            $getdate = new  CalDate();
         } else {
-            $getdate = new  \TYPO3\CMS\Cal\Model\CalDate($getdate);
+            $getdate = new  CalDate($getdate);
         }
 
-        $dayModel = new \TYPO3\CMS\Cal\View\NewDayView($getdate->day, $getdate->month, $getdate->year);
-        $today = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $dayModel = new NewDayView($getdate->day, $getdate->month, $getdate->year);
+        $today = new  CalDate();
         $dayModel->setCurrent($today);
         $dayModel->setSelected($getdate);
 
@@ -99,7 +96,7 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
         $gridLength = $this->conf['view.']['day.']['gridLength']; // '15'; // Grid distance in minutes for day view, multiples of 15 preferred
 
         if (!isset($getdate) || $getdate == '') {
-            $getdate_obj = new  \TYPO3\CMS\Cal\Model\CalDate();
+            $getdate_obj = new  CalDate();
             $getdate = $getdate_obj->format('%Y%m%d');
         }
 
@@ -109,7 +106,7 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
         $this_month = $day_array2[2];
         $this_year = $day_array2[1];
 
-        $unix_time = new  \TYPO3\CMS\Cal\Model\CalDate($getdate . '000000');
+        $unix_time = new  CalDate($getdate . '000000');
 
         $this->initLocalCObject();
 
@@ -125,29 +122,29 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
             $this->conf['view.']['day.']['legendPrevDayLink.']
         );
 
-        $next_month_obj = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $next_month_obj = new  CalDate();
         $next_month_obj->copy($unix_time);
         $next_month_obj->addSeconds(604800);
         $next_month = $next_month_obj->format('%Y%m%d');
-        $prev_month_obj = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $prev_month_obj = new  CalDate();
         $prev_month_obj->copy($unix_time);
         $prev_month_obj->subtractSeconds(604801);
         $prev_month = $prev_month_obj->format('%Y%m%d');
 
         $dateOfWeek = Calc::beginOfWeek($this_day, $this_month, $this_year);
-        $week_start_day = new  \TYPO3\CMS\Cal\Model\CalDate($dateOfWeek . '000000');
+        $week_start_day = new  CalDate($dateOfWeek . '000000');
 
         $start_day = $unix_time;
         $start_week_time = $start_day;
 
-        $end_week_time = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $end_week_time = new  CalDate();
         $end_week_time->copy($start_week_time);
         $end_week_time->addSeconds(604799);
 
         // Nasty fix to work with TS strftime
-        $start_day_time = new  \TYPO3\CMS\Cal\Model\CalDate($getdate . '000000');
+        $start_day_time = new  CalDate($getdate . '000000');
         $start_day_time->setTZbyId('UTC');
-        $end_day_time = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndDayTime($start_day_time);
+        $end_day_time = Calendar::calculateEndDayTime($start_day_time);
 
         $GLOBALS['TSFE']->register['cal_day_starttime'] = $start_day_time->getTime();
         $GLOBALS['TSFE']->register['cal_day_endtime'] = $end_day_time->getTime();
@@ -206,8 +203,8 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
         $rowspan_array = [];
         $eventArray = [];
 
-        $endOfDay = new  \TYPO3\CMS\Cal\Model\CalDate();
-        $startOfDay = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $endOfDay = new  CalDate();
+        $startOfDay = new  CalDate();
 
         if (!empty($this->master_array)) {
             foreach ($this->master_array as $ovlKey => $ovlValue) {
@@ -218,18 +215,18 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
                 preg_match('/([0-9]{2})([0-9]{2})/', $dayEnd, $dTimeEnd);
                 preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $ovlKey, $dDate);
 
-                $d_start = new  \TYPO3\CMS\Cal\Model\CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . $dTimeStart[2] . ':00');
+                $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . $dTimeStart[2] . ':00');
                 $d_start->setTZbyId('UTC');
-                $d_end = new  \TYPO3\CMS\Cal\Model\CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . $dTimeEnd[2] . ':00');
+                $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . $dTimeEnd[2] . ':00');
                 $d_end->setTZbyId('UTC');
 
                 foreach ($ovlValue as $ovl_time_key => $ovl_time_Value) {
                     foreach ($ovl_time_Value as $event) {
                         $eventStart = $event->getStart();
                         $eventArray[$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')] = $event;
-                        $starttime = new  \TYPO3\CMS\Cal\Model\CalDate();
-                        $endtime = new  \TYPO3\CMS\Cal\Model\CalDate();
-                        $j = new  \TYPO3\CMS\Cal\Model\CalDate();
+                        $starttime = new  CalDate();
+                        $endtime = new  CalDate();
+                        $j = new  CalDate();
                         if ($ovl_time_key == '-1') {
                             $starttime->copy($event->getStart());
                             $endtime->copy($event->getEnd());
@@ -246,7 +243,7 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
                             $endtime->subtractSeconds(($endtime->getMinute() % $gridLength) * 60);
 
                             $entries = 1;
-                            $old_day = new  \TYPO3\CMS\Cal\Model\CalDate($ovlKey . '000000');
+                            $old_day = new  CalDate($ovlKey . '000000');
                             $old_day->setTZbyId('UTC');
                             $endOfDay->copy($d_end);
                             $startOfDay->copy($d_start);
@@ -403,18 +400,18 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
         $dTimeStart[2] -= $dTimeStart[2] % $gridLength;
         $dTimeEnd[2] -= $dTimeEnd[2] % $gridLength;
 
-        $d_start = new  \TYPO3\CMS\Cal\Model\CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
+        $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
             '%02d',
                 $dTimeStart[2]
         ) . ':00');
         $d_start->setTZbyId('UTC');
-        $d_end = new  \TYPO3\CMS\Cal\Model\CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
+        $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
             '%02d',
                 $dTimeEnd[2]
         ) . ':00');
         $d_end->setTZbyId('UTC');
 
-        $i = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $i = new  CalDate();
         $i->copy($d_start);
         $i->setTZbyId('UTC');
         while ($i->before($d_end)) {
@@ -457,12 +454,9 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
             $i->addSeconds($gridLength * 60);
         }
 
-        $event_length = [];
-        $border = 0;
-
         $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
 
-        $cal_time_obj = new  \TYPO3\CMS\Cal\Model\CalDate($getdate . '000000');
+        $cal_time_obj = new  CalDate($getdate . '000000');
         $cal_time_obj->setTZbyId('UTC');
         foreach ($t_array as $cal_time => $val) {
             preg_match('/([0-9]{2})([0-9]{2})/', $cal_time, $dTimeStart);
@@ -503,9 +497,9 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
                         switch ($keys[0]) {
                             case 'begin':
                                 $event = &$eventArray[$val[$i][$keys[0]]];
-                                $dayEndTime = new  \TYPO3\CMS\Cal\Model\CalDate();
+                                $dayEndTime = new  CalDate();
                                 $dayEndTime->copy($event->getEnd());
-                                $dayStartTime = new  \TYPO3\CMS\Cal\Model\CalDate();
+                                $dayStartTime = new  CalDate();
                                 $dayStartTime->copy($event->getStart());
 
                                 $rest = $dayStartTime->getMinute() % ($gridLength);
@@ -580,9 +574,9 @@ class DayView extends \TYPO3\CMS\Cal\View\BaseView
             $daydisplay .= $this->conf['view.']['day.']['dayFinishRow'];
         }
 
-        $dayTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($dayTemplate, $sims, [], []);
+        $dayTemplate = Functions::substituteMarkerArrayNotCached($dayTemplate, $sims, [], []);
         $rems['###DAYEVENTS###'] = $daydisplay;
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], [
+        $page = Functions::substituteMarkerArrayNotCached($page, [], [
             '###DAY_TEMPLATE###' => $dayTemplate
         ], []);
         return $this->finish($page, $rems);

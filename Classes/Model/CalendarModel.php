@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,8 +16,7 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
+class CalendarModel extends BaseModel
 {
     public $row = [];
     public $title = '';
@@ -42,6 +43,8 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
 
     /**
      * Constructor.
+     * @param $row
+     * @param $serviceKey
      */
     public function __construct($row, $serviceKey)
     {
@@ -53,6 +56,9 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @param $row
+     */
     private function init(&$row)
     {
         $this->row = $row;
@@ -64,7 +70,7 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         $this->setIcsFile($row['ics_file']);
         $this->setRefresh($row['refresh']);
         $this->setMD5($row['md5']);
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
             'tx_cal_calendar_fnb_user_group_mm.*',
             'tx_cal_calendar_fnb_user_group_mm, fe_users, fe_groups',
@@ -99,81 +105,131 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @param $title
+     */
     public function setTitle($title)
     {
         $this->title = $title;
     }
 
+    /**
+     * @return string
+     */
     public function getTitle()
     {
         return $this->title;
     }
 
+    /**
+     * @return int
+     */
     public function isActivateFreeAndBusy()
     {
         return $this->activateFreeAndBusy;
     }
 
+    /**
+     * @return int
+     */
     public function getActivateFreeAndBusy()
     {
         return $this->activateFreeAndBusy;
     }
 
+    /**
+     * @param $activateFreeAndBusy
+     */
     public function setActivateFreeAndBusy($activateFreeAndBusy)
     {
         $this->activateFreeAndBusy = $activateFreeAndBusy;
     }
 
+    /**
+     * @return int
+     */
     public function getCalendarType()
     {
         return $this->calendarType;
     }
 
+    /**
+     * @param $calendarType
+     */
     public function setCalendarType($calendarType)
     {
         $this->calendarType = $calendarType;
     }
 
+    /**
+     * @return string
+     */
     public function getExtUrl()
     {
         return $this->extUrl;
     }
 
+    /**
+     * @param $extUrl
+     */
     public function setExtUrl($extUrl)
     {
         $this->extUrl = $extUrl;
     }
 
+    /**
+     * @return string
+     */
     public function getIcsFile()
     {
         return $this->icsFile;
     }
 
+    /**
+     * @param $icsFile
+     */
     public function setIcsFile($icsFile)
     {
         $this->icsFile = $icsFile;
     }
 
+    /**
+     * @return int
+     */
     public function getRefresh()
     {
         return $this->refresh;
     }
 
+    /**
+     * @param $refresh
+     */
     public function setRefresh($refresh)
     {
         $this->refresh = $refresh;
     }
 
+    /**
+     * @return string
+     */
     public function getMD5()
     {
         return $this->md5;
     }
 
+    /**
+     * @param $md5
+     */
     public function setMD5($md5)
     {
         $this->md5 = $md5;
     }
 
+    /**
+     * @param $table
+     * @param int $index
+     * @return mixed
+     */
     public function getFreeAndBusyUser($table, $index = 0)
     {
         if ($index > 0 && count($this->freeAndBusyUser[$table]) > $index) {
@@ -182,16 +238,29 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $this->freeAndBusyUser[$table];
     }
 
+    /**
+     * @param $table
+     * @param $freeAndBusyUser
+     */
     public function setFreeAndBusyUser($table, $freeAndBusyUser)
     {
         $this->freeAndBusyUser[$table] = $freeAndBusyUser;
     }
 
+    /**
+     * @param $table
+     * @param $freeAndBusyUser
+     */
     public function addFreeAndBusyUser($table, $freeAndBusyUser)
     {
         $this->freeAndBusyUser[$table][] = $freeAndBusyUser;
     }
 
+    /**
+     * @param $table
+     * @param int $index
+     * @return mixed
+     */
     public function getOwner($table, $index = 0)
     {
         if ($index > 0 && count($this->owner[$table]) > $index) {
@@ -200,18 +269,32 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $this->owner[$table];
     }
 
+    /**
+     * @param $table
+     * @param $owner
+     */
     public function setOwner($table, $owner)
     {
         $this->owner[$table] = $owner;
         $this->isPublic = false;
     }
 
+    /**
+     * @param $table
+     * @param $owner
+     */
     public function addOwner($table, $owner)
     {
         $this->owner[$table][] = $owner;
         $this->isPublic = false;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getExtUrlMarker(& $template, & $sims, & $rems, $view)
     {
         $this->initLocalCObject();
@@ -221,6 +304,12 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getIcsFileMarker(& $template, & $sims, & $rems, $view)
     {
         $this->initLocalCObject();
@@ -230,6 +319,12 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getRefreshMarker(& $template, & $sims, & $rems, $view)
     {
         $this->initLocalCObject();
@@ -239,6 +334,12 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getTitleMarker(& $template, & $sims, & $rems, $view)
     {
         $this->initLocalCObject();
@@ -248,14 +349,22 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         );
     }
 
+    /**
+     * @return bool
+     */
     public function isPublic()
     {
         return $this->isPublic;
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_calendar')) {
             return false;
         }
@@ -281,9 +390,14 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $isAllowedToEditCalendars && ($isCalendarOwner || ($this->isPublic && $isAllowedToEditPublicCalendars));
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_calendar')) {
             return false;
         }
@@ -309,6 +423,11 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $isAllowedToDeleteCalendars && ($isCalendarOwner || ($this->isPublic && $isAllowedToDeletePublicCalendars));
     }
 
+    /**
+     * @param $userId
+     * @param $groupIdArray
+     * @return bool
+     */
     public function isCalendarOwner($userId, $groupIdArray)
     {
         if (is_array($this->owner['fe_users']) && in_array($userId, $this->owner['fe_users'])) {
@@ -322,6 +441,13 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return false;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     * @return string
+     */
     public function getEditLink(& $template, & $sims, & $rems, $view)
     {
         $editlink = '';
@@ -366,6 +492,9 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $editlink;
     }
 
+    /**
+     * @param $piVars
+     */
     public function updateWithPIVars(&$piVars)
     {
         foreach ($piVars as $key => $value) {
@@ -425,6 +554,9 @@ class CalendarModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return 'Calendar ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(',', $this->row);

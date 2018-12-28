@@ -15,13 +15,15 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
+use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Base model for the calendar.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class Model extends \TYPO3\CMS\Cal\Model\BaseModel
+class Model extends BaseModel
 {
     public $row;
     public $isClone = false;
@@ -229,7 +231,7 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
      */
     public function renderEvent()
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
         $d = nl2br($cObj->parseFunc($this->getDescription(), $this->conf['parseFunc.']));
         $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
@@ -390,7 +392,7 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
      */
     public function setStart($start)
     {
-        $this->start = new \TYPO3\CMS\Cal\Model\CalDate();
+        $this->start = new CalDate();
         $this->start->copy($start);
         $this->row['start_date'] = $start->format('%Y%m%d');
         $this->row['start_time'] = $start->getHour() * 3600 + $start->getMinute() * 60;
@@ -404,7 +406,7 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
      */
     public function setEnd($end)
     {
-        $this->end = new \TYPO3\CMS\Cal\Model\CalDate();
+        $this->end = new CalDate();
         $this->end->copy($end);
         $this->row['end_date'] = $end->format('%Y%m%d');
         $this->row['end_time'] = $end->getHour() * 3600 + $end->getMinute() * 60;
@@ -503,7 +505,7 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
     public function getCalendarObject()
     {
         if (!$this->calendarObject) {
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $this->calendarObject = $modelObj->findCalendar($this->getCalendarUid());
         }
 
@@ -531,31 +533,50 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         $this->calname = $calname;
     }
 
+    /**
+     * @return int
+     */
     public function getOverlap()
     {
         return $this->overlap;
     }
 
+    /**
+     * @param $overlap
+     */
     public function setOverlap($overlap)
     {
         $this->overlap = $overlap;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTimezone()
     {
         return $this->timezone;
     }
 
+    /**
+     * @param $timezone
+     */
     public function setTimezone($timezone)
     {
         $this->timezone = $timezone;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDuration()
     {
         return $this->end->getTime() - $this->start->getTime();
     }
 
+    /**
+     * @param $duration
+     * @return string
+     */
     public function getFormatedDurationString($duration)
     {
         $durationString = '';
@@ -588,21 +609,33 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return $durationString;
     }
 
+    /**
+     * @return int
+     */
     public function isAllday()
     {
         return $this->allday;
     }
 
+    /**
+     * @return int
+     */
     public function getAllday()
     {
         return $this->allday;
     }
 
+    /**
+     * @param $boolean
+     */
     public function setAllday($boolean)
     {
         $this->allday = $boolean;
     }
 
+    /**
+     * @return array|void
+     */
     public function getRecurringRule()
     {
         if ($this->freq != 'none' && $this->freq != '') {
@@ -614,41 +647,65 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return;
     }
 
+    /**
+     * @param array $recur
+     */
     public function setRecur($recur = [])
     {
         // TODO?
     }
 
+    /**
+     * @return mixed
+     */
     public function getUrl()
     {
         return $this->url;
     }
 
+    /**
+     * @param $url
+     */
     public function setUrl($url)
     {
         $this->url = $url;
     }
 
+    /**
+     * @return mixed
+     */
     public function getVAlarmDescription()
     {
         return $this->alarmdescription;
     }
 
+    /**
+     * @param $alarmdescription
+     */
     public function setVAlarmDescription($alarmdescription)
     {
         $this->alarmdescription = $alarmdescription;
     }
 
+    /**
+     * @return bool
+     */
     public function isClone()
     {
         return $this->isClone;
     }
 
+    /**
+     * @param $boolean
+     */
     public function setIsClone($boolean)
     {
         $this->isClone = $boolean;
     }
 
+    /**
+     * @return array
+     */
     public function getRecurrance()
     {
         $a = [];
@@ -658,11 +715,17 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public function getByMonth()
     {
         return $this->bymonth;
     }
 
+    /**
+     * @param $bymonth
+     */
     public function setByMonth($bymonth)
     {
         if ($bymonth != '') {
@@ -686,11 +749,17 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return array
+     */
     public function getByDay()
     {
         return $this->byday;
     }
 
+    /**
+     * @param $byday
+     */
     public function setByDay($byday)
     {
         $byday = strtoupper($byday);
@@ -711,15 +780,21 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return array
+     */
     public function getByMonthDay()
     {
         return $this->bymonthday;
     }
 
+    /**
+     * @param $bymonthday
+     */
     public function setByMonthday($bymonthday)
     {
         if ($bymonthday != '') {
-            $this->bymonthday = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $bymonthday, 1);
+            $this->bymonthday = GeneralUtility::trimExplode(',', $bymonthday, 1);
         }
         if (strtoupper($bymonthday) == 'ALL' || in_array('all', $this->bymonthday)) {
             $this->bymonthday = [
@@ -758,131 +833,209 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return array
+     */
     public function getByWeekDay()
     {
         return $this->byweekday;
     }
 
+    /**
+     * @param $byweekday
+     */
     public function setByWeekDay($byweekday)
     {
         $this->byweekday = explode(',', $byweekday);
     }
 
+    /**
+     * @return array
+     */
     public function getByWeekNo()
     {
         return $this->byweekno;
     }
 
+    /**
+     * @param $byweekno
+     */
     public function setByWeekNo($byweekno)
     {
         $this->byweekno = explode(',', $byweekno);
     }
 
+    /**
+     * @return array
+     */
     public function getByMinute()
     {
         return $this->byminute;
     }
 
+    /**
+     * @param $byminute
+     */
     public function setByMinute($byminute)
     {
         $this->byminute = explode(',', $byminute);
     }
 
+    /**
+     * @return array
+     */
     public function getByHour()
     {
         return $this->byhour;
     }
 
+    /**
+     * @param $byhour
+     */
     public function setByHour($byhour)
     {
         $this->byhour = explode(',', $byhour);
     }
 
+    /**
+     * @return array
+     */
     public function getBySecond()
     {
         return $this->bysecond;
     }
 
+    /**
+     * @param $bysecond
+     */
     public function setBySecond($bysecond)
     {
         $this->bysecond = explode(',', $bysecond);
     }
 
+    /**
+     * @return array
+     */
     public function getByYearDay()
     {
         return $this->byyearday;
     }
 
+    /**
+     * @param $byyearday
+     */
     public function setByYearDay($byyearday)
     {
         $this->byyearday = explode(',', $byyearday);
     }
 
+    /**
+     * @return array
+     */
     public function getBySetPos()
     {
         return $this->bysetpos;
     }
 
+    /**
+     * @param $bysetpos
+     */
     public function setBySetPos($bysetpos)
     {
         $this->bysetpos = $bysetpos;
     }
 
+    /**
+     * @return string
+     */
     public function getWkst()
     {
         return $this->wkst;
     }
 
+    /**
+     * @param $wkst
+     */
     public function setWkst($wkst)
     {
         $this->wkst = $wkst;
     }
 
+    /**
+     * @return mixed
+     */
     public function getInterval()
     {
         return $this->interval;
     }
 
+    /**
+     * @param $interval
+     */
     public function setInterval($interval)
     {
         $this->interval = $interval;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSummary()
     {
         return $this->summary;
     }
 
+    /**
+     * @param $summary
+     */
     public function setSummary($summary)
     {
         $this->summary = $summary;
     }
 
+    /**
+     * @return mixed
+     */
     public function getClass()
     {
         return $this->_class;
     }
 
+    /**
+     * @param $class
+     */
     public function setClass($class)
     {
         $this->_class = $class;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDisplayEnd()
     {
         return $this->displayend;
     }
 
+    /**
+     * @param $displayend
+     */
     public function setDisplayEnd($displayend)
     {
         $this->displayend = $displayend;
     }
 
+    /**
+     * @return mixed
+     */
     public function getContent()
     {
         return $this->content;
     }
 
+    /**
+     * @param $t
+     */
     public function setContent($t)
     {
         $this->content = $t;
@@ -926,6 +1079,9 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         $this->until = $until;
     }
 
+    /**
+     * @return string
+     */
     public function getFreq()
     {
         return $this->freq;
@@ -982,11 +1138,11 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
     /**
      * Returns the rdate value as array split by comma.
      *
-     * @return string rdate value as array split by comma.
+     * @return array
      */
     public function getRdateValues()
     {
-        return \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $this->rdate, 1);
+        return GeneralUtility::trimExplode(',', $this->rdate, 1);
     }
 
     /**
@@ -1137,7 +1293,7 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         if (!$this->organizerObject) {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             $useOrganizerStructure = ($confArr['useOrganizerStructure'] ? $confArr['useOrganizerStructure'] : 'tx_cal_organizer');
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $this->organizerObject = $modelObj->findOrganizer(
                 $this->getOrganizerId(),
                 $useOrganizerStructure,
@@ -1215,7 +1371,7 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         if (!$this->locationObject) {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             $useLocationStructure = ($confArr['useLocationStructure'] ? $confArr['useLocationStructure'] : 'tx_cal_location');
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $this->locationObject = $modelObj->findLocation(
                 $this->getLocationId(),
                 $useLocationStructure,
@@ -1419,76 +1575,123 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
     }
 
     /* new */
+    /**
+     * @param $t
+     */
     public function setPage($t)
     {
         $this->page = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPage()
     {
         return $this->page;
     }
 
+    /**
+     * @param $t
+     */
     public function setExtUrl($t)
     {
         $this->ext_url = $t;
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventType()
     {
         return $this->event_type;
     }
 
+    /**
+     * @param $t
+     */
     public function setEventType($t)
     {
         $this->event_type = $t;
     }
 
     /* new */
+    /**
+     * @param string $pidList
+     */
     public function search($pidList = '')
     {
     }
 
+    /**
+     * @param $id
+     */
     public function addSharedUser($id)
     {
         $this->sharedUsers[] = $id;
     }
 
+    /**
+     * @param $id
+     */
     public function addSharedGroup($id)
     {
         $this->sharedGroups[] = $id;
     }
 
+    /**
+     * @return array
+     */
     public function getSharedUsers()
     {
         return $this->sharedUsers;
     }
 
+    /**
+     * @return array
+     */
     public function getSharedGroups()
     {
         return $this->sharedGroups;
     }
 
+    /**
+     * @param $userIds
+     */
     public function setSharedUsers($userIds)
     {
         $this->sharedUsers = $userIds;
     }
 
+    /**
+     * @param $groupIds
+     */
     public function setSharedGroups($groupIds)
     {
         $this->sharedGroups = $groupIds;
     }
 
+    /**
+     * @param $owner
+     */
     public function setEventOwner($owner)
     {
         $this->eventOwner = $owner;
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventOwner()
     {
         return $this->eventOwner;
     }
 
+    /**
+     * @param $userId
+     * @param $groupIdArray
+     * @return bool
+     */
     public function isEventOwner($userId, $groupIdArray)
     {
         if (is_array($this->eventOwner['fe_users']) && in_array($userId, $this->eventOwner['fe_users'])) {
@@ -1502,6 +1705,11 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return false;
     }
 
+    /**
+     * @param $userId
+     * @param $groupIdArray
+     * @return bool
+     */
     public function isSharedUser($userId, $groupIdArray)
     {
         if (is_array($this->getSharedUsers()) && in_array($userId, $this->getSharedUsers())) {
@@ -1516,6 +1724,9 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return false;
     }
 
+    /**
+     * @return array
+     */
     public function getAdditionalValuesAsArray()
     {
         $values = [];
@@ -1549,6 +1760,10 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return $values;
     }
 
+    /**
+     * @param bool $asLink
+     * @return string
+     */
     public function getCategoriesAsString($asLink = true)
     {
         /*
@@ -1607,6 +1822,9 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         );
     }
 
+    /**
+     * @return array
+     */
     public function getCategoryUidsAsArray()
     {
         if ($this->categoryUidsAsArray) {
@@ -1630,6 +1848,9 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return $this->categoryUidsAsArray;
     }
 
+    /**
+     * @return mixed
+     */
     public function cloneEvent()
     {
         $thisClass = get_class($this);
@@ -1657,6 +1878,9 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return $passVar;
     }
 
+    /**
+     * @return int
+     */
     public function isExternalPluginEvent()
     {
         return $this->externalPlugin;
@@ -1666,10 +1890,16 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
     {
     }
 
+    /**
+     * @param $currentParams
+     */
     public function addAdditionalSingleViewUrlParams(&$currentParams)
     {
     }
 
+    /**
+     * @return float|int
+     */
     public function getLengthInSeconds()
     {
         $eventStart = $this->getStart();
@@ -1687,51 +1917,81 @@ class Model extends \TYPO3\CMS\Cal\Model\BaseModel
         return $days * 86400 + $hours * 3600 + $minutes * 60;
     }
 
+    /**
+     * @param $attendee
+     */
     public function addAttendee(&$attendee)
     {
         $this->attendees[$attendee->getType()][] = $attendee;
     }
 
+    /**
+     * @param $attendees
+     */
     public function setAttendees(&$attendees)
     {
         $this->attendees = &$attendees;
     }
 
+    /**
+     * @return int
+     */
     public function getStatus()
     {
         return $this->status;
     }
 
+    /**
+     * @param $status
+     */
     public function setStatus($status)
     {
         $this->status = $status;
     }
 
+    /**
+     * @return int
+     */
     public function getPriority()
     {
         return $this->priority;
     }
 
+    /**
+     * @param $priority
+     */
     public function setPriority($priority)
     {
         $this->priority = $priority;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCompleted()
     {
         return $this->completed;
     }
 
+    /**
+     * @param $completed
+     */
     public function setCompleted($completed)
     {
         $this->completed = $completed;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDeviationDates()
     {
         return $this->deviationDates;
     }
 
+    /**
+     * @param $deviationDates
+     */
     public function setDeviationDates($deviationDates)
     {
         $this->deviationDates = $deviationDates;

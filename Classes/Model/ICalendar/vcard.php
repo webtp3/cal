@@ -4,6 +4,8 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
 
 // The following were shamelessly yoinked from Contact_Vcard_Build
 // Part numbers for N components.
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 define('VCARD_N_FAMILY', 0);
 define('VCARD_N_GIVEN', 1);
 define('VCARD_N_ADDL', 2);
@@ -35,7 +37,7 @@ define('VCARD_GEO_LON', 1);
  *
  * @author Karsten Fourmont <karsten@horde.org>
  */
-class vcard extends \TYPO3\CMS\Cal\Model\ICalendar
+class vcard extends ICalendar
 {
     public function __construct($version = '2.1')
     {

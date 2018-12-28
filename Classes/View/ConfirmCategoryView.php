@@ -14,18 +14,14 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
  * A service which renders a form to confirm the category edit/create.
  */
-class ConfirmCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class ConfirmCategoryView extends FeEditingBaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Draws a create category form.
      *
@@ -46,7 +42,7 @@ class ConfirmCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
 
         $a = [];
-        $this->object = new \TYPO3\CMS\Cal\Model\CategoryModel($a, '');
+        $this->object = new CategoryModel($a, '');
         $this->object->updateWithPIVars($this->controller->piVars);
 
         $lastViewParams = $this->controller->shortenLastViewAndGetTargetViewParameters();
@@ -69,18 +65,24 @@ class ConfirmCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         ]));
 
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $sims = [];
         $rems = [];
         $wrapped = [];
         $this->getTemplateSingleMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @return string|void
+     */
     public function getCalendarIdMarker(& $template, & $sims, & $rems)
     {
         $sims['###CALENDAR_ID###'] = '';
@@ -93,6 +95,11 @@ class ConfirmCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getHeaderstyleMarker(& $template, & $sims, & $rems)
     {
         $sims['###HEADERSTYLE###'] = '';
@@ -104,6 +111,11 @@ class ConfirmCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getBodystyleMarker(& $template, & $sims, & $rems)
     {
         $sims['###BODYSTYLE###'] = '';
@@ -115,6 +127,11 @@ class ConfirmCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getParentCategoryMarker(& $template, &$sims, & $rems)
     {
         $sims['###PARENT_CATEGORY###'] = '';
@@ -130,6 +147,11 @@ class ConfirmCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getSharedUserAllowedMarker(& $template, & $sims, & $rems)
     {
         $sims['###SHARED_USER_ALLOWED###'] = '';

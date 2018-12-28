@@ -15,22 +15,24 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class RssView extends \TYPO3\CMS\Cal\View\BaseView
+class RssView extends BaseView
 {
     public $templateCode;
     public $config;
     public $allowCaching;
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * @param $master_array
+     * @param $getdate
+     * @return string
+     */
     public function drawRss(&$master_array, $getdate)
     {
         // $this->arcExclusive = -1; // Only latest, non archive news
@@ -71,7 +73,7 @@ class RssView extends \TYPO3\CMS\Cal\View\BaseView
 
         // get siteUrl for links in rss feeds. the 'dontInsert' option seems to be needed in some configurations depending on the baseUrl setting
         if (!$this->conf['view.']['rss.']['dontInsertSiteUrl']) {
-            $this->config['siteUrl'] = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
+            $this->config['siteUrl'] = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
         }
 
         // fill at least the template header
@@ -136,6 +138,12 @@ class RssView extends \TYPO3\CMS\Cal\View\BaseView
         return $content;
     }
 
+    /**
+     * @param $eventDate
+     * @param $event
+     * @param $template
+     * @return mixed
+     */
     public function getRssFromEvent($eventDate, &$event, $template)
     {
         $eventTemplate = $this->cObj->getSubpart($template, '###EVENT###');
@@ -163,19 +171,16 @@ class RssView extends \TYPO3\CMS\Cal\View\BaseView
             $sims['###CREATE_DATE###'] = $this->getW3cDate($event->row['crdate']);
         }
 
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($eventTemplate, $sims, $rems, []);
+        return Functions::substituteMarkerArrayNotCached($eventTemplate, $sims, $rems, []);
     }
 
     /**
      * Returns a subpart from the input content stream.
      * Enables pre-/post-processing of templates/templatefiles
      *
-     * @param string $Content
-     *            typically HTML template content.
-     * @param string $Marker
-     *            typically on the form "###...###"
-     * @param array $Optional :
-     *            active row of data - if available
+     * @param $myTemplate
+     * @param $myKey
+     * @param array $row
      * @return string subpart found, if found.
      */
     public function getNewsSubpart($myTemplate, $myKey, $row = [])
@@ -186,12 +191,9 @@ class RssView extends \TYPO3\CMS\Cal\View\BaseView
     /**
      * Returns alternating layouts
      *
-     * @param string $html
-     *            of the template subpart
-     * @param int $number
-     *            alternatingLayouts
-     * @param string $name
-     *            the content-markers in this template-subpart
+     * @param $templateCode
+     * @param $alternatingLayouts
+     * @param $marker
      * @return array code for alternating content markers
      */
     public function getLayouts($templateCode, $alternatingLayouts, $marker)
@@ -237,6 +239,7 @@ class RssView extends \TYPO3\CMS\Cal\View\BaseView
     /**
      * builds the XML header (array of markers to substitute)
      *
+     * @param $lastBuildTimestamp
      * @return array filled XML header markers
      */
     public function getXmlHeader($lastBuildTimestamp)
@@ -271,16 +274,16 @@ class RssView extends \TYPO3\CMS\Cal\View\BaseView
             if (strcmp(
                 $extKey,
                     ''
-            ) && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded($extKey) && strcmp(
+            ) && ExtensionManagementUtility::isLoaded($extKey) && strcmp(
                         $local,
                     ''
                     )) {
-                $icon = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($extKey) . $local;
+                $icon = ExtensionManagementUtility::siteRelPath($extKey) . $local;
             }
         }
 
-        $markerArray['###IMG###'] = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_DIR') . $icon;
-        $imgFile = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . '/' . $icon;
+        $markerArray['###IMG###'] = GeneralUtility::getIndpEnv('TYPO3_REQUEST_DIR') . $icon;
+        $imgFile = GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . '/' . $icon;
         $imgSize = is_file($imgFile) ? getimagesize($imgFile) : '';
 
         $markerArray['###IMG_W###'] = $imgSize[0];

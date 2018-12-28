@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +22,7 @@ namespace TYPO3\CMS\Cal\Model;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class Location extends \TYPO3\CMS\Cal\Model\LocationModel
+class Location extends LocationModel
 {
 
     /**
@@ -40,19 +42,30 @@ class Location extends \TYPO3\CMS\Cal\Model\LocationModel
         $this->templatePath = $this->conf['view.']['location.']['locationModelTemplate'];
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderLocation()
     {
         return $this->fillTemplate('###TEMPLATE_LOCATION_LOCATION###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderOrganizer()
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_ORGANIZER###');
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_location')) {
             return false;
         }
@@ -77,9 +90,14 @@ class Location extends \TYPO3\CMS\Cal\Model\LocationModel
         return $isAllowedToEditLocations;
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_location')) {
             return false;
         }
@@ -103,6 +121,14 @@ class Location extends \TYPO3\CMS\Cal\Model\LocationModel
         return $isAllowedToDeleteLocation;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return string|void
+     */
     public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $editlink = '';
@@ -149,11 +175,21 @@ class Location extends \TYPO3\CMS\Cal\Model\LocationModel
         return $editlink;
     }
 
+    /**
+     * @param $viewType
+     * @param string $subpartSuffix
+     * @return string|processed
+     */
     public function renderLocationFor($viewType, $subpartSuffix = '')
     {
         return $this->fillTemplate('###TEMPLATE_LOCATION_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }
 
+    /**
+     * @param $viewType
+     * @param string $subpartSuffix
+     * @return string|processed
+     */
     public function renderOrganizerFor($viewType, $subpartSuffix = '')
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');

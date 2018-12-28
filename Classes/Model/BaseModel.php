@@ -15,9 +15,14 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 
-abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
+/**
+ * Class BaseModel
+ */
+abstract class BaseModel extends AbstractModel
 {
     public $prefixId = 'tx_cal_controller';
     public $cObj;
@@ -46,15 +51,20 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
      */
     public function __construct($serviceKey)
     {
-        $this->controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
-        $this->conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $this->controller = &Registry::Registry('basic', 'controller');
+        $this->conf = &Registry::Registry('basic', 'conf');
         $this->serviceKey = &$serviceKey;
 
-        $this->images = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
+        $this->images = new ObjectStorage();
     }
 
     /**
      * Returns the image marker
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
      */
     public function getImageMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
@@ -103,7 +113,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
                 if (is_object(parent) && count(parent::getNoAutoFetchMethods())) {
                     $noAutoFetchMethods = array_merge(parent::getNoAutoFetchMethods(), $this->getNoAutoFetchMethods());
                 }
-                $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+                $cObj = &Registry::Registry('basic', 'cobj');
                 $autoFetchTextFields = explode(',', strtolower($this->conf['autoFetchTextFields']));
                 $autoFetchTextSplitValue = $cObj->stdWrap(
                     $this->conf['autoFetchTextSplitValue'],
@@ -173,7 +183,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
 
             $mergedValues = array_merge($valueArray, $additionalValues);
 
-            $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+            $hookObjectsArr = Functions::getHookObjectsArray(
                 'tx_cal_base_model',
                 'postGetValuesAsArray',
                 'model'
@@ -205,8 +215,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
     /**
      * Sets the images
      *
-     * @param $images blob
-     *            more images
+     * @param $image
      */
     public function setImage($image)
     {
@@ -223,6 +232,9 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         return $this->image;
     }
 
+    /**
+     * @return mixed
+     */
     public function getImages()
     {
         $fileRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
@@ -232,7 +244,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
     /**
      * Adds an image
      *
-     * @param $url String
+     * @param $image
      */
     public function addImage($image)
     {
@@ -242,7 +254,8 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
     /**
      * Removes an image
      *
-     * @param $url String
+     * @param $image
+     * @return bool
      */
     public function removeImage($image)
     {
@@ -263,6 +276,9 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         return $this->attachment;
     }
 
+    /**
+     * @return mixed
+     */
     public function getAttachments()
     {
         $fileRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
@@ -294,6 +310,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
      * Removes an attachment url
      *
      * @param $url String
+     * @return bool
      */
     public function removeAttachmentURL($url)
     {
@@ -306,11 +323,21 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         return false;
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
     {
         return false;
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
     {
         return false;
@@ -338,31 +365,49 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         $this->type = $type;
     }
 
+    /**
+     * @return string
+     */
     public function getObjectType()
     {
         return $this->objectType;
     }
 
+    /**
+     * @param $type
+     */
     public function setObjectType($type)
     {
         $this->objectType = $type;
     }
 
+    /**
+     * @return int
+     */
     public function getUid()
     {
         return $this->uid;
     }
 
+    /**
+     * @param $t
+     */
     public function setUid($t)
     {
         $this->uid = $t;
     }
 
+    /**
+     * @param $pid
+     */
     public function setPid($pid)
     {
         $this->pid = $pid;
     }
 
+    /**
+     * @return int
+     */
     public function getPid()
     {
         return $this->pid;
@@ -399,6 +444,13 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         $this->hidden = $hidden;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDescriptionMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if (($view == 'ics') || ($view == 'single_ics')) {
@@ -434,18 +486,40 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getHeadingMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         $sims['###HEADING###'] = $this->controller->pi_getLL('l_' . $this->getObjectType());
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEditPanelMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         $sims['###EDIT_PANEL###'] = $this->controller->pi_getEditPanel($this->row, 'tx_cal_' . $this->getObjectType());
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param string $view
+     * @param string $base
+     */
     public function getMarker(& $template, & $sims, & $rems, & $wrapped, $view = '', $base = 'view')
     {
         // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
@@ -580,7 +654,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
             }
         }
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_base_model',
             'searchForObjectMarker',
             'model'
@@ -596,11 +670,12 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
     /**
      * Method for post processing the rendered event
      *
+     * @param $content
      * @return processed content/output
      */
     public function finish(&$content)
     {
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_base_model',
             'finishModelRendering',
             'model'
@@ -624,6 +699,10 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         return $content;
     }
 
+    /**
+     * @param $content
+     * @return mixed
+     */
     public function translateLanguageMarker(&$content)
     {
         // translate leftover markers
@@ -641,7 +720,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
                 $sims[$wrapper . $marker . '_LABEL' . $wrapper] = $label;
             }
             if (count($sims)) {
-                $content = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($content, $sims, [], []);
+                $content = Functions::substituteMarkerArrayNotCached($content, $sims, [], []);
             }
         }
         return $content;
@@ -650,6 +729,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
     /**
      * Abstract method to be implemented by each class extending.
      *
+     * @param $object
      * @return int => less, equals, greater
      */
     public function compareTo($object)
@@ -660,13 +740,13 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
     /**
      * Method to initialise a local content object, that can be used for customized TS rendering with own db values
      *
-     * @param $customData array
+     * @param bool $customData array
      *            key => value pairs that should be used as fake db-values for TS rendering instead of the values of the current object
      */
     public function initLocalCObject($customData = false)
     {
         if (!is_object($this->local_cObj)) {
-            $this->local_cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'local_cObj');
+            $this->local_cObj = &Registry::Registry('basic', 'local_cObj');
         }
         if ($customData && is_array($customData)) {
             $this->local_cObj->data = $customData;
@@ -680,6 +760,11 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         }
     }
 
+    /**
+     * @param $userId
+     * @param $groupIdArray
+     * @return bool
+     */
     public function isSharedUser($userId, $groupIdArray)
     {
         if (is_array($this->getSharedUsers()) && in_array($userId, $this->getSharedUsers())) {
@@ -694,11 +779,17 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         return false;
     }
 
+    /**
+     * @return int
+     */
     public function getIsAllowedToEdit()
     {
         return $this->isUserAllowedToEdit() ? 1 : 0;
     }
 
+    /**
+     * @return int
+     */
     public function getIsAllowedToDelete()
     {
         return $this->isUserAllowedToDelete() ? 1 : 0;
@@ -714,14 +805,18 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         // Dummy function to get the value filled automatically of the getIsAllowedToDelete function
     }
 
+    /**
+     * @param $subpartMarker
+     * @return string|processed
+     */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
 
         $page = Functions::getContent($this->templatePath);
 
         if ($page == '') {
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'No ' . $this->objectType . ' template file found at: >' . $this->templatePath . '<.',
                 'Please make sure the path is correct and that you included the static template and double-check the path using the Typoscript Object Browser.'
             );
@@ -729,7 +824,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         $page = $cObj->getSubpart($page, $subpartMarker);
 
         if (!$page) {
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Could not find the >' . str_replace(
                 '###',
                 '',
@@ -746,7 +841,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
         $sims = [];
         $wrapped = [];
         $this->getMarker($page, $sims, $rems, $wrapped);
-        return $this->finish(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        return $this->finish(Functions::substituteMarkerArrayNotCached(
             $page,
             $sims,
             $rems,

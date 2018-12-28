@@ -15,13 +15,17 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class AdminView extends \TYPO3\CMS\Cal\View\BaseView
+class AdminView extends BaseView
 {
+    /**
+     * @return mixed
+     */
     public function drawAdminPage()
     {
         $a = [];
@@ -382,13 +386,19 @@ class AdminView extends \TYPO3\CMS\Cal\View\BaseView
             '###DELETE_ORGANIZER_OPTIONS###' => $editOrganizerOptions
         ];
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
 
         $a = [];
         return $this->finish($page, $a);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getCalendarSubscriptionMarker($page, &$sims, &$rems, &$wrapped)
     {
         $sims['###CALENDAR_SUBSCRIPTION###'] = '';
@@ -396,7 +406,7 @@ class AdminView extends \TYPO3\CMS\Cal\View\BaseView
             $editCalendarOptions = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
             $calendarIds = [];
 
-            $deselectedCalendarIds = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+            $deselectedCalendarIds = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['view.']['calendar.']['subscription'],
                 1
@@ -426,6 +436,12 @@ class AdminView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getCalendarSubscriptionUrlMarker($page, &$sims, &$rems, &$wrapped)
     {
         $sims['###CALENDAR_SUBSCRIPTION_URL###'] = $this->controller->pi_linkTP_keepPIvars_url([
@@ -439,12 +455,12 @@ class AdminView extends \TYPO3\CMS\Cal\View\BaseView
             case 'editCalendarSubscription':
                 $table = 'fe_users';
                 $where = 'uid = ' . $this->rightsObj->getUserId();
-                $ids = is_array($this->controller->piVars['calendarSubscription']) ? $this->controller->piVars['calendarSubscription'] : ($this->controller->piVars['calendarSubscription'] != '' ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+                $ids = is_array($this->controller->piVars['calendarSubscription']) ? $this->controller->piVars['calendarSubscription'] : ($this->controller->piVars['calendarSubscription'] != '' ? GeneralUtility::trimExplode(
                     ',',
                     $this->controller->piVars['calendarSubscription'],
                     1
                 ) : []);
-                $allIds = $this->controller->piVars['calendarSubscriptionIds'] ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+                $allIds = $this->controller->piVars['calendarSubscriptionIds'] ? GeneralUtility::trimExplode(
                     ',',
                     $this->controller->piVars['calendarSubscriptionIds'],
                     1
@@ -457,7 +473,7 @@ class AdminView extends \TYPO3\CMS\Cal\View\BaseView
                 $this->conf['calendar'] = $this->conf['view.']['calendar'] = $this->conf['view.']['allowedCalendar'] = $this->conf['category'] = $this->conf['view.']['category'] = $this->conf['view.']['allowedCategory'] = '';
                 $this->controller->checkCalendarAndCategory();
                 unset($this->controller->piVars['calendarSubscription']);
-                \TYPO3\CMS\Cal\Utility\Functions::clearCache();
+                Functions::clearCache();
                 break;
         }
     }

@@ -14,7 +14,13 @@ namespace TYPO3\CMS\Cal\Utility;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Controller\UriHandler;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Core\Cache\Cache;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * This is a collection of many useful functions
@@ -24,12 +30,16 @@ class Functions
     /*
      * Expands a path if it includes EXT: shorthand. @param		string		The path to be expanded. @return					The expanded path.
      */
+    /**
+     * @param $path
+     * @return string
+     */
     public static function expandPath($path)
     {
         if (!strcmp(substr($path, 0, 4), 'EXT:')) {
             list($extKey, $script) = explode('/', substr($path, 4), 2);
-            if ($extKey && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded($extKey)) {
-                $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($extKey);
+            if ($extKey && ExtensionManagementUtility::isLoaded($extKey)) {
+                $extPath = ExtensionManagementUtility::extPath($extKey);
                 $path = substr($extPath, strlen(PATH_site)) . $script;
             }
         }
@@ -39,18 +49,21 @@ class Functions
 
     public static function clearCache()
     {
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
-            $pageCache = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager')->getCache('cache_pages');
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
+            $pageCache = GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_pages');
             $pageCache->flushByTag('cal');
         } else {
             // only use cachingFramework if initialized and configured in TYPO3
-            if (\TYPO3\CMS\Core\Cache\Cache::isCachingFrameworkInitialized() && TYPO3_UseCachingFramework && is_object($GLOBALS['typo3CacheManager'])) {
+            if (Cache::isCachingFrameworkInitialized() && TYPO3_UseCachingFramework && is_object($GLOBALS['typo3CacheManager'])) {
                 $pageCache = $GLOBALS['typo3CacheManager']->getCache('cache_pages');
                 $pageCache->flushByTag('cal');
             }
         }
     }
 
+    /**
+     * @return object|string[]
+     */
     public static function &getNotificationService()
     {
         $key = 'tx_default_notification';
@@ -69,6 +82,9 @@ class Functions
         }
     }
 
+    /**
+     * @return object|string[]
+     */
     public static function &getReminderService()
     {
         $key = 'tx_default_reminder';
@@ -84,6 +100,9 @@ class Functions
         }
     }
 
+    /**
+     * @return object|string[]
+     */
     public static function &getEventService()
     {
         $key = 'tx_cal_phpicalendar';
@@ -103,6 +122,10 @@ class Functions
     }
 
     // get used charset
+
+    /**
+     * @return string
+     */
     public static function getCharset()
     {
         if ($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset']) { // First priority: forceCharset! If set, this will be authoritative!
@@ -116,6 +139,10 @@ class Functions
         return $charset;
     }
 
+    /**
+     * @param $table
+     * @return mixed
+     */
     public static function getOrderBy($table)
     {
         if (isset($GLOBALS['TCA'][$table]['ctrl']['default_sortby'])) {
@@ -127,18 +154,29 @@ class Functions
         return $orderBy;
     }
 
+    /**
+     * @return string
+     */
     public static function getmicrotime()
     {
         list($asec, $sec) = explode(' ', microtime());
         return date('H:m:s', intval($sec)) . ' ' . $asec;
     }
 
+    /**
+     * @param $unixtime
+     * @return float|int
+     */
     public static function strtotimeOffset($unixtime)
     {
         $zone = intval(date('O', $unixtime)) / 100;
         return $zone * 60 * 60;
     }
 
+    /**
+     * @param $conf
+     * @return string
+     */
     public static function getFormatStringFromConf($conf)
     {
         $dateFormatArray = [];
@@ -149,6 +187,11 @@ class Functions
         return $format;
     }
 
+    /**
+     * @param $conf
+     * @param $string
+     * @return string
+     */
     public static function getYmdFromDateString($conf, $string)
     {
         // yyyy.mm.dd or dd.mm.yyyy or mm.dd.yyyy
@@ -158,25 +201,45 @@ class Functions
     }
 
     // returns true if $str begins with $sub
+
+    /**
+     * @param $str
+     * @param $sub
+     * @return bool
+     */
     public static function beginsWith($str, $sub)
     {
         return substr($str, 0, strlen($sub)) == $sub;
     }
 
     // return tru if $str ends with $sub
+
+    /**
+     * @param $str
+     * @param $sub
+     * @return bool
+     */
     public static function endsWith($str, $sub)
     {
         return substr($str, strlen($str) - strlen($sub)) == $sub;
     }
 
     // function that provides the same functionality like substituteMarkerArrayCached - but not cached, which is far better in case of cal
+
+    /**
+     * @param $content
+     * @param array $markContentArray
+     * @param array $subpartContentArray
+     * @param array $wrappedSubpartContentArray
+     * @return mixed
+     */
     public static function substituteMarkerArrayNotCached(
         $content,
         $markContentArray = [],
         $subpartContentArray = [],
         $wrappedSubpartContentArray = []
     ) {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
         // return $cObj->substituteMarkerArrayCached($content,$markContentArray,$subpartContentArray,$wrappedSubpartContentArray);
 
         // If not arrays then set them
@@ -536,12 +599,18 @@ class Functions
     /*
      * Sets up a hook in the $className PHP file with the specified name. @param	string	The class name. @param	string	The name of the hook. @return	array	The array of objects implementing this hoook.
      */
+    /**
+     * @param $className
+     * @param $hookName
+     * @param string $modulePath
+     * @return array
+     */
     public static function getHookObjectsArray($className, $hookName, $modulePath = 'controller')
     {
         $hookObjectsArr = [];
         if (is_array($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['EXTCONF']['ext/cal/' . $modulePath . '/class.' . $className . '.php'][$hookName])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['EXTCONF']['ext/cal/' . $modulePath . '/class.' . $className . '.php'][$hookName] as $classRef) {
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
                     $hookObjectsArr[] = GeneralUtility::makeInstance($classRef);
                 } else {
                     $hookObjectsArr[] = GeneralUtility::getUserObj($classRef);
@@ -554,6 +623,12 @@ class Functions
 
     /*
      * Executes the specified function for each item in the array of hook objects. @param	array	The array of hook objects. @param	string	The name of the function to execute. @return	none
+     */
+    /**
+     * @param $hookObjectsArray
+     * @param $function
+     * @param $parentObject
+     * @param $params
      */
     public static function executeHookObjectsFunction($hookObjectsArray, $function, &$parentObject, &$params)
     {
@@ -578,16 +653,24 @@ class Functions
     {
         $constructorArguments = func_get_args();
         return call_user_func_array([
-            'TYPO3\\CMS\\Core\\Utility\\GeneralUtility',
+            GeneralUtility::class,
             'makeInstance'
         ], $constructorArguments);
     }
 
+    /**
+     * @param $string
+     * @return string|string[]|null
+     */
     public static function removeEmptyLines($string)
     {
         return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $string);
     }
 
+    /**
+     * @param $type
+     * @return array
+     */
     public static function getMonthNames($type)
     {
         $monthNames = [];
@@ -597,6 +680,10 @@ class Functions
         return $monthNames;
     }
 
+    /**
+     * @param $type
+     * @return array
+     */
     public static function getWeekdayNames($type)
     {
         $weekdayNames = [];
@@ -606,9 +693,15 @@ class Functions
         return $weekdayNames;
     }
 
+    /**
+     * @param $year
+     * @param $week
+     * @param $weekday
+     * @return string
+     */
     public static function getDayByWeek($year, $week, $weekday)
     {
-        $date = new \TYPO3\CMS\Cal\Model\CalDate($year . '0101');
+        $date = new CalDate($year . '0101');
         $date->setTZbyID('UTC');
 
         $offset = $weekday - $date->format('%w');
@@ -624,11 +717,20 @@ class Functions
         return $date->format('%Y%m%d');
     }
 
+    /**
+     * @param $error
+     * @param $note
+     * @return string
+     */
     public static function createErrorMessage($error, $note)
     {
         return '<div class="error"><h2>Calendar Base Error</h2><p class="message"><strong>Message:</strong> ' . $error . '</p><p class="note"><strong>Note:</strong> ' . $note . '</p></div>';
     }
 
+    /**
+     * @param $string
+     * @return mixed
+     */
     public static function replaceLineFeed($string)
     {
         return str_replace([
@@ -653,7 +755,7 @@ class Functions
      */
     public static function fixURI($html)
     {
-        $uriHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\UriHandler');
+        $uriHandler = GeneralUtility::makeInstance(UriHandler::class);
         $uriHandler->setHTML($html);
         $uriHandler->setPATH('http://' . GeneralUtility::getHostname(1) . '/');
 
@@ -680,6 +782,10 @@ class Functions
         return $typoScriptService->convertTypoScriptArrayToPlainArray($conf);
     }
 
+    /**
+     * @param $path
+     * @return bool|string
+     */
     public static function getContent($path)
     {
         if (Functions::beginsWith($path, '/')) {
@@ -693,6 +799,7 @@ class Functions
     /**
      * @param array $conf
      * @param array $eventArray
+     * @return string
      */
     public static function getIcsUid($conf, $eventArray)
     {

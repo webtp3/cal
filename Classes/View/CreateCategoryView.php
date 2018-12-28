@@ -14,18 +14,15 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A service which renders a form to create / edit a category.
  */
-class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class CreateCategoryView extends FeEditingBaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Draws a create category form.
      *
@@ -93,7 +90,7 @@ class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             $sims['###L_EDIT_CATEGORY###'] = $this->controller->pi_getLL('l_edit_category');
         } else {
             $a = [];
-            $this->object = new \TYPO3\CMS\Cal\Model\CategoryModel($a, '');
+            $this->object = new CategoryModel($a, '');
             $allValues = array_merge($this->getDefaultValues(), $this->controller->piVars);
             $this->object->updateWithPIVars($allValues);
         }
@@ -102,8 +99,8 @@ class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
 
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped, $this->conf['view']);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
 
         $sims = [];
         $rems = [];
@@ -118,17 +115,23 @@ class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###CHANGE_CALENDAR_ACTION_URL_JS###'] = $this->escapeForJS($change_calendar_action_url);
 
         $this->getTemplateSubpartMarker($page, $sims, $rems, $this->conf['view']);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $requiredFieldsSims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $requiredFieldsSims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getHeaderstyleMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###HEADERSTYLE###'] = '';
         if ($this->isAllowed('headerstyle')) {
             $selectedStyle = $this->object->getHeaderStyle();
-            $allowedStyles = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+            $allowedStyles = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['edit.']['category.']['fields.']['headerstyle.']['available'],
                 1
@@ -150,12 +153,18 @@ class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getBodystyleMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###BODYSTYLE###'] = '';
         if ($this->isAllowed('bodystyle')) {
             $selectedStyle = $this->object->getBodyStyle();
-            $allowedStyles = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+            $allowedStyles = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['edit.']['category.']['fields.']['bodystyle.']['available'],
                 1
@@ -177,6 +186,12 @@ class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getParentCategoryMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###PARENT_CATEGORY###'] = '';
@@ -219,6 +234,12 @@ class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getSharedUserAllowedMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###SHARED_USER_ALLOWED###'] = '';
@@ -231,6 +252,12 @@ class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getFormStartMarker(& $template, & $sims, & $rems, & $wrapped)
     {
         $temp = $this->cObj->getSubpart($template, '###FORM_START###');
@@ -243,7 +270,7 @@ class CreateCategoryView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
         $temp_sims['###TYPE###'] = 'tx_cal_category';
 
-        $rems['###FORM_START###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $rems['###FORM_START###'] = Functions::substituteMarkerArrayNotCached(
             $temp,
             $temp_sims,
             [],

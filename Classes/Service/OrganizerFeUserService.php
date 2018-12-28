@@ -2,6 +2,9 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Cal\Model\OrganizerFeUser;
+use TYPO3\CMS\Cal\Utility\Functions;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +23,7 @@ namespace TYPO3\CMS\Cal\Service;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
+class OrganizerFeUserService extends BaseService
 {
     public $keyId = 'tx_feuser';
     public $tableId = 'fe_users';
@@ -29,7 +32,7 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
      * Looks for an organizer with a given uid on a certain pid-list
      * @param int $uid
      * @param string $pidList
-     * @return void|\TYPO3\CMS\Cal\Model\OrganizerFeUser
+     * @return void|OrganizerFeUser
      */
     public function find($uid, $pidList)
     {
@@ -52,7 +55,7 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
         if ($result) {
             $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
-            return new \TYPO3\CMS\Cal\Model\OrganizerFeUser($row, $pidList);
+            return new OrganizerFeUser($row, $pidList);
         }
     }
 
@@ -69,7 +72,7 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
             return;
         }
         $organizer = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('fe_users');
+        $orderBy = Functions::getOrderBy('fe_users');
         if ($pidList == '') {
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
                 '*',
@@ -89,7 +92,7 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
         }
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $organizer[] = new \TYPO3\CMS\Cal\Model\OrganizerFeUser($row, $pidList);
+                $organizer[] = new OrganizerFeUser($row, $pidList);
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
@@ -123,7 +126,7 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
     private function getOrganizerFromTable($pidList = '', $additionalWhere = '')
     {
         $organizers = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->tableId);
+        $orderBy = Functions::getOrderBy($this->tableId);
         if ($pidList != '') {
             $additionalWhere .= ' AND ' . $this->tableId . '.pid IN (' . $pidList . ')';
         }
@@ -131,10 +134,10 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
         $table = $this->tableId;
         $where = '1=1 ' . $additionalWhere . $this->cObj->enableFields($this->tableId);
         $groupBy = '';
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->tableId);
+        $orderBy = Functions::getOrderBy($this->tableId);
         $limit = '';
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_organizer_feuser_service',
             'organizerServiceClass',
             'service'
@@ -150,7 +153,7 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
 
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $organizers[] = new \TYPO3\CMS\Cal\Model\OrganizerFeUser($row, $pidList);
+                $organizers[] = new OrganizerFeUser($row, $pidList);
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
@@ -175,7 +178,7 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
     /**
      * Updates the organizer with the given $uid with the post data
      * @param int $uid
-     * @return void|\TYPO3\CMS\Cal\Model\OrganizerFeUser
+     * @return void|OrganizerFeUser
      */
     public function updateOrganizer($uid)
     {
@@ -268,7 +271,7 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
     /**
      * Saves an organizer at the page with the id $pid
      * @param int $pid
-     * @return void|\TYPO3\CMS\Cal\Model\OrganizerFeUser
+     * @return void|OrganizerFeUser
      */
     public function saveOrganizer($pid)
     {

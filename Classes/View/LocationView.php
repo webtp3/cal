@@ -20,18 +20,14 @@ use TYPO3\CMS\Cal\Utility\Functions;
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class LocationView extends \TYPO3\CMS\Cal\View\BaseView
+class LocationView extends BaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Draws a location.
      *
      * @param
      *            object        The location to be drawn.
+     * @param array $relatedEvents
      * @return string HTML output.
      */
     public function drawLocation($location, $relatedEvents = [])

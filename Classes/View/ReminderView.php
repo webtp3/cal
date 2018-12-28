@@ -16,15 +16,22 @@ namespace TYPO3\CMS\Cal\View;
  */
 use OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Cron\ReminderScheduler;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Scheduler\Execution;
+use TYPO3\CMS\Scheduler\Scheduler;
 
-class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
+/**
+ * Class ReminderView
+ */
+class ReminderView extends NotificationView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * @param $event
+     * @param $eventMonitor
+     */
     public function remind(&$event, $eventMonitor)
     {
         $this->startMailer();
@@ -67,6 +74,11 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
         }
     }
 
+    /**
+     * @param $event
+     * @param $email
+     * @param $userId
+     */
     public function process(&$event, $email, $userId)
     {
         if ($email != '' && GeneralUtility::validEmail($email)) {
@@ -104,11 +116,11 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
 
             // maybe there is a recurring instance
             // get the uids of recurring events from index
-            $now = new  \TYPO3\CMS\Cal\Model\CalDate();
-            $now->setTZbyId('UTC');
+            $now = new  CalDate();
+            $now->setTZbyID('UTC');
             $now->addSeconds($offset * 60);
-            $startDateTimeObject = new  \TYPO3\CMS\Cal\Model\CalDate($eventRecord['start_date'] . '000000');
-            $startDateTimeObject->setTZbyId('UTC');
+            $startDateTimeObject = new  CalDate($eventRecord['start_date'] . '000000');
+            $startDateTimeObject->setTZbyID('UTC');
             $startDateTimeObject->addSeconds($eventRecord['start_time']);
             $start_datetime = $startDateTimeObject->format('%Y%m%d%H%M%S');
             $select2 = '*';
@@ -120,10 +132,10 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
                 $tmp = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2);
                 if (is_array($tmp)) {
                     $start_datetime = $tmp['start_datetime'];
-                    $nextOccuranceTime = new  \TYPO3\CMS\Cal\Model\CalDate($tmp['start_datetime']);
-                    $nextOccuranceTime->setTZbyId('UTC');
-                    $nextOccuranceEndTime = new  \TYPO3\CMS\Cal\Model\CalDate($tmp['end_datetime']);
-                    $nextOccuranceEndTime->setTZbyId('UTC');
+                    $nextOccuranceTime = new  CalDate($tmp['start_datetime']);
+                    $nextOccuranceTime->setTZbyID('UTC');
+                    $nextOccuranceEndTime = new  CalDate($tmp['end_datetime']);
+                    $nextOccuranceEndTime->setTZbyID('UTC');
                     $eventRecord['start_date'] = $nextOccuranceTime->format('%Y%m%d');
                     $eventRecord['start_time'] = $nextOccuranceTime->getHour() * 3600 + $nextOccuranceTime->getMinute() * 60 + $nextOccuranceTime->getSecond();
                     $eventRecord['end_date'] = $nextOccuranceEndTime->format('%Y%m%d');
@@ -132,20 +144,20 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
                 $GLOBALS['TYPO3_DB']->sql_free_result($result2);
             }
 
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('scheduler')) {
-                $scheduler = new \TYPO3\CMS\Scheduler\Scheduler();
-                $date = new  \TYPO3\CMS\Cal\Model\CalDate($start_datetime);
-                $date->setTZbyId('UTC');
+            if (ExtensionManagementUtility::isLoaded('scheduler')) {
+                $scheduler = new Scheduler();
+                $date = new  CalDate($start_datetime);
+                $date->setTZbyID('UTC');
                 $timestamp = $date->getTime();
-                $offsetTime = new  \TYPO3\CMS\Cal\Model\CalDate();
+                $offsetTime = new  CalDate();
                 $offsetTime->copy($date);
-                $offsetTime->setTZbyId('UTC');
+                $offsetTime->setTZbyID('UTC');
                 $offsetTime->addSeconds(-1 * $offset * 60);
                 if ($taskId > 0) {
                     if ($offsetTime->isFuture()) {
                         try {
                             $task = $scheduler->fetchTask($taskId);
-                            $execution = new \TYPO3\CMS\Scheduler\Execution();
+                            $execution = new Execution();
                             $execution->setStart($timestamp - ($offset * 60));
                             $execution->setIsNewSingleExecution(true);
                             $execution->setMultiple(false);
@@ -174,11 +186,19 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
         }
     }
 
+    /**
+     * @param $scheduler
+     * @param $date
+     * @param $calEventUID
+     * @param $timestamp
+     * @param $offset
+     * @param $uid
+     */
     public function createSchedulerTask(&$scheduler, $date, $calEventUID, $timestamp, $offset, $uid)
     {
         if ($date->isFuture()) {
             /* Set up the scheduler event */
-            $task = new \TYPO3\CMS\Cal\Cron\ReminderScheduler();
+            $task = new ReminderScheduler();
             $task->setUID($calEventUID);
             $taskGroup = BackendUtility::getRecordRaw('tx_scheduler_task_group', 'groupName="cal"');
             if ($taskGroup['uid']) {
@@ -205,7 +225,7 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
             }
             $task->setDescription('Reminder of a calendar event (id=' . $calEventUID . ')');
             /* Schedule the event */
-            $execution = new \TYPO3\CMS\Scheduler\Execution();
+            $execution = new Execution();
             $execution->setStart($timestamp - ($offset * 60));
             $execution->setIsNewSingleExecution(true);
             $execution->setMultiple(false);
@@ -221,23 +241,26 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
     /* @todo    Figure out where this should live */
     public function deleteReminder($eventUid)
     {
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('scheduler')) {
+        if (ExtensionManagementUtility::isLoaded('scheduler')) {
             $eventRow = BackendUtility::getRecordRaw('tx_cal_fe_user_event_monitor_mm', 'uid_local=' . $eventUid);
             $taskId = $eventRow['schedulerId'];
             if ($taskId > 0) {
-                $scheduler = new \TYPO3\CMS\Scheduler\Scheduler();
+                $scheduler = new Scheduler();
                 try {
                     $task = $scheduler->fetchTask($taskId);
                     $scheduler->removeTask($task);
                 } catch (OutOfBoundsException $e) {
                 }
             }
-        } elseif (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('gabriel')) {
+        } elseif (ExtensionManagementUtility::isLoaded('gabriel')) {
             $monitoringUID = 'tx_cal_fe_user_event_monitor_mm:' . $eventUid;
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_gabriel', ' crid="' . $eventUid . '"');
         }
     }
 
+    /**
+     * @param $eventUid
+     */
     public function deleteReminderForEvent($eventUid)
     {
         // get the related monitoring records

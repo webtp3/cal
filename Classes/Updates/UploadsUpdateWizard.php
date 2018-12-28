@@ -2,6 +2,10 @@
 
 namespace TYPO3\CMS\Cal\Updates;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Dbal\Database\DatabaseConnection;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -19,7 +23,7 @@ namespace TYPO3\CMS\Cal\Updates;
  * Upgrade wizard which goes through all files referenced in the tx_cal_event.attachment filed
  * and creates sys_file records as well as sys_file_reference records for the individual usages.
  */
-class UploadsUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractUpdateWizard
+class UploadsUpdateWizard extends AbstractUpdateWizard
 {
 
     /**
@@ -36,6 +40,9 @@ class UploadsUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractUpdateWizard
         return 'There are Content Elements of type "upload" which are referencing files that are not using ' . ' the File Abstraction Layer. This wizard will move the files to fileadmin/' . self::FOLDER_ContentUploads . ' and index them.';
     }
 
+    /**
+     * @return mixed|string
+     */
     protected function getRecordTableName()
     {
         return 'tx_cal_event';
@@ -50,6 +57,9 @@ class UploadsUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractUpdateWizard
         return ['uid', 'pid', 'attachment', 'attachmentcaption'];
     }
 
+    /**
+     * @return string
+     */
     protected function getColumnName()
     {
         return 'attachment';
@@ -64,19 +74,19 @@ class UploadsUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractUpdateWizard
     {
         $collections = [];
 
-        $files = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $record['attachment'], true);
-        $descriptions = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('
+        $files = GeneralUtility::trimExplode(',', $record['attachment'], true);
+        $descriptions = GeneralUtility::trimExplode('
 ', $record['attachmentcaption']);
         $i = 0;
         foreach ($files as $file) {
             if (file_exists(PATH_site . 'uploads/tx_cal/media/' . $file)) {
-                \TYPO3\CMS\Core\Utility\GeneralUtility::upload_copy_move(
+                GeneralUtility::upload_copy_move(
                     PATH_site . 'uploads/tx_cal/media/' . $file,
                     $this->targetDirectory . $file
                 );
                 $fileObject = $this->storage->getFile(self::FOLDER_ContentUploads . '/' . $file);
                 //TYPO3 >= 6.2.0
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
                     $this->fileIndexRepository->add($fileObject);
                 } else {
                     //TYPO3 6.1.0
@@ -135,7 +145,7 @@ class UploadsUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractUpdateWizard
             ]
         ];
 
-        if ($GLOBALS['TYPO3_DB'] instanceof \TYPO3\CMS\Dbal\Database\DatabaseConnection) {
+        if ($GLOBALS['TYPO3_DB'] instanceof DatabaseConnection) {
             if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['dbal']['mapping']['tx_cal_event'])) {
                 $mapping = array_merge_recursive(
                     $mapping,

@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 
 /**
@@ -33,11 +34,16 @@ class DateParser
     public $timeObj;
     public $conf;
 
+    /**
+     * @param $value
+     * @param array $conf
+     * @param string $timeObj
+     */
     public function parse($value, $conf = [], $timeObj = '')
     {
         if ($timeObj == '') {
-            $timeObj = new \TYPO3\CMS\Cal\Model\CalDate();
-            $timeObj->setTZbyId('UTC');
+            $timeObj = new CalDate();
+            $timeObj->setTZbyID('UTC');
         }
         $this->timeObj = $timeObj;
         $this->conf = &$conf;
@@ -176,6 +182,9 @@ class DateParser
         }
     }
 
+    /**
+     * @param $num
+     */
     public function _parseNumber($num)
     {
         $number = intval($num);
@@ -198,6 +207,9 @@ class DateParser
         ]);
     }
 
+    /**
+     * @param $value
+     */
     public function _parseString($value)
     {
         $value = strtolower($value);
@@ -240,32 +252,32 @@ class DateParser
 
             case 'yearstart':
                 array_push($this->stack, [
-                    'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateStartYearTime($this->timeObj)
+                    'date' => Calendar::calculateStartYearTime($this->timeObj)
                 ]);
                 break;
             case 'monthstart':
                 array_push($this->stack, [
-                    'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateStartMonthTime($this->timeObj)
+                    'date' => Calendar::calculateStartMonthTime($this->timeObj)
                 ]);
                 break;
             case 'weekstart':
                 array_push($this->stack, [
-                    'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateStartWeekTime($this->timeObj)
+                    'date' => Calendar::calculateStartWeekTime($this->timeObj)
                 ]);
                 break;
             case 'weekend':
                 array_push($this->stack, [
-                    'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateEndWeekTime($this->timeObj)
+                    'date' => Calendar::calculateEndWeekTime($this->timeObj)
                 ]);
                 break;
             case 'monthend':
                 array_push($this->stack, [
-                    'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateEndMonthTime($this->timeObj)
+                    'date' => Calendar::calculateEndMonthTime($this->timeObj)
                 ]);
                 break;
             case 'yearend':
                 array_push($this->stack, [
-                    'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateEndYearTime($this->timeObj)
+                    'date' => Calendar::calculateEndYearTime($this->timeObj)
                 ]);
                 break;
             case 'quarterstart':
@@ -482,10 +494,13 @@ class DateParser
         }
     }
 
+    /**
+     * @return CalDate
+     */
     public function getDateObjectFromStack()
     {
-        $date = new \TYPO3\CMS\Cal\Model\CalDate();
-        $date->setTZbyId('UTC');
+        $date = new CalDate();
+        $date->setTZbyID('UTC');
         $date->copy($this->timeObj);
         $lastKey = '';
         $post = [];
@@ -639,6 +654,11 @@ class DateParser
         return $date;
     }
 
+    /**
+     * @param $date
+     * @param $range
+     * @param $rangeValue
+     */
     public function evaluateRange(&$date, $range, $rangeValue)
     {
         if (!is_numeric($range)) {
@@ -660,8 +680,8 @@ class DateParser
                             $date->getMonth(),
                             $date->getYear()
                         );
-                        $date = new \TYPO3\CMS\Cal\Model\CalDate($formatedDate);
-                        $date->setTZbyId('UTC');
+                        $date = new CalDate($formatedDate);
+                        $date->setTZbyID('UTC');
                     }
                 } elseif ($key == 'weekday' && $range < 0) {
                     for ($i = 0; $i > $range; $i--) {
@@ -671,8 +691,8 @@ class DateParser
                             $date->getMonth(),
                             $date->getYear()
                         );
-                        $date = new \TYPO3\CMS\Cal\Model\CalDate($formatedDate);
-                        $date->setTZbyId('UTC');
+                        $date = new CalDate($formatedDate);
+                        $date->setTZbyID('UTC');
                     }
                 } elseif ($value == 'week' && $range > 0) {
                     $date->addSeconds($range * 604800);
@@ -684,7 +704,7 @@ class DateParser
             if ($rangeValue == 'month') {
                 for ($i = 0; $i < $range; $i++) {
                     $days = Calc::daysInMonth($date->getMonth(), $date->getYear());
-                    $endOfNextMonth = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfNextMonth(
+                    $endOfNextMonth = new CalDate(Calc::endOfNextMonth(
                         $date->getDay(),
                         $date->getMonth(),
                         $date->getYear()
@@ -708,7 +728,7 @@ class DateParser
         } elseif ($range < 0) {
             if ($rangeValue == 'month') {
                 for ($i = 0; $i > $range; $i--) {
-                    $endOfPrevMonth = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfPrevMonth(
+                    $endOfPrevMonth = new CalDate(Calc::endOfPrevMonth(
                         $date->getDay(),
                         $date->getMonth(),
                         $date->getYear()

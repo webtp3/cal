@@ -14,18 +14,14 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
  * A service which renders a form to create / edit a phpicalendar event.
  */
-class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class ConfirmCalendarView extends FeEditingBaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Draws a create calendar form.
      *
@@ -52,7 +48,7 @@ class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
 
         $fakeArray = [];
-        $this->object = new \TYPO3\CMS\Cal\Model\CalendarModel($fakeArray, '');
+        $this->object = new CalendarModel($fakeArray, '');
         $this->object->updateWithPIVars($this->controller->piVars);
         $rems = [];
         $sims = [];
@@ -69,17 +65,22 @@ class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         ]));
 
         $this->getTemplateSubpartMarker($page, $sims, $rems, $this->conf['view']);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
 
         $sims = [];
         $rems = [];
         $this->getTemplateSingleMarker($page, $sims, $rems, $this->conf['view']);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTitleMarker(& $template, & $sims, & $rems)
     {
         $sims['###TITLE###'] = '';
@@ -89,6 +90,11 @@ class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalendarTypeMarker(& $template, & $sims, & $rems)
     {
         $sims['###CALENDARTYPE###'] = '';
@@ -106,6 +112,11 @@ class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getExtUrlMarker(& $template, & $sims, & $rems)
     {
         $sims['###EXTURL###'] = '';
@@ -115,6 +126,11 @@ class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getRefreshMarker(& $template, & $sims, & $rems)
     {
         $sims['###REFRESH###'] = '';
@@ -124,6 +140,11 @@ class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getActivateFreeAndBusyMarker(& $template, & $sims, & $rems)
     {
         $sims['###ACTIVATE_FREEANDBUSY###'] = '';
@@ -140,6 +161,11 @@ class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getFreeAndBusyUserMarker(& $template, & $sims, & $rems)
     {
         $sims['###FREEANDBUSYUSER###'] = '';
@@ -158,6 +184,11 @@ class ConfirmCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getOwnerMarker(& $template, & $sims, & $rems)
     {
         $sims['###OWNER###'] = '';

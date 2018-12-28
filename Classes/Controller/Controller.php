@@ -14,14 +14,25 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\Model;
+use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
+use TYPO3\CMS\Cal\Utility\Cache;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
 
 /**
  * Main controller for the calendar base.
  * All requests come through this class
  * and are routed to the model and view layers for processing.
  */
-class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
+class Controller extends AbstractPlugin
 {
     public $prefixId = 'tx_cal_controller'; // Same as class name
     public $scriptRelPath = 'Classes/Controller/Controller.php'; // Path to this script relative to the extension dir.
@@ -117,7 +128,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             }
         } else {
             // Don't use default replaceString of <x> because strip-tags will later remove it.
-            $param = \TYPO3\CMS\Cal\Utility\Functions::removeXSS($param, '--xxx--');
+            $param = Functions::removeXSS($param, '--xxx--');
         }
     }
 
@@ -246,7 +257,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $this->conf['pages'] = $this->cObj->stdWrap($this->conf['pages'], $this->conf['pages.']);
         $this->conf['pidList'] = $this->cObj->stdWrap($this->conf['pidList'], $this->conf['pidList.']);
 
-        Controller::updateIfNotEmpty($this->conf['pages'], $this->cObj->data['pages']);
+        self::updateIfNotEmpty($this->conf['pages'], $this->cObj->data['pages']);
         // don't use "updateIfNotEmpty" here, as the default value of "recursive" is 0 and thus not empty and will always override TS settings.
         if ($this->cObj->data['recursive']) {
             $this->conf['recursive'] = $this->cObj->data['recursive'];
@@ -275,7 +286,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             'cal'
         ]);
 
-        $location = Controller::convertLinkVarArrayToList($this->piVars['location_ids']);
+        $location = self::convertLinkVarArrayToList($this->piVars['location_ids']);
 
         if ($this->piVars['view'] == $this->piVars['lastview']) {
             unset($this->piVars['lastview']);
@@ -288,7 +299,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         }
 
         if ($this->piVars['jumpto']) {
-            $dp = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\DateParser');
+            $dp = GeneralUtility::makeInstance(DateParser::class);
             $dp->parse($this->piVars['jumpto'], $this->conf['dateParserConf.']);
             $newGetdate = $dp->getDateObjectFromStack();
             $this->conf['getdate'] = $newGetdate->format('%Y%m%d');
@@ -353,14 +364,14 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             $this->conf['view'] = $this->conf['view.']['allowedViews'][0];
         }
 
-        $this->getDateTimeObject = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate'] . '000000');
+        $this->getDateTimeObject = new CalDate($this->conf['getdate'] . '000000');
 
         if ($this->getDateTimeObject->month > 12) {
             $this->getDateTimeObject->month = 12;
         } elseif ($this->getDateTimeObject->month < 1) {
             $this->getDateTimeObject->month = 1;
         }
-        while (!\TYPO3\CMS\Cal\Model\Pear\Date\Calc::isValidDate(
+        while (!Calc::isValidDate(
             $this->getDateTimeObject->day,
             $this->getDateTimeObject->month,
             $this->getDateTimeObject->year
@@ -372,21 +383,21 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             }
         }
 
-        $this->getDateTimeObject->setTZbyId('UTC');
+        $this->getDateTimeObject->setTZbyID('UTC');
         $this->conf['day'] = $this->getDateTimeObject->getDay();
         $this->conf['month'] = $this->getDateTimeObject->getMonth();
         $this->conf['year'] = $this->getDateTimeObject->getYear();
 
-        Controller::initRegistry($this);
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        self::initRegistry($this);
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $rightsObj = GeneralUtility::makeInstanceService('cal_rights_model', 'rights');
         $rightsObj->setDefaultSaveToPage();
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
-        $modelObj = new \TYPO3\CMS\Cal\Controller\ModelController();
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
+        $modelObj = new ModelController();
 
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
-        $viewObj = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\ViewController');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
+        $viewObj = GeneralUtility::makeInstance(ViewController::class);
 
         $this->checkCalendarAndCategory();
 
@@ -462,7 +473,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                     break;
                 // the case 'never' uses the default: $lifetime = 0;
             }
-            $this->cache = new \TYPO3\CMS\Cal\Utility\Cache($cachingEngine);
+            $this->cache = new Cache($cachingEngine);
             $this->cache->lifetime = $lifetime;
             $this->cache->ACCESS_TIME = $this->SIM_ACCESS_TIME;
         }
@@ -483,8 +494,8 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $catIDs = [];
         $category = '';
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
 
         // et all categories
         $categoryArray = $modelObj->findAllCategories($this->confArr['categoryService'], '', $this->conf['pidList']);
@@ -510,7 +521,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $category = $this->conf['view.']['category'];
         $this->conf['view.']['allowedCategory'] = $this->conf['view.']['category'];
 
-        $piVarCategory = Controller::convertLinkVarArrayToList($this->piVars['category']);
+        $piVarCategory = self::convertLinkVarArrayToList($this->piVars['category']);
 
         if ($piVarCategory) {
             if ($this->conf['view.']['category']) {
@@ -520,7 +531,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 if (empty($sameValues)) {
                     $category = $this->conf['view.']['category'];
                 } else {
-                    $category = Controller::convertLinkVarArrayToList($sameValues);
+                    $category = self::convertLinkVarArrayToList($sameValues);
                 }
             } else {
                 $category = $piVarCategory;
@@ -584,13 +595,13 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             );
         }
 
-        $piVarCalendar = Controller::convertLinkVarArrayToList($this->piVars['calendar']);
+        $piVarCalendar = self::convertLinkVarArrayToList($this->piVars['calendar']);
         if ($piVarCalendar) {
             if ($this->conf['view.']['calendar']) {
                 $calendarArray = explode(',', $calendar);
                 $piVarCalendarArray = explode(',', $piVarCalendar);
                 $sameValues = array_intersect($calendarArray, $piVarCalendarArray);
-                $calendar = Controller::convertLinkVarArrayToList($sameValues);
+                $calendar = self::convertLinkVarArrayToList($sameValues);
             } else {
                 $calendar = $piVarCalendar;
             }
@@ -617,7 +628,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
      */
     public function getHookObjectsArray($hookName)
     {
-        return \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray($this->prefixId, $hookName);
+        return Functions::getHookObjectsArray($this->prefixId, $hookName);
     }
 
     /**
@@ -643,7 +654,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $viewParams = $this->shortenLastViewAndGetTargetViewParameters(true);
         $this->conf['view'] = $viewParams['view'];
         $this->conf['lastview'] = '';
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $this->conf['view'] = $rightsObj->checkView($this->conf['view']);
         $this->conf['uid'] = $viewParams['uid'];
         $this->conf['type'] = $viewParams['type'];
@@ -712,11 +723,11 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $eventType = intval($this->piVars['event_type']);
         $uid = intval($this->piVars['uid']);
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
 
         if ($GLOBALS['TSFE']->fe_user->getKey('ses', 'tx_cal_controller_creatingEvent') == '1') {
             $event = null;
-            if ($eventType == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO) {
+            if ($eventType == Model::EVENT_TYPE_TODO) {
                 $event = $modelObj->saveTodo($this->conf['uid'], $this->conf['type'], $pid);
             } else {
                 $event = $modelObj->saveEvent($this->conf['uid'], $this->conf['type'], $pid);
@@ -802,8 +813,8 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('removeEventClass');
         // Hook: preRemoveEvent
         $this->executeHookObjectsFunction($hookObjectsArr, 'preRemoveEvent');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
-        if ($eventType == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO) {
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
+        if ($eventType == Model::EVENT_TYPE_TODO) {
             $ok = $modelObj->removeTodo($this->conf['uid'], $this->conf['type']);
         } else {
             $ok = $modelObj->removeEvent($this->conf['uid'], $this->conf['type']);
@@ -834,7 +845,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preCreateExceptionEventRendering($this, $getdate, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnCreateExceptionEvent = $viewObj->drawCreateExceptionEvent($getdate, $pidList);
 
         // Hook: postCreateExceptionEventRendering
@@ -861,7 +872,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (!is_numeric($pid)) {
             $pid = $GLOBALS['TSFE']->id;
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ok = $modelObj->saveExceptionEvent($this->conf['uid'], $this->conf['type'], $pid);
 
         // Hook: postSaveExceptionEvent
@@ -879,7 +890,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('removeCalendarClass');
         // Hook: preRemoveCalendar
         $this->executeHookObjectsFunction($hookObjectsArr, 'preRemoveCalendar');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ok = $modelObj->removeCalendar($this->conf['uid'], $this->conf['type']);
 
         // Hook: postRemoveCalendar
@@ -897,7 +908,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('removeCategoryClass');
         // Hook: preRemoveCategory
         $this->executeHookObjectsFunction($hookObjectsArr, 'preRemoveCategory');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ok = $modelObj->removeCategory($this->conf['uid'], $this->conf['type']);
 
         // Hook: postRemoveCategory
@@ -915,7 +926,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('removeLocationClass');
         // Hook: preRemoveLocation
         $this->executeHookObjectsFunction($hookObjectsArr, 'preRemoveLocation');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ok = $modelObj->removeLocation($this->conf['uid'], $this->conf['type']);
 
         // Hook: postRemoveLocation
@@ -933,7 +944,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('removeOrganizerClass');
         // Hook: preRemoveOrganizer
         $this->executeHookObjectsFunction($hookObjectsArr, 'preRemoveOrganizer');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ok = $modelObj->removeOrganizer($this->conf['uid'], $this->conf['type']);
 
         // Hook: postRemoveOrganizer
@@ -957,7 +968,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (!is_numeric($pid)) {
             $pid = $GLOBALS['TSFE']->id;
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $location = $modelObj->saveLocation($this->conf['uid'], $this->conf['type'], $pid);
 
         if ($this->conf['view.']['enableAjax']) {
@@ -984,7 +995,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (!is_numeric($pid)) {
             $pid = $GLOBALS['TSFE']->id;
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $organizer = $modelObj->saveOrganizer($this->conf['uid'], $this->conf['type'], $pid);
 
         if ($this->conf['view.']['enableAjax']) {
@@ -1011,7 +1022,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (!is_numeric($pid)) {
             $pid = $GLOBALS['TSFE']->id;
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $calendar = $modelObj->saveCalendar($this->conf['uid'], $this->conf['type'], $pid);
 
         if ($this->conf['view.']['enableAjax']) {
@@ -1051,7 +1062,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (!is_numeric($pid)) {
             $pid = $GLOBALS['TSFE']->id;
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $category = $modelObj->saveCategory($this->conf['uid'], $this->conf['type'], $pid);
 
         if ($this->conf['view.']['enableAjax']) {
@@ -1076,19 +1087,19 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $getdate = $this->conf['getdate'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawEventClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = null;
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $event = $modelObj->findEvent($uid, $type, $pidList);
 
         if (!is_object($event)) {
             if (is_string($event)) {
                 return $event;
             }
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The event you are looking for could not be found.',
                 'Please verify your URL parameter: tx_cal_controller[uid]'
             );
@@ -1121,7 +1132,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preEventRendering($event, $relatedEvents, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnEvent = $viewObj->drawEvent($event, $getdate, $relatedEvents);
 
         // Hook: postEventRendering
@@ -1145,13 +1156,13 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $hookObjectsArr = $this->getHookObjectsArray('drawDayClass');
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = '';
         }
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate'] . '000000');
-        $timeObj->setTZbyId('UTC');
+        $timeObj = new CalDate($this->conf['getdate'] . '000000');
+        $timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForDay($timeObj, $type, $pidList);
         // Hook: preDayRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1159,7 +1170,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preDayRendering($master_array, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnDay = $viewObj->drawDay($master_array, $getdate);
         // Hook: postDayRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1181,13 +1192,13 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $getdate = $this->conf['getdate'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawWeekClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = '';
         }
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate'] . '000000');
-        $timeObj->setTZbyId('UTC');
+        $timeObj = new CalDate($this->conf['getdate'] . '000000');
+        $timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForWeek($timeObj, $type, $pidList);
         // Hook: preWeekRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1195,7 +1206,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preWeekRendering($master_array, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnWeek = $viewObj->drawWeek($master_array, $getdate);
         // Hook: postWeekRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1221,14 +1232,14 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if ($this->conf['view.']['enableAjax']) {
             $master_array = [];
         } else {
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
             if (!in_array($type, $availableTypes)) {
                 $type = '';
             }
 
-            $timeObj = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate'] . '000000');
-            $timeObj->setTZbyId('UTC');
+            $timeObj = new CalDate($this->conf['getdate'] . '000000');
+            $timeObj->setTZbyID('UTC');
             $master_array = $modelObj->findEventsForMonth($timeObj, $type, $pidList);
         }
         // Hook: preMonthRendering
@@ -1237,7 +1248,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preMonthRendering($master_array, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnMonth = $viewObj->drawMonth($master_array, $getdate);
         // Hook: postMonthRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1258,13 +1269,13 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $getdate = $this->conf['getdate'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawYearClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = '';
         }
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['getdate'] . '000000');
-        $timeObj->setTZbyId('UTC');
+        $timeObj = new CalDate($this->conf['getdate'] . '000000');
+        $timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForYear($timeObj, $type, $pidList);
         // Hook: preYearRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1273,7 +1284,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             }
         }
 
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnYear = $viewObj->drawYear($master_array, $getdate);
         // Hook: postYearRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1294,7 +1305,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawIcsClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = '';
@@ -1308,7 +1319,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preIcsRendering($master_array, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnIcs = $viewObj->drawIcs($master_array, $this->conf['getdate']);
 
         // Hook: postIcsRendering
@@ -1332,7 +1343,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawSingleIcsClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $master_array = [
             $modelObj->findEvent($uid, $type, $pidList)
         ]; // $this->conf['pid_list']));
@@ -1343,7 +1354,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preSingleIcsRendering($master_array, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnIcs = $viewObj->drawIcs($master_array, $getdate);
 
         // Hook: postSingleIcsRendering
@@ -1369,14 +1380,14 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         }
 
         $hookObjectsArr = $this->getHookObjectsArray('drawRssClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = '';
         }
 
-        $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime($this->getDateTimeObject);
-        $endtime = new \TYPO3\CMS\Cal\Model\CalDate();
+        $starttime = Calendar::calculateStartDayTime($this->getDateTimeObject);
+        $endtime = new CalDate();
         $endtime->copy($starttime);
         $endtime->addSeconds($this->conf['view.']['rss.']['range'] * 86400);
         $master_array = $modelObj->findEventsForRss($starttime, $endtime, $type, $pidList); // $this->conf['pid_list']);
@@ -1387,7 +1398,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preRssRendering($master_array, $starttime, $endtime, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnIcs = $viewObj->drawRss($master_array, $getdate);
 
         // Hook: postRssRendering
@@ -1411,7 +1422,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawLocationClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_location_model', 'location');
 
         if (!in_array($type, $availableTypes)) {
@@ -1423,7 +1434,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             if (is_string($location)) {
                 return $location;
             }
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The location you are looking for could not be found.',
                 'Please verify your URL parameter: tx_cal_controller[uid]'
             );
@@ -1440,7 +1451,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preLocationRendering($location, $relatedEvents, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnLocation = $viewObj->drawLocation($location, $relatedEvents);
 
         // Hook: postLocationRendering
@@ -1463,7 +1474,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawOrganizerClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_organizer_model', 'organizer');
         if (!in_array($type, $availableTypes)) {
             $type = '';
@@ -1474,7 +1485,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             if (is_string($organizer)) {
                 return $organizer;
             }
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The organizer you are looking for could not be found.',
                 'Please verify your URL parameter: tx_cal_controller[uid]'
             );
@@ -1487,7 +1498,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preOrganizerRendering($organizer, $relatedEvents, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnOrganizer = $viewObj->drawOrganizer($organizer, $relatedEvents);
 
         // Hook: postOrganizerRendering
@@ -1510,7 +1521,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
      */
     public function getListViewTime($timeString, $timeObj = '')
     {
-        $dp = new \TYPO3\CMS\Cal\Controller\DateParser();
+        $dp = new DateParser();
         $dp->parse($timeString, $this->conf['dateParserConf.'], $timeObj);
         return $dp->getDateObjectFromStack();
     }
@@ -1524,7 +1535,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawListClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = '';
@@ -1553,7 +1564,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                  * else { $starttime = $this->getListViewTime($starttimePreset); }
                  */
             } else {
-                $starttime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime($this->getDateTimeObject);
+                $starttime = Calendar::calculateStartDayTime($this->getDateTimeObject);
             }
 
             if ($this->conf['view.']['list.']['useCustomEndtime']) {
@@ -1566,9 +1577,9 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             } else {
                 if ($this->conf['view.']['list.']['useCustomStarttime']) {
                     // if we have a custom starttime but use getdate, calculate the endtime based on the getdate and not on the changed startdate
-                    $endtime = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime($this->getDateTimeObject);
+                    $endtime = Calendar::calculateStartDayTime($this->getDateTimeObject);
                 } else {
-                    $endtime = new \TYPO3\CMS\Cal\Model\CalDate();
+                    $endtime = new CalDate();
                     $endtime->copy($starttime);
                 }
                 $endtime->addSeconds(86340);
@@ -1583,7 +1594,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preListRendering($list, $starttime, $endtime, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnList = $viewObj->drawList($list, $starttime, $endtime);
 
         // Hook: postListRendering
@@ -1606,7 +1617,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $getdate = $this->conf['getdate'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawIcsListClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $list = $modelObj->findCategoriesForList($type, $pidList);
 
         // Hook: preIcsListRendering
@@ -1615,7 +1626,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preIcsListRendering($list, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnList = $viewObj->drawIcsList($list, $getdate);
 
         // Hook: postIcsListRendering
@@ -1635,7 +1646,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawAdminClass');
 
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnPage = $viewObj->drawAdminPage();
 
         // Hook: postAdminRendering
@@ -1665,46 +1676,46 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         if (!$start_day) {
             $start_day = $this->getListViewTime($this->conf['view.']['search.']['defaultValues.']['start_day']);
-            $start_day = \TYPO3\CMS\Cal\Controller\Calendar::calculateStartDayTime($start_day);
+            $start_day = Calendar::calculateStartDayTime($start_day);
         } else {
-            $start_day = new \TYPO3\CMS\Cal\Model\CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
+            $start_day = new CalDate(Functions::getYmdFromDateString(
                 $this->conf,
                     $start_day
             ) . '000000');
             $start_day->setHour(0);
             $start_day->setMinute(0);
             $start_day->setSecond(0);
-            $start_day->setTZbyId('UTC');
+            $start_day->setTZbyID('UTC');
         }
         if (!$end_day) {
             $end_day = $this->getListViewTime($this->conf['view.']['search.']['defaultValues.']['end_day']);
-            $end_day = \TYPO3\CMS\Cal\Controller\Calendar::calculateEndDayTime($end_day);
+            $end_day = Calendar::calculateEndDayTime($end_day);
         } else {
-            $end_day = new \TYPO3\CMS\Cal\Model\CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
+            $end_day = new CalDate(Functions::getYmdFromDateString(
                 $this->conf,
                     $end_day
             ) . '000000');
             $end_day->setHour(23);
             $end_day->setMinute(59);
             $end_day->setSecond(59);
-            $end_day->setTZbyId('UTC');
+            $end_day->setTZbyID('UTC');
         }
         if ($this->piVars['single_date']) {
-            $start_day = new \TYPO3\CMS\Cal\Model\CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
+            $start_day = new CalDate(Functions::getYmdFromDateString(
                 $this->conf,
                 $this->piVars['single_date']
             ));
             $start_day->setHour(0);
             $start_day->setMinute(0);
             $start_day->setSecond(0);
-            $start_day->setTZbyId('UTC');
-            $end_day = new \TYPO3\CMS\Cal\Model\CalDate();
+            $start_day->setTZbyID('UTC');
+            $end_day = new CalDate();
             $end_day->copy($start_day);
             $end_day->addSeconds(86399);
         }
 
-        $minStarttime = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['view.']['search.']['startRange'] . '000000');
-        $maxEndtime = new \TYPO3\CMS\Cal\Model\CalDate($this->conf['view.']['search.']['endRange'] . '000000');
+        $minStarttime = new CalDate($this->conf['view.']['search.']['startRange'] . '000000');
+        $maxEndtime = new CalDate($this->conf['view.']['search.']['endRange'] . '000000');
 
         if ($start_day->before($minStarttime)) {
             $start_day->copy($minStarttime);
@@ -1723,12 +1734,12 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             $end_day->copy($start_day);
         }
 
-        $locationIds = strip_tags(Controller::convertLinkVarArrayToList($this->piVars['location_ids']));
-        $organizerIds = strip_tags(Controller::convertLinkVarArrayToList($this->piVars['organizer_ids']));
+        $locationIds = strip_tags(self::convertLinkVarArrayToList($this->piVars['location_ids']));
+        $organizerIds = strip_tags(self::convertLinkVarArrayToList($this->piVars['organizer_ids']));
 
         $this->getDateTimeObject->copy($start_day);
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
 
         $list = [];
         if ($this->piVars['submit'] || !$this->conf['view.']['search.']['startSearchAfterSubmit']) {
@@ -1758,7 +1769,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             return '[' . implode(',', $ajaxStringArray) . ']';
         }
 
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnList = $viewObj->drawSearchEventResult(
             $list,
             $start_day,
@@ -1794,7 +1805,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preCreateEventRendering($this, $getDate, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnCreateEvent = $viewObj->drawCreateEvent($getDate, $pidList);
 
         // Hook: postCreateEventRendering
@@ -1822,7 +1833,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preConfirmEventRendering($this, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnConfirmEvent = $viewObj->drawConfirmEvent($pidList);
 
         // Hook: postConfirmEventRendering
@@ -1845,7 +1856,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('editEventClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $event = $modelObj->findEvent($uid, $type, $pidList);
 
         // Hook: preEditEventRendering
@@ -1854,7 +1865,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preEditEventRendering($this, $event, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnEditEvent = $viewObj->drawEditEvent($event, $pidList);
 
         // Hook: postEditEventRendering
@@ -1877,7 +1888,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('deleteEventClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $event = $modelObj->findEvent($uid, $type, $pidList);
 
         // Hook: preDeleteEventRendering
@@ -1886,7 +1897,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preDeleteEventRendering($this, $event, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnDeleteEvent = $viewObj->drawDeleteEvent($event, $pidList);
 
         // Hook: postDeleteEventRendering
@@ -1915,7 +1926,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preCreateLocationRendering($this, $getdate, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnCreateLocation = $viewObj->drawCreateLocation($pidList);
 
         // Hook: postCreateLocationRendering
@@ -1943,7 +1954,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preConfirmLocationRendering($this, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnConfirmLocation = $viewObj->drawConfirmLocation($pidList);
 
         // Hook: postConfirmLocationRendering
@@ -1966,7 +1977,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('editLocationClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $location = $modelObj->findLocation($uid, $type, $pidList);
 
         // Hook: preEditLocationRendering
@@ -1975,7 +1986,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preEditLocationRendering($this, $location, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnEditLocation = $viewObj->drawEditLocation($location, $pidList);
 
         // Hook: postEditLocationRendering
@@ -1999,7 +2010,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $hookObjectsArr = $this->getHookObjectsArray('deleteLocationClass');
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $location = $modelObj->findLocation($uid, $type, $pidList);
 
         // Hook: preDeleteLocationRendering
@@ -2008,7 +2019,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preDeleteLocationRendering($this, $location, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnDeleteLocation = $viewObj->drawDeleteLocation($location, $pidList);
 
         // Hook: postDeleteLocationRendering
@@ -2037,7 +2048,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preCreateOrganizerRendering($this, $getdate, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnCreateOrganizer = $viewObj->drawCreateOrganizer($pidList);
 
         // Hook: postCreateOrganizerRendering
@@ -2065,7 +2076,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preConfirmOrganizerRendering($this, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnConfirmOrganizer = $viewObj->drawConfirmOrganizer($pidList);
 
         // Hook: postConfirmOrganizerRendering
@@ -2088,7 +2099,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('editOrganizerClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $organizer = $modelObj->findOrganizer($uid, $type, $pidList);
 
         // Hook: preEditOrganizerRendering
@@ -2097,7 +2108,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preEditOrganizerRendering($this, $organizer, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnEditOrganizer = $viewObj->drawEditOrganizer($organizer, $pidList);
 
         // Hook: postEditOrganizerRendering
@@ -2121,7 +2132,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $hookObjectsArr = $this->getHookObjectsArray('deleteOrganizerClass');
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $organizer = $modelObj->findOrganizer($uid, $type, $pidList);
 
         // Hook: preDeleteOrganizerRendering
@@ -2130,7 +2141,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preDeleteOrganizerRendering($this, $organizer, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnDeleteOrganizer = $viewObj->drawDeleteOrganizer($organizer, $pidList);
 
         // Hook: postDeleteOrganizerRendering
@@ -2159,7 +2170,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preCreateCalendarRendering($this, $getdate, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnCreateCalendar = $viewObj->drawCreateCalendar($pidList);
 
         // Hook: postCreateCalendarRendering
@@ -2187,7 +2198,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preConfirmCalendarRendering($this, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnConfirmCalendar = $viewObj->drawConfirmCalendar($pidList);
 
         // Hook: postConfirmCalendarRendering
@@ -2210,7 +2221,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('editCalendarClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $calendar = $modelObj->findCalendar($uid, $type, $pidList);
 
         // Hook: preEditCalendarRendering
@@ -2219,7 +2230,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preEditCalendarRendering($this, $calendar, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnEditCalendar = $viewObj->drawEditCalendar($calendar, $pidList);
 
         // Hook: postEditCalendarRendering
@@ -2243,7 +2254,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $hookObjectsArr = $this->getHookObjectsArray('deleteCalendarClass');
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $calendar = $modelObj->findCalendar($uid, $type, $pidList);
 
         // Hook: preDeleteCalendarRendering
@@ -2252,7 +2263,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preDeleteCalendarRendering($this, $calendar, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnDeleteCalendar = $viewObj->drawDeleteCalendar($calendar, $pidList);
 
         // Hook: postDeleteCalendarRendering
@@ -2281,7 +2292,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preCreateCategoryRendering($this, $getdate, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnCreateCategory = $viewObj->drawCreateCategory($pidList);
 
         // Hook: postCreateCategoryRendering
@@ -2309,7 +2320,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preConfirmCategoryRendering($this, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnConfirmCategory = $viewObj->drawConfirmCategory($pidList);
 
         // Hook: postConfirmCategoryRendering
@@ -2333,7 +2344,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $hookObjectsArr = $this->getHookObjectsArray('editCategoryClass');
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $category = $modelObj->findCategory($uid, $type, $pidList);
 
         // Hook: preEditCategoryRendering
@@ -2342,7 +2353,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preEditCategoryRendering($this, $category, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnEditCategory = $viewObj->drawEditCategory($category, $pidList);
 
         // Hook: postEditCategoryRendering
@@ -2366,7 +2377,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $hookObjectsArr = $this->getHookObjectsArray('deleteCategoryClass');
 
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $category = $modelObj->findCategory($uid, $type, $pidList);
 
         // Hook: preDeleteCategoryRendering
@@ -2375,7 +2386,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preDeleteCategoryRendering($this, $category, $pidList);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnDeleteCategory = $viewObj->drawDeleteCategory($category, $pidList);
 
         // Hook: postDeleteCategoryRendering
@@ -2401,12 +2412,12 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (intval($this->piVars['start_day']) == 0) {
             $starttime = $this->getListViewTime($this->conf['view.']['search.']['defaultValues.']['start_day']);
         } else {
-            $starttime = new \TYPO3\CMS\Cal\Model\CalDate(intval($this->piVars['start_day']) . '000000');
+            $starttime = new CalDate(intval($this->piVars['start_day']) . '000000');
         }
         if (intval($this->piVars['end_day']) == 0) {
             $endtime = $this->getListViewTime($this->conf['view.']['search.']['defaultValues.']['end_day']);
         } else {
-            $endtime = new \TYPO3\CMS\Cal\Model\CalDate(intval($this->piVars['end_day']) . '000000');
+            $endtime = new CalDate(intval($this->piVars['end_day']) . '000000');
         }
         $searchword = strip_tags($this->piVars['query']);
         if ($searchword == '') {
@@ -2418,8 +2429,8 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $endtime->addSeconds(86399);
 
         /* Get the boundaries for allowed search dates */
-        $minStarttime = new \TYPO3\CMS\Cal\Model\CalDate(intval($this->conf['view.']['search.']['startRange']) . '000000');
-        $maxEndtime = new \TYPO3\CMS\Cal\Model\CalDate(intval($this->conf['view.']['search.']['endRange']) . '000000');
+        $minStarttime = new CalDate(intval($this->conf['view.']['search.']['startRange']) . '000000');
+        $maxEndtime = new CalDate(intval($this->conf['view.']['search.']['endRange']) . '000000');
 
         /* Check starttime against boundaries */
         if ($starttime->before($minStarttime)) {
@@ -2442,9 +2453,9 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             $endtime->copy($starttime);
         }
 
-        $locationIds = strip_tags(Controller::convertLinkVarArrayToList($this->piVars['location_ids']));
-        $organizerIds = strip_tags(Controller::convertLinkVarArrayToList($this->piVars['organizer_ids']));
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $locationIds = strip_tags(self::convertLinkVarArrayToList($this->piVars['location_ids']));
+        $organizerIds = strip_tags(self::convertLinkVarArrayToList($this->piVars['organizer_ids']));
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $list = [];
         if ($this->piVars['query'] && ($this->piVars['submit'] || !$this->conf['view.']['search.']['startSearchAfterSubmit'])) {
             $list['phpicalendar_event'] = $modelObj->searchEvents(
@@ -2477,7 +2488,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             return '[' . implode(',', $ajaxStringArray) . ']';
         }
 
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnList = $viewObj->drawSearchAllResult(
             $list,
             $starttime,
@@ -2518,7 +2529,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 //
             }
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $list = $modelObj->searchLocation($type, $pidList, $searchword);
 
         // Hook: preSearchLocationRendering
@@ -2536,7 +2547,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             return '[' . implode(',', $ajaxStringArray) . ']';
         }
 
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnList = $viewObj->drawSearchLocationResult($list, $searchword);
 
         // Hook: postSearchLocationRendering
@@ -2569,7 +2580,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 //
             }
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $list = $modelObj->searchOrganizer($type, $pidList, $searchword);
 
         // Hook: preSearchOrganizerRendering
@@ -2587,7 +2598,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             return '[' . implode(',', $ajaxStringArray) . ']';
         }
 
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnList = $viewObj->drawSearchOrganizerResult($list, $searchword);
 
         // Hook: postSearchOrganizerRendering
@@ -2723,7 +2734,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preSubscriptionRendering($this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnSubscriptionManager = $viewObj->drawSubscriptionManager();
 
         // Hook: postSubscriptionRendering
@@ -2749,7 +2760,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preMeetingRendering($this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnMeetingManager = $viewObj->drawMeetingManager();
 
         // Hook: postMeetingRendering
@@ -2781,7 +2792,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                     $hookObj->preCreateTranslation($this);
                 }
             }
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $modelObj->createTranslation($uid, $overlay, $servicename, $type, $subtype);
 
             // Hook: postCreateTranslation
@@ -2797,7 +2808,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $viewParams = $this->shortenLastViewAndGetTargetViewParameters(false);
         $this->conf['view'] = $viewParams['view'];
         $this->conf['lastview'] = $viewParams['lastview'];
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $this->conf['view'] = $rightsObj->checkView($this->conf['view']);
         $this->conf['uid'] = $viewParams['uid'];
         $this->conf['type'] = $viewParams['type'];
@@ -2815,7 +2826,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $getdate = $this->conf['getdate'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawTodoClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $todoSubtype = $confArr['todoSubtype'];
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', $todoSubtype);
@@ -2823,7 +2834,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (!in_array($type, $availableTypes)) {
             $type = '';
         }
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $todo = $modelObj->findTodo($uid, $type, $pidList);
 
         // Hook: preTodoRendering
@@ -2832,7 +2843,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 $hookObj->preTodoRendering($todo, $this);
             }
         }
-        $viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
+        $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $drawnTodo = $viewObj->drawEvent($todo, $getdate);
 
         // Hook: postTodoRendering
@@ -2854,7 +2865,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadEventsClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = '';
@@ -2865,15 +2876,15 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (!$this->piVars['start']) {
             $this->piVars['start'] = $confArr['recurrenceStart'];
         }
-        $startObj = new \TYPO3\CMS\Cal\Model\CalDate($this->piVars['start'] . '000000');
-        $startObj->setTZbyId('UTC');
+        $startObj = new CalDate($this->piVars['start'] . '000000');
+        $startObj->setTZbyID('UTC');
 
         if (!$this->piVars['end']) {
             $this->piVars['end'] = $confArr['recurrenceEnd'];
         }
 
-        $endObj = new \TYPO3\CMS\Cal\Model\CalDate($this->piVars['end'] . '000000');
-        $endObj->setTZbyId('UTC');
+        $endObj = new CalDate($this->piVars['end'] . '000000');
+        $endObj->setTZbyID('UTC');
         $eventTypes = '0,1,2,3';
 
         if ($confArr['todoSubtype'] == 'event') {
@@ -2915,8 +2926,8 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $sims = [];
         $rems = [];
         $wrapped = [];
-        $sims['###IMG_PATH###'] = \TYPO3\CMS\Cal\Utility\Functions::expandPath($this->conf['view.']['imagePath']);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $sims['###IMG_PATH###'] = Functions::expandPath($this->conf['view.']['imagePath']);
+        $page = Functions::substituteMarkerArrayNotCached(
             '[' . $ajaxString . ']',
             $sims,
             $rems,
@@ -2946,8 +2957,8 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $eventType = intval($this->piVars['event_type']);
 
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadEventClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
-        if ($eventType == \TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO) {
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
+        if ($eventType == Model::EVENT_TYPE_TODO) {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             $todoSubtype = $confArr['todoSubtype'];
             $availableTypes = $modelObj->getServiceTypes('cal_event_model', $todoSubtype);
@@ -3035,7 +3046,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $pidList = $this->conf['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadTodosClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes)) {
             $type = '';
@@ -3077,8 +3088,8 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $sims = [];
         $rems = [];
         $wrapped = [];
-        $sims['###IMG_PATH###'] = \TYPO3\CMS\Cal\Utility\Functions::expandPath($this->conf['view.']['imagePath']);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached('[' . implode(
+        $sims['###IMG_PATH###'] = Functions::expandPath($this->conf['view.']['imagePath']);
+        $page = Functions::substituteMarkerArrayNotCached('[' . implode(
             ',',
                 $ajaxStringArray
         ) . ']', $sims, $rems, $wrapped);
@@ -3099,7 +3110,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     public function loadCalendars()
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadCalendarsClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ajaxStringArray = [];
         $deselectedCalendarIds = GeneralUtility::trimExplode(',', $this->conf['view.']['calendar.']['subscription'], 1);
         $calendarIds = [];
@@ -3138,7 +3149,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     public function loadCategories()
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadCategoriesClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ajaxStringArray = [];
         $categoryArray = $modelObj->findAllCategories(
             'cal_category_model',
@@ -3172,7 +3183,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     public function loadLocations()
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadLocationsClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ajaxStringArray = [];
 
         $type = $this->conf['type'];
@@ -3205,7 +3216,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     public function loadOrganizers()
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadOrganizersClass');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $ajaxStringArray = [];
 
         $type = $this->conf['type'];
@@ -3238,7 +3249,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     public function loadRights()
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadRightsClass');
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $options = [
             'create',
             'edit',
@@ -3271,237 +3282,235 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
      */
     public function updateConfWithFlexform(&$piFlexForm)
     {
-        // Controller::updateIfNotEmpty($this->conf['pages'], $this->pi_getFFvalue($piFlexForm, 'pages'));
-        // Controller::updateIfNotEmpty($this->conf['recursive'], $this->pi_getFFvalue($piFlexForm, 'recursive'));
         if ($this->conf['dontListenToFlexForm'] == 1) {
             return;
         }
         if ($this->conf['dontListenToFlexForm.']['general.']['calendarName'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['calendarName'],
                 $this->pi_getFFvalue($piFlexForm, 'calendarName')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['general.']['allowSubscribe'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['allowSubscribe'],
                 $this->pi_getFFvalue($piFlexForm, 'subscription') == 1 ? 1 : -1
             );
         }
         if ($this->conf['dontListenToFlexForm.']['general.']['subscribeFeUser'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['subscribeFeUser'],
                 $this->pi_getFFvalue($piFlexForm, 'subscription') == 2 ? 1 : -1
             );
         }
         if ($this->conf['dontListenToFlexForm.']['general.']['subscribeWithCaptcha'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['subscribeWithCaptcha'],
                 $this->pi_getFFvalue($piFlexForm, 'subscribeWithCaptcha')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['general.']['allowedViews'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['allowedViews'],
                 $this->pi_getFFvalue($piFlexForm, 'allowedViews')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['general.']['calendarDistance'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['calendar.']['nearbyDistance'],
                 intval($this->pi_getFFvalue($piFlexForm, 'calendarDistance'))
             );
         }
 
         if ($this->conf['dontListenToFlexForm.']['day.']['dayViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['day.']['dayViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'dayViewPid', 's_Day_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['day.']['dayStart'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['day.']['dayStart'],
                 $this->pi_getFFvalue($piFlexForm, 'dayStart', 's_Day_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['day.']['dayEnd'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['day.']['dayEnd'],
                 $this->pi_getFFvalue($piFlexForm, 'dayEnd', 's_Day_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['day.']['gridLength'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['day.']['gridLength'],
                 $this->pi_getFFvalue($piFlexForm, 'gridLength', 's_Day_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['day.']['weekViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['week.']['weekViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'weekViewPid', 's_Week_View')
             );
         }
 
         if ($this->conf['dontListenToFlexForm.']['month.']['monthViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['month.']['monthViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'monthViewPid', 's_Month_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['month.']['monthMakeMiniCal'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['month.']['monthMakeMiniCal'],
                 $this->pi_getFFvalue($piFlexForm, 'monthMakeMiniCal', 's_Month_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['month.']['monthShowListView'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['month.']['showListInMonthView'],
                 $this->pi_getFFvalue($piFlexForm, 'monthShowListView', 's_Month_View')
             );
         }
 
         if ($this->conf['dontListenToFlexForm.']['year.']['yearViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['year.']['yearViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'yearViewPid', 's_Year_View')
             );
         }
 
         if ($this->conf['dontListenToFlexForm.']['event.']['eventViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['event.']['eventViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'eventViewPid', 's_Event_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['event.']['isPreview'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['event.']['isPreview'],
                 $this->pi_getFFvalue($piFlexForm, 'isPreview', 's_Event_View')
             );
         }
 
         if ($this->conf['dontListenToFlexForm.']['list.']['listViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['list.']['listViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'listViewPid', 's_List_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['list.']['starttime'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['list.']['starttime'],
                 $this->pi_getFFvalue($piFlexForm, 'starttime', 's_List_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['list.']['endtime'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['list.']['endtime'],
                 $this->pi_getFFvalue($piFlexForm, 'endtime', 's_List_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['list.']['maxEvents'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['list.']['maxEvents'],
                 $this->pi_getFFvalue($piFlexForm, 'maxEvents', 's_List_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['list.']['maxRecurringEvents'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['list.']['maxRecurringEvents'],
                 $this->pi_getFFvalue($piFlexForm, 'maxRecurringEvents', 's_List_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['list.']['usePageBrowser'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['list.']['pageBrowser.']['usePageBrowser'],
                 $this->pi_getFFvalue($piFlexForm, 'usePageBrowser', 's_List_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['list.']['recordsPerPage'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['list.']['pageBrowser.']['recordsPerPage'],
                 $this->pi_getFFvalue($piFlexForm, 'recordsPerPage', 's_List_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['list.']['pagesCount'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['list.']['pageBrowser.']['pagesCount'],
                 $this->pi_getFFvalue($piFlexForm, 'pagesCount', 's_List_View')
             );
         }
 
         if ($this->conf['dontListenToFlexForm.']['ics.']['showIcsLinks'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['ics.']['showIcsLinks'],
                 $this->pi_getFFvalue($piFlexForm, 'showIcsLinks', 's_Ics_View')
             );
         }
 
         if ($this->conf['dontListenToFlexForm.']['other.']['showLogin'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['other.']['showLogin'],
                 $this->pi_getFFvalue($piFlexForm, 'showLogin', 's_Other_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['other.']['showSearch'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['other.']['showSearch'],
                 $this->pi_getFFvalue($piFlexForm, 'showSearch', 's_Other_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['other.']['showJumps'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['other.']['showJumps'],
                 $this->pi_getFFvalue($piFlexForm, 'showJumps', 's_Other_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['other.']['showGoto'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['other.']['showGoto'],
                 $this->pi_getFFvalue($piFlexForm, 'showGoto', 's_Other_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['other.']['showCalendarSelection'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['other.']['showCalendarSelection'],
                 $this->pi_getFFvalue($piFlexForm, 'showCalendarSelection', 's_Other_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['other.']['showCategorySelection'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['other.']['showCategorySelection'],
                 $this->pi_getFFvalue($piFlexForm, 'showCategorySelection', 's_Other_View')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['other.']['showTomorrowEvents'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['other.']['showTomorrowEvents'],
                 $this->pi_getFFvalue($piFlexForm, 'showTomorrowEvents', 's_Other_View')
             );
         }
 
         if ($this->conf['dontListenToFlexForm.']['filters.']['categorySelection'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['category'],
                 $this->pi_getFFvalue($piFlexForm, 'categorySelection', 's_Cat')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['filters.']['categoryMode'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['categoryMode'],
                 $this->pi_getFFvalue($piFlexForm, 'categoryMode', 's_Cat')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['filters.']['calendarSelection'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['calendar'],
                 $this->pi_getFFvalue($piFlexForm, 'calendarSelection', 's_Cat')
             );
         }
         if ($this->conf['dontListenToFlexForm.']['filters.']['calendarMode'] != 1) {
-            Controller::updateIfNotEmpty(
+            self::updateIfNotEmpty(
                 $this->conf['view.']['calendarMode'],
                 $this->pi_getFFvalue($piFlexForm, 'calendarMode', 's_Cat')
             );
@@ -3509,7 +3518,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $flexformTyposcript = $this->pi_getFFvalue($piFlexForm, 'myTS', 's_TS_View');
         if ($flexformTyposcript) {
-            $tsparser = new \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser();
+            $tsparser = new TypoScriptParser();
             // Copy conf into existing setup
             $tsparser->setup = $this->conf;
             // Parse the new Typoscript
@@ -3569,7 +3578,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             $sims = [];
             foreach ($tags as $tag => $data) {
                 // This replaces any tags
-                $sims['###' . strtoupper($tag) . '###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                $sims['###' . strtoupper($tag) . '###'] = Functions::substituteMarkerArrayNotCached(
                     $data,
                     '###' . strtoupper($tag) . '###',
                     [],
@@ -3577,7 +3586,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 );
             }
 
-            $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+            $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         }
         //die('No tags designated for replacement.');
 
@@ -3604,7 +3613,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             }
             $lastview = implode('||', $views);
 
-            $viewParams = Controller::convertLastViewParamsToArray($target);
+            $viewParams = self::convertLastViewParamsToArray($target);
             $returnParams = $viewParams[0];
 
             switch (trim($returnParams['view'])) {
@@ -3708,24 +3717,24 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     }
 
     /**
-     * @param \TYPO3\CMS\Cal\Controller\Controller $controller
+     * @param Controller $controller
      */
     public static function initRegistry(&$controller)
     {
-        $myCobj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $myCobj = &Registry::Registry('basic', 'cobj');
         $myCobj = $controller->cObj;
         $controller->cObj = &$myCobj;
-        $myConf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $myConf = &Registry::Registry('basic', 'conf');
         $myConf = $controller->conf;
         $controller->conf = &$myConf;
-        $myController = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $myController = &Registry::Registry('basic', 'controller');
         $myController = $controller;
         $controller = &$myController;
         // besides of the regular cObj we provide a localCobj, whos data can be overridden with custom data for a more flexible rendering of TSObjects
-        $local_cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'local_cobj');
-        $local_cObj = new \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer();
+        $local_cObj = &Registry::Registry('basic', 'local_cobj');
+        $local_cObj = new ContentObjectRenderer();
         $local_cObj->start([]);
-        $cache = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cache');
+        $cache = &Registry::Registry('basic', 'cache');
         $cache = [];
         $controller->local_cObj = &$local_cObj;
     }
@@ -3814,7 +3823,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         }
         if (!$this->piVars['getdate']) {
             if ($this->piVars['week']) {
-                $this->piVars['getdate'] = \TYPO3\CMS\Cal\Utility\Functions::getDayByWeek(
+                $this->piVars['getdate'] = Functions::getDayByWeek(
                     $this->piVars['year'],
                     $this->piVars['week'],
                     $this->piVars['weekday']
@@ -3824,7 +3833,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
                 unset($this->piVars['week']);
                 unset($this->piVars['weekday']);
             } else {
-                $date = new \TYPO3\CMS\Cal\Model\CalDate();
+                $date = new CalDate();
                 $date->setTZbyID('UTC');
                 if (!$this->piVars['year']) {
                     $this->piVars['year'] = $date->format('%Y');
@@ -3913,10 +3922,10 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         if (is_array($this->piVars) && is_array($overrulePIvars) && !$clearAnyway) {
             $piVars = $this->piVars;
             unset($piVars['DATA']);
-            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '6002000') {
+            if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '6002000') {
                 $piVars = GeneralUtility::array_merge_recursive_overrule($piVars, $overrulePIvars);
             } else {
-                \TYPO3\CMS\Core\Utility\ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
+                ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
             }
             $overrulePIvars = $piVars;
             if ($this->pi_autoCacheEn) {
@@ -3930,7 +3939,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         /* TEST */
         if ($piVars[$this->prefixId]['getdate']) {
-            $date = new \TYPO3\CMS\Cal\Model\CalDate($piVars[$this->prefixId]['getdate']);
+            $date = new CalDate($piVars[$this->prefixId]['getdate']);
 
             $sessionVars = [];
             switch ($piVars[$this->prefixId]['view']) {
@@ -4192,7 +4201,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     public function findRelatedEvents($objectType, $additionalWhere)
     {
         $relatedEvents = [];
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         if ($this->conf['view.'][$this->conf['view'] . '.'][$objectType . '.']['includeEventsInResult'] == 1) {
             $starttime = $this->getListViewTime($this->conf['view.'][$this->conf['view'] . '.'][$this->conf['view'] . '.']['includeEventsInResult.']['starttime']);
             $endtime = $this->getListViewTime($this->conf['view.'][$this->conf['view'] . '.'][$this->conf['view'] . '.']['includeEventsInResult.']['endtime']);
@@ -4220,7 +4229,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
             $piFlexForm = $this->cObj->data['pi_flexform'];
 
             if ($this->conf['dontListenToFlexForm.']['day.']['weekStartDay'] != 1) {
-                Controller::updateIfNotEmpty(
+                self::updateIfNotEmpty(
                     $this->conf['view.']['weekStartDay'],
                     $this->pi_getFFvalue($piFlexForm, 'weekStartDay')
                 );

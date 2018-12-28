@@ -14,19 +14,18 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use SJBR\StaticInfoTables\Utility\LocalizationUtility;
+use TYPO3\CMS\Cal\Model\Location;
+use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * A service which renders a form to confirm the location/organizer create/edit.
  */
-class ConfirmLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class ConfirmLocationOrganizerView extends FeEditingBaseView
 {
     public $isLocation = true;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a confirm form for a location or an organizer.
@@ -55,9 +54,9 @@ class ConfirmLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
 
         if ($isLocation) {
-            $this->object = new \TYPO3\CMS\Cal\Model\Location(null, '');
+            $this->object = new Location(null, '');
         } else {
-            $this->object = new \TYPO3\CMS\Cal\Model\Organizer(null, '');
+            $this->object = new Organizer(null, '');
         }
         $this->object->updateWithPIVars($this->controller->piVars);
 
@@ -83,27 +82,32 @@ class ConfirmLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         ]));
 
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $sims = [];
         $rems = [];
         $wrapped = [];
         $this->getTemplateSingleMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCountryMarker(& $template, & $sims, & $rems)
     {
         // Initialise static info library
         $sims['###COUNTRY###'] = '';
         $sims['###COUNTRY_VALUE###'] = '';
         if ($this->isAllowed('country')) {
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+            if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+                $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
                 $staticInfo->init();
-                $current = \SJBR\StaticInfoTables\Utility\LocalizationUtility::translate(
+                $current = LocalizationUtility::translate(
                     ['uid' => $this->object->getCountry()],
                     'static_countries',
                     false
@@ -117,16 +121,21 @@ class ConfirmLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCountryzoneMarker(& $template, & $sims, & $rems)
     {
         // Initialise static info library
         $sims['###COUNTRYZONE###'] = '';
         $sims['###COUNTRYZONE_VALUE###'] = '';
         if ($this->isAllowed('countryzone')) {
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+            if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+                $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
                 $staticInfo->init();
-                $current = \SJBR\StaticInfoTables\Utility\LocalizationUtility::translate(
+                $current = LocalizationUtility::translate(
                     ['uid' => $this->object->getCountryzone()],
                     'static_country_zones',
                     false
@@ -143,6 +152,11 @@ class ConfirmLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getSharedMarker(& $template, & $sims, & $rems)
     {
         $sims['###SHARED###'] = '';

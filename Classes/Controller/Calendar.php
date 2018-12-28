@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 
 /**
@@ -85,12 +86,12 @@ class Calendar
 
     /**
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
     public static function calculateStartDayTime($dateObject = '')
     {
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate();
-        $timeObj->setTZbyId('UTC');
+        $timeObj = new CalDate();
+        $timeObj->setTZbyID('UTC');
         if ($dateObject) {
             $timeObj->copy($dateObject);
         }
@@ -102,12 +103,12 @@ class Calendar
 
     /**
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
     public static function calculateEndDayTime($dateObject = '')
     {
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate();
-        $timeObj->setTZbyId('UTC');
+        $timeObj = new CalDate();
+        $timeObj->setTZbyID('UTC');
         if ($dateObject) {
             $timeObj->copy($dateObject);
         }
@@ -119,78 +120,78 @@ class Calendar
 
     /**
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
     public static function calculateStartWeekTime($dateObject = '')
     {
-        $timeObj = Calendar::calculateStartDayTime($dateObject);
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate(Calc::beginOfWeek(
+        $timeObj = self::calculateStartDayTime($dateObject);
+        $timeObj = new CalDate(Calc::beginOfWeek(
             $timeObj->getDay(),
             $timeObj->getMonth(),
             $timeObj->getYear()
         ));
-        $timeObj->setTZbyId('UTC');
+        $timeObj->setTZbyID('UTC');
         return $timeObj;
     }
 
     /**
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
     public static function calculateEndWeekTime($dateObject = '')
     {
-        $timeObj = Calendar::calculateStartWeekTime($dateObject);
+        $timeObj = self::calculateStartWeekTime($dateObject);
         $timeObj->addSeconds(604799);
         return $timeObj;
     }
 
     /**
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
     public static function calculateStartMonthTime($dateObject = '')
     {
-        $timeObj = Calendar::calculateStartDayTime($dateObject);
+        $timeObj = self::calculateStartDayTime($dateObject);
         $timeObj->setDay(1);
         return $timeObj;
     }
 
     /**
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
     public static function calculateEndMonthTime($dateObject = '')
     {
-        $timeObj = Calendar::calculateStartDayTime($dateObject);
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfNextMonth(
+        $timeObj = self::calculateStartDayTime($dateObject);
+        $timeObj = new CalDate(Calc::endOfNextMonth(
             $timeObj->getDay(),
             $timeObj->getMonth(),
             $timeObj->getYear()
         ));
         $timeObj->setDay(1);
         $timeObj->subtractSeconds(1);
-        $timeObj->setTZbyId('UTC');
+        $timeObj->setTZbyID('UTC');
         return $timeObj;
     }
 
     /**
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
     public static function calculateStartYearTime($dateObject = '')
     {
-        $timeObj = Calendar::calculateStartMonthTime($dateObject);
+        $timeObj = self::calculateStartMonthTime($dateObject);
         $timeObj->setMonth(1);
         return $timeObj;
     }
 
     /**
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
     public static function calculateEndYearTime($dateObject = '')
     {
-        $timeObj = Calendar::calculateStartYearTime($dateObject);
+        $timeObj = self::calculateStartYearTime($dateObject);
         $timeObj->setYear($timeObj->getYear() + 1);
         $timeObj->subtractSeconds(1);
         return $timeObj;

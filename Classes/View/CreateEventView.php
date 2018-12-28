@@ -15,12 +15,14 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Rtehtmlarea\Controller\FrontendRteController;
 
 /**
  * A service which renders a form to create / edit a phpicalendar event.
  */
-class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class CreateEventView extends FeEditingBaseView
 {
 
     /* RTE vars */
@@ -46,11 +48,6 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
     public $cal_notifyGroupIds = [];
     public $eventType = 'tx_cal_phpicalendar';
     public $confArr = [];
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a create event form.
@@ -136,7 +133,7 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
 
         if ($page == '') {
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'No create event template file found at: >' . $path . '<.',
                 'Please make sure the path is correct and that you included the static template for fe-editing.'
             );
@@ -157,8 +154,8 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $this->dateFormatArray[$this->conf['dateConfig.']['yearPosition']] = 'yyyy';
 
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped, $this->conf['view']);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
 
         $sims = [];
         $rems = [];
@@ -166,22 +163,32 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $this->getTemplateSingleMarker($page, $sims, $rems, $this->conf['view']);
         $this->addAdditionalMarker($page, $sims, $rems);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
 
         $sims = array_merge($requiredFieldsSims, $constrainFieldSims);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
     }
 
     public function initTemplate()
     {
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEventCalendarMarker(& $template, & $sims, & $rems)
     {
         $sims['###EVENT_CALENDAR###'] = $this->object->getCalendarUid();
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEventCategoryMarker(& $template, & $sims, & $rems)
     {
         $sims['###EVENT_CATEGORY###'] = 'new Array(';
@@ -199,6 +206,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCategoryArrayMarker(& $template, & $sims, & $rems)
     {
         $sims['###CATEGORY_ARRAY###'] = 'new Array(';
@@ -239,6 +251,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###CATEGORY_ARRAY###'] .= ')';
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalendarArrayMarker(& $template, & $sims, & $rems)
     {
         $calendarArray = $this->modelObj->findAllCalendar('tx_cal_calendar', $this->conf['pidList']);
@@ -250,6 +267,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###CALENDAR_ARRAY###'] .= implode(',', $elements) . ')';
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCategoryMarker(& $template, & $sims, & $rems)
     {
         $sims['###CATEGORY###'] = '';
@@ -289,6 +311,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAlldayMarker(& $template, & $sims, & $rems)
     {
         $sims['###ALLDAY###'] = '';
@@ -302,17 +329,27 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getStartdateMarker(& $template, & $sims, & $rems)
     {
         $sims['###STARTDATE###'] = '';
         if ($this->isAllowed('startdate')) {
             $eventStart = $this->object->getStart();
-            $startDateValue = $eventStart->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf));
+            $startDateValue = $eventStart->format(Functions::getFormatStringFromConf($this->conf));
 
             $sims['###STARTDATE###'] = $this->applyStdWrap($startDateValue, 'startdate_stdWrap');
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEnddateMarker(& $template, & $sims, & $rems)
     {
         $sims['###ENDDATE###'] = '';
@@ -323,11 +360,18 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
                 $eventEnd = $this->object->getEnd();
             }
 
-            $endDateValue = $eventEnd->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf));
+            $endDateValue = $eventEnd->format(Functions::getFormatStringFromConf($this->conf));
             $sims['###ENDDATE###'] = $this->applyStdWrap($endDateValue, 'enddate_stdWrap');
         }
     }
 
+    /**
+     * @param $start
+     * @param $finish
+     * @param $default
+     * @param int $stepping
+     * @return string
+     */
     public function getTimeSelector($start, $finish, $default, $stepping = 1)
     {
         $selector = '';
@@ -339,6 +383,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         return $selector;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getStarttimeMarker(& $template, & $sims, & $rems)
     {
         $sims['###STARTTIME###'] = '';
@@ -362,6 +411,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEndtimeMarker(& $template, & $sims, & $rems)
     {
         $sims['###ENDTIME###'] = '';
@@ -429,6 +483,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getOrganizerMarker(& $template, & $sims, & $rems)
     {
         $sims['###ORGANIZER###'] = '';
@@ -437,6 +496,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalOrganizerMarker(& $template, & $sims, & $rems)
     {
         $sims['###CAL_ORGANIZER###'] = '';
@@ -508,6 +572,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getLocationMarker(& $template, & $sims, & $rems)
     {
         $sims['###LOCATION###'] = '';
@@ -516,6 +585,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCalLocationMarker(& $template, & $sims, & $rems)
     {
         $sims['###CAL_LOCATION###'] = '';
@@ -587,6 +661,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getDescriptionMarker(& $template, & $sims, & $rems)
     {
         $sims['###ADDITIONALJS_PRE###'] = '';
@@ -600,13 +679,13 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             );
 
             /* Start setting the RTE markers */
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tinymce_rte')) {
-                require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('tinymce_rte') . 'pi1/class.tx_tinymce_rte_pi1.php'); // alternative RTE
+            if (ExtensionManagementUtility::isLoaded('tinymce_rte')) {
+                require_once(ExtensionManagementUtility::extPath('tinymce_rte') . 'pi1/class.tx_tinymce_rte_pi1.php'); // alternative RTE
             }
-            if (!$this->RTEObj && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('rtehtmlarea') && class_exists('\TYPO3\CMS\Rtehtmlarea\Controller\FrontendRteController')) {
-                $this->RTEObj = new \TYPO3\CMS\Rtehtmlarea\Controller\FrontendRteController();
-            } elseif (!$this->RTEObj && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tinymce_rte')) {
-                $this->RTEObj = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('tx_tinymce_rte_pi1'); // load alternative RTE
+            if (!$this->RTEObj && ExtensionManagementUtility::isLoaded('rtehtmlarea') && class_exists('\TYPO3\CMS\Rtehtmlarea\Controller\FrontendRteController')) {
+                $this->RTEObj = new FrontendRteController();
+            } elseif (!$this->RTEObj && ExtensionManagementUtility::isLoaded('tinymce_rte')) {
+                $this->RTEObj = Functions::makeInstance('tx_tinymce_rte_pi1'); // load alternative RTE
             }
             if (is_object($this->RTEObj) && $this->RTEObj->isAvailable() && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['enableRTE']) {
                 $this->RTEcounter++;
@@ -646,16 +725,31 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAdditionaljsPostMarker(& $template, & $sims, & $rems)
     {
         // do nothing, to ensure that the preset marker doesn't get overwritten
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAdditionaljsPreMarker(& $template, & $sims, & $rems)
     {
         // do nothing, to ensure that the preset marker doesn't get overwritten
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTeaserMarker(& $template, & $sims, & $rems)
     {
         $sims['###TEASER###'] = '';
@@ -664,6 +758,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getFrequencyMarker(& $template, & $sims, & $rems)
     {
         $sims['###FREQUENCY###'] = '';
@@ -691,6 +790,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByDayMarker(& $template, & $sims, & $rems)
     {
         $sims['###BY_DAY###'] = '';
@@ -718,6 +822,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByMonthDayMarker(& $template, & $sims, & $rems)
     {
         $sims['###BY_MONTHDAY###'] = '';
@@ -729,6 +838,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getByMonthMarker(& $template, & $sims, & $rems)
     {
         $sims['###BY_MONTH###'] = '';
@@ -737,13 +851,18 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getUntilMarker(& $template, & $sims, & $rems)
     {
         $sims['###UNTIL###'] = '';
         if ($this->isAllowed('recurring')) {
             $until = $this->object->getUntil();
             if (is_object($until) && $until->getYear() != 0 && $until->format('%Y%m%d') != '19700101') {
-                $untilValue = $until->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf));
+                $untilValue = $until->format(Functions::getFormatStringFromConf($this->conf));
                 $sims['###UNTIL###'] = $this->applyStdWrap($untilValue, 'until_stdWrap');
             } else {
                 $sims['###UNTIL###'] = $this->applyStdWrap('', 'until_stdWrap');
@@ -751,6 +870,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getCountMarker(& $template, & $sims, & $rems)
     {
         $sims['###COUNT###'] = '';
@@ -759,6 +883,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getIntervalMarker(& $template, & $sims, & $rems)
     {
         $sims['###INTERVAL###'] = '';
@@ -767,6 +896,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getRdateTypeMarker(& $template, & $sims, & $rems)
     {
         $sims['###RDATE_TYPE###'] = '';
@@ -793,6 +927,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getNotifyMarker(& $template, & $sims, & $rems)
     {
         $sims['###NOTIFY###'] = '';
@@ -871,6 +1010,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getExceptionMarker(& $template, & $sims, & $rems)
     {
         $sims['###EXCEPTION###'] = '';
@@ -918,6 +1062,12 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getFormStartMarker(& $template, & $sims, & $rems, & $wrapped)
     {
         $temp = $this->cObj->getSubpart($template, '###FORM_START###');
@@ -931,7 +1081,7 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $temp_sims['###L_WRONG_DATE_MSG###'] = $this->controller->pi_getLL('l_wrong_date');
         $temp_sims['###L_WRONG_TIME_MSG###'] = $this->controller->pi_getLL('l_wrong_time');
         $temp_sims['###L_IS_IN_PAST_MSG###'] = $this->controller->pi_getLL('l_is_in_past');
-        $rems['###FORM_START###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $rems['###FORM_START###'] = Functions::substituteMarkerArrayNotCached(
             $temp,
             $temp_sims,
             [],
@@ -939,6 +1089,12 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @return string
+     */
     public function addAdditionalMarker(& $template, & $sims, & $rems)
     {
         $sims['###DATE_SPLIT_SYMBOL###'] = $this->conf['dateConfig.']['splitSymbol'];
@@ -974,6 +1130,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###CHANGE_CALENDAR_ACTION_URL_JS###'] = $this->escapeForJS($change_calendar_action_url);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getDateFormatMarker(& $template, & $sims, & $rems)
     {
         $dateFormatArray = [];
@@ -984,6 +1145,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###DATE_FORMAT###'] = $dateFormatArray[0] . $this->conf['dateConfig.']['splitSymbol'] . $dateFormatArray[1] . $this->conf['dateConfig.']['splitSymbol'] . $dateFormatArray[2];
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getEventTypeMarker(& $template, & $sims, & $rems)
     {
         $sims['###EVENT_TYPE###'] = '';
@@ -1014,6 +1180,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAttendeeMarker(& $template, & $sims, & $rems)
     {
         $sims['###ATTENDEE###'] = '';
@@ -1123,6 +1294,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $attendeeId
+     * @param string $selectedValue
+     * @return string
+     */
     public function getAttendeeOptions($attendeeId, $selectedValue = '')
     {
         $options = [
@@ -1143,6 +1319,11 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         return $html;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAttendeeExternalMarker(& $template, & $sims, & $rems)
     {
         $sims['###ATTENDEE_EXTERNAL###'] = '';
@@ -1169,6 +1350,12 @@ class CreateEventView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getSendoutInvitationMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###SENDOUT_INVITATION###'] = '';

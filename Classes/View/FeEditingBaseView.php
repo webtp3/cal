@@ -14,12 +14,17 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * A service which serves as base for all fe-editing clases.
  */
-class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
+class FeEditingBaseView extends BaseView
 {
     public $object;
     public $objectString = '';
@@ -29,11 +34,12 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
     public $table = 'insertTableName';
     public $lastPiVars = [];
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     protected function getTemplateSingleMarker(& $template, & $sims, & $rems, $view)
     {
         preg_match_all('!\###([A-Z0-9_-|]*)\###!is', $template, $match);
@@ -138,6 +144,12 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     protected function getTemplateSubpartMarker(& $template, & $sims, & $rems, & $wrapped)
     {
         preg_match_all('!\<\!--[a-zA-Z0-9 ]*###([A-Z0-9_-|]*)\###[a-zA-Z0-9 ]*-->!is', $template, $match);
@@ -165,11 +177,23 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getFormStartMarker(& $template, & $sims, & $rems, & $wrapped)
     {
         $rems['###FORM_START###'] = $this->cObj->getSubpart($template, '###FORM_START###');
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getFormEndMarker(& $template, & $sims, & $rems, & $wrapped)
     {
         $temp = $this->cObj->getSubpart($template, '###FORM_END###');
@@ -186,7 +210,7 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         $temp_sims['###L_SUBMIT###'] = $this->controller->pi_getLL('l_submit');
         $temp_sims['###L_SAVE###'] = $this->controller->pi_getLL('l_save');
         $temp_sims['###L_DELETE###'] = $this->controller->pi_getLL('l_delete');
-        $rems['###FORM_END###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $rems['###FORM_END###'] = Functions::substituteMarkerArrayNotCached(
             $temp,
             $temp_sims,
             [],
@@ -194,6 +218,12 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getHiddenMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###HIDDEN###'] = '';
@@ -231,6 +261,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getTitleMarker(& $template, & $sims, & $rems)
     {
         $sims['###TITLE###'] = '';
@@ -242,6 +277,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getDescriptionMarker(& $template, & $sims, & $rems)
     {
         $sims['###DESCRIPTION###'] = '';
@@ -251,6 +291,12 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @return string
+     */
     public function getCalendarIdMarker(& $template, & $sims, & $rems)
     {
         $sims['###CALENDAR_ID###'] = '';
@@ -312,21 +358,42 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getImageMarker(& $template, & $sims, & $rems)
     {
         $this->getFileMarker('image', $template, $sims, $rems);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getAttachmentMarker(& $template, & $sims, & $rems)
     {
         $this->getFileMarker('attachment', $template, $sims, $rems);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getIcsFileMarker(& $template, & $sims, & $rems)
     {
         $this->getFileMarker('ics_file', $template, $sims, $rems);
     }
 
+    /**
+     * @param $marker
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     protected function getFileMarker($marker, & $template, & $sims, & $rems)
     {
         if (!$this->isAllowed($marker)) {
@@ -342,11 +409,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         if ($this->isConfirm) {
             $sims['###' . strtoupper($marker) . '###'] = '';
 
-            $fileFunc = new \TYPO3\CMS\Core\Utility\File\BasicFileUtility();
+            $fileFunc = new BasicFileUtility();
             $all_files = [];
             $all_files['webspace']['allow'] = '*';
             $all_files['webspace']['deny'] = '';
-            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '8000000') {
+            if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '8000000') {
                 $fileFunc->init('', $all_files);
             }
             $allowedExt = [];
@@ -413,7 +480,7 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
                             $marker . '_title_stdWrap'
                         );
                     }
-                    $sims['###' . strtoupper($marker) . '###'] .= \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                    $sims['###' . strtoupper($marker) . '###'] .= Functions::substituteMarkerArrayNotCached(
                         $temp,
                         $temp_sims,
                         [],
@@ -458,7 +525,7 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
                 if ($this->isAllowed($marker . '_title')) {
                     $temp .= $this->applyStdWrap($row['title'], $marker . '_title_stdWrap');
                 }
-                $sims['###' . strtoupper($marker) . '###'] .= \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                $sims['###' . strtoupper($marker) . '###'] .= Functions::substituteMarkerArrayNotCached(
                     $temp,
                     $temp_sims,
                     [],
@@ -504,7 +571,7 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
                         );
                     }
 
-                    $temp = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($temp, $temp_sims, [], []);
+                    $temp = Functions::substituteMarkerArrayNotCached($temp, $temp_sims, [], []);
                     if ($this->isAllowed($marker . '_caption')) {
                         $temp .= $this->applyStdWrap($row['description'], $marker . '_caption_stdWrap');
                     }
@@ -512,7 +579,7 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
                         $temp .= $this->applyStdWrap($row['title'], $marker . '_title_stdWrap');
                     }
                     $temp_sims['###INDEX###'] = $i;
-                    $sims['###' . strtoupper($marker) . '###'] .= \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                    $sims['###' . strtoupper($marker) . '###'] .= Functions::substituteMarkerArrayNotCached(
                         $temp,
                         $temp_sims,
                         [],
@@ -535,7 +602,7 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
                         $upload .= $this->applyStdWrap('', $marker . '_title_stdWrap');
                     }
                     $temp_sims['###INDEX###'] = $i;
-                    $upload = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                    $upload = Functions::substituteMarkerArrayNotCached(
                         $upload,
                         $temp_sims,
                         [],
@@ -558,7 +625,7 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
                         $upload .= $this->applyStdWrap('', $marker . '_title_stdWrap');
                     }
                     $temp_sims['###INDEX###'] = $i;
-                    $sims['###' . strtoupper($marker) . '###'] .= \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                    $sims['###' . strtoupper($marker) . '###'] .= Functions::substituteMarkerArrayNotCached(
                         $upload,
                         $temp_sims,
                         [],
@@ -569,6 +636,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     protected function getTranslationOptionsMarker(& $template, & $sims, & $rems)
     {
         if ($this->isEditMode && $this->rightsObj->isViewEnabled('translation') && $this->rightsObj->isAllowedTo(
@@ -617,10 +689,10 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
                         ];
                         $piVars = (array)$this->piVars;
                         unset($piVars['DATA']);
-                        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '6002000') {
+                        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '6002000') {
                             $piVars = GeneralUtility::array_merge_recursive_overrule($piVars, $overrulePIvars);
                         } else {
-                            \TYPO3\CMS\Core\Utility\ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
+                            ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
                         }
                         $overrulePIvars = $piVars;
                         $sims['###TRANSLATION_OPTIONS###'] .= ' ' . $this->controller->pi_linkTP($this->cObj->cObjGetSingle(
@@ -642,6 +714,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     protected function getCurrentTranslationMarker(& $template, & $sims, & $rems)
     {
         if ($this->rightsObj->isViewEnabled('translation') && $this->isEditMode) {
@@ -658,6 +735,10 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $requiredFieldsSims
+     * @return bool
+     */
     protected function checkRequiredFields(&$requiredFieldsSims)
     {
         $allRequiredFieldsAreFilled = true;
@@ -679,6 +760,9 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         return $allRequiredFieldsAreFilled;
     }
 
+    /**
+     * @return array
+     */
     protected function getDefaultValues()
     {
         $defaultValues = [];
@@ -694,6 +778,10 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         return $defaultValues;
     }
 
+    /**
+     * @param $constrainSims
+     * @return bool
+     */
     protected function checkContrains(&$constrainSims)
     {
         $noComplains = true;
@@ -715,10 +803,15 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         return $noComplains;
     }
 
+    /**
+     * @param $field
+     * @param $constrainConfig
+     * @return string
+     */
     protected function constrainParser($field, $constrainConfig)
     {
         $result = [];
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         foreach ($constrainConfig as $rule) {
             $value = $this->ruleParser($field, $rule);
             if (($value != '') && ($field == 'start' || $field == 'end') && ($rule['rule'] == 'after') && ($rule['field'] == 'now')) {
@@ -733,6 +826,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         return implode('<br/>', $result);
     }
 
+    /**
+     * @param $field
+     * @param $rule
+     * @return string
+     */
     protected function ruleParser($field, $rule)
     {
         $passedAny = [];
@@ -879,6 +977,10 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         return '';
     }
 
+    /**
+     * @param $field
+     * @return bool
+     */
     public function isAllowed($field)
     {
         if ($this->isEditMode) {
@@ -899,12 +1001,25 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         return $this->rightsObj->isAllowedTo($action, $this->objectString, $field);
     }
 
+    /**
+     * @param $value
+     * @param $key
+     * @return mixed
+     */
     protected function applyStdWrap($value, $key)
     {
         $this->object->initLocalCObject();
         return $this->object->local_cObj->stdWrap($value, $this->conf['view.'][$this->conf['view'] . '.'][$key . '.']);
     }
 
+    /**
+     * @param $file
+     * @param $caption
+     * @param $title
+     * @param $marker
+     * @param bool $isTemp
+     * @return mixed
+     */
     protected function renderFile($file, $caption, $title, $marker, $isTemp = false)
     {
         if ($isTemp) {
@@ -924,6 +1039,14 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         );
     }
 
+    /**
+     * @param $file
+     * @param $caption
+     * @param $title
+     * @param $marker
+     * @param bool $isTemp
+     * @return mixed
+     */
     protected function renderImage($file, $caption, $title, $marker, $isTemp = false)
     {
         if ($isTemp) {
@@ -945,11 +1068,17 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getTabbedMenuMarker($template, &$sims, &$rems, $view)
     {
         $tabbedMenuConf = $this->conf['view.'][$view . '.']['tabbedMenu.'];
         foreach ((array)$tabbedMenuConf as $id => $tab) {
-            if (\TYPO3\CMS\Cal\Utility\Functions::endsWith($id, '.') && $tab['requiredFields'] != '') {
+            if (Functions::endsWith($id, '.') && $tab['requiredFields'] != '') {
                 $requiredFields = GeneralUtility::trimExplode(',', $tab['requiredFields'], 1);
                 $isAllowed = false;
                 foreach ($requiredFields as $field) {
@@ -971,6 +1100,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     */
     public function getSharedMarker(& $template, & $sims, & $rems)
     {
         $sims['###SHARED###'] = '';
@@ -1050,6 +1184,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $row
+     * @param string $tsName
+     * @return mixed
+     */
     public function getFeUserDisplayName(&$row, $tsName = 'defaultFeUserDisplayName')
     {
         $this->initLocalCObject($row);
@@ -1059,6 +1198,11 @@ class FeEditingBaseView extends \TYPO3\CMS\Cal\View\BaseView
         );
     }
 
+    /**
+     * @param $row
+     * @param string $tsName
+     * @return mixed
+     */
     public function getFeGroupDisplayName(&$row, $tsName = 'defaultFeGroupDisplayName')
     {
         return $this->getFeUserDisplayName($row, $tsName);

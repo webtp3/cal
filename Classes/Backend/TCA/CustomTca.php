@@ -2,6 +2,12 @@
 
 namespace TYPO3\CMS\Cal\Backend\TCA;
 
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Backend\Utility\IconUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -32,46 +38,50 @@ class CustomTca
     public $rdate;
     public $rdateValues;
 
+    /**
+     * @param $PA
+     * @param $fobj
+     */
     public function init($PA, $fobj)
     {
-        $GLOBALS['LANG']->includeLLFile(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_db.xml');
+        $GLOBALS['LANG']->includeLLFile(ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_db.xml');
 
         $this->frequency = $PA['row']['freq'];
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
             $this->frequency = $PA['row']['freq'][0];
         }
         $this->uid = $PA['row']['uid'];
         $this->row = $PA['row'];
         $this->table = $PA['table'];
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
             $this->rdateType = $this->row['rdate_type'][0];
         } else {
             $this->rdateType = $this->row['rdate_type'];
         }
         $this->rdate = $this->row['rdate'];
-        $this->rdateValues = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $this->row['rdate'], 1);
+        $this->rdateValues = GeneralUtility::trimExplode(',', $this->row['rdate'], 1);
 
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
             $this->garbageIcon = '<span class="t3-icon fa t3-icon fa fa-trash"> </span>';
             $this->newIcon = '<span title="' . $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '" class="t3-icon fa t3-icon fa fa-plus-square"> </span>';
         } else {
-            $this->garbageIcon = '<img' . \TYPO3\CMS\Backend\Utility\IconUtility::skinImg(
+            $this->garbageIcon = '<img' . IconUtility::skinImg(
                 $GLOBALS['BACK_PATH'],
                     'gfx/garbage.gif'
             ) . ' title="' . $GLOBALS['LANG']->getLL('tx_cal_event.remove_recurrence') . '" alt="' . $GLOBALS['LANG']->getLL('tx_cal_event.delete_recurrence') . '" />';
-            $this->newIcon = '<img' . \TYPO3\CMS\Backend\Utility\IconUtility::skinImg(
+            $this->newIcon = '<img' . IconUtility::skinImg(
                 $GLOBALS['BACK_PATH'],
                     'gfx/new_el.gif'
             ) . ' title="' . $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '" alt="' . $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '" />';
         }
 
         $this->commonJS = '';
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-            $this->commonJS .= '<script src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui3.js" type="text/javascript"></script>' . chr(10) . '<script src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url2.js" type="text/javascript"></script>';
-        } elseif (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
-            $this->commonJS .= '<script src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui2.js" type="text/javascript"></script>' . chr(10) . '<script src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url2.js" type="text/javascript"></script>';
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
+            $this->commonJS .= '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui3.js" type="text/javascript"></script>' . chr(10) . '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url2.js" type="text/javascript"></script>';
+        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
+            $this->commonJS .= '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui2.js" type="text/javascript"></script>' . chr(10) . '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url2.js" type="text/javascript"></script>';
         } else {
-            $this->commonJS .= '<script src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui.js" type="text/javascript"></script>' . chr(10) . '<script src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url.js" type="text/javascript"></script>';
+            $this->commonJS .= '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui.js" type="text/javascript"></script>' . chr(10) . '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url.js" type="text/javascript"></script>';
         }
 
         $this->everyMonthText = $GLOBALS['LANG']->getLL('tx_cal_event.recurs_every_month');
@@ -85,10 +95,14 @@ class CustomTca
         $this->months = $this->getMonthsArray();
     }
 
+    /**
+     * @param $PA
+     * @return string
+     */
     public function getWeekStartDay($PA)
     {
         $pageID = $PA['row']['pid'];
-        $tsConfig = \TYPO3\CMS\Backend\Utility\BackendUtility::getModTSconfig(
+        $tsConfig = BackendUtility::getModTSconfig(
             $pageID,
             'options.tx_cal_controller.weekStartDay'
         );
@@ -107,6 +121,9 @@ class CustomTca
         return $startDay;
     }
 
+    /**
+     * @return array
+     */
     public function getCountsArray()
     {
         return [
@@ -121,6 +138,10 @@ class CustomTca
         ];
     }
 
+    /**
+     * @param $startDay
+     * @return array
+     */
     public function getWeekdaysArray($startDay)
     {
         $weekdays = [];
@@ -143,6 +164,9 @@ class CustomTca
         return $weekdays;
     }
 
+    /**
+     * @return array
+     */
     public function getMonthsArray()
     {
         return [
@@ -161,6 +185,11 @@ class CustomTca
         ];
     }
 
+    /**
+     * @param $PA
+     * @param $fobj
+     * @return string
+     */
     public function extUrl($PA, $fobj)
     {
         $this->init($PA, $fobj);
@@ -168,9 +197,9 @@ class CustomTca
         $out[] = $this->commonJS;
         $out[] = '<script type="text/javascript">';
         $out[] = "var extUrl = new ExtUrlUI('ext_url-container', 'data[" . $this->table . '][' . $this->uid . "][ext_url]', 'cal-row', '" . $this->getExtUrlRow() . "');";
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
             $out[] = '$(function(){ extUrl.load(); });';
-        } elseif (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
+        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
             $out[] = 'TYPO3.jQuery(function(){ extUrl.load(); });';
         } else {
             $out[] = "Event.observe(window, 'load', function() { extUrl.load(); });";
@@ -185,6 +214,9 @@ class CustomTca
         return implode(chr(10), $out);
     }
 
+    /**
+     * @return string
+     */
     public function getExtUrlRow()
     {
         $html = '<div class="cal-row">';
@@ -196,6 +228,11 @@ class CustomTca
         return $this->removeNewLines($html);
     }
 
+    /**
+     * @param $PA
+     * @param $fobj
+     * @return string
+     */
     public function byDay($PA, $fobj)
     {
         $this->init($PA, $fobj);
@@ -221,6 +258,11 @@ class CustomTca
         return implode(chr(10), $out);
     }
 
+    /**
+     * @param $PA
+     * @param $fobj
+     * @return string
+     */
     public function byMonthDay($PA, $fobj)
     {
         $this->init($PA, $fobj);
@@ -247,6 +289,11 @@ class CustomTca
         return implode(chr(10), $out);
     }
 
+    /**
+     * @param $PA
+     * @param $fobj
+     * @return string
+     */
     public function byMonth($PA, $fobj)
     {
         $this->init($PA, $fobj);
@@ -255,9 +302,9 @@ class CustomTca
         $out[] = $this->commonJS;
         $out[] = '<script type="text/javascript">';
         $out[] = "var byMonth = new ByMonthUI('bymonth-container', 'data[" . $this->table . '][' . $this->uid . "][bymonth]', 'cal-row');";
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
             $out[] = 'TYPO3.jQuery(function(){ byMonth.load(); });';
-        } elseif (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
+        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
             $out[] = '$(function(){ byMonth.load(); });';
         } else {
             $out[] = "Event.observe(window, 'load', function() { byMonth.load(); });";
@@ -277,6 +324,11 @@ class CustomTca
         return implode(chr(10), $out);
     }
 
+    /**
+     * @param $PA
+     * @param $fobj
+     * @return string
+     */
     public function rdate($PA, $fobj)
     {
         $this->init($PA, $fobj);
@@ -378,7 +430,7 @@ class CustomTca
             $params['field'] = 'rdate' . $key;
             $params['md5ID'] = $this->table . '_' . $this->uid . '_' . 'rdate' . $key;
             if ($this->rdateType == 'date_time' || $this->rdateType == 'period') {
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= '7000000') {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= '7000000') {
                     $out[] = '<div class="form-control-wrap" style="max-width: 192px">
 						<div class="input-group">
 						    <input type="hidden" value="' . $formatedValue . '" id="data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '" />
@@ -392,7 +444,7 @@ class CustomTca
                     $out[] = '<span class="t3-form-palette-fieldclass-main5"><input type="text" value="' . $formatedValue . '" class="tceforms-datetimefield" name="rdate' . $key . '" id="tceforms-datetimefield-data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '_hr" onchange="' . 'rdateChanged();"/>' . '<input type="hidden" value="' . $formatedValue . '" id="data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '" />' . '<span id="picker-tceforms-datetimefield-data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '_hr" style="cursor: pointer; vertical-align: middle;" class="t3-icon t3-icon-actions t3-icon-actions-edit t3-icon-edit-pick-date"/></span></span><br/>';
                 }
             } else {
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= '7000000') {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= '7000000') {
                     $out[] = '<div class="form-control-wrap" style="max-width: 192px">
 						<div class="input-group">
 						    <input type="hidden" value="' . $formatedValue . '" id="data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '" />
@@ -432,14 +484,17 @@ class CustomTca
         return implode(chr(10), $out);
     }
 
+    /**
+     * @return string
+     */
     public function byDay_checkbox()
     {
         $out = [];
         $out[] = '<script type="text/javascript">';
         $out[] = "var byDay = new ByDayUI('byday-container', 'data[" . $this->table . '][' . $this->uid . "][byday]', 'cal-row');";
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
             $out[] = '$(function(){ byDay.load(); });';
-        } elseif (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
+        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
             $out[] = 'TYPO3.jQuery(function(){ byDay.load(); });';
         } else {
             $out[] = "Event.observe(window, 'load', function() { byDay.load(); });";
@@ -458,14 +513,18 @@ class CustomTca
         return implode(chr(10), $out);
     }
 
+    /**
+     * @param $row
+     * @return string
+     */
     public function byDay_select($row)
     {
         $out = [];
         $out[] = '<script type="text/javascript">';
         $out[] = "var byDay = new ByDayUI('byday-container', 'data[" . $this->table . '][' . $this->uid . "][byday]', 'cal-row', '" . $row . "');";
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
             $out[] = '$(function(){ byDay.load(); });';
-        } elseif (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
+        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
             $out[] = 'TYPO3.jQuery(function(){ byDay.load(); });';
         } else {
             $out[] = "Event.observe(window, 'load', function() { byDay.load(); });";
@@ -478,14 +537,18 @@ class CustomTca
         return implode(chr(10), $out);
     }
 
+    /**
+     * @param $row
+     * @return string
+     */
     public function byMonthDay_select($row)
     {
         $out = [];
         $out[] = '<script type="text/javascript">';
         $out[] = "var byMonthDay = new ByMonthDayUI('bymonthday-container', 'data[" . $this->table . '][' . $this->uid . "][bymonthday]', 'cal-row', '" . $row . "');";
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
             $out[] = '$(function(){ byMonthDay.load(); });';
-        } elseif (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
+        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
             $out[] = 'TYPO3.jQuery(function(){ byMonthDay.load(); });';
         } else {
             $out[] = "Event.observe(window, 'load', function() { byMonthDay.load(); });";
@@ -498,6 +561,10 @@ class CustomTca
         return implode(chr(10), $out);
     }
 
+    /**
+     * @param $endString
+     * @return string
+     */
     public function getByDayRow($endString)
     {
         $html = '<div class="cal-row">';
@@ -524,6 +591,10 @@ class CustomTca
         return $this->removeNewLines($html);
     }
 
+    /**
+     * @param $endString
+     * @return string
+     */
     public function getByMonthDayRow($endString)
     {
         $html = '<div class="cal-row">';
@@ -564,16 +635,31 @@ class CustomTca
         return $newstr;
     }
 
+    /**
+     * @param $PA
+     * @param $fobj
+     * @return string
+     */
     public function getHeaderStyles($PA, $fobj)
     {
         return $this->getStyles($PA, 'header');
     }
 
+    /**
+     * @param $PA
+     * @param $fobj
+     * @return string
+     */
     public function getBodyStyles($PA, $fobj)
     {
         return $this->getStyles($PA, 'body');
     }
 
+    /**
+     * @param $PA
+     * @param $part
+     * @return string
+     */
     public function getStyles($PA, $part)
     {
         $table = $PA['table'];
@@ -581,19 +667,19 @@ class CustomTca
         $value = $PA['row'][$part . 'style'];
         $html = '<div class="cal-row">';
 
-        $pageTSConf = \TYPO3\CMS\Backend\Utility\BackendUtility::getPagesTSconfig($pid);
+        $pageTSConf = BackendUtility::getPagesTSconfig($pid);
         if ($pageTSConf['options.']['tx_cal_controller.'][$part . 'Styles']) {
             $html .= '<select class="select" name="data[' . $table . '][' . $PA['row']['uid'] . '][' . $part . 'style]">';
             $html .= '<option value=""></option>';
 
-            $options = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+            $options = GeneralUtility::trimExplode(
                 ',',
                 $pageTSConf['options.']['tx_cal_controller.'][$part . 'Styles'],
                 1
             );
 
             foreach ($options as $option) {
-                $nameAndColor = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('=', $option, 1);
+                $nameAndColor = GeneralUtility::trimExplode('=', $option, 1);
                 $selected = '';
                 if ($value == $nameAndColor[0]) {
                     $selected = ' selected="selected"';

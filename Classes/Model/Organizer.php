@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +22,7 @@ namespace TYPO3\CMS\Cal\Model;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class Organizer extends \TYPO3\CMS\Cal\Model\LocationModel
+class Organizer extends LocationModel
 {
 
     /**
@@ -40,19 +42,30 @@ class Organizer extends \TYPO3\CMS\Cal\Model\LocationModel
         $this->templatePath = $this->conf['view.']['organizer.']['organizerModelTemplate'];
     }
 
+    /**
+     * @param $row
+     */
     public function createOrganizer($row)
     {
         $this->createLocation($row);
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderOrganizer()
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_ORGANIZER###');
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_organizer')) {
             return false;
         }
@@ -77,9 +90,14 @@ class Organizer extends \TYPO3\CMS\Cal\Model\LocationModel
         return $isAllowedToEditOrganizers;
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_organizer')) {
             return false;
         }
@@ -103,6 +121,13 @@ class Organizer extends \TYPO3\CMS\Cal\Model\LocationModel
         return $isAllowedToDeleteOrganizers;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     * @return string
+     */
     public function getEditLink(& $template, & $sims, & $rems, $view)
     {
         $editlink = '';
@@ -148,6 +173,11 @@ class Organizer extends \TYPO3\CMS\Cal\Model\LocationModel
         return $editlink;
     }
 
+    /**
+     * @param $viewType
+     * @param string $subpartSuffix
+     * @return string|processed
+     */
     public function renderOrganizerFor($viewType, $subpartSuffix = '')
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');

@@ -1,4 +1,7 @@
 <?php
+
+use TYPO3\CMS\Cal\Backend\CalWizIcon;
+
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
@@ -52,7 +55,7 @@ $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY)
 );
 
 if (TYPO3_MODE == 'BE') {
-    $GLOBALS['TBE_MODULES_EXT']['xMOD_db_new_content_el']['addElClasses']['TYPO3\CMS\Cal\Backend\CalWizIcon'] = $extPath . 'Classes/Backend/CalWizIcon.php';
+    $GLOBALS['TBE_MODULES_EXT']['xMOD_db_new_content_el']['addElClasses'][CalWizIcon::class] = $extPath . 'Classes/Backend/CalWizIcon.php';
     if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '8000000') {
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
             'tools',

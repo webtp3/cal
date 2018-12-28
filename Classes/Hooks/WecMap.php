@@ -14,7 +14,9 @@ namespace TYPO3\CMS\Cal\Hooks;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class WecMap
 {
@@ -36,9 +38,9 @@ class WecMap
         $locationStructure = $this->confArr['useLocationStructure'] ? $this->confArr['useLocationStructure'] : 'tx_cal_location';
 
         if ($table == $locationStructure && is_object($markerObj)) {
-            $tx_cal_api = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\Api');
+            $tx_cal_api = GeneralUtility::makeInstance(Api::class);
 
-            $cObj = new \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer();
+            $cObj = new ContentObjectRenderer();
             $conf = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_cal_controller.'];
             $conf['view.']['allowedViews'] = 'location';
 

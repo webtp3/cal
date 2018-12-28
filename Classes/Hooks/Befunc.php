@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Hooks;
 
+use TYPO3\CMS\Cal\Model\CalDate;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -21,6 +23,9 @@ namespace TYPO3\CMS\Cal\Hooks;
  */
 class Befunc
 {
+    /**
+     * @param $conf
+     */
     public function preprocessvalue(&$conf)
     {
         if ($conf['tx_cal_event']) {
@@ -28,10 +33,14 @@ class Befunc
         }
     }
 
+    /**
+     * @param $conf
+     * @return string
+     */
     public function postprocessvalue(&$conf)
     {
         if ($conf['colConf']['tx_cal_event']) {
-            $value = new \TYPO3\CMS\Cal\Model\CalDate($conf['value'] . '000000');
+            $value = new CalDate($conf['value'] . '000000');
             if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] == '1') {
                 $conf['value'] = $value->format('%d.%m.%Y');
             } else {

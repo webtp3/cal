@@ -14,6 +14,9 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\Organizer;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -21,7 +24,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
+class OrganizerService extends BaseService
 {
     public $keyId = 'tx_cal_organizer';
 
@@ -87,7 +90,7 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
     public function getOrganizerFromTable($pidList = '', $additionalWhere = '')
     {
         $organizers = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('tx_cal_organizer');
+        $orderBy = Functions::getOrderBy('tx_cal_organizer');
         if ($pidList != '') {
             $additionalWhere .= ' AND tx_cal_organizer.pid IN (' . $pidList . ')';
         }
@@ -96,11 +99,11 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         $select = '*';
         $where = ' l18n_parent = 0 ' . $additionalWhere . $this->cObj->enableFields('tx_cal_organizer');
 
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $feUserUid = $rightsObj->getUserId();
         $feGroupsArray = $rightsObj->getUserGroups();
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_organizer_service',
             'organizerServiceClass',
             'service'
@@ -128,7 +131,7 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
                     $GLOBALS['TSFE']->sys_page->versionOL('tx_cal_organizer', $row);
                 }
 
-                $lastOrganizer = new \TYPO3\CMS\Cal\Model\Organizer($row, $pidList);
+                $lastOrganizer = new Organizer($row, $pidList);
 
                 $select = 'uid_foreign,tablenames';
                 $table = 'tx_cal_organizer_shared_user_mm';
@@ -171,6 +174,10 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         return $where;
     }
 
+    /**
+     * @param $uid
+     * @return object|void
+     */
     public function updateOrganizer($uid)
     {
         if (!$this->isAllowedService()) {
@@ -203,13 +210,13 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         }
         if ($this->rightsObj->isAllowedTo('edit', 'organizer', 'shared')) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_organizer_shared_user_mm', 'uid_local =' . $uid);
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_organizer_shared_user_mm',
                 array_unique($sharedUsers),
                 $uid,
                 'fe_users'
             );
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_organizer_shared_user_mm',
                 array_unique($sharedGroups),
                 $uid,
@@ -246,13 +253,13 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
             }
             if (!empty($userIdArray) || !empty($groupIdArray)) {
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_organizer_shared_user_mm', 'uid_local =' . $uid);
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_organizer_shared_user_mm',
                     array_unique($userIdArray),
                     $uid,
                     'fe_users'
                 );
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_organizer_shared_user_mm',
                     array_unique($groupIdArray),
                     $uid,
@@ -266,7 +273,7 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
             }
         }
 
-        $uid = $this->checkUidForLanguageOverlay($uid, 'tx_cal_organizer');
+        $uid = self::checkUidForLanguageOverlay($uid, 'tx_cal_organizer');
         // Creating DB records
         $table = 'tx_cal_organizer';
         $where = 'uid = ' . $uid;
@@ -275,6 +282,9 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $uid
+     */
     public function removeOrganizer($uid)
     {
         if (!$this->isAllowedService()) {
@@ -292,6 +302,9 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         $this->unsetPiVars();
     }
 
+    /**
+     * @param $insertFields
+     */
     public function retrievePostData(&$insertFields)
     {
         if (!$this->isAllowedService()) {
@@ -367,6 +380,10 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pid
+     * @return object|void
+     */
     public function saveOrganizer($pid)
     {
         if (!$this->isAllowedService()) {
@@ -395,6 +412,10 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $insertFields
+     * @return mixed
+     */
     public function _saveOrganizer(&$insertFields)
     {
         $table = 'tx_cal_organizer';
@@ -427,7 +448,7 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
                 $sharedUsers[] = $this->rightsObj->getUserId();
             }
             if (count($sharedUsers) > 0 && $sharedUsers[0] != 0) {
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_organizer_shared_user_mm',
                     array_unique($sharedUsers),
                     $uid,
@@ -441,7 +462,7 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
             );
             $groupArray = array_diff($sharedGroups, $ignore);
             if (count($groupArray) > 0 && $groupArray[0] != 0) {
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_organizer_shared_user_mm',
                     array_unique($groupArray),
                     $uid,
@@ -466,7 +487,7 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
             }
 
             if (count($idArray) > 0 && $idArray[0] != 0) {
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_organizer_shared_user_mm',
                     array_unique($idArray),
                     $uid,
@@ -490,7 +511,7 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
                     );
                     $groupArray = array_diff($idArray, $ignore);
                 }
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_organizer_shared_user_mm',
                     array_unique($groupArray),
                     $uid,
@@ -506,6 +527,9 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         return $uid;
     }
 
+    /**
+     * @return bool
+     */
     public function isAllowedService()
     {
         $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
@@ -516,6 +540,10 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
         return false;
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     */
     public function createTranslation($uid, $overlay)
     {
         $table = 'tx_cal_organizer';
@@ -540,24 +568,6 @@ class OrganizerService extends \TYPO3\CMS\Cal\Service\BaseService
 
     public function unsetPiVars()
     {
-        unset($this->controller->piVars['hidden']);
-        unset($this->controller->piVars['_TRANSFORM_description']);
-        unset($this->controller->piVars['uid']);
-        unset($this->controller->piVars['type']);
-        unset($this->controller->piVars['formCheck']);
-        unset($this->controller->piVars['name']);
-        unset($this->controller->piVars['description']);
-        unset($this->controller->piVars['street']);
-        unset($this->controller->piVars['zip']);
-        unset($this->controller->piVars['city']);
-        unset($this->controller->piVars['country']);
-        unset($this->controller->piVars['countryzone']);
-        unset($this->controller->piVars['phone']);
-        unset($this->controller->piVars['email']);
-        unset($this->controller->piVars['link']);
-        unset($this->controller->piVars['image']);
-        unset($this->controller->piVars['image_caption']);
-        unset($this->controller->piVars['image_title']);
-        unset($this->controller->piVars['image_alt']);
+        unset($this->controller->piVars['hidden'], $this->controller->piVars['_TRANSFORM_description'], $this->controller->piVars['uid'], $this->controller->piVars['type'], $this->controller->piVars['formCheck'], $this->controller->piVars['name'], $this->controller->piVars['description'], $this->controller->piVars['street'], $this->controller->piVars['zip'], $this->controller->piVars['city'], $this->controller->piVars['country'], $this->controller->piVars['countryzone'], $this->controller->piVars['phone'], $this->controller->piVars['email'], $this->controller->piVars['link'], $this->controller->piVars['image'], $this->controller->piVars['image_caption'], $this->controller->piVars['image_title'], $this->controller->piVars['image_alt']);
     }
 }

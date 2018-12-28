@@ -2,6 +2,10 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Cal\Model\CategoryModel;
+use TYPO3\CMS\Cal\TreeProvider\TreeView;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +24,7 @@ namespace TYPO3\CMS\Cal\Service;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
+class CategoryService extends BaseService
 {
     public $categoryArrayByEventUid = [];
     public $categoryArrayByCalendarUid = null;
@@ -50,13 +54,17 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
      *
      * @param string $pidList
      *            to search in
-     * @return array array of array (array of $rows)
+     * @param $categoryArrayToBeFilled
      */
     public function findAll($pidList, &$categoryArrayToBeFilled)
     {
         $this->getCategoryArray($pidList, $categoryArrayToBeFilled, true);
     }
 
+    /**
+     * @param $uid
+     * @return array
+     */
     public function updateCategory($uid)
     {
         $insertFields = [
@@ -76,6 +84,9 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $uid
+     */
     public function removeCategory($uid)
     {
         if ($this->rightsObj->isAllowedToDeleteCategory()) {
@@ -88,15 +99,13 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
             $where = 'uid = ' . $uid;
             $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
 
-            // 'delete' all the events related to the category
-            // $table = 'tx_cal_event';
-            // $where = 'category_id = '.$uid;
-            // $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table,$where,$updateFields);
-
             $this->unsetPiVars();
         }
     }
 
+    /**
+     * @param $insertFields
+     */
     private function retrievePostData(&$insertFields)
     {
         $hidden = 0;
@@ -117,11 +126,11 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
             $insertFields['parent_category'] = intval($this->controller->piVars['parent_category']);
         }
 
-        if ($this->rightsObj->isAllowedToEditCategoryHeaderstyle() || $this->rightsObj->isAllowedToCreateCategoryHeaderstyle()) {
+        if ($this->rightsObj->isAllowedToEditCategoryHeaderstyle() || $this->rightsObj->isAllowedToCreateCategoryHeaderStyle()) {
             $insertFields['headerstyle'] = strip_tags($this->controller->piVars['headerstyle']);
         }
 
-        if ($this->rightsObj->isAllowedToEditCategoryBodystyle() || $this->rightsObj->isAllowedToCreateCategoryBodystyle()) {
+        if ($this->rightsObj->isAllowedToEditCategoryBodystyle() || $this->rightsObj->isAllowedToCreateCategoryBodyStyle()) {
             $insertFields['bodystyle'] = strip_tags($this->controller->piVars['bodystyle']);
         }
 
@@ -130,6 +139,10 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pid
+     * @return array
+     */
     public function saveCategory($pid)
     {
         $crdate = time();
@@ -148,6 +161,10 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $insertFields
+     * @return mixed
+     */
     private function _saveCategory(&$insertFields)
     {
         $table = 'tx_cal_category';
@@ -162,6 +179,11 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         return $uid;
     }
 
+    /**
+     * @param $pidList
+     * @param $includePublic
+     * @return string
+     */
     public function getCategorySearchString($pidList, $includePublic)
     {
         if ($this->conf['category'] != '') {
@@ -215,6 +237,9 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
 
     /**
      * Search for categories
+     * @param $pidList
+     * @param $categoryArrayToBeFilled
+     * @param bool $showPublicCategories
      */
     public function getCategoryArray($pidList, &$categoryArrayToBeFilled, $showPublicCategories = true)
     {
@@ -245,7 +270,7 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
                 break;
             case 1: // show selected
             case 3:
-                $allowedCategories = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+                $allowedCategories = GeneralUtility::trimExplode(
                     ',',
                     $this->cObj->stdWrap($this->conf['view.']['category'], $this->conf['view.']['category.']),
                     1
@@ -273,7 +298,7 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
                 }
                 break;
             case 2: // exclude selected
-                $allowedCategories = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+                $allowedCategories = GeneralUtility::trimExplode(
                     ',',
                     $this->cObj->stdWrap($this->conf['view.']['category'], $this->conf['view.']['category.']),
                     1
@@ -285,7 +310,7 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
                 }
                 break;
             case 4: // minimum match
-                $allowedCategories = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+                $allowedCategories = GeneralUtility::trimExplode(
                     ',',
                     $this->cObj->stdWrap($this->conf['view.']['category'], $this->conf['view.']['category.']),
                     1
@@ -480,9 +505,12 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         $categoryArrayToBeFilled[] = $categoryMultiArray;
     }
 
+    /**
+     * @param $categoryArray
+     */
     public function addChildCategories(&$categoryArray)
     {
-        $calTreeView = new \TYPO3\CMS\Cal\TreeProvider\TreeView();
+        $calTreeView = new TreeView();
 
         $ids = [];
         $knownUids = [];
@@ -499,6 +527,9 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @return array
+     */
     public function getAllCategoryIdsByParentId()
     {
         if ($this->allCateogryIdsByParentId == null) {
@@ -520,6 +551,9 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->allCateogryIdsByParentId;
     }
 
+    /**
+     * @return array
+     */
     public function getCategoriesForSharedUser()
     {
         $categories = [];
@@ -532,6 +566,13 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->getCategoriesFromTable($select, $table, $where, $groupby);
     }
 
+    /**
+     * @param $select
+     * @param $table
+     * @param $where
+     * @param string $groupby
+     * @return array
+     */
     public function getCategoriesFromTable($select, $table, $where, $groupby = '')
     {
         $categories = [];
@@ -564,11 +605,19 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         return $categories;
     }
 
+    /**
+     * @param $row
+     * @return CategoryModel
+     */
     public function createCategory($row)
     {
-        return new \TYPO3\CMS\Cal\Model\CategoryModel($row, $this->getServiceKey());
+        return new CategoryModel($row, $this->getServiceKey());
     }
 
+    /**
+     * @param $eventUid
+     * @return mixed
+     */
     public function getCategoriesForEvent($eventUid)
     {
         if (count($this->categoryArrayByEventUid) == 0) {
@@ -578,6 +627,9 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->categoryArrayByEventUid[$eventUid];
     }
 
+    /**
+     * @param $category
+     */
     public function checkStyles(&$category)
     {
         $headerStyle = $category->getHeaderStyle();
@@ -601,19 +653,13 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
 
     public function unsetPiVars()
     {
-        unset($this->controller->piVars['hidden']);
-        unset($this->controller->piVars['uid']);
-        unset($this->controller->piVars['calendar']);
-        unset($this->controller->piVars['type']);
-        unset($this->controller->piVars['calendar_id']);
-        unset($this->controller->piVars['category']);
-        unset($this->controller->piVars['shared_user_allowed']);
-        unset($this->controller->piVars['headerstyle']);
-        unset($this->controller->piVars['bodystyle']);
-        unset($this->controller->piVars['parent_category']);
-        unset($this->controller->piVars['title']);
+        unset($this->controller->piVars['hidden'], $this->controller->piVars['uid'], $this->controller->piVars['calendar'], $this->controller->piVars['type'], $this->controller->piVars['calendar_id'], $this->controller->piVars['category'], $this->controller->piVars['shared_user_allowed'], $this->controller->piVars['headerstyle'], $this->controller->piVars['bodystyle'], $this->controller->piVars['parent_category'], $this->controller->piVars['title']);
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     */
     public function createTranslation($uid, $overlay)
     {
         $table = 'tx_cal_category';
@@ -636,6 +682,13 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $select
+     * @param $table
+     * @param $where
+     * @param $groupBy
+     * @param $orderBy
+     */
     public function enhanceEventQuery(&$select, &$table, &$where, &$groupBy, &$orderBy)
     {
         $select .= ', tx_cal_event_category_mm.uid_foreign AS category_uid ';
@@ -656,6 +709,9 @@ class CategoryService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @return array
+     */
     public function getUidsOfEventsWithCategories()
     {
         $uidCollector = [];

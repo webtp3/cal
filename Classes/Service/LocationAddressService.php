@@ -2,6 +2,9 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Cal\Model\LocationAddress;
+use TYPO3\CMS\Cal\Utility\Functions;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,15 +23,10 @@ namespace TYPO3\CMS\Cal\Service;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
+class LocationAddressService extends BaseService
 {
     public $keyId = 'tx_tt_address';
     public $tableId = 'tt_address';
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Looks for an location with a given uid on a certain pid-list
@@ -94,7 +92,7 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
     public function getLocationFromTable($pidList = '', $additionalWhere = '')
     {
         $locations = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->tableId);
+        $orderBy = Functions::getOrderBy($this->tableId);
         if ($pidList != '') {
             $additionalWhere .= ' AND ' . $this->tableId . '.pid IN (' . $pidList . ')';
         }
@@ -103,10 +101,10 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         $table = $this->tableId;
         $where = 'tx_cal_controller_islocation = 1 AND l18n_parent = 0 ' . $additionalWhere . $this->cObj->enableFields($this->tableId);
         $groupBy = '';
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->tableId);
+        $orderBy = Functions::getOrderBy($this->tableId);
         $limit = '';
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_location_address_service',
             'locationServiceClass',
             'service'
@@ -122,7 +120,7 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
 
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $locations[] = new \TYPO3\CMS\Cal\Model\LocationAddress($row, $pidList);
+                $locations[] = new LocationAddress($row, $pidList);
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
@@ -148,6 +146,10 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return $where;
     }
 
+    /**
+     * @param $uid
+     * @return object
+     */
     public function updateLocation($uid)
     {
         $insertFields = [
@@ -164,6 +166,9 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $uid
+     */
     public function removeLocation($uid)
     {
         if (!$this->isAllowedService()) {
@@ -180,6 +185,9 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $insertFields
+     */
     public function retrievePostData(&$insertFields)
     {
         $hidden = 0;
@@ -229,6 +237,10 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pid
+     * @return object
+     */
     public function saveLocation($pid)
     {
         $crdate = time();
@@ -281,6 +293,10 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $insertFields
+     * @return mixed
+     */
     public function _saveLocation(&$insertFields)
     {
         $table = 'tt_address';
@@ -295,6 +311,9 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return $uid;
     }
 
+    /**
+     * @return bool
+     */
     public function isAllowedService()
     {
         $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
@@ -305,6 +324,10 @@ class LocationAddressService extends \TYPO3\CMS\Cal\Service\BaseService
         return false;
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     */
     public function createTranslation($uid, $overlay)
     {
         $table = 'tt_address';

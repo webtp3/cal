@@ -14,12 +14,14 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A service which renders a form to create / edit a phpicalendar event.
  */
-class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class CreateCalendarView extends FeEditingBaseView
 {
     public function __construct()
     {
@@ -58,7 +60,7 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             $this->object = $object;
         } else {
             $a = [];
-            $this->object = new \TYPO3\CMS\Cal\Model\CalendarModel($a, '');
+            $this->object = new CalendarModel($a, '');
             $allValues = array_merge($this->getDefaultValues(), $this->controller->piVars);
             $this->object->updateWithPIVars($allValues);
         }
@@ -91,8 +93,8 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
 
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped, $this->conf['view']);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
 
         $sims = [];
         $rems = [];
@@ -102,17 +104,23 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims['###ACTION_URL###'] = htmlspecialchars($this->controller->pi_linkTP_keepPIvars_url([
             'formCheck' => '1'
         ]));
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $requiredFieldsSims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $requiredFieldsSims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getOwnerMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###OWNER###'] = '';
         if ($this->isAllowed('owner')) {
             $cal_owner_user = '';
-            $allowedUsers = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+            $allowedUsers = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['allowedUsers'],
                 1
@@ -141,7 +149,7 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
                 }
                 $GLOBALS['TYPO3_DB']->sql_free_result($result);
             }
-            $allowedGroups = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+            $allowedGroups = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['allowedGroups'],
                 1
@@ -174,6 +182,12 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getActivateFreeAndBusyMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###ACTIVATE_FREEANDBUSY###'] = '';
@@ -196,12 +210,18 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getFreeAndBusyUserMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###FREEANDBUSYUSER###'] = '';
         if ($this->isAllowed('freeAndBusyUser')) {
             $freeAndBusyUser = '';
-            $allowedUsers = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+            $allowedUsers = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['allowedUsers'],
                 1
@@ -234,6 +254,12 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCalendarTypeMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###CALENDARTYPE###'] = '';
@@ -256,6 +282,12 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getExtUrlMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###EXTURL###'] = '';
@@ -264,6 +296,12 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getRefreshMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###REFRESH###'] = '';
@@ -272,6 +310,12 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getFormStartMarker(& $template, & $sims, & $rems, & $wrapped)
     {
         $temp = $this->cObj->getSubpart($template, '###FORM_START###');
@@ -284,7 +328,7 @@ class CreateCalendarView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         }
         $temp_sims['###TYPE###'] = 'tx_cal_calendar';
 
-        $rems['###FORM_START###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $rems['###FORM_START###'] = Functions::substituteMarkerArrayNotCached(
             $temp,
             $temp_sims,
             [],

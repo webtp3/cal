@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -14,8 +16,7 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
+class CategoryModel extends BaseModel
 {
     public $row = [];
     public $parentUid = 0;
@@ -31,6 +32,8 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
 
     /**
      * Constructor.
+     * @param $row
+     * @param $serviceKey
      */
     public function __construct($row, $serviceKey)
     {
@@ -43,6 +46,9 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @param $row
+     */
     public function init(&$row)
     {
         $this->row = $row;
@@ -67,91 +73,151 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         $this->setIcon($row['icon']);
     }
 
+    /**
+     * @param $uid
+     */
     public function setParentUid($uid)
     {
         $this->parentUid = $uid;
     }
 
+    /**
+     * @return int
+     */
     public function getParentUid()
     {
         return $this->parentUid;
     }
 
+    /**
+     * @param $title
+     */
     public function setTitle($title)
     {
         $this->title = $title;
     }
 
+    /**
+     * @return string
+     */
     public function getTitle()
     {
         return $this->title;
     }
 
+    /**
+     * @param $headerStyle
+     */
     public function setHeaderStyle($headerStyle)
     {
         $this->headerStyle = $headerStyle;
     }
 
+    /**
+     * @return string
+     */
     public function getHeaderStyle()
     {
         return $this->headerStyle;
     }
 
+    /**
+     * @param $bodyStyle
+     */
     public function setBodyStyle($bodyStyle)
     {
         $this->bodyStyle = $bodyStyle;
     }
 
+    /**
+     * @return string
+     */
     public function getBodyStyle()
     {
         return $this->bodyStyle;
     }
 
+    /**
+     * @param $boolean
+     */
     public function setSharedUserAllowed($boolean)
     {
         $this->sharedUserAllowed = $boolean;
     }
 
+    /**
+     * @return bool
+     */
     public function isSharedUserAllowed()
     {
         return $this->sharedUserAllowed;
     }
 
+    /**
+     * @param $uid
+     */
     public function setCalendarUid($uid)
     {
         $this->calendarUid = $uid;
     }
 
+    /**
+     * @return int
+     */
     public function getCalendarUid()
     {
         return $this->calendarUid;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getHeaderstyleMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###HEADERSTYLE###'] = $this->getHeaderStyle();
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getBodystyleMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###BODYSTYLE###'] = $this->getBodyStyle();
     }
 
+    /**
+     * @return int
+     */
     public function getSinglePid()
     {
         return $this->singlePid;
     }
 
+    /**
+     * @param $singlePid
+     */
     public function setSinglePid($singlePid)
     {
         $this->singlePid = $singlePid;
     }
 
+    /**
+     * @return array
+     */
     public function getNotificationEmails()
     {
         return $this->notificationEmails;
     }
 
+    /**
+     * @param $emailArray
+     */
     public function setNotificationEmails($emailArray)
     {
         if (is_array($emailArray)) {
@@ -159,19 +225,30 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return string
+     */
     public function getIcon()
     {
         return $this->icon;
     }
 
+    /**
+     * @param $icon
+     */
     public function setIcon($icon)
     {
         $this->icon = $icon;
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightsController');
+        $rightsObj = &Registry::Registry('basic', 'rightsController');
         if (!$rightsObj->isViewEnabled('edit_category')) {
             return false;
         }
@@ -189,7 +266,7 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         $isCategoryOwner = false;
         $isAllowedToEditPublicCategory = false;
         if ($this->getCalendarUid()) {
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $calendar = $modelObj->findCalendar($this->getCalendarUid(), 'tx_cal_calendar', $this->conf['pidList']);
             $isCategoryOwner = $calendar->isCalendarOwner($feUserUid, $feGroupsArray);
             if ($calendar->isPublic()) {
@@ -207,9 +284,14 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $isAllowedToEditCategory && ($isCategoryOwner || ($this->getCalendarUid() == 0 && $isAllowedToEditGeneralCategory) || $isAllowedToEditPublicCategory);
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightsController');
+        $rightsObj = &Registry::Registry('basic', 'rightsController');
         if (!$rightsObj->isViewEnabled('delete_category')) {
             return false;
         }
@@ -226,7 +308,7 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         $isCategoryOwner = false;
         $isAllowedToDeletePublicCategory = false;
         if ($this->getCalendarUid()) {
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $calendar = $modelObj->findCalendar($this->getCalendarUid(), 'tx_cal_calendar', $this->conf['pidList']);
             $isCategoryOwner = $calendar->isCalendarOwner($feUserUid, $feGroupsArray);
             if ($calendar->isPublic()) {
@@ -244,16 +326,26 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $isAllowedToDeleteCategory && ($isCategoryOwner || ($this->getCalendarUid() == 0 && $isAllowedToDeleteGeneralCategory) || $isAllowedToDeletePublicCategory);
     }
 
+    /**
+     * @return mixed
+     */
     public function getCalendarObject()
     {
         if (!$this->calendarObject) {
-            $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $this->calendarObject = $modelObj->findCalendar($this->getCalendarUid());
         }
 
         return $this->calendarObject;
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     * @return string
+     */
     public function getEditLink(& $template, & $sims, & $rems, $view)
     {
         $editlink = '';
@@ -300,10 +392,13 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         return $editlink;
     }
 
+    /**
+     * @param $piVars
+     */
     public function updateWithPIVars(&$piVars)
     {
         // cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','cobj');
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelController');
+        $modelObj = &Registry::Registry('basic', 'modelController');
         // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         $cObj = &$this->controller->cObj;
 
@@ -345,6 +440,9 @@ class CategoryModel extends \TYPO3\CMS\Cal\Model\BaseModel
         }
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return 'Category ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(',', $this->row);

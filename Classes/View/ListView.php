@@ -14,13 +14,15 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 
 /**
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class ListView extends \TYPO3\CMS\Cal\View\BaseView
+class ListView extends BaseView
 {
     public $eventCounter = [];
     public $error = false;
@@ -36,11 +38,9 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
     public $listStartOffsetCounter;
     public $listStartOffset;
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * @param $page
+     */
     public function initTemplate(&$page)
     {
         if ($page == '') {
@@ -63,6 +63,9 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $page
+     */
     public function getListSubpart($page)
     {
         $listTemplate = $this->cObj->getSubpart($page, '###LIST_TEMPLATE###');
@@ -98,6 +101,12 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
         return $listTemplate;
     }
 
+    /**
+     * @param $master_array
+     * @param $sims
+     * @param $rems
+     * @return string
+     */
     public function processObjects(&$master_array, &$sims, &$rems)
     {
         /* Subtract strtotimeOffset because we're going from GMT back to local time */
@@ -156,10 +165,10 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
                 $pageItemCount = $this->recordsPerPage * $this->offset;
 
                 // don't assign these dates in one line like "$date1 = $date2 = $date3 = new CalDate()", as this will make all dates references to each other!!!
-                $lastEventDay = new  \TYPO3\CMS\Cal\Model\CalDate('000000001000000');
-                $lastEventWeek = new  \TYPO3\CMS\Cal\Model\CalDate('000000001000000');
-                $lastEventMonth = new  \TYPO3\CMS\Cal\Model\CalDate('000000001000000');
-                $lastEventYear = new  \TYPO3\CMS\Cal\Model\CalDate('000000001000000');
+                $lastEventDay = new  CalDate('000000001000000');
+                $lastEventWeek = new  CalDate('000000001000000');
+                $lastEventMonth = new  CalDate('000000001000000');
+                $lastEventYear = new  CalDate('000000001000000');
 
                 $categoryGroupArray = [];
                 $categoryArray = [];
@@ -198,7 +207,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
                 }
 
                 // Hook: get hook objects for drawList
-                $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+                $hookObjectsArr = Functions::getHookObjectsArray(
                     'tx_cal_listview',
                     'drawList',
                     'view'
@@ -227,8 +236,8 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
 
                     unset($calTimeObject);
 
-                    $calTimeObject = new  \TYPO3\CMS\Cal\Model\CalDate($cal_time . '000000');
-                    $calTimeObject->setTZbyId('UTC');
+                    $calTimeObject = new  CalDate($cal_time . '000000');
+                    $calTimeObject->setTZbyID('UTC');
 
                     $cal_day = $calTimeObject->getDay();
                     $cal_month = $calTimeObject->getMonth();
@@ -584,6 +593,12 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
         return $middle;
     }
 
+    /**
+     * @param $event
+     * @param $cal_time
+     * @param $firstEventDate
+     * @return bool
+     */
     public function processObject(&$event, &$cal_time, &$firstEventDate)
     {
         $eventStart = $event->getStart();
@@ -595,7 +610,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
 
         /* If we haven't saved an event date already, save this one */
         if (!$firstEventDate) {
-            $firstEventDate = new  \TYPO3\CMS\Cal\Model\CalDate();
+            $firstEventDate = new  CalDate();
             if ($this->reverse) {
                 $firstEventDate->copy($eventEnd);
             } else {
@@ -660,7 +675,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
         $GLOBALS['TSFE']->register['cal_list_lastevent'] = $event->getStart()->getTime();
 
         // reference the event in the rendering array
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray('tx_cal_listview', 'sorting', 'view');
+        $hookObjectsArr = Functions::getHookObjectsArray('tx_cal_listview', 'sorting', 'view');
         if (count($hookObjectsArr)) {
             foreach ($hookObjectsArr as $hookObj) {
                 if (method_exists($hookObj, 'sorting')) {
@@ -673,7 +688,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
 
         if ($this->conf['view.']['list.']['showLongEventsInEachWrapper']) {
             if ($this->conf['view.']['list.']['enableDayWrapper'] && $eventStart->format('%Y%m%d') != $eventEnd->format('%Y%m%d')) {
-                $tempEventStart = new  \TYPO3\CMS\Cal\Model\CalDate();
+                $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
                 while ($tempEventStart->format('%Y%m%d') != $eventEnd->format('%Y%m%d')) {
                     $tempEventStart->addSeconds(60 * 60 * 24);
@@ -681,7 +696,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
                 }
             }
             if ($this->conf['view.']['list.']['enableWeekWrapper'] && $eventStart->format('%Y%U') != $eventEnd->format('%Y%U')) {
-                $tempEventStart = new  \TYPO3\CMS\Cal\Model\CalDate();
+                $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
                 while ($tempEventStart->format('%Y%U') != $eventEnd->format('%Y%U')) {
                     $tempEventStart->addSeconds(60 * 60 * 24 * 7);
@@ -689,7 +704,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
                 }
             }
             if ($this->conf['view.']['list.']['enableMonthWrapper'] && $eventStart->format('%Y%m') != $eventEnd->format('%Y%m')) {
-                $tempEventStart = new  \TYPO3\CMS\Cal\Model\CalDate();
+                $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
                 while ($tempEventStart->format('%Y%m') != $eventEnd->format('%Y%m')) {
                     $tempEventStart->setMonth($tempEventStart->getMonth() + 1);
@@ -697,7 +712,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
                 }
             }
             if ($this->conf['view.']['list.']['enableYearWrapper'] && $eventStart->format('%Y') != $eventEnd->format('%Y')) {
-                $tempEventStart = new  \TYPO3\CMS\Cal\Model\CalDate();
+                $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
                 while ($tempEventStart->format('%Y') != $eventEnd->format('%Y')) {
                     $tempEventStart->setYear($tempEventStart->getYear() + 1);
@@ -713,6 +728,11 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
         return $finished;
     }
 
+    /**
+     * @param $master_array
+     * @param $reverse
+     * @param $firstEventDate
+     */
     public function walkThroughMasterArray(&$master_array, $reverse, &$firstEventDate)
     {
         $finished = false;
@@ -773,6 +793,13 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
         }
     }
 
+    /**
+     * @param $master_array
+     * @param string $page
+     * @param $starttime
+     * @param $endtime
+     * @return mixed
+     */
     public function drawList(&$master_array, $page = '', $starttime, $endtime)
     {
         $this->starttime = $starttime;
@@ -789,7 +816,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
         $this->_init($master_array);
 
         if ($this->error) {
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage($this->errorMessage, $this->suggestMessage);
+            return Functions::createErrorMessage($this->errorMessage, $this->suggestMessage);
         }
 
         $listTemplate = $this->getListSubpart($page);
@@ -871,18 +898,22 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
             }
         }
         $rems['###LIST###'] = $middle;
-        $listTemplate = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $listTemplate = Functions::substituteMarkerArrayNotCached(
             $listTemplate,
             [],
             $listRems,
             []
         );
 
-        $return = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($listTemplate, $sims, $rems, []);
+        $return = Functions::substituteMarkerArrayNotCached($listTemplate, $sims, $rems, []);
         $rems = [];
         return $this->finish($return, $rems);
     }
 
+    /**
+     * @param $template
+     * @return mixed|string
+     */
     public function getPageBrowser($template)
     {
         $pb = '';
@@ -891,7 +922,7 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
         if ($this->conf['view.']['list.']['pageBrowser.']['usePageBrowser']) {
             $this->controller->pointerName = $this->pointerName;
             // Hook: getPageBrowser
-            $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+            $hookObjectsArr = Functions::getHookObjectsArray(
                 'tx_cal_listview',
                 'getPageBrowser',
                 'view'
@@ -1056,16 +1087,23 @@ class ListView extends \TYPO3\CMS\Cal\View\BaseView
                         }
                     }
                 }
-                $pb = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($template, $pbMarker, [], []);
+                $pb = Functions::substituteMarkerArrayNotCached($template, $pbMarker, [], []);
             }
         }
         return $pb;
     }
 
+    /**
+     * @param $old
+     * @param $new
+     * @param bool $reverse
+     * @param bool $debug
+     * @return bool
+     */
     public function hasPeriodChanged($old, $new, $reverse = false, $debug = false)
     {
         if ($debug) {
-            \TYPO3\CMS\Core\Utility\DebugUtility::debug([
+            DebugUtility::debug([
                 $old,
                 $new,
                 $reverse

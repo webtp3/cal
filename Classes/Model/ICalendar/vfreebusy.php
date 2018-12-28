@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vFreebusy components.
  *
@@ -15,7 +17,7 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  * @author Mike Cochrane <mike@graftonhall.co.nz>
  * @since Horde 3.0
  */
-class vfreebusy extends \TYPO3\CMS\Cal\Model\ICalendar
+class vfreebusy extends ICalendar
 {
     public $_busyPeriods = [];
 

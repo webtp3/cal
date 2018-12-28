@@ -2,6 +2,10 @@
 
 namespace TYPO3\CMS\Cal\Backend\TCA;
 
+use TYPO3\CMS\Backend\Tree\View\AbstractTreeView;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -23,14 +27,14 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
 /**
  * extend class \TYPO3\CMS\Backend\Tree\View\AbstractTreeView to change function wrapTitle().
  */
-class TceFuncSelectTreeView extends \TYPO3\CMS\Backend\Tree\View\AbstractTreeView
+class TceFuncSelectTreeView extends AbstractTreeView
 {
     public $TCEforms_itemFormElName = '';
     public $TCEforms_nonSelectableItemsArray = [];
 
     public function __construct()
     {
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) > 8000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) > 8000000) {
             $this->init();
         }
     }
@@ -84,7 +88,7 @@ class TceFuncSelectTreeView extends \TYPO3\CMS\Backend\Tree\View\AbstractTreeVie
     public function getRootIcon($rec)
     {
         return $this->wrapIcon(
-            '<img src="' . \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('cal') . 'res/icons/icon_tx_cal_calendar.gif" width="18" height="16" alt="" />',
+            '<img src="' . ExtensionManagementUtility::extRelPath('cal') . 'res/icons/icon_tx_cal_calendar.gif" width="18" height="16" alt="" />',
             []
         );
     }

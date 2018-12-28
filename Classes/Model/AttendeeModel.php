@@ -14,8 +14,7 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-class AttendeeModel extends \TYPO3\CMS\Cal\Model\BaseModel
+class AttendeeModel extends BaseModel
 {
     public $row = [];
     public $eventUid = 0;

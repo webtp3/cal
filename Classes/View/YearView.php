@@ -20,18 +20,13 @@ use TYPO3\CMS\Cal\Utility\Functions;
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class YearView extends \TYPO3\CMS\Cal\View\MonthView
+class YearView extends MonthView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Draws the year view
      *
-     * @param
-     *            array            The events to be drawn.
+     * @param $master_array
+     * @param $getdate
      * @return string HTML output.
      */
     public function drawYear(&$master_array, $getdate)

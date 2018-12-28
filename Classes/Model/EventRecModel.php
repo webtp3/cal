@@ -15,11 +15,12 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
  * A concrete model for the calendar.
  */
-class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
+class EventRecModel extends Model
 {
     public $parentEvent;
     public $start;
@@ -29,6 +30,12 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
     public $row;
     public $myMarkerCache = [];
 
+    /**
+     * EventRecModel constructor.
+     * @param $event
+     * @param $start
+     * @param $end
+     */
     public function __construct($event, $start, $end)
     {
         parent::__construct($event->serviceKey);
@@ -38,12 +45,18 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         $this->row = &$event->row;
     }
 
+    /**
+     * @param $piVars
+     */
     public function updateWithPiVars(&$piVars)
     {
         $this->parentEvent->updateWithPiVars($piVars);
         $this->parentEvent->markerCache = [];
     }
 
+    /**
+     * @return mixed
+     */
     public function cloneEvent()
     {
         return $this->parentEvent->cloneEvent();
@@ -61,16 +74,25 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->parentEvent->getLocation();
     }
 
+    /**
+     * @return string
+     */
     public function getOrganizer()
     {
         return $this->parentEvent->getOrganizer();
     }
 
+    /**
+     * @return int
+     */
     public function getLocationId()
     {
         return $this->parentEvent->getLocationId();
     }
 
+    /**
+     * @return int
+     */
     public function getOrganizerId()
     {
         return $this->parentEvent->getOrganizerId();
@@ -87,11 +109,19 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->parentEvent->getTeaser();
     }
 
+    /**
+     * @param $view
+     * @return mixed
+     */
     public function getLocationLink($view)
     {
         return $this->parentEvent->getLocationLink($view);
     }
 
+    /**
+     * @param $view
+     * @return mixed
+     */
     public function getOrganizerLink($view)
     {
         return $this->parentEvent->getOrganizerLink($view);
@@ -123,36 +153,57 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->parentEvent->getCreateUserId();
     }
 
+    /**
+     * @return mixed
+     */
     public function getTimezone()
     {
         return $this->parentEvent->getTimezone();
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForOrganizer()
     {
         return $this->renderEventFor('ORGANIZER');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForLocation()
     {
         return $this->renderEventFor('LOCATION');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForDay()
     {
         return $this->renderEventFor('DAY');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForWeek()
     {
         return $this->renderEventFor('WEEK');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForAllDay()
     {
         return $this->renderEventFor('ALLDAY');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForMonth()
     {
         if ($this->isAllday()) {
@@ -161,6 +212,9 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->renderEventFor('MONTH');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForMiniMonth()
     {
         if ($this->isAllday()) {
@@ -169,21 +223,36 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->renderEventFor('MONTH_MINI');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventForYear()
     {
         return $this->renderEventFor('year');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEvent()
     {
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT###');
     }
 
+    /**
+     * @param string $subpartSuffix
+     * @return string|processed
+     */
     public function renderEventForList($subpartSuffix = 'LIST_ODD')
     {
         return $this->renderEventFor($subpartSuffix);
     }
 
+    /**
+     * @param $viewType
+     * @param string $subpartSuffix
+     * @return string|processed
+     */
     public function renderEventFor($viewType, $subpartSuffix = '')
     {
         if ($this->parentEvent->conf['view.']['freeAndBusy.']['enable'] == 1) {
@@ -195,7 +264,7 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         ) != 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('%Y%m%d') != $this->getEnd()->format('%Y%m%d'))) {
             $subpartSuffix .= 'ALLDAY';
         }
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_phpicalendar_rec_model',
             'eventModelClass',
             'model'
@@ -209,21 +278,31 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderEventPreview()
     {
         $this->parentEvent->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_PREVIEW###');
     }
 
+    /**
+     * @return string|processed
+     */
     public function renderTomorrowsEvent()
     {
         $this->parentEvent->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_TOMORROW###');
     }
 
+    /**
+     * @param $subpartMarker
+     * @return string|processed
+     */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+        $cObj = &Registry::Registry('basic', 'cobj');
 
         $templatePath = $this->parentEvent->conf['view.']['event.']['eventModelTemplate'];
 
@@ -250,7 +329,7 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
             $wrapped,
             $this->parentEvent->conf['alternateRenderingView'] ? $this->parentEvent->conf['alternateRenderingView'] : ''
         );
-        return $this->parentEvent->finish(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        return $this->parentEvent->finish(Functions::substituteMarkerArrayNotCached(
             $page,
             $sims,
             $rems,
@@ -258,11 +337,26 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         ));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getSubscriptionMarker(& $template, & $sims, & $rems, &$wrapped, $view)
     {
         return $this->parentEvent->getSubscriptionMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStartAndEndMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->initLocalCObject();
@@ -336,61 +430,149 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @return string
+     */
     public function getTitle()
     {
         return $this->parentEvent->getTitle();
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTitleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getTitleMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getTitleFnbMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getTitleFnbMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getOrganizerMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getOrganizerMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getLocationMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getLocationMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getTeaserMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getTeaserMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getIcsLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getIcsLinkMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getCategoryMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getCategoryMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getCategoryLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getcategoryLinkMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getCategoryIconMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getCategoryIconMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getHeaderstyleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###HEADERSTYLE###'] = $this->parentEvent->getHeaderStyle();
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getBodystyleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###BODYSTYLE###'] = $this->parentEvent->getBodyStyle();
@@ -404,21 +586,50 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         $this->parentEvent->getCalendarStyle($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getMapMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getMapMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAttachmentMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getAttachmentMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return mixed
+     */
     public function getAttachmentUrlMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         return $this->parentEvent->getAttachmentUrlMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -428,6 +639,13 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventUrlMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -439,6 +657,13 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         ));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAbsoluteEventLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -448,18 +673,31 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @return mixed
+     */
     public function getStartdate()
     {
         $start = $this->getStart();
-        return $start->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->parentEvent->conf));
+        return $start->format(Functions::getFormatStringFromConf($this->parentEvent->conf));
     }
 
+    /**
+     * @return mixed
+     */
     public function getEnddate()
     {
         $end = $this->getEnd();
-        return $end->format(\TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->parentEvent->conf));
+        return $end->format(Functions::getFormatStringFromConf($this->parentEvent->conf));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
@@ -514,39 +752,86 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getMoreLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getMoreLinkMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStartdateMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->getStartAndEndMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEnddateMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->getStartdateMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStarttimeMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->getStartdateMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEndtimeMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->getStartdateMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDescriptionStriptagsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getDescriptionStriptagsMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_event')) {
             return false;
         }
@@ -566,8 +851,8 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         if ($rightsObj->isAllowedToEditStartedEvent()) {
             $eventHasntStartedYet = true;
         } else {
-            $temp = new \TYPO3\CMS\Cal\Model\CalDate();
-            $temp->setTZbyId('UTC');
+            $temp = new CalDate();
+            $temp->setTZbyID('UTC');
             $temp->addSeconds($editOffset);
             $eventStart = $this->getStart();
             $eventHasntStartedYet = $eventStart->after($temp);
@@ -581,9 +866,14 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $isAllowedToEditEvent && ($isEventOwner || $isSharedUser) && $eventHasntStartedYet;
     }
 
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_event')) {
             return false;
         }
@@ -602,8 +892,8 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         if ($rightsObj->isAllowedToDeleteStartedEvents()) {
             $eventHasntStartedYet = true;
         } else {
-            $temp = new \TYPO3\CMS\Cal\Model\CalDate();
-            $temp->setTZbyId('UTC');
+            $temp = new CalDate();
+            $temp->setTZbyID('UTC');
             $temp->addSeconds($deleteOffset);
             $eventStart = $this->getStart();
             $eventHasntStartedYet = $eventStart->after($temp);
@@ -617,6 +907,9 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $isAllowedToDeleteEvents && ($isEventOwner || $isSharedUser) && $eventHasntStartedYet;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return 'Phpicalendar ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(
@@ -625,122 +918,246 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         );
     }
 
+    /**
+     * @return mixed
+     */
     public function getAttendees()
     {
         return $this->parentEvent->getAttendees();
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAttendeeMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getAttendeeMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $linktext
+     * @param $view
+     * @param $date
+     * @param bool $urlOnly
+     * @return mixed
+     */
     public function getLinkToEvent($linktext, $view, $date, $urlOnly = false)
     {
         return $this->parentEvent->getLinkToEvent($linktext, $view, $date, $urlOnly);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventIdMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $start = $this->getStart();
         $sims['###EVENT_ID###'] = $this->parentEvent->getType() . $this->parentEvent->getUid() . $start->format('%Y%m%d%H%M');
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getGuidMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getGuidMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDtstampMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getDtstampMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCruserNameMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getCruserNameMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCalendarTitleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getCalendarTitleMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @return mixed
+     */
     public function getNow()
     {
         return $this->parentEvent->getNow();
     }
 
+    /**
+     * @return mixed
+     */
     public function getToday()
     {
         return $this->parentEvent->getToday();
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getImageMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getImageMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDescriptionMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getDescriptionMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getHeadingMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getHeadingMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEditPanelMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getEditPanelMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getTopMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getTopMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getLengthMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getLengthMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @return int
+     */
     public function getUid()
     {
         return $this->parentEvent->getUid();
     }
 
+    /**
+     * @return int
+     */
     public function isAllday()
     {
         return $this->parentEvent->isAllday();
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventOwner()
     {
         return $this->parentEvent->getEventOwner();
     }
 
+    /**
+     * @return int
+     */
     public function getCalendarUid()
     {
         return $this->parentEvent->getCalendarUid();
     }
 
+    /**
+     * @return int
+     */
     public function getType()
     {
         return $this->parentEvent->getType();
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventType()
     {
         return $this->parentEvent->getEventType();
     }
 
+    /**
+     * @return mixed
+     */
     public function getCount()
     {
         return $this->parentEvent->getCount();
     }
 
+    /**
+     * @return array
+     */
     public function getValuesAsArray()
     {
         if ($this->initializingCacheValues) {
@@ -762,6 +1179,9 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $this->cachedValueArray;
     }
 
+    /**
+     * @return array
+     */
     public function getAdditionalValuesAsArray()
     {
         $values = parent::getAdditionalValuesAsArray();
@@ -774,11 +1194,17 @@ class EventRecModel extends \TYPO3\CMS\Cal\Model\Model
         return $values;
     }
 
+    /**
+     * @return array
+     */
     public function getCategories()
     {
         return $this->parentEvent->categories;
     }
 
+    /**
+     * @return mixed
+     */
     public function getUntil()
     {
         return $this->parentEvent->getUntil();

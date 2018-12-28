@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vNotes.
  *
@@ -14,7 +16,7 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  *
  * @author Karsten Fourmont <fourmont@gmx.de>
  */
-class vnote extends \TYPO3\CMS\Cal\Model\ICalendar
+class vnote extends ICalendar
 {
     public function __construct($version = '1.1')
     {

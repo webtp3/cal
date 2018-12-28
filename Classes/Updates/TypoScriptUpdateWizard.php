@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Updates;
 
+use TYPO3\CMS\Install\Updates\AbstractUpdate;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -16,9 +18,9 @@ namespace TYPO3\CMS\Cal\Updates;
  */
 
 /**
- * Update wizzard after move of typoscript templates from EXT:cal/static/ to EXT:cal/Configuration/TypoScript/
+ * Update wizard after move of typoscript templates from EXT:cal/static/ to EXT:cal/Configuration/TypoScript/
  */
-class TypoScriptUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate
+class TypoScriptUpdateWizard extends AbstractUpdate
 {
 
     /**
@@ -76,7 +78,7 @@ class TypoScriptUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate
     public function performUpdate(array &$dbQueries, &$customMessages)
     {
         $sql = 'UPDATE sys_template	SET include_static_file = replace(include_static_file,\'XT:cal/static/\',\'XT:cal/Configuration/TypoScript/\') WHERE include_static_file like \'%XT:cal/static/%\'';
-        $resultSet = $GLOBALS['TYPO3_DB']->sql_query($sql);
+        $GLOBALS['TYPO3_DB']->sql_query($sql);
         return true;
     }
 }

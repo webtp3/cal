@@ -16,18 +16,25 @@ namespace TYPO3\CMS\Cal\Backend\Modul;
  */
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Module\BaseScriptClass;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\DateParser;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Module 'Indexer' for the 'cal' extension.
  */
-class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
+class CalIndexer extends BaseScriptClass
 {
 
     /**
@@ -56,7 +63,7 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
     protected $backendTemplatePath = '';
 
     /**
-     * @var \TYPO3\CMS\Fluid\View\StandaloneView
+     * @var StandaloneView
      */
     protected $view;
 
@@ -82,7 +89,7 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
     public $pageinfo;
 
     /**
-     * @return \TYPO3\CMS\Cal\Backend\Modul\CalIndexer
+     * @throws InvalidExtensionNameException
      */
     public function __construct()
     {
@@ -93,7 +100,7 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         ];
         $this->cshKey = '_MOD_' . $this->moduleName;
         $this->backendTemplatePath = ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Templates/Backend/IndexerModule/';
-        $this->view = GeneralUtility::makeInstance(\TYPO3\CMS\Fluid\View\StandaloneView::class);
+        $this->view = GeneralUtility::makeInstance(StandaloneView::class);
         $this->view->getRequest()->setControllerExtensionName('cal');
         $this->view->setPartialRootPaths([ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Templates/Backend/IndexerModule/Partials/']);
         $this->moduleUri = BackendUtility::getModuleUrl($this->moduleName);
@@ -229,9 +236,9 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 
                 if (count($pageIds) > 0 && is_int($starttime) && is_int($endtime)) {
                     $content = $this->getLanguageService()->getLL('indexing') . '<br/>';
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
+                    /** @var RecurrenceGenerator $rgc */
                     $rgc = GeneralUtility::makeInstance(
-                        'TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator',
+                        RecurrenceGenerator::class,
                         0,
                         $starttime,
                         $endtime
@@ -252,8 +259,8 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
                 } else {
                     $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                    $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator');
+                    /** @var RecurrenceGenerator $rgc */
+                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
                     $pages = $rgc->getRecurringEventPages();
                     $selectFieldIds = [];
                     // Load necessary JavaScript
@@ -352,25 +359,35 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         return $content;
     }
 
+    /**
+     * @param $timeString
+     * @return CalDate
+     */
     private function getTimeParsed($timeString)
     {
-        $dp = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\DateParser');
+        $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }
 
+    /**
+     * @param $message
+     * @param $type
+     * @return string
+     * @throws Exception
+     */
     public static function getMessage($message, $type)
     {
         /** @var $flashMessage FlashMessage */
         $flashMessage = GeneralUtility::makeInstance(
-            'TYPO3\\CMS\\Core\\Messaging\\FlashMessage',
+            FlashMessage::class,
             htmlspecialchars($message),
             '',
             $type,
             true
         );
-        /** @var $flashMessageService \TYPO3\CMS\Core\Messaging\FlashMessageService */
-        $flashMessageService = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessageService');
+        /** @var $flashMessageService FlashMessageService */
+        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
         return $defaultFlashMessageQueue->renderFlashMessages();

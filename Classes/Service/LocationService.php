@@ -14,6 +14,10 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\Location;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -21,14 +25,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
+class LocationService extends BaseService
 {
     public $keyId = 'tx_cal_location';
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Looks for an organizer with a given uid on a certain pid-list
@@ -92,7 +91,7 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
     public function getLocationFromTable($pidList = '', $additionalWhere = '')
     {
         $locations = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('tx_cal_location');
+        $orderBy = Functions::getOrderBy('tx_cal_location');
         if ($pidList != '') {
             $additionalWhere .= ' AND tx_cal_location.pid IN (' . $pidList . ')';
         }
@@ -103,11 +102,11 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         $groupBy = '';
         $limit = '';
 
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $feUserUid = $rightsObj->getUserId();
         $feGroupsArray = $rightsObj->getUserGroups();
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+        $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_location_service',
             'locationServiceClass',
             'service'
@@ -135,7 +134,7 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
                     $GLOBALS['TSFE']->sys_page->versionOL('tx_cal_location', $row);
                 }
 
-                $lastLocation = new \TYPO3\CMS\Cal\Model\Location($row, $pidList);
+                $lastLocation = new Location($row, $pidList);
 
                 $select = 'uid_foreign,tablenames';
                 $table = 'tx_cal_location_shared_user_mm';
@@ -159,35 +158,13 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         return $locations;
     }
 
+    /**
+     * @param $location
+     * @param $event_uid
+     */
     public function _addEventLinkToLocation(&$location, $event_uid)
     {
         return;
-        // modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','modelcontroller');
-        $event_s = $this->modelObj->findAllEventInstances(
-            $event_uid,
-            'tx_cal_phpicalendar',
-            $this->conf['pidList'],
-            false,
-            false,
-            true
-        );
-        if (is_array($event_s)) {
-            foreach ($event_s as $date => $time) {
-                foreach ($time as $eventArray) {
-                    foreach ($eventArray as $event) {
-                        $location->addEventLink(
-                            $event->getStart()->format('%Y%m%d%H%M') . '_' . $event->getType() . '_' . $event->getUid(),
-                            $event->renderEventForLocation()
-                        );
-                    }
-                }
-            }
-        } else {
-            $location->addEventLink(
-                $event->getStart()->format('%Y%m%d%H%M') . '_' . $event->getType() . '_' . $event->getUid(),
-                $event->renderEventForOrganizer()
-            );
-        }
     }
 
     /**
@@ -210,6 +187,10 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         return $where;
     }
 
+    /**
+     * @param $uid
+     * @return object|void
+     */
     public function updateLocation($uid)
     {
         if (!$this->isAllowedService()) {
@@ -314,6 +295,9 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $uid
+     */
     public function removeLocation($uid)
     {
         if (!$this->isAllowedService()) {
@@ -331,6 +315,9 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         $this->unsetPiVars();
     }
 
+    /**
+     * @param $insertFields
+     */
     public function retrievePostData(&$insertFields)
     {
         $hidden = 0;
@@ -410,9 +397,9 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
             $insertFields['link'] = strip_tags($this->controller->piVars['link']);
         }
 
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map') && ($insertFields['street'] != '' || $insertFields['city'] != '' || $insertFields['country_zone'] != '' || $insertFields['zip'] != '' || $insertFields['country'])) {
+        if (ExtensionManagementUtility::isLoaded('wec_map') && ($insertFields['street'] != '' || $insertFields['city'] != '' || $insertFields['country_zone'] != '' || $insertFields['zip'] != '' || $insertFields['country'])) {
             /* Geocode the address */
-            $lookupTable = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('JBartels\WecMap\Utility\Cache');
+            $lookupTable = Functions::makeInstance('JBartels\WecMap\Utility\Cache');
             $latlong = $lookupTable->lookup(
                 $insertFields['street'],
                 $insertFields['city'],
@@ -425,6 +412,10 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pid
+     * @return object|void
+     */
     public function saveLocation($pid)
     {
         if (!$this->isAllowedService()) {
@@ -447,6 +438,10 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $insertFields
+     * @return mixed
+     */
     public function _saveLocation(&$insertFields)
     {
         $table = 'tx_cal_location';
@@ -562,6 +557,9 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         return $uid;
     }
 
+    /**
+     * @return bool
+     */
     public function isAllowedService()
     {
         $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
@@ -572,6 +570,10 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
         return false;
     }
 
+    /**
+     * @param $uid
+     * @param $overlay
+     */
     public function createTranslation($uid, $overlay)
     {
         $table = 'tx_cal_location';
@@ -596,24 +598,6 @@ class LocationService extends \TYPO3\CMS\Cal\Service\BaseService
 
     public function unsetPiVars()
     {
-        unset($this->controller->piVars['hidden']);
-        unset($this->controller->piVars['_TRANSFORM_description']);
-        unset($this->controller->piVars['uid']);
-        unset($this->controller->piVars['type']);
-        unset($this->controller->piVars['formCheck']);
-        unset($this->controller->piVars['name']);
-        unset($this->controller->piVars['description']);
-        unset($this->controller->piVars['street']);
-        unset($this->controller->piVars['zip']);
-        unset($this->controller->piVars['city']);
-        unset($this->controller->piVars['country']);
-        unset($this->controller->piVars['countryzone']);
-        unset($this->controller->piVars['phone']);
-        unset($this->controller->piVars['email']);
-        unset($this->controller->piVars['link']);
-        unset($this->controller->piVars['image']);
-        unset($this->controller->piVars['image_caption']);
-        unset($this->controller->piVars['image_title']);
-        unset($this->controller->piVars['image_alt']);
+        unset($this->controller->piVars['hidden'], $this->controller->piVars['_TRANSFORM_description'], $this->controller->piVars['uid'], $this->controller->piVars['type'], $this->controller->piVars['formCheck'], $this->controller->piVars['name'], $this->controller->piVars['description'], $this->controller->piVars['street'], $this->controller->piVars['zip'], $this->controller->piVars['city'], $this->controller->piVars['country'], $this->controller->piVars['countryzone'], $this->controller->piVars['phone'], $this->controller->piVars['email'], $this->controller->piVars['link'], $this->controller->piVars['image'], $this->controller->piVars['image_caption'], $this->controller->piVars['image_title'], $this->controller->piVars['image_alt']);
     }
 }

@@ -15,9 +15,18 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Model\CalDate;
 
+/**
+ * Class Labels
+ */
 class Labels
 {
+    /**
+     * @param $params
+     * @param $pObj
+     * @return string
+     */
     public function getEventRecordLabel(&$params, &$pObj)
     {
         if ($params['table'] != 'tx_cal_event' && $params['table'] != 'tx_cal_exception_event') {
@@ -26,8 +35,8 @@ class Labels
 
         // Get complete record
         $rec = BackendUtility::getRecordWSOL($params['table'], $params['row']['uid']);
-        $dateObj = new \TYPO3\CMS\Cal\Model\CalDate($rec['start_date'] . '000000');
-        $dateObj->setTZbyId('UTC');
+        $dateObj = new CalDate($rec['start_date'] . '000000');
+        $dateObj->setTZbyID('UTC');
 
         $format = str_replace([
             'd',
@@ -63,6 +72,11 @@ class Labels
         $params['title'] = $label;
     }
 
+    /**
+     * @param $params
+     * @param $pObj
+     * @return string
+     */
     public function getAttendeeRecordLabel(&$params, &$pObj)
     {
         if (!$params['table'] == 'tx_cal_attendee') {
@@ -77,12 +91,17 @@ class Labels
             $feUserRec = BackendUtility::getRecord('fe_users', $rec['fe_user_id']);
             $label = $feUserRec['name'] != '' ? $feUserRec['name'] : $feUserRec['username'];
         }
-        $label .= ' (' . $GLOBALS['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.attendance.' . $rec['attendance']) . ' -> ' . $rec['status'] . ')';
+        $label .= ' (' . $GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.attendance.' . $rec['attendance']) . ' -> ' . $rec['status'] . ')';
 
         // Write to the label
         $params['title'] = $label;
     }
 
+    /**
+     * @param $params
+     * @param $pObj
+     * @return string
+     */
     public function getMonitoringRecordLabel(&$params, &$pObj)
     {
         if (!$params['table'] == 'tx_cal_fe_user_event_monitor_mm') {
@@ -109,9 +128,14 @@ class Labels
         }
 
         // Write to the label
-        $params['title'] = $label . ' (' . $GLOBALS['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.offset') . ': ' . $rec['offset'] . ')';
+        $params['title'] = $label . ' (' . $GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.offset') . ': ' . $rec['offset'] . ')';
     }
 
+    /**
+     * @param $params
+     * @param $pObj
+     * @return string
+     */
     public function getDeviationRecordLabel(&$params, &$pObj)
     {
         if (!$params['table'] == 'tx_cal_event_deviation') {
@@ -121,11 +145,11 @@ class Labels
         // Get complete record
         $rec = BackendUtility::getRecord($params['table'], $params['row']['uid']);
 
-        $label = $GLOBALS['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.deviation') . ': ';
+        $label = $GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.deviation') . ': ';
 
         if ($rec['orig_start_date']) {
-            $dateObj = new \TYPO3\CMS\Cal\Model\CalDate($rec['orig_start_date'] . '000000');
-            $dateObj->setTZbyId('UTC');
+            $dateObj = new CalDate($rec['orig_start_date'] . '000000');
+            $dateObj->setTZbyID('UTC');
 
             $format = str_replace([
                 'd',

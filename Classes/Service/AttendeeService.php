@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Cal\Model\AttendeeModel;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -20,7 +22,7 @@ namespace TYPO3\CMS\Cal\Service;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
+class AttendeeService extends BaseService
 {
 
     /**
@@ -80,6 +82,10 @@ class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
         return $foundAttendees;
     }
 
+    /**
+     * @param $uid
+     * @return array
+     */
     public function updateAttendee($uid)
     {
         $insertFields = [
@@ -93,6 +99,10 @@ class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $uid
+     * @param $insertFields
+     */
     public function _updateAttendee($uid, &$insertFields)
     {
 
@@ -105,6 +115,9 @@ class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
         $this->unsetPiVars();
     }
 
+    /**
+     * @param $uid
+     */
     public function removeAttendee($uid)
     {
         if ($this->rightsObj->isAllowedToDeleteCategory()) {
@@ -121,6 +134,9 @@ class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $insertFields
+     */
     public function retrievePostData(&$insertFields)
     {
         $hidden = 0;
@@ -166,6 +182,10 @@ class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
         }
     }
 
+    /**
+     * @param $pid
+     * @return array
+     */
     public function saveAttendee($pid)
     {
         $crdate = time();
@@ -184,6 +204,10 @@ class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
         return $this->find($uid, $this->conf['pidList']);
     }
 
+    /**
+     * @param $insertFields
+     * @return mixed
+     */
     public function _saveAttendee(&$insertFields)
     {
         $table = 'tx_cal_attendee';
@@ -198,17 +222,29 @@ class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
         return $uid;
     }
 
+    /**
+     * @param $eventUid
+     * @return string
+     */
     public function getAttendeeEventSearchString($eventUid)
     {
         return ' AND tx_cal_attendee.event_id = ' . $eventUid;
     }
 
+    /**
+     * @param $row
+     * @return AttendeeModel
+     */
     public function createAttendee($row)
     {
-        $attendee = new \TYPO3\CMS\Cal\Model\AttendeeModel($row, $this->getServiceKey());
+        $attendee = new AttendeeModel($row, $this->getServiceKey());
         return $attendee;
     }
 
+    /**
+     * @param $eventUid
+     * @return array
+     */
     public function findEventAttendees($eventUid)
     {
         $foundAttendees = [];
@@ -243,12 +279,6 @@ class AttendeeService extends \TYPO3\CMS\Cal\Service\BaseService
 
     public function unsetPiVars()
     {
-        unset($this->controller->piVars['hidden']);
-        unset($this->controller->piVars['uid']);
-        unset($this->controller->piVars['type']);
-        unset($this->controller->piVars['email']);
-        unset($this->controller->piVars['fe_user_id']);
-        unset($this->controller->piVars['attendance']);
-        unset($this->controller->piVars['status']);
+        unset($this->controller->piVars['hidden'], $this->controller->piVars['uid'], $this->controller->piVars['type'], $this->controller->piVars['email'], $this->controller->piVars['fe_user_id'], $this->controller->piVars['attendance'], $this->controller->piVars['status']);
     }
 }

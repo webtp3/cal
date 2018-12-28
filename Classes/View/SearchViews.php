@@ -14,13 +14,16 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Controller\Controller;
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
  */
-class SearchViews extends \TYPO3\CMS\Cal\View\ListView
+class SearchViews extends ListView
 {
     public $confArr = [];
     public $page;
@@ -114,11 +117,17 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
             $this->conf['view.']['search_all.']['searchOrganizer.']
         );
 
-        $page = \TYPO3\CMS\Cal\Controller\Controller::replace_tags($sims, $page);
+        $page = Controller::replace_tags($sims, $page);
         $rems = [];
         return $this->finish($page, $rems);
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     */
     public function getSearchActionUrlMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $this->initLocalCObject();
@@ -129,6 +138,12 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         );
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCategoryIdsMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###CATEGORY_IDS###'] = '<option value="">' . $this->controller->pi_getLL('l_all_category') . '</option>';
@@ -159,6 +174,12 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getLocationIdsMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###LOCATION_IDS###'] = '<option  value="">' . $this->controller->pi_getLL('l_all_location') . '</option>';
@@ -183,6 +204,12 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getOrganizerIdsMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###ORGANIZER_IDS###'] = '<option  value="">' . $this->controller->pi_getLL('l_all_organizer') . '</option>';
@@ -193,7 +220,7 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
 
         $organizerIdArray = [];
         if ($organizerIds != '') {
-            $organizerIdArray = \TYPO3\CMS\Core\Utility\GeneralUtility::intExplode(',', $organizerIds);
+            $organizerIdArray = GeneralUtility::intExplode(',', $organizerIds);
         }
 
         if (is_array($organizerArray)) {
@@ -207,9 +234,15 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getStartAndEnd(&$page, &$sims, &$rems, $view)
     {
-        $outputFormat = \TYPO3\CMS\Cal\Utility\Functions::getFormatStringFromConf($this->conf);
+        $outputFormat = Functions::getFormatStringFromConf($this->conf);
         if (!$this->controller->piVars['submit']) {
             $date = $this->controller->getListViewTime($this->conf['view.']['search.']['defaultValues.']['start_day']);
             $sims['###EVENT_START_DAY###'] = $date->format($outputFormat);
@@ -230,6 +263,12 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getEventStartDayMarker(&$page, &$sims, &$rems, $view)
     {
         if (!$sims['###EVENT_START_DAY###']) {
@@ -237,6 +276,12 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         }
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getEventEndDayMarker(&$page, &$sims, &$rems, $view)
     {
         if (!$sims['###EVENT_END_DAY###']) {
@@ -297,11 +342,14 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
                 return $this->drawLocation(array_pop(array_pop($master_array)), $this->conf['getdate']);
             }
         }
-        $starttime = new  \TYPO3\CMS\Cal\Model\CalDate();
-        $endtime = new  \TYPO3\CMS\Cal\Model\CalDate();
+        $starttime = new  CalDate();
+        $endtime = new  CalDate();
         return $this->drawList($master_array, '', $starttime, $endtime);
     }
 
+    /**
+     * @param $page
+     */
     public function initTemplate(&$page)
     {
         if ($page == '') {
@@ -315,11 +363,14 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         }
         if ($this->conf['view'] == 'search_all') {
             $rems['###SEARCHFORM###'] = '';
-            $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+            $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
         }
         $this->page = $page;
     }
 
+    /**
+     * @param $page
+     */
     public function getListSubpart($page)
     {
         $listTemplate = $this->cObj->getSubpart($page, '###LIST_TEMPLATE###');
@@ -332,6 +383,12 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         return $listTemplate;
     }
 
+    /**
+     * @param $master_array
+     * @param $sims
+     * @param $rems
+     * @return string
+     */
     public function processObjects(&$master_array, &$sims, &$rems)
     {
         if ($this->objectType == 'event') {
@@ -382,10 +439,10 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
                 $pageItemCount = $this->recordsPerPage * $this->offset;
 
                 // don't assign these dates in one line like "$date1 = $date2 = $date3 = new CalDate()", as this will make all dates references to each other!!!
-                $lastEventDay = new  \TYPO3\CMS\Cal\Model\CalDate('000000001000000');
-                $lastEventWeek = new  \TYPO3\CMS\Cal\Model\CalDate('000000001000000');
-                $lastEventMonth = new  \TYPO3\CMS\Cal\Model\CalDate('000000001000000');
-                $lastEventYear = new  \TYPO3\CMS\Cal\Model\CalDate('000000001000000');
+                $lastEventDay = new  CalDate('000000001000000');
+                $lastEventWeek = new  CalDate('000000001000000');
+                $lastEventMonth = new  CalDate('000000001000000');
+                $lastEventYear = new  CalDate('000000001000000');
 
                 // prepare alternating layouts
                 $alternatingLayoutConfig = $this->conf['view.'][$this->conf['view'] . '.']['alternatingLayoutMarkers.'];
@@ -411,7 +468,7 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
                 }
 
                 // Hook: get hook objects for drawList
-                $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray(
+                $hookObjectsArr = Functions::getHookObjectsArray(
                     'tx_cal_searchview',
                     'drawList',
                     'view'
@@ -489,6 +546,11 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         return $middle;
     }
 
+    /**
+     * @param $master_array
+     * @param $reverse
+     * @param $firstEventDate
+     */
     public function walkThroughMasterArray(&$master_array, $reverse, &$firstEventDate)
     {
         if ($this->objectType == 'event') {
@@ -505,6 +567,12 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         }
     }
 
+    /**
+     * @param $object
+     * @param $id
+     * @param $firstEventDate
+     * @return bool
+     */
     public function processObject(&$object, &$id, &$firstEventDate)
     {
         if ($this->objectType == 'event') {
@@ -533,6 +601,12 @@ class SearchViews extends \TYPO3\CMS\Cal\View\ListView
         $this->count++;
     }
 
+    /**
+     * @param $page
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getSearchAllLinkMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###SEARCH_ALL_LINK###'] = '';

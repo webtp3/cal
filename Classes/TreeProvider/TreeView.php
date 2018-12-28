@@ -14,9 +14,13 @@ namespace TYPO3\CMS\Cal\TreeProvider;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Backend\Form\FormEngine;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc;
+use TYPO3\CMS\Cal\Backend\TCA\TceFuncSelectTreeView;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * This function displays a selector with nested categories.
@@ -28,6 +32,11 @@ use TYPO3\CMS\Core\Utility\MathUtility;
  */
 class TreeView
 {
+    /**
+     * @param $uid
+     * @param $recursive
+     * @param $ids
+     */
     public function getTreeList($uid, $recursive, &$ids)
     {
         if (intval($uid) > 0 && $recursive > -1) {
@@ -207,7 +216,7 @@ class TreeView
             $GLOBALS['TYPO3_DB']->sql_free_result($calres);
         }
 
-        $test = new \TYPO3\CMS\Backend\Form\FormEngine();
+        $test = new FormEngine();
         $test->initDefaultBEmode();
 
         $disabled = '';
@@ -221,7 +230,7 @@ class TreeView
         }
 
         // Set max and min items:
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
             $maxitems = MathUtility::forceIntegerInRange($config['maxitems'], 0);
             if (!$maxitems) {
                 $maxitems = 100000;
@@ -257,7 +266,7 @@ class TreeView
             // Put together the selector box:
             $selector_itemListStyle = isset($config['itemListStyle']) ? ' style="' . htmlspecialchars($config['itemListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"';
             $size = intval($config['size']);
-            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+            if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
                 $size = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
                     count($itemArray) + 1,
                     MathUtility::forceIntegerInRange($size, 1),
@@ -290,12 +299,12 @@ class TreeView
             $itemsToSelect .= '</div>';
         }
 
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
             $params = [
                 'size' => $config['size'],
                 'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
                 'style' => isset($config['selectedListStyle']) ? ' style="' . htmlspecialchars($config['selectedListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"',
-                'dontShowMoveIcons' => ($config['maxitems'] <= 1),
+                'dontShowMoveIcons' => $config['maxitems'] <= 1,
                 'maxitems' => $config['maxitems'],
                 'info' => '',
                 'headers' => [
@@ -306,12 +315,12 @@ class TreeView
                 'rightbox' => $itemsToSelect,
                 'readOnly' => $disabled
             ];
-        } elseif (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
             $params = [
                 'size' => $config['size'],
                 'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
                 'style' => isset($config['selectedListStyle']) ? ' style="' . htmlspecialchars($config['selectedListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"',
-                'dontShowMoveIcons' => ($config['maxitems'] <= 1),
+                'dontShowMoveIcons' => $config['maxitems'] <= 1,
                 'maxitems' => $config['maxitems'],
                 'info' => '',
                 'headers' => [
@@ -327,7 +336,7 @@ class TreeView
                 'size' => $config['size'],
                 'autoSizeMax' => GeneralUtility::forceIntegerInRange($config['autoSizeMax'], 0),
                 'style' => isset($config['selectedListStyle']) ? ' style="' . htmlspecialchars($config['selectedListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"',
-                'dontShowMoveIcons' => ($config['maxitems'] <= 1),
+                'dontShowMoveIcons' => $config['maxitems'] <= 1,
                 'maxitems' => $config['maxitems'],
                 'info' => '',
                 'headers' => [
@@ -339,7 +348,7 @@ class TreeView
                 'readOnly' => $disabled
             ];
         }
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
             $treeHelperElement = new TreeHelperElement($test);
             $item .= $treeHelperElement->getDbFileIcon(
                 $PA['itemFormElName'],
@@ -413,7 +422,7 @@ class TreeView
         if ($row['calendar_id'] == 0 && !$isCategoryForm && !$isPluginFlexform && !$isBeUserForm && !$isBeGroupsForm) {
 
             /* Get the records, with access restrictions and all that good stuff applied. */
-            $tempCalRes = \TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc::getSQLResource('tx_cal_calendar', '', '', '', '1');
+            $tempCalRes = ItemsProcFunc::getSQLResource('tx_cal_calendar', '', '', '', '1');
             if ($tempCalRes) {
                 while ($calendarRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($tempCalRes)) {
                     $row['calendar_id'] = $calendarRow['uid'];
@@ -568,7 +577,7 @@ class TreeView
                 $item .= '<input type="hidden" name="' . $PA['itemFormElName'] . '_mul" value="' . ($config['multiple'] ? 1 : 0) . '" />';
 
                 // Set max and min items:
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
                     $maxitems = MathUtility::forceIntegerInRange($config['maxitems'], 0);
                     if (!$maxitems) {
                         $maxitems = 100000;
@@ -772,7 +781,7 @@ class TreeView
                         false
                     ))) {
                     } else {
-                        $treeViewObj = new \TYPO3\CMS\Cal\Backend\TCA\TceFuncSelectTreeView();
+                        $treeViewObj = new TceFuncSelectTreeView();
                     }
 
                     if ((TYPO3_MODE == 'BE') || ($GLOBALS['TSFE']->beUserLogin && $GLOBALS['BE_USER']->extAdmEnabled)) {
@@ -929,17 +938,11 @@ class TreeView
 
                     // ###################
 
-                    // $treeViewObj->table = $config['foreign_table'];
                     $treeViewObj->table = 'tx_cal_category';
                     $treeViewObj->init($SPaddWhere);
                     $treeViewObj->backPath = $this->pObj->backPath;
 
                     $treeViewObj->setDataFromArray($dataArray);
-                    // $treeViewObj->parentField = $GLOBALS['TCA'][$config['foreign_table']]['ctrl']['treeParentField'];
-                    // $treeViewObj->parentField = 'parent_category';
-                    // if($row['calendar_id']){
-                    // $treeViewObj->clause = ' AND calendar_id = '.$row['calendar_id'];
-                    // }
                     $treeViewObj->expandAll = 1;
                     $treeViewObj->expandFirst = 1;
                     $treeViewObj->fieldArray = [
@@ -967,16 +970,12 @@ class TreeView
                     $treeItemC = count($treeViewObj->dataLookup);
                     $GLOBALS['TYPO3_CONF_VARS']['BE']['lockBeUserToDBmounts'] = $lockBeUserToDBmounts;
 
-                    /*
-                     * if ($defItems[0]) { // add default items to the tree table. In this case the value[not categorized] $treeItemC += count($defItems); $treeContent .= '<table border="0" cellpadding="0" cellspacing="0"><tr> <td>'.$this->pObj->sL($config['itemsHeader']).'&nbsp;</td><td>'.implode($defItems,'<br />').'</td> </tr></table>'; }
-                     */
-
                     // find recursive categories or "storagePid" related errors and if there are some, add a message to the $errorMsg array.
                     $errorMsg = $this->findRecursiveCategories($PA, $row, $table, $storagePid, $treeViewObj->ids);
 
                     $width = 280; // default width for the field with the category tree
                     if (intval($confArr['categoryTreeWidth'])) { // if a value is set in extConf take this one.
-                        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+                        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
                             $width = MathUtility::forceIntegerInRange($confArr['categoryTreeWidth'], 1, 600);
                         } else {
                             $width = GeneralUtility::forceIntegerInRange($confArr['categoryTreeWidth'], 1, 600);
@@ -985,7 +984,7 @@ class TreeView
                         $width = 320;
                     }
 
-                    if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
                         $config['autoSizeMax'] = MathUtility::forceIntegerInRange($config['autoSizeMax'], 0);
                         $height = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
                             $treeItemC + 2,
@@ -1015,7 +1014,7 @@ class TreeView
 
                     // Put together the select form with selected elements:
                     $selector_itemListStyle = isset($config['itemListStyle']) ? ' style="' . htmlspecialchars($config['itemListStyle']) . '"' : ' style="' . $this->pObj->defaultMultipleSelectorStyle . '"';
-                    if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
                         $size = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
                             count($itemArray) + 1,
                             MathUtility::forceIntegerInRange($size, 1),
@@ -1053,19 +1052,19 @@ class TreeView
                 }
                 $sWidth = 150; // default width for the left field of the category select
                 if (intval($confArr['categorySelectedWidth'])) {
-                    if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
                         $sWidth = MathUtility::forceIntegerInRange($confArr['categorySelectedWidth'], 1, 600);
                     } else {
                         $sWidth = GeneralUtility::forceIntegerInRange($confArr['categorySelectedWidth'], 1, 600);
                     }
                 }
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
                     $params = [
                         'size' => $size,
                         'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
                         // style' => isset($config['selectedListStyle']) ? ' style="'.htmlspecialchars($config['selectedListStyle']).'"' : ' style="'.$this->pObj->defaultMultipleSelectorStyle.'"',
                         'style' => ' style="width:' . $sWidth . 'px;"',
-                        'dontShowMoveIcons' => ($maxitems <= 1),
+                        'dontShowMoveIcons' => $maxitems <= 1,
                         'maxitems' => $maxitems,
                         'info' => '',
                         'headers' => [
@@ -1086,13 +1085,13 @@ class TreeView
                             ]
                         ],
                     ];
-                } elseif (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
+                } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
                     $params = [
                         'size' => $size,
                         'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
                         // style' => isset($config['selectedListStyle']) ? ' style="'.htmlspecialchars($config['selectedListStyle']).'"' : ' style="'.$this->pObj->defaultMultipleSelectorStyle.'"',
                         'style' => ' style="width:' . $sWidth . 'px;"',
-                        'dontShowMoveIcons' => ($maxitems <= 1),
+                        'dontShowMoveIcons' => $maxitems <= 1,
                         'maxitems' => $maxitems,
                         'info' => '',
                         'headers' => [
@@ -1108,7 +1107,7 @@ class TreeView
                         'autoSizeMax' => GeneralUtility::forceIntegerInRange($config['autoSizeMax'], 0),
                         // style' => isset($config['selectedListStyle']) ? ' style="'.htmlspecialchars($config['selectedListStyle']).'"' : ' style="'.$this->pObj->defaultMultipleSelectorStyle.'"',
                         'style' => ' style="width:' . $sWidth . 'px;"',
-                        'dontShowMoveIcons' => ($maxitems <= 1),
+                        'dontShowMoveIcons' => $maxitems <= 1,
                         'maxitems' => $maxitems,
                         'info' => '',
                         'headers' => [
@@ -1119,7 +1118,7 @@ class TreeView
                         'thumbnails' => $thumbnails
                     ];
                 }
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
                     $treeHelperElement = new TreeHelperElement($this->pObj);
                     $item .= $treeHelperElement->getDbFileIcon(
                         $PA['itemFormElName'],
@@ -1144,7 +1143,7 @@ class TreeView
                 // Wizards:
                 $altItem = '<input type="hidden" name="' . $PA['itemFormElName'] . '" value="' . htmlspecialchars($PA['itemFormElValue']) . '" />';
 
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
+                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
                     $treeHelperElement = new TreeHelperElement($this->pObj);
                     $item = $treeHelperElement->getRenderWizards([
                         $item,
@@ -1162,6 +1161,14 @@ class TreeView
         return $this->NA_Items . implode($errorMsg, chr(10)) . $item;
     }
 
+    /**
+     * @param $uid
+     * @param $childArray
+     * @param $categoryById
+     * @param $categoryByParentId
+     * @param $subLevelID
+     * @param $notAllowedItems
+     */
     public function addChildren(
         $uid,
         &$childArray,
@@ -1192,6 +1199,11 @@ class TreeView
         }
     }
 
+    /**
+     * @param $uid
+     * @param $categoryByParentId
+     * @return array
+     */
     public function checkChildIds($uid, &$categoryByParentId)
     {
         $childIds = $categoryByParentId[$uid];

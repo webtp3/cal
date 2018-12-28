@@ -26,6 +26,7 @@ class RealUrl
      *            existing RealURL configuration thas has been
      *            generated to this point and 'extKey' is unique
      *            that this hook used when it was registered.
+     * @return
      */
     public function addRealURLConfig(&$params, $parentObj)
     {
@@ -44,6 +45,9 @@ class RealUrl
         return $config;
     }
 
+    /**
+     * @return array
+     */
     public function addFilenameSet()
     {
         $calendarRSS = [];
