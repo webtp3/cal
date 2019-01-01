@@ -17,7 +17,6 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\QueryGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class ItemsProcFunc
 {
@@ -225,12 +224,7 @@ class ItemsProcFunc
             if (is_array($cache[$GLOBALS['BE_USER']->user['uid']]) && $cache[$GLOBALS['BE_USER']->user['uid']]['pidlist']) {
                 $pidlist = $cache[$GLOBALS['BE_USER']->user['uid']]['pidlist'];
             } else {
-                $mounts = [];
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7001000) {
-                    $mounts = $GLOBALS['BE_USER']->returnWebmounts();
-                } else {
-                    $mounts = $GLOBALS['WEBMOUNTS'];
-                }
+                $mounts = $GLOBALS['BE_USER']->returnWebmounts();
                 $qG = new QueryGenerator();
                 $pidlist = '';
                 foreach ($mounts as $idx => $uid) {

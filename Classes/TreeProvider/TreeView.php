@@ -20,7 +20,6 @@ use TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc;
 use TYPO3\CMS\Cal\Backend\TCA\TceFuncSelectTreeView;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * This function displays a selector with nested categories.
@@ -230,19 +229,12 @@ class TreeView
         }
 
         // Set max and min items:
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-            $maxitems = MathUtility::forceIntegerInRange($config['maxitems'], 0);
-            if (!$maxitems) {
-                $maxitems = 100000;
-            }
-            $minitems = MathUtility::forceIntegerInRange($config['minitems'], 0);
-        } else {
-            $maxitems = GeneralUtility::forceIntegerInRange($config['maxitems'], 0);
-            if (!$maxitems) {
-                $maxitems = 100000;
-            }
-            $minitems = GeneralUtility::forceIntegerInRange($config['minitems'], 0);
+        $maxitems = MathUtility::forceIntegerInRange($config['maxitems'], 0);
+        if (!$maxitems) {
+            $maxitems = 100000;
         }
+        $minitems = MathUtility::forceIntegerInRange($config['minitems'], 0);
+
         // Register the required number of elements:
         $test->requiredElements[$PA['itemFormElName']] = [
             $minitems,
@@ -266,19 +258,11 @@ class TreeView
             // Put together the selector box:
             $selector_itemListStyle = isset($config['itemListStyle']) ? ' style="' . htmlspecialchars($config['itemListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"';
             $size = intval($config['size']);
-            if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-                $size = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
-                    count($itemArray) + 1,
-                    MathUtility::forceIntegerInRange($size, 1),
-                    $config['autoSizeMax']
-                ) : $size;
-            } else {
-                $size = $config['autoSizeMax'] ? GeneralUtility::forceIntegerInRange(
-                    count($itemArray) + 1,
-                    GeneralUtility::forceIntegerInRange($size, 1),
-                    $config['autoSizeMax']
-                ) : $size;
-            }
+            $size = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
+                count($itemArray) + 1,
+                MathUtility::forceIntegerInRange($size, 1),
+                $config['autoSizeMax']
+            ) : $size;
             if ($config['exclusiveKeys']) {
                 $sOnChange = 'setFormValueFromBrowseWin(\'' . $PA['itemFormElName'] . '\',this.options[this.selectedIndex].value,this.options[this.selectedIndex].text,\'' . $config['exclusiveKeys'] . '\'); ';
             } else {
@@ -299,69 +283,31 @@ class TreeView
             $itemsToSelect .= '</div>';
         }
 
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
-            $params = [
-                'size' => $config['size'],
-                'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
-                'style' => isset($config['selectedListStyle']) ? ' style="' . htmlspecialchars($config['selectedListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"',
-                'dontShowMoveIcons' => $config['maxitems'] <= 1,
-                'maxitems' => $config['maxitems'],
-                'info' => '',
-                'headers' => [
-                    'selector' => $test->getLL('l_selected') . ':<br />',
-                    'items' => $test->getLL('l_items') . ':<br />'
-                ],
-                'noBrowser' => 1,
-                'rightbox' => $itemsToSelect,
-                'readOnly' => $disabled
-            ];
-        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-            $params = [
-                'size' => $config['size'],
-                'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
-                'style' => isset($config['selectedListStyle']) ? ' style="' . htmlspecialchars($config['selectedListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"',
-                'dontShowMoveIcons' => $config['maxitems'] <= 1,
-                'maxitems' => $config['maxitems'],
-                'info' => '',
-                'headers' => [
-                    'selector' => $test->getLL('l_selected') . ':<br />',
-                    'items' => $test->getLL('l_items') . ':<br />'
-                ],
-                'noBrowser' => 1,
-                'thumbnails' => $itemsToSelect,
-                'readOnly' => $disabled
-            ];
-        } else {
-            $params = [
-                'size' => $config['size'],
-                'autoSizeMax' => GeneralUtility::forceIntegerInRange($config['autoSizeMax'], 0),
-                'style' => isset($config['selectedListStyle']) ? ' style="' . htmlspecialchars($config['selectedListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"',
-                'dontShowMoveIcons' => $config['maxitems'] <= 1,
-                'maxitems' => $config['maxitems'],
-                'info' => '',
-                'headers' => [
-                    'selector' => $test->getLL('l_selected') . ':<br />',
-                    'items' => $test->getLL('l_items') . ':<br />'
-                ],
-                'noBrowser' => 1,
-                'thumbnails' => $itemsToSelect,
-                'readOnly' => $disabled
-            ];
-        }
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
-            $treeHelperElement = new TreeHelperElement($test);
-            $item .= $treeHelperElement->getDbFileIcon(
-                $PA['itemFormElName'],
-                '',
-                '',
-                $selectedCalendars,
-                '',
-                $params,
-                $PA['onFocus']
-            );
-        } else {
-            $item .= $test->dbFileIcons($PA['itemFormElName'], '', '', $selectedCalendars, '', $params, $PA['onFocus']);
-        }
+        $params = [
+            'size' => $config['size'],
+            'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
+            'style' => isset($config['selectedListStyle']) ? ' style="' . htmlspecialchars($config['selectedListStyle']) . '"' : ' style="' . $this->defaultMultipleSelectorStyle . '"',
+            'dontShowMoveIcons' => $config['maxitems'] <= 1,
+            'maxitems' => $config['maxitems'],
+            'info' => '',
+            'headers' => [
+                'selector' => $test->getLL('l_selected') . ':<br />',
+                'items' => $test->getLL('l_items') . ':<br />'
+            ],
+            'noBrowser' => 1,
+            'rightbox' => $itemsToSelect,
+            'readOnly' => $disabled
+        ];
+        $treeHelperElement = new TreeHelperElement($test);
+        $item .= $treeHelperElement->getDbFileIcon(
+            $PA['itemFormElName'],
+            '',
+            '',
+            $selectedCalendars,
+            '',
+            $params,
+            $PA['onFocus']
+        );
 
         return $item;
     }
@@ -484,9 +430,9 @@ class TreeView
             // Removing doktypes with no access:
             if ($table . '.' . $field == 'pages.doktype') {
                 if (!($GLOBALS['BE_USER']->isAdmin() || GeneralUtility::inList(
-                    $GLOBALS['BE_USER']->groupData['pagetypes_select'],
+                        $GLOBALS['BE_USER']->groupData['pagetypes_select'],
                         $p[1]
-                ))) {
+                    ))) {
                     unset($selItems[$tk]);
                 }
             }
@@ -561,9 +507,9 @@ class TreeView
 
                 if ($na) {
                     $this->NA_Items = '<table class="warningbox" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td><img src="gfx/icon_fatalerror.gif" class="absmiddle" alt="" height="16" width="18">SAVING DISABLED!! <br />' . ($row['l18n_parent'] && $row['sys_language_uid'] ? 'The translation original of this' : 'This') . ' record has the following categories assigned that are not defined in your BE usergroup: ' . implode(
-                        $NACats,
+                            $NACats,
                             chr(10)
-                    ) . '</td></tr></tbody></table>';
+                        ) . '</td></tr></tbody></table>';
                 }
                 $item = implode($categories, chr(10));
 
@@ -577,19 +523,11 @@ class TreeView
                 $item .= '<input type="hidden" name="' . $PA['itemFormElName'] . '_mul" value="' . ($config['multiple'] ? 1 : 0) . '" />';
 
                 // Set max and min items:
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-                    $maxitems = MathUtility::forceIntegerInRange($config['maxitems'], 0);
-                    if (!$maxitems) {
-                        $maxitems = 100000;
-                    }
-                    $minitems = MathUtility::forceIntegerInRange($config['minitems'], 0);
-                } else {
-                    $maxitems = GeneralUtility::forceIntegerInRange($config['maxitems'], 0);
-                    if (!$maxitems) {
-                        $maxitems = 100000;
-                    }
-                    $minitems = GeneralUtility::forceIntegerInRange($config['minitems'], 0);
+                $maxitems = MathUtility::forceIntegerInRange($config['maxitems'], 0);
+                if (!$maxitems) {
+                    $maxitems = 100000;
                 }
+                $minitems = MathUtility::forceIntegerInRange($config['minitems'], 0);
                 // Register the required number of elements:
                 $this->pObj->requiredElements[$PA['itemFormElName']] = [
                     $minitems,
@@ -618,9 +556,9 @@ class TreeView
                             $allowedCalendarIds = GeneralUtility::intExplode(',', $row['tx_cal_calendar']);
                             $allowedCalendarIds[] = 0;
                             $catWhere = ' AND tx_cal_category.calendar_id in (' . implode(
-                                ',',
+                                    ',',
                                     $allowedCalendarIds
-                            ) . ')';
+                                ) . ')';
                             $calWhere = ' AND tx_cal_calendar.uid in (' . implode(',', $allowedCalendarIds) . ')';
                         }
                     } else {
@@ -746,9 +684,9 @@ class TreeView
                             if ($calendarMode == 0) {
                             } elseif ($calendarMode == 1) {
                                 $catWhere = ' AND tx_cal_category.calendar_id in (' . implode(
-                                    ',',
+                                        ',',
                                         $selectedCalendars
-                                ) . ')';
+                                    ) . ')';
                                 $calWhere = ' AND tx_cal_calendar.uid in (' . implode(',', $selectedCalendars) . ')';
                             } else { // $calendarMode==2
                                 $selectedCalendars = array_diff($selectedCalendars, [
@@ -756,30 +694,30 @@ class TreeView
                                 ]);
                                 if (count($selectedCalendars) > 0) {
                                     $catWhere = ' AND tx_cal_category.calendar_id not in (' . implode(
-                                        ',',
+                                            ',',
                                             $selectedCalendars
-                                    ) . ')';
+                                        ) . ')';
                                     $calWhere = ' AND tx_cal_calendar.uid not in (' . implode(
-                                        ',',
+                                            ',',
                                             $selectedCalendars
-                                    ) . ')';
+                                        ) . ')';
                                 }
                             }
                         } elseif (count($selectedCalendars) > 0) {
                             $catWhere = ' AND tx_cal_category.calendar_id in (' . implode(
-                                ',',
+                                    ',',
                                     $selectedCalendars
-                            ) . ')';
+                                ) . ')';
                             $calWhere = ' AND tx_cal_calendar.uid in (' . implode(',', $selectedCalendars) . ')';
                         }
                     }
                     $calWhere .= ' AND tx_cal_calendar.sys_language_uid IN (-1,0)';
                     $catWhere .= ' AND tx_cal_category.sys_language_uid IN (-1,0)';
                     if ($config['treeViewClass'] and is_object($treeViewObj = &GeneralUtility::getUserObj(
-                        $config['treeViewClass'],
+                            $config['treeViewClass'],
                             'user_',
-                        false
-                    ))) {
+                            false
+                        ))) {
                     } else {
                         $treeViewObj = new TceFuncSelectTreeView();
                     }
@@ -824,9 +762,9 @@ class TreeView
                             }
 
                             if (($allowAllCalendars && $allowAllCategories) || (($catrow['calendar_id'] == 0 || in_array(
-                                $catrow['calendar_id'],
+                                            $catrow['calendar_id'],
                                             $be_userCalendars
-                            )) && in_array($catrow['uid'], $be_userCategories))) {
+                                        )) && in_array($catrow['uid'], $be_userCategories))) {
                                 $categoryById[$catrow['uid']] = $catrow;
                                 $categoryByCalendarId[$catrow['calendar_id']][] = $catrow;
                                 $categoryByParentId[$catrow['parent_category']][] = $catrow;
@@ -848,9 +786,9 @@ class TreeView
                         $categoryById[$id] = $allCategoryById[$id];
                         $categoryByCalendarId[$allCategoryById[$id]['calendar_id']][] = $allCategoryById[$id];
                         if (in_array(
-                            $allCategoryById[$id]['parent_category'],
+                                $allCategoryById[$id]['parent_category'],
                                 $ids
-                        ) || $categoryById[$allCategoryById[$id]['parent_category']]) {
+                            ) || $categoryById[$allCategoryById[$id]['parent_category']]) {
                             $categoryByParentId[$allCategoryById[$id]['parent_category']][] = $allCategoryById[$id];
                         }
                     }
@@ -975,30 +913,17 @@ class TreeView
 
                     $width = 280; // default width for the field with the category tree
                     if (intval($confArr['categoryTreeWidth'])) { // if a value is set in extConf take this one.
-                        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-                            $width = MathUtility::forceIntegerInRange($confArr['categoryTreeWidth'], 1, 600);
-                        } else {
-                            $width = GeneralUtility::forceIntegerInRange($confArr['categoryTreeWidth'], 1, 600);
-                        }
+                        $width = MathUtility::forceIntegerInRange($confArr['categoryTreeWidth'], 1, 600);
                     } elseif ($GLOBALS['CLIENT']['BROWSER'] == 'msie') { // to suppress the unneeded horizontal scrollbar IE needs a width of at least 320px
                         $width = 320;
                     }
 
-                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-                        $config['autoSizeMax'] = MathUtility::forceIntegerInRange($config['autoSizeMax'], 0);
-                        $height = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
-                            $treeItemC + 2,
-                            MathUtility::forceIntegerInRange($size, 1),
-                            $config['autoSizeMax']
-                        ) : $size;
-                    } else {
-                        $config['autoSizeMax'] = GeneralUtility::forceIntegerInRange($config['autoSizeMax'], 0);
-                        $height = $config['autoSizeMax'] ? GeneralUtility::forceIntegerInRange(
-                            $treeItemC + 2,
-                            GeneralUtility::forceIntegerInRange($size, 1),
-                            $config['autoSizeMax']
-                        ) : $size;
-                    }
+                    $config['autoSizeMax'] = MathUtility::forceIntegerInRange($config['autoSizeMax'], 0);
+                    $height = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
+                        $treeItemC + 2,
+                        MathUtility::forceIntegerInRange($size, 1),
+                        $config['autoSizeMax']
+                    ) : $size;
                     // hardcoded: 16 is the height of the icons
                     $height = $height * 16;
 
@@ -1008,25 +933,17 @@ class TreeView
                     $thumbnails .= '</div>';
                 } else {
                     $sOnChange = 'setFormValueFromBrowseWin(\'' . $PA['itemFormElName'] . '\',this.options[this.selectedIndex].value,this.options[this.selectedIndex].text); ' . implode(
-                        '',
+                            '',
                             $PA['fieldChangeFunc']
-                    );
+                        );
 
                     // Put together the select form with selected elements:
                     $selector_itemListStyle = isset($config['itemListStyle']) ? ' style="' . htmlspecialchars($config['itemListStyle']) . '"' : ' style="' . $this->pObj->defaultMultipleSelectorStyle . '"';
-                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-                        $size = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
-                            count($itemArray) + 1,
-                            MathUtility::forceIntegerInRange($size, 1),
-                            $config['autoSizeMax']
-                        ) : $size;
-                    } else {
-                        $size = $config['autoSizeMax'] ? GeneralUtility::forceIntegerInRange(
-                            count($itemArray) + 1,
-                            GeneralUtility::forceIntegerInRange($size, 1),
-                            $config['autoSizeMax']
-                        ) : $size;
-                    }
+                    $size = $config['autoSizeMax'] ? MathUtility::forceIntegerInRange(
+                        count($itemArray) + 1,
+                        MathUtility::forceIntegerInRange($size, 1),
+                        $config['autoSizeMax']
+                    ) : $size;
 
                     $thumbnails = '<select style="width:150px;" name="' . $PA['itemFormElName'] . '_sel"' . $this->pObj->insertDefStyle('select') . ($size ? ' size="' . $size . '"' : '') . ' onchange="' . htmlspecialchars($sOnChange) . '"' . $PA['onFocus'] . $selector_itemListStyle . '>';
                     // thumbnails = '<select name="'.$PA['itemFormElName'].'_sel"'.$this->pObj->insertDefStyle('select').($size?' size="'.$size.'"':'').' onchange="'.htmlspecialchars($sOnChange).'"'.$PA['onFocus'].$selector_itemListStyle.'>';
@@ -1052,110 +969,53 @@ class TreeView
                 }
                 $sWidth = 150; // default width for the left field of the category select
                 if (intval($confArr['categorySelectedWidth'])) {
-                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-                        $sWidth = MathUtility::forceIntegerInRange($confArr['categorySelectedWidth'], 1, 600);
-                    } else {
-                        $sWidth = GeneralUtility::forceIntegerInRange($confArr['categorySelectedWidth'], 1, 600);
-                    }
+                    $sWidth = MathUtility::forceIntegerInRange($confArr['categorySelectedWidth'], 1, 600);
                 }
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
-                    $params = [
-                        'size' => $size,
-                        'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
-                        // style' => isset($config['selectedListStyle']) ? ' style="'.htmlspecialchars($config['selectedListStyle']).'"' : ' style="'.$this->pObj->defaultMultipleSelectorStyle.'"',
-                        'style' => ' style="width:' . $sWidth . 'px;"',
-                        'dontShowMoveIcons' => $maxitems <= 1,
-                        'maxitems' => $maxitems,
-                        'info' => '',
-                        'headers' => [
-                            'selector' => $this->pObj->getLL('l_selected') . ':<br />',
-                            'items' => $this->pObj->getLL('l_items') . ':<br />'
-                        ],
-                        'noBrowser' => 1,
-                        'rightbox' => $thumbnails,
-                        'foreign_table' => 'tx_cal_category',
-                        'treeConfig' => [
-                            'dataProvider' => 'TYPO3\\CMS\\Cal\\TreeProvider\\MixedTreeDataProvider',
-                            'parentField' => 'calendar_id',
-                            'appearance' => [
-                                'showHeader' => true,
-                                'allowRecursiveMode' => true,
-                                'expandAll' => true,
-                                'maxLevels' => 99
-                            ]
-                        ],
-                    ];
-                } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
-                    $params = [
-                        'size' => $size,
-                        'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
-                        // style' => isset($config['selectedListStyle']) ? ' style="'.htmlspecialchars($config['selectedListStyle']).'"' : ' style="'.$this->pObj->defaultMultipleSelectorStyle.'"',
-                        'style' => ' style="width:' . $sWidth . 'px;"',
-                        'dontShowMoveIcons' => $maxitems <= 1,
-                        'maxitems' => $maxitems,
-                        'info' => '',
-                        'headers' => [
-                            'selector' => $this->pObj->getLL('l_selected') . ':<br />',
-                            'items' => $this->pObj->getLL('l_items') . ':<br />'
-                        ],
-                        'noBrowser' => 1,
-                        'thumbnails' => $thumbnails
-                    ];
-                } else {
-                    $params = [
-                        'size' => $size,
-                        'autoSizeMax' => GeneralUtility::forceIntegerInRange($config['autoSizeMax'], 0),
-                        // style' => isset($config['selectedListStyle']) ? ' style="'.htmlspecialchars($config['selectedListStyle']).'"' : ' style="'.$this->pObj->defaultMultipleSelectorStyle.'"',
-                        'style' => ' style="width:' . $sWidth . 'px;"',
-                        'dontShowMoveIcons' => $maxitems <= 1,
-                        'maxitems' => $maxitems,
-                        'info' => '',
-                        'headers' => [
-                            'selector' => $this->pObj->getLL('l_selected') . ':<br />',
-                            'items' => $this->pObj->getLL('l_items') . ':<br />'
-                        ],
-                        'noBrowser' => 1,
-                        'thumbnails' => $thumbnails
-                    ];
-                }
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
-                    $treeHelperElement = new TreeHelperElement($this->pObj);
-                    $item .= $treeHelperElement->getDbFileIcon(
-                        $PA['itemFormElName'],
-                        '',
-                        '',
-                        $itemArray,
-                        '',
-                        $params,
-                        $PA['onFocus']
-                    );
-                } else {
-                    $item .= $this->pObj->dbFileIcons(
-                        $PA['itemFormElName'],
-                        '',
-                        '',
-                        $itemArray,
-                        '',
-                        $params,
-                        $PA['onFocus']
-                    );
-                }
+                $params = [
+                    'size' => $size,
+                    'autoSizeMax' => MathUtility::forceIntegerInRange($config['autoSizeMax'], 0),
+                    // style' => isset($config['selectedListStyle']) ? ' style="'.htmlspecialchars($config['selectedListStyle']).'"' : ' style="'.$this->pObj->defaultMultipleSelectorStyle.'"',
+                    'style' => ' style="width:' . $sWidth . 'px;"',
+                    'dontShowMoveIcons' => $maxitems <= 1,
+                    'maxitems' => $maxitems,
+                    'info' => '',
+                    'headers' => [
+                        'selector' => $this->pObj->getLL('l_selected') . ':<br />',
+                        'items' => $this->pObj->getLL('l_items') . ':<br />'
+                    ],
+                    'noBrowser' => 1,
+                    'rightbox' => $thumbnails,
+                    'foreign_table' => 'tx_cal_category',
+                    'treeConfig' => [
+                        'dataProvider' => 'TYPO3\\CMS\\Cal\\TreeProvider\\MixedTreeDataProvider',
+                        'parentField' => 'calendar_id',
+                        'appearance' => [
+                            'showHeader' => true,
+                            'allowRecursiveMode' => true,
+                            'expandAll' => true,
+                            'maxLevels' => 99
+                        ]
+                    ],
+                ];
+                $treeHelperElement = new TreeHelperElement($this->pObj);
+                $item .= $treeHelperElement->getDbFileIcon(
+                    $PA['itemFormElName'],
+                    '',
+                    '',
+                    $itemArray,
+                    '',
+                    $params,
+                    $PA['onFocus']
+                );
                 // Wizards:
                 $altItem = '<input type="hidden" name="' . $PA['itemFormElName'] . '" value="' . htmlspecialchars($PA['itemFormElValue']) . '" />';
 
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7000000) {
-                    $treeHelperElement = new TreeHelperElement($this->pObj);
-                    $item = $treeHelperElement->getRenderWizards([
-                        $item,
-                        $altItem
-                    ], $config['wizards'], $table, $row, $field, $PA, $PA['itemFormElName'], $specConf);
-                    $item .= '<style>.t3-icon-blank {width: 18px;height: 30px;}</style>';
-                } else {
-                    $item = $this->pObj->renderWizards([
-                        $item,
-                        $altItem
-                    ], $config['wizards'], $table, $row, $field, $PA, $PA['itemFormElName'], $specConf);
-                }
+                $treeHelperElement = new TreeHelperElement($this->pObj);
+                $item = $treeHelperElement->getRenderWizards([
+                    $item,
+                    $altItem
+                ], $config['wizards'], $table, $row, $field, $PA, $PA['itemFormElName'], $specConf);
+                $item .= '<style>.t3-icon-blank {width: 18px;height: 30px;}</style>';
             }
         }
         return $this->NA_Items . implode($errorMsg, chr(10)) . $item;
@@ -1264,9 +1124,9 @@ class TreeView
                 }
                 if ($notAllowedCats[0]) {
                     $this->NA_Items = '<table class="warningbox" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td><img src="gfx/icon_fatalerror.gif" class="absmiddle" alt="" height="16" width="18">SAVING DISABLED!! <br />This record has the following categories assigned that are not defined in your BE usergroup: ' . implode(
-                        $notAllowedCats,
+                            $notAllowedCats,
                             chr(10)
-                    ) . '</td></tr></tbody></table>';
+                        ) . '</td></tr></tbody></table>';
                 }
             }
         }
@@ -1302,9 +1162,9 @@ class TreeView
             }
         } elseif ($table == 'tt_news_cat' || $table == 'tt_news') {
             if ($table == 'tt_news_cat' && $row['pid'] == $storagePid && intval($row['uid']) && !in_array(
-                $row['uid'],
+                    $row['uid'],
                     $treeIds
-            )) { // if the selected category is not empty and not in the array of tree-uids it seems to be part of a chain of recursive categories
+                )) { // if the selected category is not empty and not in the array of tree-uids it seems to be part of a chain of recursive categories
                 $recursionMsg = 'RECURSIVE CATEGORIES DETECTED!! <br />This record is part of a chain of recursive categories. The affected categories will not be displayed in the category tree.	You should remove the parent category of this record to prevent this.';
             }
             if ($table == 'tt_news' && $row['category']) { // find recursive categories in the tt_news db-record
@@ -1415,9 +1275,9 @@ class TreeView
 
                 if ($NACats[0]) {
                     $NA_Items = '<table class="warningbox" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td><img src="gfx/icon_fatalerror.gif" class="absmiddle" alt="" height="16" width="18">SAVING DISABLED!! <br />' . ($row['l18n_parent'] && $row['sys_language_uid'] ? 'The translation original of this' : 'This') . ' record has the following categories assigned that are not defined in your BE usergroup: ' . implode(
-                        $NACats,
+                            $NACats,
                             chr(10)
-                    ) . '</td></tr></tbody></table>';
+                        ) . '</td></tr></tbody></table>';
                 }
             }
         }

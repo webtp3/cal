@@ -23,7 +23,6 @@ use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * TCA tree data provider which considers
@@ -136,14 +135,8 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     protected function appendCalendarCategories($level, $childNodes)
     {
         $calendarId = 0;
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) > 8000000) {
-            if (isset($this->currentValue['calendar_id'])) {
-                $calendarId = $this->currentValue['calendar_id'];
-            }
-        } else {
-            if (isset($this->parentRow['calendar_id'][0])) {
-                $calendarId = $this->parentRow['calendar_id'][0];
-            }
+        if (isset($this->currentValue['calendar_id'])) {
+            $calendarId = $this->currentValue['calendar_id'];
         }
         if ($calendarId > 0) {
             $calres = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -271,9 +264,9 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
             $icon = $iconFactory->getIconForRecord($this->tableName, $row, Icon::SIZE_SMALL);
             $node->setIcon($icon);
             $node->setSelectable(!GeneralUtility::inList(
-                $this->getNonSelectableLevelList(),
+                    $this->getNonSelectableLevelList(),
                     $level
-            ) && !in_array($basicNode->getId(), $this->getItemUnselectableList()));
+                ) && !in_array($basicNode->getId(), $this->getItemUnselectableList()));
             $node->setSortValue($this->nodeSortValues[$basicNode->getId()]);
         }
 

@@ -14,27 +14,25 @@ namespace TYPO3\CMS\Cal\Utility;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+
 use TYPO3\CMS\Cal\Controller\UriHandler;
 use TYPO3\CMS\Cal\Model\CalDate;
-use TYPO3\CMS\Core\Cache\Cache;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * This is a collection of many useful functions
  */
 class Functions
 {
-    /*
-     * Expands a path if it includes EXT: shorthand. @param		string		The path to be expanded. @return					The expanded path.
-     */
     /**
-     * @param $path
-     * @return string
+     * Expands a path if it includes EXT: shorthand.
+     * @param string $path The path to be expanded.
+     * @return string The expanded path.
      */
-    public static function expandPath($path)
+    public static function expandPath(string $path): string
     {
         if (!strcmp(substr($path, 0, 4), 'EXT:')) {
             list($extKey, $script) = explode('/', substr($path, 4), 2);
@@ -49,16 +47,8 @@ class Functions
 
     public static function clearCache()
     {
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
-            $pageCache = GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_pages');
-            $pageCache->flushByTag('cal');
-        } else {
-            // only use cachingFramework if initialized and configured in TYPO3
-            if (Cache::isCachingFrameworkInitialized() && TYPO3_UseCachingFramework && is_object($GLOBALS['typo3CacheManager'])) {
-                $pageCache = $GLOBALS['typo3CacheManager']->getCache('cache_pages');
-                $pageCache->flushByTag('cal');
-            }
-        }
+        $pageCache = GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_pages');
+        $pageCache->flushByTag('cal');
     }
 
     /**
@@ -610,11 +600,7 @@ class Functions
         $hookObjectsArr = [];
         if (is_array($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['EXTCONF']['ext/cal/' . $modulePath . '/class.' . $className . '.php'][$hookName])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['EXTCONF']['ext/cal/' . $modulePath . '/class.' . $className . '.php'][$hookName] as $classRef) {
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-                    $hookObjectsArr[] = GeneralUtility::makeInstance($classRef);
-                } else {
-                    $hookObjectsArr[] = GeneralUtility::getUserObj($classRef);
-                }
+                $hookObjectsArr[] = GeneralUtility::makeInstance($classRef);
             }
         }
 
@@ -778,7 +764,7 @@ class Functions
     {
 
         /** @var TypoScriptService $typoScriptService */
-        $typoScriptService = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
+        $typoScriptService = GeneralUtility::makeInstance(TypoScriptService::class);
         return $typoScriptService->convertTypoScriptArrayToPlainArray($conf);
     }
 

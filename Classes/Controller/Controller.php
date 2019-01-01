@@ -23,7 +23,6 @@ use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
 
@@ -309,12 +308,12 @@ class Controller extends AbstractPlugin
 
         // date and strtotime should be ok here
         if ($this->conf['getdate'] <= date(
-            'Ymd',
+                'Ymd',
                 strtotime($this->conf['view.']['startLinkRange'])
-        ) || $this->conf['getdate'] >= date(
-                    'Ymd',
+            ) || $this->conf['getdate'] >= date(
+                'Ymd',
                 strtotime($this->conf['view.']['endLinkRange'])
-                )) {
+            )) {
             // Set additional META-Tag for google et al
             $GLOBALS['TSFE']->additionalHeaderData['cal'] = '<meta name="robots" content="index,nofollow" />';
 
@@ -1679,9 +1678,9 @@ class Controller extends AbstractPlugin
             $start_day = Calendar::calculateStartDayTime($start_day);
         } else {
             $start_day = new CalDate(Functions::getYmdFromDateString(
-                $this->conf,
+                    $this->conf,
                     $start_day
-            ) . '000000');
+                ) . '000000');
             $start_day->setHour(0);
             $start_day->setMinute(0);
             $start_day->setSecond(0);
@@ -1692,9 +1691,9 @@ class Controller extends AbstractPlugin
             $end_day = Calendar::calculateEndDayTime($end_day);
         } else {
             $end_day = new CalDate(Functions::getYmdFromDateString(
-                $this->conf,
+                    $this->conf,
                     $end_day
-            ) . '000000');
+                ) . '000000');
             $end_day->setHour(23);
             $end_day->setMinute(59);
             $end_day->setSecond(59);
@@ -2716,9 +2715,9 @@ class Controller extends AbstractPlugin
             $ajaxGroupStringArray[] = '{' . $this->getEventAjaxString($group) . '}';
         }
         return '{"fe_users":[' . implode(',', $ajaxUserStringArray) . '],"fe_groups":[' . implode(
-            ',',
+                ',',
                 $ajaxGroupStringArray
-        ) . ']}';
+            ) . ']}';
     }
 
     /**
@@ -3090,9 +3089,9 @@ class Controller extends AbstractPlugin
         $wrapped = [];
         $sims['###IMG_PATH###'] = Functions::expandPath($this->conf['view.']['imagePath']);
         $page = Functions::substituteMarkerArrayNotCached('[' . implode(
-            ',',
+                ',',
                 $ajaxStringArray
-        ) . ']', $sims, $rems, $wrapped);
+            ) . ']', $sims, $rems, $wrapped);
 
         // Hook: postLoadTodosRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -3859,16 +3858,16 @@ class Controller extends AbstractPlugin
                     $this->piVars['day'] = 30;
                 }
                 $this->piVars['getdate'] = str_pad(
-                    (int)$this->piVars['year'],
-                    4,
-                    '0',
+                        (int)$this->piVars['year'],
+                        4,
+                        '0',
                         STR_PAD_LEFT
-                ) . str_pad(
-                            (int)$this->piVars['month'],
-                            2,
-                            '0',
+                    ) . str_pad(
+                        (int)$this->piVars['month'],
+                        2,
+                        '0',
                         STR_PAD_LEFT
-                        ) . str_pad((int)$this->piVars['day'], 2, '0', STR_PAD_LEFT);
+                    ) . str_pad((int)$this->piVars['day'], 2, '0', STR_PAD_LEFT);
                 unset($this->piVars['year']);
                 unset($this->piVars['month']);
                 unset($this->piVars['day']);
@@ -3922,11 +3921,7 @@ class Controller extends AbstractPlugin
         if (is_array($this->piVars) && is_array($overrulePIvars) && !$clearAnyway) {
             $piVars = $this->piVars;
             unset($piVars['DATA']);
-            if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '6002000') {
-                $piVars = GeneralUtility::array_merge_recursive_overrule($piVars, $overrulePIvars);
-            } else {
-                ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
-            }
+            ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
             $overrulePIvars = $piVars;
             if ($this->pi_autoCacheEn) {
                 $cache = $this->pi_autoCache($overrulePIvars);
@@ -3996,11 +3991,11 @@ class Controller extends AbstractPlugin
         $parameterArray['link_no_cache'] = $this->pi_USER_INT_obj ? 0 : !$cache;
         $parameterArray['link_parameter'] = $altPageId ? $altPageId : ($this->pi_tmpPageId ? $this->pi_tmpPageId : $GLOBALS['TSFE']->id);
         $parameterArray['link_additionalParams'] = $this->conf['parent.']['addParams'] . GeneralUtility::implodeArrayForUrl(
-            '',
+                '',
                 $piVars,
-            '',
-            true
-        ) . $this->pi_moreParams;
+                '',
+                true
+            ) . $this->pi_moreParams;
         $parameterArray['link_ATagParams'] = 'class="url"';
 
         // add time/date related parameters to all link objects, so that they can use them e.g. to display the monthname etc.

@@ -8,8 +8,7 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
-use TYPO3\CMS\Dbal\Database\DatabaseConnection;
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 use TYPO3\CMS\Install\Updates\AbstractUpdate;
 
 /**
@@ -74,9 +73,9 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
             $configuration = $storage->getConfiguration();
             $isLocalDriver = $storageRecord['driver'] === 'Local';
             $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
-                $configuration['basePath'],
+                    $configuration['basePath'],
                     $fileadminDirectory
-            );
+                );
             if ($isLocalDriver && $isOnFileadmin) {
                 $this->storage = $storage;
                 break;
@@ -86,13 +85,7 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
             throw new \RuntimeException('Local default storage could not be initialized - might be due to missing sys_file* tables.');
         }
         $this->fileFactory = GeneralUtility::makeInstance(ResourceFactory::class);
-        //TYPO3 >= 6.2.0
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
-            $this->fileIndexRepository = GeneralUtility::makeInstance(FileIndexRepository::class);
-        } else {
-            //TYPO3 = 6.1
-            $this->fileRepository = GeneralUtility::makeInstance(FileRepository::class);
-        }
+        $this->fileIndexRepository = GeneralUtility::makeInstance(FileIndexRepository::class);
         $this->targetDirectory = PATH_site . $fileadminDirectory . self::FOLDER_ContentUploads . '/';
     }
 

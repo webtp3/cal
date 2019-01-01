@@ -20,7 +20,6 @@ use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Class NotificationView
@@ -98,16 +97,16 @@ class NotificationView extends BaseService
                     }
 
                     $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                             '',
-                        [
+                            [
                                 'tx_cal_controller[view]' => 'subscription',
                                 'tx_cal_controller[email]' => $row1['email'],
                                 'tx_cal_controller[uid]' => $event_old->getUid(),
                                 'tx_cal_controller[monitor]' => 'stop',
                                 'tx_cal_controller[sid]' => md5($event_old->getUid() . $row1['email'] . $row1['crdate'])
                             ]
-                    );
+                        );
                     $this->sendNotificationOfChanges(
                         $event_old,
                         $event_new,
@@ -129,16 +128,16 @@ class NotificationView extends BaseService
                     $template = $this->conf['view.']['event.']['notify.']['all.']['onChangeTemplate'];
                     $titleText = $this->conf['view.']['event.']['notify.']['all.']['onChangeEmailTitle'];
                     $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                             '',
-                        [
+                            [
                                 'tx_cal_controller[view]' => 'subscription',
                                 'tx_cal_controller[email]' => $row1['email'],
                                 'tx_cal_controller[uid]' => $event_old->getUid(),
                                 'tx_cal_controller[monitor]' => 'stop',
                                 'tx_cal_controller[sid]' => md5($event_old->getUid() . $row1['email'] . $row1['crdate'])
                             ]
-                    );
+                        );
                     $this->sendNotificationOfChanges(
                         $event_old,
                         $event_new,
@@ -214,16 +213,16 @@ class NotificationView extends BaseService
                         }
 
                         $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                                $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                                 '',
-                            [
+                                [
                                     'tx_cal_controller[view]' => 'subscription',
                                     'tx_cal_controller[email]' => $row2['email'],
                                     'tx_cal_controller[uid]' => $event_old->getUid(),
                                     'tx_cal_controller[monitor]' => 'stop',
                                     'tx_cal_controller[sid]' => md5($event_old->getUid() . $row2['email'] . $row2['crdate'])
                                 ]
-                        );
+                            );
                         $this->sendNotificationOfChanges(
                             $event_old,
                             $event_new,
@@ -296,21 +295,12 @@ class NotificationView extends BaseService
         $rems = [];
         $wrapped = [];
         $event_new->getMarker($titleText, $switch, $rems, $wrapped, 'title');
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
-            $this->mailer->subject = Functions::substituteMarkerArrayNotCached(
-                $titleText,
-                $switch,
-                $rems,
-                $wrapped
-            );
-        } else {
-            $this->mailer->setSubject(Functions::substituteMarkerArrayNotCached(
-                $titleText,
-                $switch,
-                $rems,
-                $wrapped
-            ));
-        }
+        $this->mailer->setSubject(Functions::substituteMarkerArrayNotCached(
+            $titleText,
+            $switch,
+            $rems,
+            $wrapped
+        ));
         $this->sendEmail($email, $htmlTemplate, $plainTemplate);
     }
 
@@ -421,16 +411,16 @@ class NotificationView extends BaseService
                     }
 
                     $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                             '',
-                        [
+                            [
                                 'tx_cal_controller[view]' => 'subscription',
                                 'tx_cal_controller[email]' => $row1['email'],
                                 'tx_cal_controller[uid]' => $event->getUid(),
                                 'tx_cal_controller[monitor]' => 'stop',
                                 'tx_cal_controller[sid]' => md5($event->getUid() . $row1['email'] . $row1['crdate'])
                             ]
-                    );
+                        );
                     $this->sendNotification($event, $row1['email'], $template, $titleText, $unsubscribeLink);
                 }
             }
@@ -449,16 +439,16 @@ class NotificationView extends BaseService
                         $titleText = $this->conf['view.']['event.']['notify.']['all.']['onDeleteEmailTitle'];
                     }
                     $unsubscribeLink = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $this->controller->pi_getPageLink(
-                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                             '',
-                        [
+                            [
                                 'tx_cal_controller[view]' => 'subscription',
                                 'tx_cal_controller[email]' => $row1['email'],
                                 'tx_cal_controller[uid]' => $event->getUid(),
                                 'tx_cal_controller[monitor]' => 'stop',
                                 'tx_cal_controller[sid]' => md5($event->getUid() . $row1['email'] . $row1['crdate'])
                             ]
-                    );
+                        );
                     $this->sendNotification($event, $row1['email'], $template, $titleText, $unsubscribeLink);
                 }
             }
@@ -540,16 +530,16 @@ class NotificationView extends BaseService
                         }
 
                         $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                                $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                                 '',
-                            [
+                                [
                                     'tx_cal_controller[view]' => 'subscription',
                                     'tx_cal_controller[email]' => $row2['email'],
                                     'tx_cal_controller[uid]' => $event->getUid(),
                                     'tx_cal_controller[monitor]' => 'stop',
                                     'tx_cal_controller[sid]' => md5($event->getUid() . $row2['email'] . $row2['crdate'])
                                 ]
-                        );
+                            );
                         $this->sendNotification($event, $row2['email'], $template, $titleText, $unsubscribeLink);
                     }
                 }
@@ -623,21 +613,12 @@ class NotificationView extends BaseService
         $wrapped = [];
         $event->getMarker($titleText, $switch, $rems, $wrapped, 'title');
 
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
-            $this->mailer->subject = Functions::substituteMarkerArrayNotCached(
-                $titleText,
-                $switch,
-                $rems,
-                $wrapped
-            );
-        } else {
-            $this->mailer->setSubject(Functions::substituteMarkerArrayNotCached(
-                $titleText,
-                $switch,
-                $rems,
-                $wrapped
-            ));
-        }
+        $this->mailer->setSubject(Functions::substituteMarkerArrayNotCached(
+            $titleText,
+            $switch,
+            $rems,
+            $wrapped
+        ));
 
         $this->sendEmail($email, $htmlTemplate, $plainTemplate);
     }
@@ -719,12 +700,7 @@ class NotificationView extends BaseService
                         ',' => '_'
                     ]);
                     $icsAttachmentFile = $this->createTempIcsFile($ics, $title);
-                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
-                        $this->mailer->addAttachment($icsAttachmentFile);
-                    } else {
-                        $attachment = \Swift_Attachment::fromPath($icsAttachmentFile, 'text/calendar');
-                        $this->mailer->attach($attachment);
-                    }
+                    $this->mailer->addAttachment($icsAttachmentFile);
 
                     if (count($newEventDataArray) > 0) {
                         $this->sendNotificationOfChanges(
@@ -749,9 +725,6 @@ class NotificationView extends BaseService
                         );
                     }
                     unlink($icsAttachmentFile);
-                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
-                        $this->mailer->theParts['attach'] = [];
-                    }
                 }
             }
         }
@@ -766,19 +739,12 @@ class NotificationView extends BaseService
             foreach (array_keys($globalAttendeeArray[$serviceType]) as $uid) {
                 $attendee = &$globalAttendeeArray[$serviceType][$uid];
                 if ($attendee->getAttendance() == 'CHAIR') {
-                    if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
-                        $this->mailer->from_email = $attendee->getEmail();
-                        $this->mailer->from_name = $attendee->getName();
-                        $this->mailer->replyto_email = $attendee->getEmail();
-                        $this->mailer->replyto_name = $attendee->getName();
-                    } else {
-                        $this->mailer->setFrom([
-                            $attendee->getEmail() => $attendee->getName()
-                        ]);
-                        $this->mailer->setReplyTo([
-                            $attendee->getEmail() => $attendee->getName()
-                        ]);
-                    }
+                    $this->mailer->setFrom([
+                        $attendee->getEmail() => $attendee->getName()
+                    ]);
+                    $this->mailer->setReplyTo([
+                        $attendee->getEmail() => $attendee->getName()
+                    ]);
 
                     // do not invite the chairman
                     unset($globalAttendeeArray[$serviceType][$uid]);
@@ -820,32 +786,23 @@ class NotificationView extends BaseService
         $this->controller->finish($plainTemplate);
         $plainTemplate = str_replace('&nbsp;', ' ', strip_tags($plainTemplate));
 
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 4005010) {
-            $this->mailer->theParts['html']['content'] = $htmlTemplate;
-            $this->mailer->theParts['html']['path'] = '';
-            $this->mailer->extractMediaLinks();
-            $this->mailer->extractHyperLinks();
-            $this->mailer->fetchHTMLMedia();
-            $this->mailer->substMediaNamesInHTML(0); // 0 = relative
-            $this->mailer->substHREFsInHTML();
+        $this->mailer->theParts['html']['content'] = $htmlTemplate;
+        $this->mailer->theParts['html']['path'] = '';
+        $this->mailer->extractMediaLinks();
+        $this->mailer->extractHyperLinks();
+        $this->mailer->fetchHTMLMedia();
+        $this->mailer->substMediaNamesInHTML(0); // 0 = relative
+        $this->mailer->substHREFsInHTML();
 
-            $this->mailer->setHTML($this->mailer->encodeMsg($this->mailer->theParts['html']['content']));
+        $this->mailer->setHTML($this->mailer->encodeMsg($this->mailer->theParts['html']['content']));
 
-            $this->mailer->substHREFsInHTML();
+        $this->mailer->substHREFsInHTML();
 
-            $this->mailer->setPlain(strip_tags($plainTemplate));
-            $this->mailer->setHeaders();
-            $this->mailer->setContent();
-            $this->mailer->setRecipient($email);
-            $this->mailer->sendtheMail();
-        } else {
-            $this->mailer->setTo([
-                $email
-            ]);
-            $this->mailer->setBody(strip_tags($plainTemplate), 'text/plain');
-            $this->mailer->addPart(Functions::fixURI($htmlTemplate), 'text/html');
-            $this->mailer->send();
-        }
+        $this->mailer->setPlain(strip_tags($plainTemplate));
+        $this->mailer->setHeaders();
+        $this->mailer->setContent();
+        $this->mailer->setRecipient($email);
+        $this->mailer->sendtheMail();
     }
 
     /**

@@ -3,8 +3,7 @@
 namespace TYPO3\CMS\Cal\Updates;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
-use TYPO3\CMS\Dbal\Database\DatabaseConnection;
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -85,13 +84,7 @@ class UploadsUpdateWizard extends AbstractUpdateWizard
                     $this->targetDirectory . $file
                 );
                 $fileObject = $this->storage->getFile(self::FOLDER_ContentUploads . '/' . $file);
-                //TYPO3 >= 6.2.0
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
-                    $this->fileIndexRepository->add($fileObject);
-                } else {
-                    //TYPO3 6.1.0
-                    $this->fileRepository->addToIndex($fileObject);
-                }
+                $this->fileIndexRepository->add($fileObject);
                 $dataArray = [
                     'uid_local' => $fileObject->getUid(),
                     'tablenames' => 'tx_cal_event',

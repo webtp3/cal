@@ -19,7 +19,6 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\TimeTracker\TimeTracker;
 use TYPO3\CMS\Core\TypoScript\ExtendedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
@@ -157,11 +156,6 @@ class Api
         if ($tt_content_row['pages']) {
             // $conf['pages'] = $tt_content_row['pages'];
             $cObj->data = $tt_content_row;
-        }
-        if (TYPO3_MODE == 'BE') {
-            if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 8000000) {
-                $this->cleanUpPageRendererBackPath();
-            }
         }
         return $this->tx_cal_api_with($cObj, $conf);
     }

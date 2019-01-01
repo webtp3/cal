@@ -3,10 +3,8 @@
 namespace TYPO3\CMS\Cal\Backend\TCA;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Backend\Utility\IconUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -46,43 +44,19 @@ class CustomTca
     {
         $GLOBALS['LANG']->includeLLFile(ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_db.xml');
 
-        $this->frequency = $PA['row']['freq'];
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
-            $this->frequency = $PA['row']['freq'][0];
-        }
+        $this->frequency = $PA['row']['freq'][0];
         $this->uid = $PA['row']['uid'];
         $this->row = $PA['row'];
         $this->table = $PA['table'];
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
-            $this->rdateType = $this->row['rdate_type'][0];
-        } else {
-            $this->rdateType = $this->row['rdate_type'];
-        }
+        $this->rdateType = $this->row['rdate_type'][0];
         $this->rdate = $this->row['rdate'];
         $this->rdateValues = GeneralUtility::trimExplode(',', $this->row['rdate'], 1);
 
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
-            $this->garbageIcon = '<span class="t3-icon fa t3-icon fa fa-trash"> </span>';
-            $this->newIcon = '<span title="' . $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '" class="t3-icon fa t3-icon fa fa-plus-square"> </span>';
-        } else {
-            $this->garbageIcon = '<img' . IconUtility::skinImg(
-                $GLOBALS['BACK_PATH'],
-                    'gfx/garbage.gif'
-            ) . ' title="' . $GLOBALS['LANG']->getLL('tx_cal_event.remove_recurrence') . '" alt="' . $GLOBALS['LANG']->getLL('tx_cal_event.delete_recurrence') . '" />';
-            $this->newIcon = '<img' . IconUtility::skinImg(
-                $GLOBALS['BACK_PATH'],
-                    'gfx/new_el.gif'
-            ) . ' title="' . $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '" alt="' . $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '" />';
-        }
+        $this->garbageIcon = '<span class="t3-icon fa t3-icon fa fa-trash"> </span>';
+        $this->newIcon = '<span title="' . $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '" class="t3-icon fa t3-icon fa fa-plus-square"> </span>';
 
         $this->commonJS = '';
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-            $this->commonJS .= '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui3.js" type="text/javascript"></script>' . chr(10) . '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url2.js" type="text/javascript"></script>';
-        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
-            $this->commonJS .= '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui2.js" type="text/javascript"></script>' . chr(10) . '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url2.js" type="text/javascript"></script>';
-        } else {
-            $this->commonJS .= '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/recurui.js" type="text/javascript"></script>' . chr(10) . '<script src="' . ExtensionManagementUtility::extRelPath('cal') . 'Resources/Public/js/url.js" type="text/javascript"></script>';
-        }
+        $this->commonJS .= '<script src="' . ExtensionManagementUtility::extPath('cal') . 'Resources/Public/js/recurui3.js" type="text/javascript"></script>' . chr(10) . '<script src="' . ExtensionManagementUtility::extPath('cal') . 'Resources/Public/js/url2.js" type="text/javascript"></script>';
 
         $this->everyMonthText = $GLOBALS['LANG']->getLL('tx_cal_event.recurs_every_month');
         $this->selectedMonthText = $GLOBALS['LANG']->getLL('tx_cal_event.recurs_selected_months');
@@ -197,13 +171,7 @@ class CustomTca
         $out[] = $this->commonJS;
         $out[] = '<script type="text/javascript">';
         $out[] = "var extUrl = new ExtUrlUI('ext_url-container', 'data[" . $this->table . '][' . $this->uid . "][ext_url]', 'cal-row', '" . $this->getExtUrlRow() . "');";
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-            $out[] = '$(function(){ extUrl.load(); });';
-        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
-            $out[] = 'TYPO3.jQuery(function(){ extUrl.load(); });';
-        } else {
-            $out[] = "Event.observe(window, 'load', function() { extUrl.load(); });";
-        }
+        $out[] = '$(function(){ extUrl.load(); });';
         $out[] = '</script>';
         $out[] = '<input type="hidden" name="data[' . $PA['table'] . '][' . $PA['row']['uid'] . '][ext_url_notes]" id="data[' . $PA['table'] . '][' . $PA['row']['uid'] . '][ext_url_notes]" value="' . $PA['row']['ext_url_notes'] . '" />';
 
@@ -302,13 +270,7 @@ class CustomTca
         $out[] = $this->commonJS;
         $out[] = '<script type="text/javascript">';
         $out[] = "var byMonth = new ByMonthUI('bymonth-container', 'data[" . $this->table . '][' . $this->uid . "][bymonth]', 'cal-row');";
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-            $out[] = 'TYPO3.jQuery(function(){ byMonth.load(); });';
-        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
-            $out[] = '$(function(){ byMonth.load(); });';
-        } else {
-            $out[] = "Event.observe(window, 'load', function() { byMonth.load(); });";
-        }
+        $out[] = 'TYPO3.jQuery(function(){ byMonth.load(); });';
         $out[] = '</script>';
 
         $out[] = '<div id="bymonth-container" style="margin-bottom: 5px;">';
@@ -399,29 +361,29 @@ class CustomTca
                 $splittedDateTime = explode('T', $splittedPeriod[0]);
                 if ($jsDate == '%d-%m-%Y') {
                     $formatedValue = substr($splittedDateTime[0], 6, 2) . '-' . substr(
-                        $splittedDateTime[0],
-                        4,
+                            $splittedDateTime[0],
+                            4,
                             2
-                    ) . '-' . substr($splittedDateTime[0], 0, 4);
+                        ) . '-' . substr($splittedDateTime[0], 0, 4);
                 } elseif ($jsDate == '%m-%d-%Y') {
                     $formatedValue = substr($splittedDateTime[0], 4, 2) . '-' . substr(
-                        $splittedDateTime[0],
-                        6,
+                            $splittedDateTime[0],
+                            6,
                             2
-                    ) . '-' . substr($splittedDateTime[0], 0, 4);
+                        ) . '-' . substr($splittedDateTime[0], 0, 4);
                 } else {
                     $formatedValue = 'unknown date format';
                 }
                 if ($this->rdateType == 'date_time' || $this->rdateType == 'period') {
                     $formatedValue = count($splittedDateTime) == 2 ? substr(
-                        $splittedDateTime[1],
-                        0,
+                            $splittedDateTime[1],
+                            0,
                             2
-                    ) . ':' . substr(
-                                $splittedDateTime[1],
-                                2,
+                        ) . ':' . substr(
+                            $splittedDateTime[1],
+                            2,
                             2
-                            ) . ' ' . $formatedValue : '00:00 ' . $formatedValue;
+                        ) . ' ' . $formatedValue : '00:00 ' . $formatedValue;
                 }
             }
             $params = [];
@@ -430,8 +392,7 @@ class CustomTca
             $params['field'] = 'rdate' . $key;
             $params['md5ID'] = $this->table . '_' . $this->uid . '_' . 'rdate' . $key;
             if ($this->rdateType == 'date_time' || $this->rdateType == 'period') {
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= '7000000') {
-                    $out[] = '<div class="form-control-wrap" style="max-width: 192px">
+                $out[] = '<div class="form-control-wrap" style="max-width: 192px">
 						<div class="input-group">
 						    <input type="hidden" value="' . $formatedValue . '" id="data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '" />
 							<div class="form-control-clearable">
@@ -440,12 +401,8 @@ class CustomTca
 							</div>
 						</div>
 					</div>';
-                } else {
-                    $out[] = '<span class="t3-form-palette-fieldclass-main5"><input type="text" value="' . $formatedValue . '" class="tceforms-datetimefield" name="rdate' . $key . '" id="tceforms-datetimefield-data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '_hr" onchange="' . 'rdateChanged();"/>' . '<input type="hidden" value="' . $formatedValue . '" id="data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '" />' . '<span id="picker-tceforms-datetimefield-data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '_hr" style="cursor: pointer; vertical-align: middle;" class="t3-icon t3-icon-actions t3-icon-actions-edit t3-icon-edit-pick-date"/></span></span><br/>';
-                }
             } else {
-                if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= '7000000') {
-                    $out[] = '<div class="form-control-wrap" style="max-width: 192px">
+                $out[] = '<div class="form-control-wrap" style="max-width: 192px">
 						<div class="input-group">
 						    <input type="hidden" value="' . $formatedValue . '" id="data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '" />
 							<div class="form-control-clearable">
@@ -456,9 +413,6 @@ class CustomTca
 							</div>
 						</div>
 					</div>';
-                } else {
-                    $out[] = '<span class="t3-form-palette-fieldclass-main5"><input type="text" value="' . $formatedValue . '" class="tceforms-datefield" name="rdate' . $key . '" id="tceforms-datefield-data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '_hr" onchange="' . 'rdateChanged();"/>' . '<input type="hidden" value="' . $formatedValue . '" id="data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '" />' . '<span id="picker-tceforms-datefield-data_' . $this->table . '_' . $this->uid . '_rdate' . $key . '_hr" style="cursor: pointer; vertical-align: middle;" class="t3-icon t3-icon-actions t3-icon-actions-edit t3-icon-edit-pick-date"/></span></span><br/>';
-                }
             }
             if ($this->rdateType == 'date') {
                 $params['wConf']['evalValue'] = 'date';
@@ -492,13 +446,7 @@ class CustomTca
         $out = [];
         $out[] = '<script type="text/javascript">';
         $out[] = "var byDay = new ByDayUI('byday-container', 'data[" . $this->table . '][' . $this->uid . "][byday]', 'cal-row');";
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-            $out[] = '$(function(){ byDay.load(); });';
-        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
-            $out[] = 'TYPO3.jQuery(function(){ byDay.load(); });';
-        } else {
-            $out[] = "Event.observe(window, 'load', function() { byDay.load(); });";
-        }
+        $out[] = '$(function(){ byDay.load(); });';
         $out[] = '</script>';
 
         $out[] = '<div id="byday-container" style="margin-bottom: 5px;">';
@@ -522,13 +470,7 @@ class CustomTca
         $out = [];
         $out[] = '<script type="text/javascript">';
         $out[] = "var byDay = new ByDayUI('byday-container', 'data[" . $this->table . '][' . $this->uid . "][byday]', 'cal-row', '" . $row . "');";
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-            $out[] = '$(function(){ byDay.load(); });';
-        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
-            $out[] = 'TYPO3.jQuery(function(){ byDay.load(); });';
-        } else {
-            $out[] = "Event.observe(window, 'load', function() { byDay.load(); });";
-        }
+        $out[] = '$(function(){ byDay.load(); });';
         $out[] = '</script>';
 
         $out[] = '<div id="byday-container"></div>';
@@ -546,13 +488,7 @@ class CustomTca
         $out = [];
         $out[] = '<script type="text/javascript">';
         $out[] = "var byMonthDay = new ByMonthDayUI('bymonthday-container', 'data[" . $this->table . '][' . $this->uid . "][bymonthday]', 'cal-row', '" . $row . "');";
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-            $out[] = '$(function(){ byMonthDay.load(); });';
-        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7004000) {
-            $out[] = 'TYPO3.jQuery(function(){ byMonthDay.load(); });';
-        } else {
-            $out[] = "Event.observe(window, 'load', function() { byMonthDay.load(); });";
-        }
+        $out[] = '$(function(){ byMonthDay.load(); });';
         $out[] = '</script>';
 
         $out[] = '<div id="bymonthday-container"></div>';

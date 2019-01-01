@@ -17,7 +17,6 @@ namespace TYPO3\CMS\Cal\Backend\Form;
 use TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowDateTimeFields;
 use TYPO3\CMS\Backend\Form\FormDataProviderInterface;
 use TYPO3\CMS\Cal\Hooks\TceFormsGetmainfields;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * FormDateDataProvider class for the FormEngine
@@ -41,11 +40,7 @@ class FormDateDataProvider implements FormDataProviderInterface
      */
     public function addData(array $result)
     {
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7006000) {
-            $processedTcaColumns = $result['processedTca']['columns'];
-        } else {
-            $processedTcaColumns = $result['vanillaTableTca']['columns'];
-        }
+        $processedTcaColumns = $result['processedTca']['columns'];
         foreach ($processedTcaColumns as $column => $columnConfig) {
             if (isset($columnConfig['config']['tx_cal_event'])) {
                 $mainFields = new TceFormsGetmainfields();
