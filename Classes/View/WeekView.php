@@ -218,14 +218,14 @@ class WeekView extends BaseView
                 preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $ovlKey, $dDate);
 
                 $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
-                    '%02d',
+                        '%02d',
                         $dTimeStart[2]
-                ) . ':00');
+                    ) . ':00');
                 $d_start->setTZbyID('UTC');
                 $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
-                    '%02d',
+                        '%02d',
                         $dTimeEnd[2]
-                ) . ':00');
+                    ) . ':00');
                 $d_end->setTZbyID('UTC');
 
                 // minus 1 second to allow endtime 24:00
@@ -364,14 +364,14 @@ class WeekView extends BaseView
             $week_day = &$view_array[$week_key];
             preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $week_key, $dDate);
             $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
-                '%02d',
+                    '%02d',
                     $dTimeStart[2]
-            ) . ':00');
+                ) . ':00');
             $d_start->setTZbyId('UTC');
             $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
-                '%02d',
+                    '%02d',
                     $dTimeEnd[2]
-            ) . ':00');
+                ) . ':00');
             $d_end->setTZbyId('UTC');
 
             $d_start->subtractSeconds(($d_start->getMinute() % $gridLength) * 60);
@@ -387,9 +387,9 @@ class WeekView extends BaseView
                         $eventType = $event->getType();
                         $eventUid = $event->getUid();
                         if (is_array($pos_array[$week_key]) && array_key_exists(
-                            $eventType . $eventUid . '_' . $startFormatted,
+                                $eventType . $eventUid . '_' . $startFormatted,
                                 ($pos_array[$week_key])
-                        )) {
+                            )) {
                             $nd->copy($event->getEnd());
                             $nd->addSeconds(($gridLength - (($nd->getMinute()) % $gridLength)) * 60);
                             if ($nd->before($i)) {
@@ -487,10 +487,10 @@ class WeekView extends BaseView
                     $this->controller->getParametersForTyposcriptLink(
                         $this->local_cObj->data,
                         [
-                        'getdate' => $daylink,
-                        'view' => $this->conf['view.']['dayLinkTarget'],
-                        $this->pointerName => null
-                    ],
+                            'getdate' => $daylink,
+                            'view' => $this->conf['view.']['dayLinkTarget'],
+                            $this->pointerName => null
+                        ],
                         $this->conf['cache'],
                         $this->conf['clear_anyway'],
                         $this->conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid']

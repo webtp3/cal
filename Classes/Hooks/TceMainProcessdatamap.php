@@ -338,9 +338,9 @@ class TceMainProcessdatamap
              * If both are 0, then its an all day event.
              */
             if (array_key_exists('start_time', $incomingFieldArray) && array_key_exists(
-                'end_time',
+                    'end_time',
                     $incomingFieldArray
-            ) && $incomingFieldArray['start_time'] == 0 && $incomingFieldArray['end_time'] == 0) {
+                ) && $incomingFieldArray['start_time'] == 0 && $incomingFieldArray['end_time'] == 0) {
                 $incomingFieldArray['allday'] = 1;
             }
 
@@ -397,9 +397,9 @@ class TceMainProcessdatamap
         }
 
         if ($table == 'tx_cal_category' && array_key_exists('calendar_id', $incomingFieldArray) && !strstr(
-            $id,
+                $id,
                 'NEW'
-        )) {
+            )) {
             $category = BackendUtility::getRecord('tx_cal_category', $id);
             if ($incomingFieldArray['calendar_id'] != $category['calendar_id']) {
                 $incomingFieldArray['parent_category'] = 0;

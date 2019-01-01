@@ -1338,12 +1338,12 @@ class RightsService extends BaseService
     public function isAllowedToConfigure()
     {
         return $this->isLoggedIn() && $this->isViewEnabled('admin') && ($this->isCalAdmin() || $this->isAllowedToCreateCalendar() || $this->isAllowedToEditCalendar() || $this->isAllowedToDeleteCalendar() || $this->isAllowedToCreateCategory() || $this->isAllowedToEditCategory() || $this->isAllowedToDeleteCategory() || $this->isAllowedTo(
-            'create',
+                    'create',
                     'location'
-        ) || $this->isAllowedTo('edit', 'location') || $this->isAllowedTo(
-                        'delete',
+                ) || $this->isAllowedTo('edit', 'location') || $this->isAllowedTo(
+                    'delete',
                     'location'
-                    ) || $this->isAllowedToCreateOrganizer() || $this->isAllowedToEditOrganizer() || $this->isAllowedToDeleteOrganizer());
+                ) || $this->isAllowedToCreateOrganizer() || $this->isAllowedToEditOrganizer() || $this->isAllowedToDeleteOrganizer());
     }
 
     /**
@@ -1415,9 +1415,9 @@ class RightsService extends BaseService
             return $view;
         } elseif ($view == 'subscription' && $this->conf['allowSubscribe'] && $this->isViewEnabled($view)) {
         } elseif ($view == 'translation' && $this->rightsObj->isAllowedTo(
-            'create',
+                'create',
                 'translation'
-        ) && $this->isViewEnabled($view)) {
+            ) && $this->isViewEnabled($view)) {
         } elseif ($view == 'meeting' && $this->isViewEnabled($view)) {
         } elseif ($view == 'admin' && $this->rightsObj->isAllowedToConfigure()) {
         } elseif (($view == 'load_events' || $view == 'load_todos' || $view == 'load_calendars' || $view == 'load_categories' || $view == 'load_rights' || $view == 'load_locations' || $view == 'load_organizers' || $view == 'search_user_and_group') && $this->conf['view.']['enableAjax']) {
@@ -1453,18 +1453,18 @@ class RightsService extends BaseService
                 $this->conf['type'] = '';
                 $this->piVars['type'] = null;
             } elseif ($this->conf['view.']['allowedViews'][0] == 'event' && (($this->piVars['view'] == 'location' && !in_array(
-                'location',
+                            'location',
                             $this->conf['view.']['allowedViews']
-            )) || ($this->piVars['view'] == 'organizer' && !in_array(
-                                'organizer',
+                        )) || ($this->piVars['view'] == 'organizer' && !in_array(
+                            'organizer',
                             $this->conf['view.']['allowedViews']
-                            )))) {
+                        )))) {
                 return;
             }
         } elseif (!($view == 'admin' && $this->rightsObj->isAllowedToConfigure()) && !in_array(
-            $view,
+                $view,
                 $this->conf['view.']['allowedViews']
-        )) {
+            )) {
             $view = $this->conf['view.']['allowedViews'][0];
         }
         if (!$view) {

@@ -56,9 +56,9 @@ class AdminView extends BaseView
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'create_calendar',
-                'type' => 'tx_cal_calendar'
-            ],
+                    'view' => 'create_calendar',
+                    'type' => 'tx_cal_calendar'
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['calendar.']['createCalendarViewPid']
@@ -77,17 +77,17 @@ class AdminView extends BaseView
             $showCalendarForm = true;
         }
         if (!$this->rightsObj->isAllowedTo(
-            'delete',
+                'delete',
                 'calendar'
-        ) || !$this->rightsObj->isViewEnabled('delete_calendar')) {
+            ) || !$this->rightsObj->isViewEnabled('delete_calendar')) {
             $rems['###DELETE_CALENDAR###'] = '';
         } else {
             $showCalendarForm = true;
         }
         if (!$this->rightsObj->isAllowedTo('delete', 'calendar') && !$this->rightsObj->isAllowedTo(
-            'edit',
+                'edit',
                 'calendar'
-        )) {
+            )) {
             $rems['###CHOOSE_CALENDAR###'] = '';
         }
         if (!$showCalendarForm) {
@@ -99,9 +99,9 @@ class AdminView extends BaseView
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'create_category',
-                'type' => 'tx_cal_category'
-            ],
+                    'view' => 'create_category',
+                    'type' => 'tx_cal_category'
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['category.']['createCategoryViewPid']
@@ -120,17 +120,17 @@ class AdminView extends BaseView
             $showCategoryForm = true;
         }
         if (!$this->rightsObj->isAllowedTo(
-            'delete',
+                'delete',
                 'category'
-        ) || !$this->rightsObj->isViewEnabled('delete_category')) {
+            ) || !$this->rightsObj->isViewEnabled('delete_category')) {
             $rems['###DELETE_CATEGORY###'] = '';
         } else {
             $showCategoryForm = true;
         }
         if (!$this->rightsObj->isAllowedTo('delete', 'category') && !$this->rightsObj->isAllowedTo(
-            'edit',
+                'edit',
                 'category'
-        )) {
+            )) {
             $rems['###CHOOSE_CATEGORY###'] = '';
         }
         if (!$showCategoryForm) {
@@ -138,15 +138,15 @@ class AdminView extends BaseView
         }
         $createOrganizerLink = '';
         if ($this->rightsObj->isAllowedTo(
-            'create',
+                'create',
                 'organizer'
-        ) && $this->rightsObj->isViewEnabled('create_organizer')) {
+            ) && $this->rightsObj->isViewEnabled('create_organizer')) {
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_create_organizer'));
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'create_organizer'
-            ],
+                    'view' => 'create_organizer'
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['organizer.']['createOrganizerViewPid']
@@ -165,17 +165,17 @@ class AdminView extends BaseView
             $showOrganizerForm = true;
         }
         if (!$this->rightsObj->isAllowedTo(
-            'delete',
+                'delete',
                 'organizer'
-        ) || !$this->rightsObj->isViewEnabled('delete_organizer')) {
+            ) || !$this->rightsObj->isViewEnabled('delete_organizer')) {
             $rems['###DELETE_ORGANIZER###'] = '';
         } else {
             $showOrganizerForm = true;
         }
         if (!$this->rightsObj->isAllowedTo('delete', 'organizer') && !$this->rightsObj->isAllowedTo(
-            'edit',
+                'edit',
                 'organizer'
-        )) {
+            )) {
             $rems['###CHOOSE_ORGANIZER###'] = '';
         }
         if (!$showOrganizerForm) {
@@ -187,8 +187,8 @@ class AdminView extends BaseView
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'create_location'
-            ],
+                    'view' => 'create_location'
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['location.']['createLocationViewPid']
@@ -207,17 +207,17 @@ class AdminView extends BaseView
             $showLocationForm = true;
         }
         if (!$this->rightsObj->isAllowedTo(
-            'delete',
+                'delete',
                 'location'
-        ) || !$this->rightsObj->isViewEnabled('delete_location')) {
+            ) || !$this->rightsObj->isViewEnabled('delete_location')) {
             $rems['###DELETE_LOCATION###'] = '';
         } else {
             $showLocationForm = true;
         }
         if (!$this->rightsObj->isAllowedTo('delete', 'location') && !$this->rightsObj->isAllowedTo(
-            'edit',
+                'edit',
                 'location'
-        )) {
+            )) {
             $rems['###CHOOSE_LOCATION###'] = '';
         }
         if (!$showLocationForm) {
@@ -428,9 +428,9 @@ class AdminView extends BaseView
             }
 
             $sims['###CALENDAR_SUBSCRIPTION###'] .= '<input type="hidden" value="' . implode(
-                ',',
+                    ',',
                     array_unique($calendarIds)
-            ) . '" name="tx_cal_controller[calendarSubscriptionIds]"/>';
+                ) . '" name="tx_cal_controller[calendarSubscriptionIds]"/>';
         } else {
             $rems['###CALENDAR_SUBSCRIPTION###'] = '';
         }

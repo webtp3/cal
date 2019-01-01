@@ -356,10 +356,10 @@ class CategoryModel extends BaseModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'edit_category',
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'edit_category',
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['calendar.']['editCategoryViewPid']
@@ -376,10 +376,10 @@ class CategoryModel extends BaseModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'delete_category',
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'delete_category',
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['category.']['deleteCategoryViewPid']

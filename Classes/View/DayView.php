@@ -344,10 +344,10 @@ class DayView extends BaseView
                 $this->controller->getParametersForTyposcriptLink(
                     $this->local_cObj->data,
                     [
-                    'getdate' => $daylink,
-                    'view' => $dayLinkViewTarget,
-                    $this->pointerName => null
-                ],
+                        'getdate' => $daylink,
+                        'view' => $dayLinkViewTarget,
+                        $this->pointerName => null
+                    ],
                     $this->conf['cache'],
                     $this->conf['clear_anyway'],
                     $this->conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid']
@@ -401,14 +401,14 @@ class DayView extends BaseView
         $dTimeEnd[2] -= $dTimeEnd[2] % $gridLength;
 
         $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
-            '%02d',
+                '%02d',
                 $dTimeStart[2]
-        ) . ':00');
+            ) . ':00');
         $d_start->setTZbyId('UTC');
         $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
-            '%02d',
+                '%02d',
                 $dTimeEnd[2]
-        ) . ':00');
+            ) . ':00');
         $d_end->setTZbyId('UTC');
 
         $i = new  CalDate();

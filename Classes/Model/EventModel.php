@@ -124,8 +124,8 @@ class EventModel extends Model
                             $this->addCategory($categories[0][0][$categoryId]);
                         }
                     }
-                unset($piVars['category'], $piVars['category_ids']);
-                break;
+                    unset($piVars['category'], $piVars['category_ids']);
+                    break;
                 case 'allday_checkbox':
                 case 'allday':
                     if (intval($piVars[$key]) == 1) {
@@ -148,9 +148,9 @@ class EventModel extends Model
                 case 'startminutes':
                     if (!$startDateIsSet) {
                         $start = new CalDate(Functions::getYmdFromDateString(
-                            $this->conf,
+                                $this->conf,
                                 strip_tags($piVars['startdate'] ? $piVars['startdate'] : $piVars['getdate'])
-                        ) . '000000');
+                            ) . '000000');
                         if (strlen($piVars['starttime']) == 4) {
                             $tempArray = [];
                             preg_match('/([0-9]{2})([0-9]{2})/', $piVars['starttime'], $tempArray);
@@ -181,9 +181,9 @@ class EventModel extends Model
                 case 'endminutes':
                     if (!$endDateIsSet) {
                         $end = new CalDate(Functions::getYmdFromDateString(
-                            $this->conf,
+                                $this->conf,
                                 strip_tags($piVars['enddate'] ? $piVars['enddate'] : $piVars['getdate'])
-                        ) . '000000');
+                            ) . '000000');
                         if (strlen($piVars['endtime']) == 4) {
                             $tempArray = [];
                             preg_match('/([0-9]{2})([0-9]{2})/', $piVars['endtime'], $tempArray);
@@ -273,9 +273,9 @@ class EventModel extends Model
                 case 'until':
                     if ($piVars['until'] != 0) {
                         $until = new CalDate(Functions::getYmdFromDateString(
-                            $this->conf,
+                                $this->conf,
                                 strip_tags($piVars['until'])
-                        ) . '000000');
+                            ) . '000000');
                     } else {
                         $until = new CalDate('00000000000000');
                     }
@@ -906,9 +906,9 @@ class EventModel extends Model
             $viewType .= '_FNB';
         }
         if (substr(
-            $viewType,
+                $viewType,
                 -6
-        ) != 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('%Y%m%d') != $this->getEnd()->format('%Y%m%d'))) {
+            ) != 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('%Y%m%d') != $this->getEnd()->format('%Y%m%d'))) {
             $subpartSuffix .= 'ALLDAY';
         }
         $hookObjectsArr = Functions::getHookObjectsArray(
@@ -944,10 +944,10 @@ class EventModel extends Model
         $page = $cObj->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
-                '###',
-                '',
+                    '###',
+                    '',
                     $subpartMarker
-            ) . '< subpart-marker in ' . $templatePath;
+                ) . '< subpart-marker in ' . $templatePath;
         }
         $rems = [];
         $sims = [];
@@ -1092,27 +1092,27 @@ class EventModel extends Model
                                     );
 
                                     $local_switch['###CONFIRM_LINK###'] = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $this->controller->pi_getPageLink(
-                                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                                             '',
-                                        [
+                                            [
                                                 'tx_cal_controller[view]' => 'subscription',
                                                 'tx_cal_controller[monitor]' => 'start',
                                                 'tx_cal_controller[email]' => $email,
                                                 'tx_cal_controller[uid]' => $this->getUid(),
                                                 'tx_cal_controller[sid]' => md5($this->getUid() . $email . $this->getCreationDate())
                                             ]
-                                    );
+                                        );
 
                                     $local_switch['###EVENT_LINK###'] = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $this->controller->pi_getPageLink(
-                                        $this->conf['view.']['event.']['eventViewPid'],
+                                            $this->conf['view.']['event.']['eventViewPid'],
                                             '',
-                                        [
+                                            [
                                                 'tx_cal_controller[view]' => 'event',
                                                 'tx_cal_controller[uid]' => $this->getUid(),
                                                 'tx_cal_controller[type]' => $this->getType(),
                                                 'tx_cal_controller[getdate]' => $this->getStart()->format('%Y%m%d')
                                             ]
-                                    );
+                                        );
                                     $htmlTemplate = Functions::substituteMarkerArrayNotCached(
                                         $htmlTemplate,
                                         $local_switch,
@@ -1210,16 +1210,16 @@ class EventModel extends Model
                                         'event'
                                     );
                                     $local_switch['###CONFIRM_LINK###'] = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $this->controller->pi_getPageLink(
-                                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                                             '',
-                                        [
+                                            [
                                                 'tx_cal_controller[view]' => 'subscription',
                                                 'tx_cal_controller[monitor]' => 'stop',
                                                 'tx_cal_controller[email]' => $email,
                                                 'tx_cal_controller[uid]' => $this->getUid(),
                                                 'tx_cal_controller[sid]' => md5($this->getUid() . $email . $crdate)
                                             ]
-                                    );
+                                        );
                                     $htmlTemplate = Functions::substituteMarkerArrayNotCached(
                                         $htmlTemplate,
                                         $local_switch,
@@ -1238,16 +1238,16 @@ class EventModel extends Model
                                         'event'
                                     );
                                     $local_switch['###CONFIRM_LINK###'] = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $this->controller->pi_getPageLink(
-                                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
                                             '',
-                                        [
+                                            [
                                                 'tx_cal_controller[view]' => 'subscription',
                                                 'tx_cal_controller[monitor]' => 'stop',
                                                 'tx_cal_controller[email]' => $email,
                                                 'tx_cal_controller[uid]' => $this->getUid(),
                                                 'tx_cal_controller[sid]' => md5($this->getUid() . $email . $crdate)
                                             ]
-                                    );
+                                        );
                                     $plainTemplate = Functions::substituteMarkerArrayNotCached(
                                         $plainTemplate,
                                         $local_switch,
@@ -2220,12 +2220,12 @@ class EventModel extends Model
                                 $this->controller->getParametersForTyposcriptLink(
                                     $this->local_cObj->data,
                                     [
-                                    'view' => 'meeting',
-                                    'attendee' => $attendee->getUid(),
-                                    'uid' => $this->getUid(),
-                                    'status' => 'decline',
-                                    'sid' => md5($this->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
-                                ],
+                                        'view' => 'meeting',
+                                        'attendee' => $attendee->getUid(),
+                                        'uid' => $this->getUid(),
+                                        'status' => 'decline',
+                                        'sid' => md5($this->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
+                                    ],
                                     $this->conf['cache'],
                                     $this->conf['clear_anyway'],
                                     $this->conf['view.']['event.']['meeting.']['statusViewPid']
@@ -2245,12 +2245,12 @@ class EventModel extends Model
                                 $this->controller->getParametersForTyposcriptLink(
                                     $this->local_cObj->data,
                                     [
-                                    'view' => 'meeting',
-                                    'attendee' => $attendee->getUid(),
-                                    'uid' => $this->getUid(),
-                                    'status' => 'accept',
-                                    'sid' => md5($this->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
-                                ],
+                                        'view' => 'meeting',
+                                        'attendee' => $attendee->getUid(),
+                                        'uid' => $this->getUid(),
+                                        'status' => 'accept',
+                                        'sid' => md5($this->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
+                                    ],
                                     $this->conf['cache'],
                                     $this->conf['clear_anyway'],
                                     $this->conf['view.']['event.']['meeting.']['statusViewPid']
@@ -2414,9 +2414,9 @@ class EventModel extends Model
     public function getDtstampMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###DTSTAMP###'] = 'DTSTAMP:' . gmdate('Ymd', $this->getCreationDate()) . 'T' . gmdate(
-            'His',
+                'His',
                 $this->getCreationDate()
-        );
+            );
     }
 
     /**
@@ -2800,9 +2800,9 @@ class EventModel extends Model
     public function getCreatedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###CREATED###'] = 'CREATED:' . gmdate('Ymd', $this->getCreationDate()) . 'T' . gmdate(
-            'His',
+                'His',
                 $this->getCreationDate()
-        ) . 'Z';
+            ) . 'Z';
     }
 
     /**
@@ -2815,9 +2815,9 @@ class EventModel extends Model
     public function getLastModifiedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###LAST_MODIFIED###'] = 'LAST_MODIFIED:' . gmdate('Ymd', $this->getTstamp()) . 'T' . gmdate(
-            'His',
+                'His',
                 $this->getTstamp()
-        ) . 'Z';
+            ) . 'Z';
     }
 
     /**

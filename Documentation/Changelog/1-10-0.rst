@@ -3,7 +3,7 @@
 
 ::
 
-	* Bug #68755     - Fatal error: Class 'TYPO3\CMS\cal\cron\CalendarScheduler' not found
+	* Bug #68755     - Fatal error: Class 'TYPO3\CMS\Cal\cron\CalendarScheduler' not found
 	* Bug #68943     - RTE not loading in T3 7.4
 	* Bug #68944     - Date handling for events broken (T3 7.4)
 	* Bug #68847     - Alter registering of wizard in TCA

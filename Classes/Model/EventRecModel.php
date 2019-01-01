@@ -259,9 +259,9 @@ class EventRecModel extends Model
             $viewType .= '_FNB';
         }
         if (substr(
-            $viewType,
+                $viewType,
                 -6
-        ) != 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('%Y%m%d') != $this->getEnd()->format('%Y%m%d'))) {
+            ) != 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('%Y%m%d') != $this->getEnd()->format('%Y%m%d'))) {
             $subpartSuffix .= 'ALLDAY';
         }
         $hookObjectsArr = Functions::getHookObjectsArray(
@@ -314,10 +314,10 @@ class EventRecModel extends Model
         $page = $cObj->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
-                '###',
-                '',
+                    '###',
+                    '',
                     $subpartMarker
-            ) . '< subpart-marker in ' . $templatePath;
+                ) . '< subpart-marker in ' . $templatePath;
         }
         $rems = [];
         $sims = [];
@@ -913,9 +913,9 @@ class EventRecModel extends Model
     public function __toString()
     {
         return 'Phpicalendar ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(
-            ',',
+                ',',
                 $this->parentEvent->row
-        );
+            );
     }
 
     /**

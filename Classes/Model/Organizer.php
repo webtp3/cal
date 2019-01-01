@@ -137,10 +137,10 @@ class Organizer extends LocationModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'edit_organizer',
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'edit_organizer',
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['calendar.']['editOrganizerViewPid']
@@ -157,10 +157,10 @@ class Organizer extends LocationModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'delete_organizer',
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'delete_organizer',
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['organizer.']['deleteOrganizerViewPid']

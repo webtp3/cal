@@ -155,9 +155,9 @@ class FnbEventService extends EventService
             $groups = $this->rightsObj->getUserGroups();
             $userId = $this->rightsObj->getUserId();
             $where = '(tablenames = "fe_users" AND uid_foreign = ' . $userId . ') OR (tablenames = "fe_groups" AND uid_foreign in (' . implode(
-                ',',
+                    ',',
                     $groups
-            ) . '))';
+                ) . '))';
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_cal_calendar_fnb_user_group_mm', $where);
             if ($result) {
                 while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {

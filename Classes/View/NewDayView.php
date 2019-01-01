@@ -376,10 +376,10 @@ class NewDayView extends NewTimeView
             $controller->getParametersForTyposcriptLink(
                 $local_cObj->data,
                 [
-                'getdate' => $this->getYmd(),
-                'view' => $dayLinkViewTarget,
-                $controller->getPointerName() => null
-            ],
+                    'getdate' => $this->getYmd(),
+                    'view' => $dayLinkViewTarget,
+                    $controller->getPointerName() => null
+                ],
                 $conf['cache'],
                 $conf['clear_anyway'],
                 $conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid']

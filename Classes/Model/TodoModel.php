@@ -143,10 +143,10 @@ class TodoModel extends EventModel
         $page = $cObj->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
-                '###',
-                '',
+                    '###',
+                    '',
                     $subpartMarker
-            ) . '< subpart-marker in ' . $resourcePath;
+                ) . '< subpart-marker in ' . $resourcePath;
         }
         $rems = [];
         $sims = [];

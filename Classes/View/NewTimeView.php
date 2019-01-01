@@ -94,10 +94,10 @@ abstract class NewTimeView
                         }
                     }
                     $funcFromMarker = 'get' . str_replace(
-                        ' ',
-                        '',
+                            ' ',
+                            '',
                             ucwords(str_replace('_', ' ', strtolower($marker)))
-                    ) . 'Marker';
+                        ) . 'Marker';
 
                     if (method_exists($this, $funcFromMarker)) {
                         $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
@@ -124,10 +124,10 @@ abstract class NewTimeView
                         continue;
                     }
                     $funcFromMarker = 'get' . str_replace(
-                        ' ',
-                        '',
+                            ' ',
+                            '',
                             ucwords(str_replace('_', ' ', strtolower($marker)))
-                    ) . 'Marker';
+                        ) . 'Marker';
                     if (method_exists($this, $funcFromMarker)) {
                         $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
                     } elseif (preg_match('/MODULE__([A-Z0-9_-|])*/', $marker)) {
@@ -138,10 +138,10 @@ abstract class NewTimeView
 
                         // first, try to fill $current with a method of the model matching the markers name
                         $functionName = 'get' . str_replace(
-                            ' ',
-                            '',
+                                ' ',
+                                '',
                                 ucwords(str_replace('_', ' ', strtolower($marker)))
-                        );
+                            );
                         if (method_exists($this, $functionName)) {
                             $tmp = $this->$functionName();
                             if (!is_object($tmp) && !is_array($tmp)) {

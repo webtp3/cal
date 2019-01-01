@@ -156,10 +156,10 @@ class UriHandler
             if ($imageData['ref']) {
                 // find out if the value had quotes around it
                 $imageData['quotes'] = (substr(
-                    $codepieces[$i],
-                    strpos($codepieces[$i], $imageData['ref']) - 1,
+                        $codepieces[$i],
+                        strpos($codepieces[$i], $imageData['ref']) - 1,
                         1
-                ) == '"') ? '"' : '';
+                    ) == '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
                 if ($imageData['ref'] && !strstr($this->image_fullpath_list, '|' . $imageData['subst_str'] . '|')) {
@@ -189,10 +189,10 @@ class UriHandler
                 $imageData['ref'] = $attributes['href'];
                 // Finds out if the value had quotes around it
                 $imageData['quotes'] = (substr(
-                    $codepieces[$i],
-                    strpos($codepieces[$i], $imageData['ref']) - 1,
+                        $codepieces[$i],
+                        strpos($codepieces[$i], $imageData['ref']) - 1,
                         1
-                ) == '"') ? '"' : '';
+                    ) == '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
                 if ($imageData['ref'] && !strstr($this->image_fullpath_list, '|' . $imageData['subst_str'] . '|')) {
@@ -257,17 +257,17 @@ class UriHandler
             if ($hrefData['ref']) {
                 // Finds out if the value had quotes around it
                 $hrefData['quotes'] = (substr(
-                    $codepieces[$i],
-                    strpos($codepieces[$i], $hrefData['ref']) - 1,
+                        $codepieces[$i],
+                        strpos($codepieces[$i], $hrefData['ref']) - 1,
                         1
-                ) == '"') ? '"' : '';
+                    ) == '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $hrefData['subst_str'] = $hrefData['quotes'] . $hrefData['ref'] . $hrefData['quotes'];
                 if ($hrefData['ref'] && substr(
-                    trim($hrefData['ref']),
-                    0,
+                        trim($hrefData['ref']),
+                        0,
                         1
-                ) != '#' && !strstr($this->href_fullpath_list, '|' . $hrefData['subst_str'] . '|')) {
+                    ) != '#' && !strstr($this->href_fullpath_list, '|' . $hrefData['subst_str'] . '|')) {
                     $this->href_fullpath_list .= '|' . $hrefData['subst_str'] . '|';
                     $hrefData['absRef'] = $this->absRef($hrefData['ref']);
                     $hrefData['tag'] = $tag;
@@ -405,10 +405,10 @@ class UriHandler
                         $theSubStr = 'http://';
                     }
                     $part = substr($part, 0, $thePos) . $theSubStr . substr(
-                        $part,
-                        $thePos + strlen($reg[0]),
+                            $part,
+                            $thePos + strlen($reg[0]),
                             strlen($part)
-                    );
+                        );
                 }
             }
             $newContent .= $part . ((($key + 1) != count($items)) ? '.src' : '');

@@ -11,5 +11,13 @@
 			"email": "typo3@helke.de"
 		}
 	],
-	"require": {}
+	"require": {
+		"friendsoftypo3/typo3db-legacy": "^1.1",
+		"sjbr/static-info-tables": "^6.7"
+	},
+	"autoload": {
+		"psr-4": {
+			"TYPO3\\CMS\\Cal\\": "Classes/"
+		}
+	}
 }

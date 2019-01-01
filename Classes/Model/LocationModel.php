@@ -497,10 +497,10 @@ class LocationModel extends BaseModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'edit_' . $this->getObjectType(),
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'edit_' . $this->getObjectType(),
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.'][$this->getObjectType() . '.']['edit' . ucwords($this->getObjectType()) . 'ViewPid']
@@ -524,10 +524,10 @@ class LocationModel extends BaseModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'delete_' . $this->getObjectType(),
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'delete_' . $this->getObjectType(),
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.'][$this->getObjectType() . '.']['delete' . ucwords($this->getObjectType()) . 'ViewPid']
@@ -581,10 +581,10 @@ class LocationModel extends BaseModel
             return $this->controller->pi_linkTP_keepPIvars(
                 $linktext,
                 [
-                'view' => $this->getObjectType(),
-                'uid' => $this->getUid(),
-                'type' => $this->getType()
-            ],
+                    'view' => $this->getObjectType(),
+                    'uid' => $this->getUid(),
+                    'type' => $this->getType()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.'][$this->getObjectType() . '.'][$this->getObjectType() . 'ViewPid']

@@ -264,13 +264,13 @@ class CalDate extends Date
         }
         if ($format == '%Y%m%d%H%M%S') {
             return $this->year . sprintf(
-                '%02d%02d%02d%02d%02d',
-                $this->month,
-                $this->day,
-                $this->hour,
-                $this->minute,
+                    '%02d%02d%02d%02d%02d',
+                    $this->month,
+                    $this->day,
+                    $this->hour,
+                    $this->minute,
                     $this->second
-            );
+                );
         }
 
         for ($strpos = 0; $strpos < strlen($format); $strpos++) {

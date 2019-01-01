@@ -272,12 +272,12 @@ class RssView extends BaseView
             list($extKey, $local) = explode('/', substr($icon, 4), 2);
             $filename = '';
             if (strcmp(
-                $extKey,
+                    $extKey,
                     ''
-            ) && ExtensionManagementUtility::isLoaded($extKey) && strcmp(
-                        $local,
+                ) && ExtensionManagementUtility::isLoaded($extKey) && strcmp(
+                    $local,
                     ''
-                    )) {
+                )) {
                 $icon = ExtensionManagementUtility::siteRelPath($extKey) . $local;
             }
         }
@@ -296,9 +296,9 @@ class RssView extends BaseView
         if ($this->conf['view.']['rss.']['xmlLastBuildDate']) {
             // date should be ok
             $markerArray['###NEWS_LASTBUILD###'] = '<lastBuildDate>' . date(
-                'D, d M Y H:i:s O',
+                    'D, d M Y H:i:s O',
                     $lastBuildTimestamp
-            ) . '</lastBuildDate>';
+                ) . '</lastBuildDate>';
         } else {
             $markerArray['###NEWS_LASTBUILD###'] = '';
         }

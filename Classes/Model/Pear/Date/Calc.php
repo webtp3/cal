@@ -841,7 +841,7 @@ class Calc
      * TODO: cache values to some global array to avoid preformace
      * hits when called more than once.
      *
-     * @return s array an array of month names
+     * @return array an array of month names
      *
      * @static
      */
@@ -866,7 +866,7 @@ class Calc
      * TODO: cache values to some global array to avoid preformace
      * hits when called more than once.
      *
-     * @return s array an array of week day names
+     * @return array an array of week day names
      *
      * @static
      */

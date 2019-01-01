@@ -25,7 +25,7 @@ Using this function you will obtain an instance of the service. Looking at the s
 ::
 
    /* Cal Example Concrete Model */
-   t3lib_extMgm::addService($_EXTKEY, 'cal_event_model' /* sv type */, 'tx_cal_phpicalendar' /* sv key */,
+   t3lib_extMgm::addService('cal', 'cal_event_model' /* sv type */, 'tx_cal_phpicalendar' /* sv key */,
      array(
              'title' => 'Cal PHPiCalendar Model', 'description' => '', 'subtype' => 'event',
              'available' => TRUE, 'priority' => 50, 'quality' => 50,

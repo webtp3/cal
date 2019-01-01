@@ -294,10 +294,10 @@ class ListView extends BaseView
 
                         // yearwrapper
                         if ($this->conf['view.']['list.']['enableYearWrapper'] && ($this->hasPeriodChanged(
-                            $lastEventYear->getYear(),
+                                    $lastEventYear->getYear(),
                                     $cal_year,
-                            $this->reverse
-                        ) || $firstTime)) {
+                                    $this->reverse
+                                ) || $firstTime)) {
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['yearSectionMenuFormat']));
@@ -328,14 +328,14 @@ class ListView extends BaseView
                         }
                         // monthwrapper
                         if ($this->conf['view.']['list.']['enableMonthWrapper'] && ($this->hasPeriodChanged(
-                            $lastEventMonth->format('%Y%m'),
+                                    $lastEventMonth->format('%Y%m'),
                                     $calTimeObject->format('%Y%m'),
                                     $this->reverse
-                        ) || $firstTime || $this->hasPeriodChanged(
-                                        $lastEventMonth->getYear(),
+                                ) || $firstTime || $this->hasPeriodChanged(
+                                    $lastEventMonth->getYear(),
                                     $cal_year,
-                                        $this->reverse
-                                    ))) {
+                                    $this->reverse
+                                ))) {
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['monthSectionMenuFormat']));
@@ -366,14 +366,14 @@ class ListView extends BaseView
                         }
                         // weekwrapper
                         if ($this->conf['view.']['list.']['enableWeekWrapper'] && ($this->hasPeriodChanged(
-                            $lastEventWeek->getWeekOfYear(),
+                                    $lastEventWeek->getWeekOfYear(),
                                     $cal_week,
                                     $this->reverse
-                        ) || $firstTime || $this->hasPeriodChanged(
-                                        $lastEventWeek->getYear(),
+                                ) || $firstTime || $this->hasPeriodChanged(
+                                    $lastEventWeek->getYear(),
                                     $cal_year,
-                                        $this->reverse
-                                    ))) {
+                                    $this->reverse
+                                ))) {
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['weekSectionMenuFormat']));
@@ -404,10 +404,10 @@ class ListView extends BaseView
                         }
                         // daywrapper
                         if ($this->conf['view.']['list.']['enableDayWrapper'] && (($this->reverse ? $lastEventDay->after($calTimeObject) : $lastEventDay->before($calTimeObject)) || $firstTime || $this->hasPeriodChanged(
-                            $lastEventDay->getYear(),
+                                    $lastEventDay->getYear(),
                                     $cal_year,
-                            $this->reverse
-                        ))) {
+                                    $this->reverse
+                                ))) {
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['daySectionMenuFormat']));
@@ -963,9 +963,9 @@ class ListView extends BaseView
                 }
 
                 if ($wrapArr['showResultsNumbersWrap'] && strpos(
-                    $this->controller->LOCAL_LANG[$this->controller->LLkey]['pi_list_browseresults_displays'],
+                        $this->controller->LOCAL_LANG[$this->controller->LLkey]['pi_list_browseresults_displays'],
                         '%s'
-                )) {
+                    )) {
                     // if the advanced pagebrowser is enabled and the "pi_list_browseresults_displays" label contains %s it will be replaced with the content of the label "pi_list_browseresults_displays_advanced"
                     $this->controller->LOCAL_LANG[$this->controller->LLkey]['pi_list_browseresults_displays'] = $this->controller->LOCAL_LANG[$this->controller->LLkey]['pi_list_browseresults_displays_advanced'];
                 }

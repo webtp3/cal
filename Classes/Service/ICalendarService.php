@@ -14,6 +14,8 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+
+use Doctrine\Common\Proxy\Exception\OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Cron\CalendarScheduler;
@@ -440,18 +442,18 @@ class ICalendarService extends BaseService
                 $where = 'tx_cal_exception_event.uid in (' . implode(',', $exceptionEventUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                    ',',
+                        ',',
                         $exceptionEventUids
-                ) . ') and tablenames="tx_cal_exception_event"';
+                    ) . ') and tablenames="tx_cal_exception_event"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
             if (!empty($exceptionGroupUids)) {
                 $where = 'tx_cal_exception_group.uid in (' . implode(',', $exceptionGroupUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_group', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                    ',',
+                        ',',
                         $exceptionGroupUids
-                ) . ') and tablenames="tx_cal_exception_group"';
+                    ) . ') and tablenames="tx_cal_exception_group"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
         }
@@ -589,9 +591,9 @@ class ICalendarService extends BaseService
             $categorySelect = '*';
             $categoryTable = 'tx_cal_category';
             $categoryWhere = 'calendar_id = ' . intval($calId) . ' AND title =' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
-                $category,
+                    $category,
                     $categoryTable
-            );
+                );
             $foundCategory = false;
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($categorySelect, $categoryTable, $categoryWhere);
             if ($result) {
@@ -904,10 +906,10 @@ class ICalendarService extends BaseService
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($GLOBALS['TYPO3_DB']->exec_SELECTcountRows(
-                    '*',
-                    'sys_file_reference',
+                        '*',
+                        'sys_file_reference',
                         'uid_local=' . $row['uid_local']
-                ) == 1) {
+                    ) == 1) {
                     $fileIndexRepository->remove($row['uid_local']);
                 }
             }
@@ -962,9 +964,9 @@ class ICalendarService extends BaseService
         }
 
         if ((string)$content === '' || (!empty($denyExt) && in_array(
-            $ext,
+                    $ext,
                     $denyExt
-        )) || (!empty($allowedExt) && !in_array($ext, $allowedExt))) {
+                )) || (!empty($allowedExt) && !in_array($ext, $allowedExt))) {
             return;
         }
 

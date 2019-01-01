@@ -457,10 +457,10 @@ class CalendarModel extends BaseModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'edit_calendar',
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'edit_calendar',
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['calendar.']['editCalendarViewPid']
@@ -476,10 +476,10 @@ class CalendarModel extends BaseModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'delete_calendar',
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'delete_calendar',
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['calendar.']['deleteCalendarViewPid']

@@ -215,9 +215,9 @@ class EventService extends BaseService
 
         if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere']) {
             $where .= ' ' . $this->cObj->cObjGetSingle(
-                $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere'],
+                    $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere'],
                     $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere.']
-            );
+                );
         }
 
         if ($addCategoryWhere) {
@@ -759,9 +759,9 @@ class EventService extends BaseService
         $insertFields['crdate'] = $crdate;
 
         if ($GLOBALS['TSFE']->sys_language_content > 0 && $this->conf['showRecordsWithoutDefaultTranslation'] == 1 && $this->rightsObj->isAllowedTo(
-            'create',
+                'create',
                 'translation'
-        )) {
+            )) {
             $insertFields['sys_language_uid'] = $GLOBALS['TSFE']->sys_language_content;
         }
 
@@ -1039,10 +1039,10 @@ class EventService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedTo(
-            'create',
-            'event',
+                'create',
+                'event',
                 'attendee'
-        ) && $object->getEventType() == Model::EVENT_TYPE_MEETING) {
+            ) && $object->getEventType() == Model::EVENT_TYPE_MEETING) {
             $attendeeUids = [];
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $attendeeService = $modelObj->getServiceObjByKey('cal_attendee_model', 'attendee', 'tx_cal_attendee');
@@ -1376,10 +1376,10 @@ class EventService extends BaseService
             }
         }
         if ($this->rightsObj->isAllowedTo(
-            'edit',
-            'event',
+                'edit',
+                'event',
                 'attendee'
-        ) && $object->getEventType() == Model::EVENT_TYPE_MEETING) {
+            ) && $object->getEventType() == Model::EVENT_TYPE_MEETING) {
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $attendeeServices = $modelObj->findEventAttendees($uid);
 
@@ -1905,16 +1905,16 @@ class EventService extends BaseService
                         // 1,2,3,4,5,6,7,8,9,10,11,12
                         foreach ($bymonth as $month) {
                             if ($counter < $count && $until->after($nextOccuranceTime) && intval(str_pad(
-                                $year,
-                                2,
-                                '0',
+                                        $year,
+                                        2,
+                                        '0',
                                         STR_PAD_LEFT
-                            ) . str_pad(
-                                            $month,
-                                            2,
-                                            '0',
+                                    ) . str_pad(
+                                        $month,
+                                        2,
+                                        '0',
                                         STR_PAD_LEFT
-                                        )) >= intval($nextOccuranceTime->format('%Y') . $nextOccuranceTime->format('%m')) && $added < $maxRecurringEvents) {
+                                    )) >= intval($nextOccuranceTime->format('%Y') . $nextOccuranceTime->format('%m')) && $added < $maxRecurringEvents) {
                                 $bymonthday = $this->getMonthDaysAccordingly($event, $month, $year);
                                 // 1,2,3,4....31
                                 foreach ($bymonthday as $day) {
@@ -2804,9 +2804,9 @@ class EventService extends BaseService
             if (preg_match('/([-\+]{0,1})?([0-9]{1})?([A-Z]{2})/', $byDayArray[$i], $byDaySplit)) {
                 $dayOfWeekday = Calendar::two2threeCharDays($byDaySplit[3], false);
                 $monthStartTime = new  CalDate($year . '-' . sprintf(
-                    '%02d',
+                        '%02d',
                         $month
-                ) . '-01 00:00:00');
+                    ) . '-01 00:00:00');
                 $monthStartTime->setTZbyID('UTC');
                 $monthEndTime = Calendar::calculateEndMonthTime($monthStartTime);
                 if ($byDaySplit[2] > 0) {
@@ -2990,7 +2990,7 @@ class EventService extends BaseService
         }
         $eventObject = $this->createEvent($eventRow, false);
 
-        $modelObj = &tx_cal_registry::Registry('basic', 'modelcontroller');
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $attendeeRecordsArray = $modelObj->findEventAttendees($eventObject->getUid());
 
         if (!empty($attendeeRecordsArray['tx_cal_attendee'])) {
@@ -3035,9 +3035,9 @@ class EventService extends BaseService
                 $select = 'tx_cal_calendar.uid, tx_cal_calendar.pid';
                 $table = 'fe_users, tx_cal_calendar';
                 $where = 'tx_cal_calendar.uid NOT IN (' . implode(
-                    ',',
+                        ',',
                         $updatedCalendar
-                ) . ') AND fe_users.uid = ' . $attendee->getFeUserId() . ' AND fe_users.tx_cal_calendar=tx_cal_calendar.uid AND fe_users.disable=0 AND fe_users.deleted=0 AND tx_cal_calendar.hidden=0 AND tx_cal_calendar.deleted=0';
+                    ) . ') AND fe_users.uid = ' . $attendee->getFeUserId() . ' AND fe_users.tx_cal_calendar=tx_cal_calendar.uid AND fe_users.disable=0 AND fe_users.deleted=0 AND tx_cal_calendar.hidden=0 AND tx_cal_calendar.deleted=0';
                 $groupBy = 'tx_cal_calendar.uid';
                 $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupBy);
                 if ($result) {

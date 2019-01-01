@@ -126,15 +126,15 @@ class NewWeekView extends NewTimeView
             }
 
             if (!($eventStartYear == $this->getYear() && $eventStart->getWeekOfYear() == $this->week) && $eventStart->year . sprintf(
-                '%02d',
+                    '%02d',
                     $eventStart->getWeekOfYear()
-            ) < $this->getYear() . sprintf(
-                        '%02d',
+                ) < $this->getYear() . sprintf(
+                    '%02d',
                     $this->week
-                    ) && $eventYearEnd . sprintf(
-                        '%02d',
+                ) && $eventYearEnd . sprintf(
+                    '%02d',
                     $event->getEnd()->getWeekOfYear()
-                    ) >= $this->getYear() . sprintf('%02d', $this->week)) {
+                ) >= $this->getYear() . sprintf('%02d', $this->week)) {
                 do {
                     $eventStart->addSeconds(86400);
                     $eventStartYear = $eventStart->year;
@@ -523,10 +523,10 @@ class NewWeekView extends NewTimeView
             $controller->getParametersForTyposcriptLink(
                 $local_cObj->data,
                 [
-                'getdate' => $this->weekStart,
-                'view' => $weekLinkViewTarget,
-                $controller->getPointerName() => null
-            ],
+                    'getdate' => $this->weekStart,
+                    'view' => $weekLinkViewTarget,
+                    $controller->getPointerName() => null
+                ],
                 $conf['cache'],
                 $conf['clear_anyway'],
                 $conf['view.'][$weekLinkViewTarget . '.'][$weekLinkViewTarget . 'ViewPid']

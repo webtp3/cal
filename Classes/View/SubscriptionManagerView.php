@@ -143,11 +143,11 @@ class SubscriptionManagerView extends BaseView
                     $this->conf['type'] = $event->getType();
                     $event->getMarker($subscriptionContainer, $local_sims, $local_rems, $local_wrapped);
                     $eventList[] = '<li>' . Functions::substituteMarkerArrayNotCached(
-                        $subscriptionContainer,
+                            $subscriptionContainer,
                             $local_sims,
-                        $local_rems,
-                        $local_wrapped
-                    ) . '</li>';
+                            $local_rems,
+                            $local_wrapped
+                        ) . '</li>';
                 }
                 $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
@@ -191,16 +191,16 @@ class SubscriptionManagerView extends BaseView
     {
         $eventUID = $event->getUID();
         return $this->unsubscribeByTable(
-            'fe_users',
-            $email,
-            $eventUID,
+                'fe_users',
+                $email,
+                $eventUID,
                 $subscriptionHash
-        ) || $this->unsubscribeByTable(
-                    'tx_cal_unknown_users',
-                    $email,
-                    $eventUID,
+            ) || $this->unsubscribeByTable(
+                'tx_cal_unknown_users',
+                $email,
+                $eventUID,
                 $subscriptionHash
-                );
+            );
     }
 
     /**

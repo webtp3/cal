@@ -831,10 +831,10 @@ class BaseView extends BaseService
                         }
                     }
                     $funcFromMarker = 'get' . str_replace(
-                        ' ',
-                        '',
+                            ' ',
+                            '',
                             ucwords(str_replace('_', ' ', strtolower($marker)))
-                    ) . 'Marker';
+                        ) . 'Marker';
                     if (method_exists($this, $funcFromMarker)) {
                         $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
                     }
@@ -868,10 +868,10 @@ class BaseView extends BaseService
                         continue;
                     }
                     $funcFromMarker = 'get' . str_replace(
-                        ' ',
-                        '',
+                            ' ',
+                            '',
                             ucwords(str_replace('_', ' ', strtolower($marker)))
-                    ) . 'Marker';
+                        ) . 'Marker';
                     if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
                         $module = GeneralUtility:: makeInstanceService(substr($marker, 8), 'module');
                         if (is_object($module)) {
@@ -987,13 +987,13 @@ class BaseView extends BaseService
         ));
 
         $next_year = ($this->conf['year'] + 1) . sprintf('%02d', $this->conf['month']) . sprintf(
-            '%02d',
+                '%02d',
                 $this->conf['day']
-        );
+            );
         $prev_year = ($this->conf['year'] - 1) . sprintf('%02d', $this->conf['month']) . sprintf(
-            '%02d',
+                '%02d',
                 $this->conf['day']
-        );
+            );
 
         $endOfNextMonth = new CalDate(Calc::endOfNextMonth(
             $this->conf['day'],
@@ -1382,10 +1382,10 @@ class BaseView extends BaseService
         if (!empty($this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid'])) {
             $link = $this->controller->pi_linkTP_keepPIvars_url(
                 [
-                'getdate' => $today,
-                'view' => $viewTarget,
-                $this->pointerName => null
-            ],
+                    'getdate' => $today,
+                    'view' => $viewTarget,
+                    $this->pointerName => null
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']
@@ -1609,9 +1609,9 @@ class BaseView extends BaseService
             if ($treeConf['selector.']) {
                 $treeHtml .= $this->cObj->stdWrap(
                     ((in_array(
-                    $parentCategory->getUid(),
-                        $selectedCategories
-                ) || empty($selectedCategories)) ? ' checked="checked"' : ''),
+                            $parentCategory->getUid(),
+                            $selectedCategories
+                        ) || empty($selectedCategories)) ? ' checked="checked"' : ''),
                     $treeConf['selector.']
                 );
             } else {
@@ -1742,10 +1742,10 @@ class BaseView extends BaseService
             if (!empty($this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid'])) {
                 $link = $this->controller->pi_linkTP_keepPIvars_url(
                     [
-                    'getdate' => $monthdate,
-                    'view' => $viewTarget,
-                    $this->pointerName => null
-                ],
+                        'getdate' => $monthdate,
+                        'view' => $viewTarget,
+                        $this->pointerName => null
+                    ],
                     $this->conf['cache'],
                     $this->conf['clear_anyway'],
                     $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']
@@ -1804,10 +1804,10 @@ class BaseView extends BaseService
             if (!empty($this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid'])) {
                 $link = $this->controller->pi_linkTP_keepPIvars_url(
                     [
-                    'getdate' => $date,
-                    'view' => $viewTarget,
-                    $this->pointerName => null
-                ],
+                        'getdate' => $date,
+                        'view' => $viewTarget,
+                        $this->pointerName => null
+                    ],
                     $this->conf['cache'],
                     $this->conf['clear_anyway'],
                     $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']
@@ -1870,10 +1870,10 @@ class BaseView extends BaseService
             if (!empty($this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid'])) {
                 $link = $this->controller->pi_linkTP_keepPIvars_url(
                     [
-                    'getdate' => $weekdate,
-                    'view' => $viewTarget,
-                    $this->pointerName => null
-                ],
+                        'getdate' => $weekdate,
+                        'view' => $viewTarget,
+                        $this->pointerName => null
+                    ],
                     $this->conf['cache'],
                     $this->conf['clear_anyway'],
                     $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']

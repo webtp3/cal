@@ -198,10 +198,10 @@ class CreateCalendarView extends FeEditingBaseView
             }
             $sims['###ACTIVATE_FREEANDBUSY###'] = $this->applyStdWrap($activate, 'activateFreeAndBusy_stdWrap');
         } elseif (!$this->isEditMode && $this->rightsObj->isAllowedTo(
-            'create',
-            $this->objectString,
+                'create',
+                $this->objectString,
                 'activateFreeAndBusy'
-        )) {
+            )) {
             $activate = '';
             if ($this->conf['rights.']['create.'][$this->objectString . '.']['fields.']['activateFreeAndBusy.']['default'] || $this->object->isActivateFreeAndBusy()) {
                 $activate = ' checked="checked" ';

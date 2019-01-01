@@ -703,9 +703,9 @@ class CategoryService extends BaseService
 
         if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere']) {
             $where .= ' ' . $this->cObj->cObjGetSingle(
-                $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere'],
+                    $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere'],
                     $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere.']
-            );
+                );
         }
     }
 

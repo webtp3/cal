@@ -1132,10 +1132,10 @@ class ICalendar
                  * quotedPrintableEncode does not escape CRLFs, but strange enough single LFs. so convert everything to LF only and replace afterwards.
                  */
                 $result .= $name . $params_str . ':=' . $this->_newline . str_replace(
-                    '=0A',
-                    '=0D=0A',
+                        '=0A',
+                        '=0D=0A',
                         $this->_quotedPrintableEncode($value)
-                ) . $this->_newline;
+                    ) . $this->_newline;
             } else {
                 $attr_string = $name . $params_str . ':' . $value;
                 $result .= $this->_foldLine($attr_string) . $this->_newline;

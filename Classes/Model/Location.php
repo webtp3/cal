@@ -139,10 +139,10 @@ class Location extends LocationModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'edit_location',
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'edit_location',
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['calendar.']['editLocationViewPid']
@@ -159,10 +159,10 @@ class Location extends LocationModel
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
                 [
-                'view' => 'delete_location',
-                'type' => $this->getType(),
-                'uid' => $this->getUid()
-            ],
+                    'view' => 'delete_location',
+                    'type' => $this->getType(),
+                    'uid' => $this->getUid()
+                ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.']['location.']['deleteLocationViewPid']

@@ -227,10 +227,10 @@ class Date
     public function setDate($date, $format = DATE_FORMAT_ISO)
     {
         if (preg_match(
-            '/^(\d{4})-?(\d{2})-?(\d{2})([T\s]?(\d{2}):?(\d{2}):?(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:?\d{2})?)?$/i',
+                '/^(\d{4})-?(\d{2})-?(\d{2})([T\s]?(\d{2}):?(\d{2}):?(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:?\d{2})?)?$/i',
                 $date,
-            $regs
-        ) && $format != DATE_FORMAT_UNIXTIME) {
+                $regs
+            ) && $format != DATE_FORMAT_UNIXTIME) {
             // DATE_FORMAT_ISO, ISO_BASIC, ISO_EXTENDED, and TIMESTAMP
             // These formats are extremely close to each other. This regex
             // is very loose and accepts almost any butchered format you could

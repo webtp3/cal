@@ -162,12 +162,12 @@ class CreateLocationOrganizerView extends FeEditingBaseView
                 $staticInfo->init();
                 $sims['###COUNTRYZONE###'] = $this->applyStdWrap(
                     $staticInfo->buildStaticInfoSelector(
-                    'SUBDIVISIONS',
-                    'tx_cal_controller[countryzone]',
-                    '',
-                    $this->object->getCountryZone(),
-                    $this->object->getCountry()
-                ),
+                        'SUBDIVISIONS',
+                        'tx_cal_controller[countryzone]',
+                        '',
+                        $this->object->getCountryZone(),
+                        $this->object->getCountry()
+                    ),
                     'countryzone_static_info_stdWrap'
                 );
             } else {

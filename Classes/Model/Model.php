@@ -154,7 +154,7 @@ class Model extends BaseModel
     /**
      * Sets the sequence value.
      *
-     * @param $sequence Array
+     * @param $sequence array
      */
     public function setSequence($sequence)
     {
@@ -500,7 +500,7 @@ class Model extends BaseModel
     /**
      * Returns the calendar object
      *
-     * @return tx_cal_calendar_model calendar object
+     * @return Model calendar object
      */
     public function getCalendarObject()
     {
@@ -1207,8 +1207,7 @@ class Model extends BaseModel
     /**
      * Sets the categories
      *
-     * @param $categories Array
-     *            representation of the categories
+     * @param $categories array representation of the categories
      */
     public function setCategories($categories)
     {
@@ -1403,8 +1402,7 @@ class Model extends BaseModel
     /**
      * Sets the exception_single_ids array
      *
-     * @param $idArray Array
-     *            exception single ids
+     * @param $idArray array exception single ids
      */
     public function setExceptionSingleIds($idArray)
     {
@@ -1465,8 +1463,7 @@ class Model extends BaseModel
     /**
      * Sets the exceptionGroupIds array
      *
-     * @param $idArray Array
-     *            exception group ids
+     * @param $idArray array exception group ids
      */
     public function setExceptionGroupIds($idArray)
     {
@@ -1815,9 +1812,9 @@ class Model extends BaseModel
         $this->initLocalCObject();
         return implode(
             $this->local_cObj->cObjGetSingle(
-            $this->conf['view.'][$this->conf['view'] . '.'][$objectType . '.']['categoryLink_splitChar'],
-            $this->conf['view.'][$this->conf['view'] . '.'][$objectType . '.']['categoryLink_splitChar.']
-        ),
+                $this->conf['view.'][$this->conf['view'] . '.'][$objectType . '.']['categoryLink_splitChar'],
+                $this->conf['view.'][$this->conf['view'] . '.'][$objectType . '.']['categoryLink_splitChar.']
+            ),
             $this->categoriesAsString
         );
     }

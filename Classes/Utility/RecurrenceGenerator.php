@@ -285,9 +285,9 @@ class RecurrenceGenerator
         $this->info .= '</ul>';
         $this->info .= 'Done.';
         $this->info .= '<br/><br/><a href="javascript:history.back();">' . LocalizationUtility::translate(
-            'l_back',
+                'l_back',
                 'cal'
-        ) . '</a><br/><br/>';
+            ) . '</a><br/><br/>';
     }
 
     /**

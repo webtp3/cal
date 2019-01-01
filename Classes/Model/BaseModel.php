@@ -129,12 +129,12 @@ abstract class BaseModel extends AbstractModel
                         foreach ($classMethods as $methodName) {
                             // check if the methods name is get method, not a getMarker method and not this method itself (a loop wouldn't be that nice)
                             if (substr($methodName, 0, 3) == 'get' && substr(
-                                $methodName,
+                                    $methodName,
                                     strlen($methodName) - 6
-                            ) != 'Marker' && $methodName != 'getValuesAsArray' && $methodName != 'getCustomValuesAsArray' && !in_array(
-                                        $methodName,
+                                ) != 'Marker' && $methodName != 'getValuesAsArray' && $methodName != 'getCustomValuesAsArray' && !in_array(
+                                    $methodName,
                                     $this->noAutoFetchMethods
-                                    )) {
+                                )) {
                                 $varName = substr($methodName, 3);
                                 // as final check that the method name seems to be propper, check if there is also a setter for it
                                 if (method_exists($this, 'set' . $varName)) {
@@ -298,8 +298,7 @@ abstract class BaseModel extends AbstractModel
     /**
      * Sets the attachments
      *
-     * @param $attachmentArray Array
-     *            array
+     * @param $attachmentArray array
      */
     public function setAttachment($attachmentArray)
     {
@@ -540,10 +539,10 @@ abstract class BaseModel extends AbstractModel
                         }
                     }
                     $funcFromMarker = 'get' . str_replace(
-                        ' ',
-                        '',
+                            ' ',
+                            '',
                             ucwords(str_replace('_', ' ', strtolower($marker)))
-                    ) . 'Marker';
+                        ) . 'Marker';
                     if (method_exists($this, $funcFromMarker)) {
                         $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
                     }
@@ -574,10 +573,10 @@ abstract class BaseModel extends AbstractModel
                         continue;
                     }
                     $funcFromMarker = 'get' . str_replace(
-                        ' ',
-                        '',
+                            ' ',
+                            '',
                             ucwords(str_replace('_', ' ', strtolower($marker)))
-                    ) . 'Marker';
+                        ) . 'Marker';
                     if (method_exists($this, $funcFromMarker)) {
                         $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
                     } elseif (preg_match('/MODULE__([A-Z0-9_-|])*/', $marker)) {
@@ -588,10 +587,10 @@ abstract class BaseModel extends AbstractModel
 
                         // first, try to fill $current with a method of the model matching the markers name
                         $functionName = 'get' . str_replace(
-                            ' ',
-                            '',
+                                ' ',
+                                '',
                                 ucwords(str_replace('_', ' ', strtolower($marker)))
-                        );
+                            );
                         if (method_exists($this, $functionName)) {
                             $tmp = $this->$functionName();
                             if (!is_object($tmp) && !is_array($tmp)) {
@@ -826,10 +825,10 @@ abstract class BaseModel extends AbstractModel
         if (!$page) {
             return Functions::createErrorMessage(
                 'Could not find the >' . str_replace(
-                '###',
-                '',
+                    '###',
+                    '',
                     $subpartMarker
-            ) . '< subpart-marker in ' . $this->templatePath,
+                ) . '< subpart-marker in ' . $this->templatePath,
                 'Please add the subpart >' . str_replace(
                     '###',
                     '',
