@@ -37,8 +37,8 @@ $tx_cal_exception_event_group = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event_group.title',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128',
+                'size' => 30,
+                'max' => 128,
                 'eval' => 'required'
             ]
         ],

@@ -52,8 +52,8 @@ $tx_cal_calendar = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.title',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128',
+                'size' => 30,
+                'max' => 128,
                 'eval' => 'unique, required'
             ]
         ],
@@ -147,14 +147,14 @@ $tx_cal_calendar = [
                 'allowed' => 'ics', // Must be empty for disallowed to work.
                 'max_size' => '10000',
                 'uploadfolder' => 'uploads/tx_cal/ics',
-                'size' => '1',
+                'size' => 1,
                 'fieldWizard' => [
                     'fileThumbnails' => [
                         'disabled' => true,
                     ]
                 ],
-                'autoSizeMax' => '1',
-                'maxitems' => '1',
+                'autoSizeMax' => 1,
+                'maxitems' => 1,
                 'minitems' => '0'
             ]
         ],
@@ -164,8 +164,8 @@ $tx_cal_calendar = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.refresh',
             'config' => [
                 'type' => 'input',
-                'size' => '6',
-                'max' => '4',
+                'size' => 6,
+                'max' => 4,
                 'eval' => 'num',
                 'default' => '60'
             ]
@@ -175,7 +175,7 @@ $tx_cal_calendar = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.schedulerId',
             'config' => [
                 'type' => 'input',
-                'size' => '5',
+                'size' => 5,
                 'readOnly' => 1
             ]
         ],

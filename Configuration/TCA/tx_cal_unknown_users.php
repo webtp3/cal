@@ -35,8 +35,8 @@ $tx_cal_unknown_users = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_unknown_users.email',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '64',
+                'size' => 30,
+                'max' => 64,
                 'eval' => 'required'
             ]
         ]

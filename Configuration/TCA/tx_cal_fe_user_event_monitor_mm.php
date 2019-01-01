@@ -47,7 +47,7 @@ $tx_cal_fe_user_event_monitor_mm = [
             'label' => 'tablenames',
             'config' => [
                 'type' => 'input',
-                'size' => '12'
+                'size' => 12
             ]
         ],
         'offset' => [
@@ -55,8 +55,8 @@ $tx_cal_fe_user_event_monitor_mm = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.offset',
             'config' => [
                 'type' => 'input',
-                'size' => '6',
-                'max' => '4',
+                'size' => 6,
+                'max' => 4,
                 'eval' => 'num',
                 'default' => '60'
             ]
@@ -66,7 +66,7 @@ $tx_cal_fe_user_event_monitor_mm = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.schedulerId',
             'config' => [
                 'type' => 'input',
-                'size' => '5',
+                'size' => 5,
                 'readOnly' => 1
             ]
         ]

@@ -42,8 +42,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.name',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128
             ]
         ],
         'description' => [
@@ -51,8 +51,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.description',
             'config' => [
                 'type' => 'text',
-                'cols' => '30',
-                'rows' => '5',
+                'cols' => 30,
+                'rows' => 5,
                 'enableRichtext' => true,
                 'fieldControl' => [
                     'fullScreenRichtext' => [
@@ -72,8 +72,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.street',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128
             ]
         ],
         'zip' => [
@@ -81,8 +81,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.zip',
             'config' => [
                 'type' => 'input',
-                'size' => '15',
-                'max' => '15'
+                'size' => 15,
+                'max' => 15
             ]
         ],
         'city' => [
@@ -90,8 +90,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.city',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128
             ]
         ],
         'phone' => [
@@ -99,8 +99,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.phone',
             'config' => [
                 'type' => 'input',
-                'size' => '15',
-                'max' => '24'
+                'size' => 15,
+                'max' => 24
             ]
         ],
         'fax' => [
@@ -108,8 +108,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.fax',
             'config' => [
                 'type' => 'input',
-                'size' => '15',
-                'max' => '24'
+                'size' => 15,
+                'max' => 24
             ]
         ],
         'email' => [
@@ -117,8 +117,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.email',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '64',
+                'size' => 30,
+                'max' => 64,
                 'eval' => 'lower'
             ]
         ],
@@ -147,8 +147,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.link',
             'config' => [
                 'type' => 'input',
-                'size' => '25',
-                'max' => '128',
+                'size' => 25,
+                'max' => 128,
                 'checkbox' => '',
                 'eval' => 'trim',
                 'renderType' => 'inputLink',
@@ -325,16 +325,10 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
             'maxitems' => 1,
         ]
     ];
-    if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7006000) {
-        $tx_cal_location['columns']['country_zone']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountryZonesSelector';
-        $tx_cal_location['columns']['country_zone']['config']['wizards']['suggest']['default']['receiverClass'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\Wizard\\SuggestReceiver';
-        $tx_cal_location['columns']['country']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountriesSelector';
-        $tx_cal_location['columns']['country']['config']['wizards']['suggest']['default']['receiverClass'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\Wizard\\SuggestReceiver';
-    }
-}
-
-if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 7000000) {
-    $tx_cal_location['types']['0']['showitem'] = 'name, --palette--;;1, description;;;richtext:rte_transform[flag=rte_enabled|mode=ts_css],, street, city, country, country_zone, zip, latitude, longitude, phone, fax, email, image, link, shared_user_cnt';
+    $tx_cal_location['columns']['country_zone']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountryZonesSelector';
+    $tx_cal_location['columns']['country_zone']['config']['wizards']['suggest']['default']['receiverClass'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\Wizard\\SuggestReceiver';
+    $tx_cal_location['columns']['country']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountriesSelector';
+    $tx_cal_location['columns']['country']['config']['wizards']['suggest']['default']['receiverClass'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\Wizard\\SuggestReceiver';
 }
 
 return $tx_cal_location;

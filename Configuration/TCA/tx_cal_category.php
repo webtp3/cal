@@ -45,8 +45,8 @@ $tx_cal_category = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.title',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128',
+                'size' => 30,
+                'max' => 128,
                 'eval' => 'required'
             ]
         ],
@@ -135,9 +135,9 @@ $tx_cal_category = [
                 'type' => 'group',
                 'internal_type' => 'db',
                 'allowed' => 'pages',
-                'size' => '1',
-                'maxitems' => '1',
-                'minitems' => '0',
+                'size' => 1,
+                'maxitems' => 1,
+                'minitems' => 0,
             ]
         ],
         'notification_emails' => [
@@ -145,7 +145,7 @@ $tx_cal_category = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.notification_emails',
             'config' => [
                 'type' => 'input',
-                'size' => '30'
+                'size' => 30
             ]
         ],
         'icon' => [
@@ -153,8 +153,8 @@ $tx_cal_category = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.icon',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128
             ]
         ],
         'sys_language_uid' => [

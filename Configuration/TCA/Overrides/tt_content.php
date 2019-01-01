@@ -2,17 +2,21 @@
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
-$_EXTKEY = $GLOBALS['_EXTKEY'] = 'cal';
-$extensionName = \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToUpperCamelCase($_EXTKEY);
+
+$extensionName = \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToUpperCamelCase('cal');
 $pluginSignature = strtolower($extensionName) . '_controller';
 
 /***************
  * Plugin
  */
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin([
-    'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tt_content.list_type',
-    $_EXTKEY . '_controller'
-], 'list_type');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(
+    [
+        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tt_content.list_type',
+        'cal_controller'
+    ],
+    'list_type',
+    'cal'
+);
 
 $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist'][$pluginSignature] = 'layout,select_key';
 $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignature] = 'pi_flexform';
@@ -21,12 +25,12 @@ $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 if ($extConf['categoryService'] == 'sys_category') {
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
         $pluginSignature,
-        'FILE:EXT:' . $_EXTKEY . '/Configuration/FlexForms/flexform_cal_sys_category.xml'
+        'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal_sys_category.xml'
     );
 } else {
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
         $pluginSignature,
-        'FILE:EXT:' . $_EXTKEY . '/Configuration/FlexForms/flexform_cal.xml'
+        'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal.xml'
     );
 }
 
@@ -34,42 +38,42 @@ if ($extConf['categoryService'] == 'sys_category') {
  * Default TypoScript
  */
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    $_EXTKEY,
+    'cal',
     'Configuration/TypoScript/ts/',
     'Classic CSS-based template'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    $_EXTKEY,
+    'cal',
     'Configuration/TypoScript/ts_standard/',
     'Standard CSS-based template'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    $_EXTKEY,
+    'cal',
     'Configuration/TypoScript/ajax/',
     'AJAX-based template (Experimental!)'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    $_EXTKEY,
+    'cal',
     'Configuration/TypoScript/css/',
     'Classic CSS styles'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    $_EXTKEY,
+    'cal',
     'Configuration/TypoScript/css_standard/',
     'Standard CSS styles'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    $_EXTKEY,
+    'cal',
     'Configuration/TypoScript/rss_feed/',
     'News-feed (RSS,RDF,ATOM)'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    $_EXTKEY,
+    'cal',
     'Configuration/TypoScript/ics/',
     'ICS Export'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    $_EXTKEY,
+    'cal',
     'Configuration/TypoScript/fe-editing/',
     'Fe-Editing'
 );

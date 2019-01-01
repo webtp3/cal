@@ -59,8 +59,8 @@ $tx_cal_attendee = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.email',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '64',
+                'size' => 30,
+                'max' => 64,
                 'eval' => 'lower'
             ]
         ],
@@ -88,7 +88,7 @@ $tx_cal_attendee = [
                         'CHAIR'
                     ]
                 ],
-                'size' => '1',
+                'size' => 1,
                 'minitems' => 1,
                 'maxitems' => 1
             ]
@@ -125,7 +125,7 @@ $tx_cal_attendee = [
                         'DELEGATED'
                     ]
                 ],
-                'size' => '1',
+                'size' => 1,
                 'minitems' => 1,
                 'maxitems' => 1
             ]

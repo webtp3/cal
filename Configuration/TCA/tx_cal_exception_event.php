@@ -39,8 +39,8 @@ $tx_cal_exception_event = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.title',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128',
+                'size' => 30,
+                'max' => 128,
                 'eval' => 'required'
             ]
         ],
@@ -50,7 +50,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'datetime',
                 'default' => '0',
                 'checkbox' => '0'
@@ -62,7 +62,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'datetime',
                 'default' => '0',
                 'checkbox' => '0'
@@ -74,7 +74,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'required,date',
                 'tx_cal_event' => 'start_date'
             ]
@@ -92,7 +92,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
-                'size' => '1',
+                'size' => 1,
                 'items' => [
                     [
                         'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:frequency.none',
@@ -195,7 +195,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'date'
             ]
         ],
@@ -206,7 +206,7 @@ $tx_cal_exception_event = [
             'displayCond' => 'FIELD:freq:IN:day,week,month,year',
             'config' => [
                 'type' => 'input',
-                'size' => '4',
+                'size' => 4,
                 'eval' => 'num',
                 'checkbox' => '0'
             ]
@@ -218,7 +218,7 @@ $tx_cal_exception_event = [
             'displayCond' => 'FIELD:freq:IN:day,week,month,year',
             'config' => [
                 'type' => 'input',
-                'size' => '4',
+                'size' => 4,
                 'eval' => 'num',
                 'default' => '1'
             ]

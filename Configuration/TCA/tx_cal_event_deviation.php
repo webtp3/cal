@@ -62,8 +62,8 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.title',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128
             ]
         ],
         'starttime' => [
@@ -72,7 +72,7 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'datetime',
                 'default' => '0',
                 'checkbox' => '0'
@@ -84,7 +84,7 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'datetime',
                 'default' => '0',
                 'checkbox' => '0'
@@ -96,7 +96,7 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'required,date'
             ]
         ],
@@ -106,7 +106,7 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'time'
             ]
         ],
@@ -116,7 +116,7 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'date'
             ]
         ],
@@ -135,7 +135,7 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'time',
                 'default' => '0'
             ]
@@ -146,7 +146,7 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'date',
                 'tx_cal_event' => 'start_date'
             ]
@@ -158,7 +158,7 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => '12',
+                'size' => 12,
                 'eval' => 'time',
                 'default' => '0'
             ]
@@ -168,8 +168,8 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.organizer',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128
             ]
         ],
         'organizer_id' => [
@@ -214,8 +214,8 @@ $tx_cal_event_deviation = [
                 'type' => 'group',
                 'internal_type' => 'db',
                 'allowed' => 'pages',
-                'size' => '1',
-                'maxitems' => '1',
+                'size' => 1,
+                'maxitems' => 1,
                 'minitems' => '0',
             ]
         ],
@@ -224,8 +224,8 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.organizer_link',
             'config' => [
                 'type' => 'input',
-                'size' => '25',
-                'max' => '128',
+                'size' => 25,
+                'max' => 128,
                 'checkbox' => '',
                 'eval' => 'trim',
                 'renderType' => 'inputLink',
@@ -239,8 +239,8 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.location',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128
             ]
         ],
         'location_id' => [
@@ -285,8 +285,8 @@ $tx_cal_event_deviation = [
                 'type' => 'group',
                 'internal_type' => 'db',
                 'allowed' => 'pages',
-                'size' => '1',
-                'maxitems' => '1',
+                'size' => 1,
+                'maxitems' => 1,
                 'minitems' => '0',
             ]
         ],
@@ -295,8 +295,8 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.location_link',
             'config' => [
                 'type' => 'input',
-                'size' => '25',
-                'max' => '128',
+                'size' => 25,
+                'max' => 128,
                 'checkbox' => '',
                 'eval' => 'trim',
                 'renderType' => 'inputLink',
@@ -319,8 +319,8 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.teaser',
             'config' => [
                 'type' => 'text',
-                'cols' => '40',
-                'rows' => '6',
+                'cols' => 40,
+                'rows' => 6,
                 'enableRichtext' => true,
                 'fieldControl' => [
                     'fullScreenRichtext' => [
@@ -340,8 +340,8 @@ $tx_cal_event_deviation = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.description',
             'config' => [
                 'type' => 'text',
-                'cols' => '40',
-                'rows' => '6',
+                'cols' => 40,
+                'rows' => 6,
                 'enableRichtext' => true,
                 'fieldControl' => [
                     'fullScreenRichtext' => [
@@ -471,15 +471,13 @@ $tx_cal_event_deviation = [
     ]
 ];
 
-if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) > 8000000) {
-    $tx_cal_event_deviation['columns']['attachment']['config'] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
-        'attachment',
-        [
-            'appearance' => [
-                'createNewRelationLinkTitle' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:media.addFileReference'
-            ],
-        ]
-    );
-}
+$tx_cal_event_deviation['columns']['attachment']['config'] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
+    'attachment',
+    [
+        'appearance' => [
+            'createNewRelationLinkTitle' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:media.addFileReference'
+        ],
+    ]
+);
 
 return $tx_cal_event_deviation;
