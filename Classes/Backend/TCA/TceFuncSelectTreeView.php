@@ -31,6 +31,11 @@ class TceFuncSelectTreeView extends AbstractTreeView
     public $TCEforms_itemFormElName = '';
     public $TCEforms_nonSelectableItemsArray = [];
 
+    /**
+     * TceFuncSelectTreeView constructor.
+     *
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
+     */
     public function __construct()
     {
         $this->init();
@@ -44,6 +49,7 @@ class TceFuncSelectTreeView extends AbstractTreeView
      * @param array $v :
      *            array with uid and title of the current item.
      * @return string wrapped title
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function wrapTitle($title, $v, $bank = 0)
     {
@@ -64,6 +70,7 @@ class TceFuncSelectTreeView extends AbstractTreeView
      * @param
      *            array        Item row.
      * @return string tag.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getIcon($row)
     {
@@ -81,6 +88,7 @@ class TceFuncSelectTreeView extends AbstractTreeView
      * @param
      *            array        Record for root.
      * @return string image tag.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getRootIcon($rec)
     {

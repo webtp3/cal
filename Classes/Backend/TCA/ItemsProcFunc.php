@@ -30,6 +30,7 @@ class ItemsProcFunc
      *
      * @todo Localize translation names. Probably not too critical since
      *       they're mostly English anyway but its easy to do.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getDayTimes($config)
     {
@@ -62,6 +63,7 @@ class ItemsProcFunc
      * @param
      *            array        The current config array.
      * @return array
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getUsersAndGroups($config)
     {
@@ -113,6 +115,7 @@ class ItemsProcFunc
      * @param
      *            array        Associate array with keys 'items', 'config', 'TSconfig', 'table', 'row', and 'field'.
      * @return none
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getRecords(&$params)
     {
@@ -153,6 +156,7 @@ class ItemsProcFunc
      * @param
      *            string        LIMIT options.
      * @return object resource.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public static function getSQLResource($table, $where = '', $groupBy = '', $orderBy = '', $limit = '', $pid = '')
     {

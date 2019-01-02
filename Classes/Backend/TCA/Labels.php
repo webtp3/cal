@@ -26,6 +26,7 @@ class Labels
      * @param $params
      * @param $pObj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getEventRecordLabel(&$params, &$pObj)
     {
@@ -76,6 +77,7 @@ class Labels
      * @param $params
      * @param $pObj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getAttendeeRecordLabel(&$params, &$pObj)
     {
@@ -101,6 +103,7 @@ class Labels
      * @param $params
      * @param $pObj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getMonitoringRecordLabel(&$params, &$pObj)
     {
@@ -135,6 +138,7 @@ class Labels
      * @param $params
      * @param $pObj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getDeviationRecordLabel(&$params, &$pObj)
     {

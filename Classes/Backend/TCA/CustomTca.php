@@ -39,6 +39,7 @@ class CustomTca
     /**
      * @param $PA
      * @param $fobj
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function init($PA, $fobj)
     {
@@ -72,6 +73,7 @@ class CustomTca
     /**
      * @param $PA
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getWeekStartDay($PA)
     {
@@ -97,6 +99,7 @@ class CustomTca
 
     /**
      * @return array
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getCountsArray()
     {
@@ -115,6 +118,7 @@ class CustomTca
     /**
      * @param $startDay
      * @return array
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getWeekdaysArray($startDay)
     {
@@ -140,6 +144,7 @@ class CustomTca
 
     /**
      * @return array
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getMonthsArray()
     {
@@ -163,6 +168,7 @@ class CustomTca
      * @param $PA
      * @param $fobj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function extUrl($PA, $fobj)
     {
@@ -184,6 +190,7 @@ class CustomTca
 
     /**
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getExtUrlRow()
     {
@@ -200,6 +207,7 @@ class CustomTca
      * @param $PA
      * @param $fobj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function byDay($PA, $fobj)
     {
@@ -230,6 +238,7 @@ class CustomTca
      * @param $PA
      * @param $fobj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function byMonthDay($PA, $fobj)
     {
@@ -261,6 +270,7 @@ class CustomTca
      * @param $PA
      * @param $fobj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function byMonth($PA, $fobj)
     {
@@ -290,6 +300,7 @@ class CustomTca
      * @param $PA
      * @param $fobj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function rdate($PA, $fobj)
     {
@@ -440,6 +451,7 @@ class CustomTca
 
     /**
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function byDay_checkbox()
     {
@@ -464,6 +476,7 @@ class CustomTca
     /**
      * @param $row
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function byDay_select($row)
     {
@@ -482,6 +495,7 @@ class CustomTca
     /**
      * @param $row
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function byMonthDay_select($row)
     {
@@ -500,6 +514,7 @@ class CustomTca
     /**
      * @param $endString
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getByDayRow($endString)
     {
@@ -530,6 +545,7 @@ class CustomTca
     /**
      * @param $endString
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getByMonthDayRow($endString)
     {
@@ -556,6 +572,7 @@ class CustomTca
      * @param
      *            string        The input string to filtered.
      * @return string converted string.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function removeNewlines($input)
     {
@@ -575,6 +592,7 @@ class CustomTca
      * @param $PA
      * @param $fobj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getHeaderStyles($PA, $fobj)
     {
@@ -585,6 +603,7 @@ class CustomTca
      * @param $PA
      * @param $fobj
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getBodyStyles($PA, $fobj)
     {
@@ -595,6 +614,7 @@ class CustomTca
      * @param $PA
      * @param $part
      * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getStyles($PA, $part)
     {
