@@ -148,7 +148,7 @@ class ConfirmEventView extends FeEditingBaseView
         $categoryArray = $this->object->getCategories();
         if ($this->isAllowed('category')) {
             if (!empty($categoryArray)) {
-                $temp = $this->cObj->getSubpart($template, '###FORM_CATEGORY###');
+                $temp = $this->markerBasedTemplateService->getSubpart($template, '###FORM_CATEGORY###');
                 $catIds = explode(',', $piVarCategory);
                 $ids = [];
                 $names = [];

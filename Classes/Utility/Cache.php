@@ -2,7 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Utility;
 
-use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -51,18 +52,7 @@ class Cache
 
     public function initCachingFramework()
     {
-        try {
-            $GLOBALS['typo3CacheFactory']->create(
-                'tx_cal_cache',
-                StringFrontend::class,
-                $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_cal_cache']['backend'],
-                $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_cal_cache']['options']
-            );
-        } catch (\TYPO3\CMS\Core\Cache\Exception\DuplicateIdentifierException $e) {
-            // do nothing, a cal_cache cache already exists
-        }
-
-        $this->tx_cal_cache = $GLOBALS['typo3CacheManager']->getCache('tx_cal_cache');
+        $this->tx_cal_cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('tx_cal_cache');
     }
 
     /**
@@ -76,6 +66,7 @@ class Cache
         if ($lifetime == 0) {
             $lifetime = $this->lifetime;
         }
+
         if ($this->cachingEngine == 'cachingFramework') {
             $this->tx_cal_cache->set($hash, $content, [
                 'ident_' . $ident

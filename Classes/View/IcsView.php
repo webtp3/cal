@@ -56,7 +56,7 @@ class IcsView extends BaseView
 ###BACK_LINK###';
         }
 
-        $calendarLinkLoop = $this->cObj->getSubpart($page, '###CALENDARLINK_LOOP###');
+        $calendarLinkLoop = $this->markerBasedTemplateService->getSubpart($page, '###CALENDARLINK_LOOP###');
         $return = '';
         $page = str_replace('###L_ICSLISTTITLE###', $this->controller->pi_getLL('l_icslist_title'), $page);
         $rememberUid = [];
@@ -89,7 +89,7 @@ class IcsView extends BaseView
             }
         }
 
-        $categoryLinkLoop = $this->cObj->getSubpart($page, '###CATEGORYLINK_LOOP###');
+        $categoryLinkLoop = $this->markerBasedTemplateService->getSubpart($page, '###CATEGORYLINK_LOOP###');
 
         // by category
         $categories = $master_array['tx_cal_category'][0][0];

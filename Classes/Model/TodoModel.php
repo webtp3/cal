@@ -15,7 +15,6 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Utility\Functions;
-use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
  * A concrete model for the calendar.
@@ -128,7 +127,6 @@ class TodoModel extends EventModel
      */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &Registry::Registry('basic', 'cobj');
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $page = '';
         if ($confArr['todoSubtype'] == 'event') {
@@ -140,7 +138,7 @@ class TodoModel extends EventModel
         if ($page == '') {
             return '<h3>calendar: no todo model template file found:</h3>' . $resourcePath;
         }
-        $page = $cObj->getSubpart($page, $subpartMarker);
+        $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
                     '###',

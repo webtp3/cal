@@ -8,8 +8,8 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 use TYPO3\CMS\Install\Updates\AbstractUpdate;
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).

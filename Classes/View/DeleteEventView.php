@@ -523,7 +523,7 @@ class DeleteEventView extends FeEditingBaseView
             $local_sims['###EVENT_START_TIME###'] = $eventStart->format('%H%M');
             $local_sims['###EVENT_END_TIME###'] = $eventEnd->format('%H%M');
             $local_sims['###EVENT_UID###'] = $this->object->getUid();
-            $rems['###CREATE_EXCEPTION###'] = $this->cObj->getSubpart($template, '###CREATE_EXCEPTION###');
+            $rems['###CREATE_EXCEPTION###'] = $this->markerBasedTemplateService->getSubpart($template, '###CREATE_EXCEPTION###');
             $rems['###CREATE_EXCEPTION###'] = Functions::substituteMarkerArrayNotCached(
                 $rems['###CREATE_EXCEPTION###'],
                 $local_sims,

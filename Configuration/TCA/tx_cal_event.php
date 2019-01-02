@@ -953,7 +953,6 @@ $tx_cal_event = [
     ]
 ];
 
-
 $tx_cal_event['columns']['attachment']['config'] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
     'attachment',
     [

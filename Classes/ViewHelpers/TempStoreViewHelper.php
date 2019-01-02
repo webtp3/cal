@@ -11,7 +11,6 @@
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**

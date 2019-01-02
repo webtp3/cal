@@ -20,6 +20,8 @@ use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Cache;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -47,6 +49,17 @@ class Controller extends AbstractPlugin
     public $error = false;
     public $getDateTimeObject;
     public $SIM_ACCESS_TIME = 0;
+
+    /**
+     * @var MarkerBasedTemplateService
+     */
+    protected $markerBasedTemplateService;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+    }
 
     /**
      * Main controller function that serves as the entry point from TYPO3.
@@ -85,6 +98,7 @@ class Controller extends AbstractPlugin
         }
 
         $return = $this->initConfigs();
+
         if (!$this->error) {
             $return .= $this->getContent();
         }
@@ -191,7 +205,7 @@ class Controller extends AbstractPlugin
             $viewFunction = str_replace('_', '', $this->conf['view']);
 
             /* @todo Hack! List is a reserved name so we have to change the function name. */
-            if ($viewFunction == 'list') {
+            if ($viewFunction === 'list') {
                 $viewFunction = 'listView';
             }
 
@@ -440,8 +454,11 @@ class Controller extends AbstractPlugin
         if ($this->conf['useInternalCaching']) {
             $cachingEngine = $this->conf['cachingEngine'];
 
-            if ($cachingEngine == 'cachingFramework') {
-                if (!is_object($GLOBALS['typo3CacheFactory']) || !isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_cal_cache']['backend'])) {
+            /** @var CacheManager $cacheManager */
+            $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+
+            if ($cachingEngine === 'cachingFramework') {
+                if (!is_object($cacheManager) || !isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_cal_cache']['backend'])) {
                     // if there's no cacheFactory object fall back to internal caching (TYPO3 < 4.3)
                     $cachingEngine = 'internal';
                 }
@@ -472,6 +489,7 @@ class Controller extends AbstractPlugin
                     break;
                 // the case 'never' uses the default: $lifetime = 0;
             }
+
             $this->cache = new Cache($cachingEngine);
             $this->cache->lifetime = $lifetime;
             $this->cache->ACCESS_TIME = $this->SIM_ACCESS_TIME;
@@ -1273,9 +1291,12 @@ class Controller extends AbstractPlugin
         if (!in_array($type, $availableTypes)) {
             $type = '';
         }
+
         $timeObj = new CalDate($this->conf['getdate'] . '000000');
         $timeObj->setTZbyID('UTC');
+
         $master_array = $modelObj->findEventsForYear($timeObj, $type, $pidList);
+
         // Hook: preYearRendering
         foreach ($hookObjectsArr as $hookObj) {
             if (method_exists($hookObj, 'preYearRendering')) {
@@ -4174,7 +4195,7 @@ class Controller extends AbstractPlugin
                 $sims[$wrapper . $marker . $wrapper] = $value;
             }
             if (count($sims)) {
-                $content = $this->cObj->substituteMarkerArray($content, $sims);
+                $content = $this->markerBasedTemplateService->substituteMarkerArray($content, $sims);
             }
         }
         return $content;

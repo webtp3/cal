@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\Model;
  */
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 
@@ -44,6 +45,11 @@ abstract class BaseModel extends AbstractModel
     public $templatePath;
 
     /**
+     * @var MarkerBasedTemplateService
+     */
+    protected $markerBasedTemplateService;
+
+    /**
      * Constructor.
      *
      * @param $serviceKey String
@@ -54,6 +60,8 @@ abstract class BaseModel extends AbstractModel
         $this->controller = &Registry::Registry('basic', 'controller');
         $this->conf = &Registry::Registry('basic', 'conf');
         $this->serviceKey = &$serviceKey;
+
+        $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
 
         $this->images = new ObjectStorage();
     }
@@ -110,7 +118,7 @@ abstract class BaseModel extends AbstractModel
                 $autoFetchTextSplitValue = $cachedValues[2];
             } else {
                 $noAutoFetchMethods = $this->noAutoFetchMethods;
-                if (is_object(parent) && count(parent::getNoAutoFetchMethods())) {
+                if (count(parent::getNoAutoFetchMethods())) {
                     $noAutoFetchMethods = array_merge(parent::getNoAutoFetchMethods(), $this->getNoAutoFetchMethods());
                 }
                 $cObj = &Registry::Registry('basic', 'cobj');
@@ -121,7 +129,7 @@ abstract class BaseModel extends AbstractModel
                 );
 
                 // new way - get everything dynamically
-                if (!count($this->classMethodVars)) {
+                if (empty($this->classMethodVars)) {
                     // get all methods of this class and search for apropriate get-methods
                     $classMethods = get_class_methods($this);
                     if (count($classMethods)) {
@@ -160,7 +168,7 @@ abstract class BaseModel extends AbstractModel
             $valueArray = $this->row;
 
             // process the get methods and fill the valueArray dynamically
-            if (count($this->classMethodVars)) {
+            if (!empty($this->classMethodVars)) {
                 foreach ($this->classMethodVars as $varName) {
                     $methodName = 'get' . $varName;
                     $methodValue = $this->$methodName();
@@ -810,8 +818,6 @@ abstract class BaseModel extends AbstractModel
      */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &Registry::Registry('basic', 'cobj');
-
         $page = Functions::getContent($this->templatePath);
 
         if ($page == '') {
@@ -820,7 +826,7 @@ abstract class BaseModel extends AbstractModel
                 'Please make sure the path is correct and that you included the static template and double-check the path using the Typoscript Object Browser.'
             );
         }
-        $page = $cObj->getSubpart($page, $subpartMarker);
+        $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
 
         if (!$page) {
             return Functions::createErrorMessage(

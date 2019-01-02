@@ -125,14 +125,14 @@ class RssView extends BaseView
             '###HEADER###'
         ), $markerArray);
         // substitute the xml declaration (it's not included in the subpart ###HEADER###)
-        $t['total'] = $this->cObj->substituteMarkerArray($t['total'], [
+        $t['total'] = $this->markerBasedTemplateService->substituteMarkerArray($t['total'], [
             '###XML_DECLARATION###' => $markerArray['###XML_DECLARATION###']
         ]);
-        $t['total'] = $this->cObj->substituteMarkerArray($t['total'], [
+        $t['total'] = $this->markerBasedTemplateService->substituteMarkerArray($t['total'], [
             '###SITE_LANG###' => $markerArray['###SITE_LANG###']
         ]);
-        $t['total'] = $this->cObj->substituteSubpart($t['total'], '###HEADER###', $subpartArray['###HEADER###'], 0);
-        $t['total'] = $this->cObj->substituteSubpart($t['total'], '###CONTENT###', $subpartArray['###CONTENT###'], 0);
+        $t['total'] = $this->markerBasedTemplateService->substituteSubpart($t['total'], '###HEADER###', $subpartArray['###HEADER###'], 0);
+        $t['total'] = $this->markerBasedTemplateService->substituteSubpart($t['total'], '###CONTENT###', $subpartArray['###CONTENT###'], 0);
 
         $content .= $t['total'];
         return $content;
@@ -146,7 +146,7 @@ class RssView extends BaseView
      */
     public function getRssFromEvent($eventDate, &$event, $template)
     {
-        $eventTemplate = $this->cObj->getSubpart($template, '###EVENT###');
+        $eventTemplate = $this->markerBasedTemplateService->getSubpart($template, '###EVENT###');
         $rems = [];
         $sims = [];
         $wrapped = [];
@@ -185,7 +185,7 @@ class RssView extends BaseView
      */
     public function getNewsSubpart($myTemplate, $myKey, $row = [])
     {
-        return $this->cObj->getSubpart($myTemplate, $myKey);
+        return $this->markerBasedTemplateService->getSubpart($myTemplate, $myKey);
     }
 
     /**

@@ -373,7 +373,7 @@ class SearchViews extends ListView
      */
     public function getListSubpart($page)
     {
-        $listTemplate = $this->cObj->getSubpart($page, '###LIST_TEMPLATE###');
+        $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST_TEMPLATE###');
         if ($listTemplate == '') {
             $this->error = true;
             $this->errorMessage = 'No ###LIST_TEMPLATE### subpart found in "view.search.searchResult' . ucwords($this->objectType) . 'Template" at >' . $this->conf['view.']['search.']['searchResult' . ucwords($this->objectType) . 'Template'] . '<';

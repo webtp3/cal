@@ -318,7 +318,7 @@ class CreateCalendarView extends FeEditingBaseView
      */
     public function getFormStartMarker(& $template, & $sims, & $rems, & $wrapped)
     {
-        $temp = $this->cObj->getSubpart($template, '###FORM_START###');
+        $temp = $this->markerBasedTemplateService->getSubpart($template, '###FORM_START###');
         $temp_sims = [];
         $temp_sims['###L_CREATE_CALENDAR###'] = $this->controller->pi_getLL('l_create_calendar');
         $temp_sims['###UID###'] = '';

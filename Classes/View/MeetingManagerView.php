@@ -65,7 +65,7 @@ class MeetingManagerView extends BaseView
             $local_sims = [];
             $local_wrapped = [];
 
-            $status = $this->cObj->getSubpart($page, '###STATUS###');
+            $status = $this->markerBasedTemplateService->getSubpart($page, '###STATUS###');
             switch ($attendeeStatus) {
                 case 'accept': /* user comes to the meeting */
                     if ($this->changeStatus($attendeeUid, $event, $meetingHash, 'ACCEPTED')) {
@@ -84,7 +84,7 @@ class MeetingManagerView extends BaseView
                     break;
                 case 'decline': /* user does not come to the meeting */
                     if ($this->changeStatus($attendeeUid, $event, $meetingHash, 'DECLINE')) {
-                        $status = $this->cObj->getSubpart($page, '###STATUS_START###');
+                        $status = $this->markerBasedTemplateService->getSubpart($page, '###STATUS_START###');
                         $sims['###STATUS###'] = sprintf(
                             $this->controller->pi_getLL('l_meeting_declined'),
                             $event->getTitle()

@@ -932,8 +932,6 @@ class EventModel extends Model
      */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &Registry::Registry('basic', 'cobj');
-
         $templatePath = $this->conf['view.']['event.']['eventModelTemplate'];
 
         $page = Functions::getContent($templatePath);
@@ -941,7 +939,7 @@ class EventModel extends Model
         if ($page == '') {
             return '<h3>calendar: no event model template file found:</h3>' . $templatePath;
         }
-        $page = $cObj->getSubpart($page, $subpartMarker);
+        $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
                     '###',
@@ -1004,7 +1002,6 @@ class EventModel extends Model
         // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         // cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','cobj');
-        $cObj = &$this->controller->cObj;
         if (($this->conf['allowSubscribe'] == 1 || ($this->conf['subscribeFeUser'] == 1 && $rightsObj->isLoggedIn())) && $uid) {
             if ($monitoring != null && $monitoring != '') {
                 $user_uid = $rightsObj->getUserId();
@@ -1070,8 +1067,8 @@ class EventModel extends Model
 
                                     $local_template = Functions::getContent($this->conf['view.']['event.']['notify.']['confirmTemplate']);
 
-                                    $htmlTemplate = $cObj->getSubpart($local_template, '###HTML###');
-                                    $plainTemplate = $cObj->getSubpart($local_template, '###PLAIN###');
+                                    $htmlTemplate = $this->markerBasedTemplateService->getSubpart($local_template, '###HTML###');
+                                    $plainTemplate = $this->markerBasedTemplateService->getSubpart($local_template, '###PLAIN###');
 
                                     $local_switch = [];
                                     $local_rems = [];
@@ -1196,8 +1193,8 @@ class EventModel extends Model
 
                                     $local_template = Functions::getContent($this->conf['view.']['event.']['notify.']['unsubscribeConfirmTemplate']);
 
-                                    $htmlTemplate = $cObj->getSubpart($local_template, '###HTML###');
-                                    $plainTemplate = $cObj->getSubpart($local_template, '###PLAIN###');
+                                    $htmlTemplate = $this->markerBasedTemplateService->getSubpart($local_template, '###HTML###');
+                                    $plainTemplate = $this->markerBasedTemplateService->getSubpart($local_template, '###PLAIN###');
 
                                     $local_switch = [];
                                     $local_rems = [];
@@ -1341,7 +1338,7 @@ class EventModel extends Model
                     $sims_temp['CAPTCHA_TEXT'] = '';
                 }
 
-                $notLoggedinNoMonitoring = $cObj->getSubpart($template, '###NOTLOGGEDIN_NOMONITORING###');
+                $notLoggedinNoMonitoring = $this->markerBasedTemplateService->getSubpart($template, '###NOTLOGGEDIN_NOMONITORING###');
                 $parameter = [
                     'no_cache' => 1,
                     'view' => 'event',
@@ -1366,7 +1363,7 @@ class EventModel extends Model
                 $monitor = Controller::replace_tags($sims_temp, $notLoggedinNoMonitoring);
 
                 $sims_temp['ACTIONURL'] = $actionUrl2;
-                $notLoggedinMonitoring = $cObj->getSubpart($template, '###NOTLOGGEDIN_MONITORING###');
+                $notLoggedinMonitoring = $this->markerBasedTemplateService->getSubpart($template, '###NOTLOGGEDIN_MONITORING###');
                 $sims_temp['NOTLOGGEDIN_MONITORING_HEADING'] = $this->controller->pi_getLL('l_monitor_event_logged_in_monitoring');
                 $sims_temp['NOTLOGGEDIN_MONITORING_SUBMIT'] = $this->controller->pi_getLL('l_submit');
                 $sims_temp['L_ENTER_EMAIL'] = $this->controller->pi_getLL('l_enter_email');

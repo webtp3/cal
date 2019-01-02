@@ -94,7 +94,7 @@ class WeekView extends BaseView
             return '<h3>week: no template file found:</h3>' . $this->conf['view.']['week.']['weekTemplate'] . "<br />Please check your template record and add both cal items at 'include static (from extension)'";
         }
 
-        $weekTemplate = $this->cObj->getSubpart($page, '###WEEK_TEMPLATE###');
+        $weekTemplate = $this->markerBasedTemplateService->getSubpart($page, '###WEEK_TEMPLATE###');
         if ($weekTemplate == '') {
             $rems = [];
             return $this->finish($page, $rems);
@@ -436,7 +436,7 @@ class WeekView extends BaseView
         ];
 
         // Replaces the allday events
-        $alldays = $this->cObj->getSubpart($weekTemplate, '###ALLDAYSOFWEEK##');
+        $alldays = $this->markerBasedTemplateService->getSubpart($weekTemplate, '###ALLDAYSOFWEEK##');
 
         foreach ($weekarray as $get_date) {
             $replace = '';
@@ -455,7 +455,7 @@ class WeekView extends BaseView
         $rems['###ALLDAYSOFWEEK###'] = $weekreplace;
 
         // Replaces the daysofweek
-        $loop_dof = $this->cObj->getSubpart($weekTemplate, '###DAYSOFWEEK###');
+        $loop_dof = $this->markerBasedTemplateService->getSubpart($weekTemplate, '###DAYSOFWEEK###');
 
         $start_day = new  CalDate();
         $start_day->copy($week_start_day);

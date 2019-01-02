@@ -25,10 +25,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ViewController extends BaseController
 {
-    public function __construct()
-    {
-        $this->BaseController();
-    }
 
     /**
      * Draws the day view.

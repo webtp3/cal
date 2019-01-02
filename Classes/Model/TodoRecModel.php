@@ -81,7 +81,6 @@ class TodoRecModel extends EventRecModel
      */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $modelTemplate = $confArr['todoSubtype'] == 'event' ? 'todoInlineModelTemplate' : 'todoSeparateModelTemplate';
 
@@ -89,7 +88,7 @@ class TodoRecModel extends EventRecModel
         if ($page == '') {
             return '<h3>calendar: no todo model template file found:</h3>' . $this->parentEvent->conf['view.']['todo.'][$modelTemplate];
         }
-        $page = $cObj->getSubpart($page, $subpartMarker);
+        $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
                     '###',

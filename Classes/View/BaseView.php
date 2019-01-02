@@ -21,6 +21,7 @@ use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Service\BaseService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -36,9 +37,15 @@ class BaseView extends BaseService
     public $legend = '';
     public $local_cObj; // reference to a locally created cObject whos data is allowed to be altered and is used to render TS objects
 
+    /**
+     * @var MarkerBasedTemplateService
+     */
+    protected $markerBasedTemplateService;
+
     public function __construct()
     {
         parent::__construct();
+        $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
         $this->pointerName = $this->controller->getPointerName();
     }
 
@@ -88,7 +95,7 @@ class BaseView extends BaseService
     {
         $rems['###TOMORROWS_EVENTS###'] = '';
         if ($this->conf['view.']['other.']['showTomorrowEvents'] == 1) {
-            $rems['###TOMORROWS_EVENTS###'] = $this->tomorrows_events($this->cObj->getSubpart(
+            $rems['###TOMORROWS_EVENTS###'] = $this->tomorrows_events($this->markerBasedTemplateService->getSubpart(
                 $page,
                 '###TOMORROWS_EVENTS###'
             ));
@@ -152,7 +159,7 @@ class BaseView extends BaseService
                 }
             }
 
-            $todoTemplate = $this->cObj->getSubpart($page, '###TODO###');
+            $todoTemplate = $this->markerBasedTemplateService->getSubpart($page, '###TODO###');
             $rems['###TODO###'] = Functions::substituteMarkerArrayNotCached(
                 $todoTemplate,
                 [],
@@ -195,7 +202,7 @@ class BaseView extends BaseService
             }
             $local_sims['###USER_FOLDER###'] = $this->conf['view.']['other.']['userFolderId'];
             $local_sims['###REDIRECT_URL###'] = $this->controller->pi_linkTP_keepPIvars_url();
-            $rems['###USER_LOGIN###'] = Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
+            $rems['###USER_LOGIN###'] = Functions::substituteMarkerArrayNotCached($this->markerBasedTemplateService->getSubpart(
                 $page,
                 '###USER_LOGIN###'
             ), $local_sims, $local_rems, []);
@@ -246,7 +253,7 @@ class BaseView extends BaseService
             $page = $this->replace_files($page, ['search_box' => $this->conf['view.']['other.']['searchBoxTemplate']]);
             $local_sims['###GETDATE###'] = $this->conf['getdate'];
 
-            $rems['###SEARCH###'] = Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
+            $rems['###SEARCH###'] = Functions::substituteMarkerArrayNotCached($this->markerBasedTemplateService->getSubpart(
                 $page,
                 '###SEARCH###'
             ), $local_sims, [], []);
@@ -299,7 +306,7 @@ class BaseView extends BaseService
                 $this->conf['view.']['other.']['dateFormatWeekJump']
             );
 
-            $rems['###JUMPS###'] = Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
+            $rems['###JUMPS###'] = Functions::substituteMarkerArrayNotCached($this->markerBasedTemplateService->getSubpart(
                 $page,
                 '###JUMPS###'
             ), $temp_sims, [], []);
@@ -357,7 +364,7 @@ class BaseView extends BaseService
             );
             $temp_sims['###CHANGE_CALENDAR_ACTION_URL###'] = htmlspecialchars($change_calendar_action_url);
             $temp_sims['###CHANGE_CALENDAR_ACTION_URL_JS###'] = $this->escapeForJS($change_calendar_action_url);
-            $rems['###CALENDAR_SELECTOR###'] = Functions::substituteMarkerArrayNotCached($this->cObj->getSubpart(
+            $rems['###CALENDAR_SELECTOR###'] = Functions::substituteMarkerArrayNotCached($this->markerBasedTemplateService->getSubpart(
                 $page,
                 '###CALENDAR_SELECTOR###'
             ), $temp_sims, [], []);
@@ -425,7 +432,7 @@ class BaseView extends BaseService
         $tempAlternateRenderingView = $tx_cal_listview->conf['alternateRenderingView'];
         $renderingView = $this->conf['view.'][$this->conf['view'] . '.']['useListEventRenderSettingsView'];
         $tx_cal_listview->conf['alternateRenderingView'] = $renderingView ? $renderingView : 'list';
-        $listSubpart = $this->cObj->getSubpart($page, '###LIST###');
+        $listSubpart = $this->markerBasedTemplateService->getSubpart($page, '###LIST###');
 
         if ($this->conf['view'] == 'month' && $this->conf['view.']['month.']['showListInMonthView']) {
             $starttime = Calendar::calculateStartMonthTime($starttime);
@@ -458,7 +465,7 @@ class BaseView extends BaseService
     {
         $rems['###RELATED_LIST###'] = '';
         $tx_cal_listview = GeneralUtility::makeInstanceService('cal_view', 'list', 'list');
-        $listSubpart = $this->cObj->getSubpart($page, '###RELATED_LIST###');
+        $listSubpart = $this->markerBasedTemplateService->getSubpart($page, '###RELATED_LIST###');
         if ($this->conf['view.'][$this->conf['view'] . '.'][$this->conf['view'] . '.']['includeEventsInResult']) {
             $starttime = $this->controller->getListViewTime($this->conf['view.'][$this->conf['view'] . '.'][$this->conf['view'] . '.']['includeEventsInResult.']['starttime']);
             $endtime = $this->controller->getListViewTime($this->conf['view.'][$this->conf['view'] . '.'][$this->conf['view'] . '.']['includeEventsInResult.']['endtime']);
@@ -1033,7 +1040,7 @@ class BaseView extends BaseService
         $yearViewPid = $this->conf['view.']['year.']['yearViewPid'] ? $this->conf['view.']['year.']['yearViewPid'] : false;
 
         // next day
-        $nextdaylinktext = $this->cObj->getSubpart($page, '###NEXT_DAYLINKTEXT###');
+        $nextdaylinktext = $this->markerBasedTemplateService->getSubpart($page, '###NEXT_DAYLINKTEXT###');
         $this->local_cObj->setCurrentVal($nextdaylinktext);
         $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
             'getdate' => $next_day->format('%Y%m%d'),
@@ -1046,7 +1053,7 @@ class BaseView extends BaseService
         );
 
         // prev day
-        $prevdaylinktext = $this->cObj->getSubpart($page, '###PREV_DAYLINKTEXT###');
+        $prevdaylinktext = $this->markerBasedTemplateService->getSubpart($page, '###PREV_DAYLINKTEXT###');
         $this->local_cObj->setCurrentVal($prevdaylinktext);
         $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
             'getdate' => $prev_day->format('%Y%m%d'),
@@ -1059,7 +1066,7 @@ class BaseView extends BaseService
         );
 
         // next week
-        $nextweeklinktext = $this->cObj->getSubpart($page, '###NEXT_WEEKLINKTEXT###');
+        $nextweeklinktext = $this->markerBasedTemplateService->getSubpart($page, '###NEXT_WEEKLINKTEXT###');
         $this->local_cObj->setCurrentVal($nextweeklinktext);
         $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
             'getdate' => $next_week->format('%Y%m%d'),
@@ -1072,7 +1079,7 @@ class BaseView extends BaseService
         );
 
         // prev week
-        $prevweeklinktext = $this->cObj->getSubpart($page, '###PREV_WEEKLINKTEXT###');
+        $prevweeklinktext = $this->markerBasedTemplateService->getSubpart($page, '###PREV_WEEKLINKTEXT###');
         $this->local_cObj->setCurrentVal($prevweeklinktext);
         $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
             'getdate' => $prev_week->format('%Y%m%d'),
@@ -1085,7 +1092,7 @@ class BaseView extends BaseService
         );
 
         // next month
-        $nextmonthlinktext = $this->cObj->getSubpart($page, '###NEXT_MONTHLINKTEXT###');
+        $nextmonthlinktext = $this->markerBasedTemplateService->getSubpart($page, '###NEXT_MONTHLINKTEXT###');
         $this->local_cObj->setCurrentVal($nextmonthlinktext);
         $this->controller->getParametersForTyposcriptLink(
             $this->local_cObj->data,
@@ -1100,7 +1107,7 @@ class BaseView extends BaseService
         );
 
         // prev month
-        $prevmonthlinktext = $this->cObj->getSubpart($page, '###PREV_MONTHLINKTEXT###');
+        $prevmonthlinktext = $this->markerBasedTemplateService->getSubpart($page, '###PREV_MONTHLINKTEXT###');
         $this->local_cObj->setCurrentVal($prevmonthlinktext);
         $this->controller->getParametersForTyposcriptLink(
             $this->local_cObj->data,
@@ -1115,7 +1122,7 @@ class BaseView extends BaseService
         );
 
         // next year
-        $nextyearlinktext = $this->cObj->getSubpart($page, '###NEXT_YEARLINKTEXT###');
+        $nextyearlinktext = $this->markerBasedTemplateService->getSubpart($page, '###NEXT_YEARLINKTEXT###');
         $this->local_cObj->setCurrentVal($nextyearlinktext);
         $this->controller->getParametersForTyposcriptLink(
             $this->local_cObj->data,
@@ -1130,7 +1137,7 @@ class BaseView extends BaseService
         );
 
         // prev year
-        $prevyearlinktext = $this->cObj->getSubpart($page, '###PREV_YEARLINKTEXT###');
+        $prevyearlinktext = $this->markerBasedTemplateService->getSubpart($page, '###PREV_YEARLINKTEXT###');
         $this->local_cObj->setCurrentVal($prevyearlinktext);
         $this->controller->getParametersForTyposcriptLink(
             $this->local_cObj->data,
@@ -1263,7 +1270,7 @@ class BaseView extends BaseService
             if ($viewTarget == $this->conf['view']) {
                 $this->local_cObj->data['link_ATagParams'] = 'class="current"';
             }
-            $this->local_cObj->setCurrentVal($this->cObj->getSubpart(
+            $this->local_cObj->setCurrentVal($this->markerBasedTemplateService->getSubpart(
                 $template,
                 '###' . strtoupper($view) . 'VIEWLINKTEXT###'
             ));
@@ -1916,8 +1923,8 @@ class BaseView extends BaseService
         $starttime->addSeconds(86400);
         $next_day = $starttime->format('%Y%m%d');
 
-        $match1 = $this->cObj->getSubpart($template, '###T_ALLDAY_SWITCH###');
-        $match2 = $this->cObj->getSubpart($template, '###T_EVENT_SWITCH###');
+        $match1 = $this->markerBasedTemplateService->getSubpart($template, '###T_ALLDAY_SWITCH###');
+        $match2 = $this->markerBasedTemplateService->getSubpart($template, '###T_EVENT_SWITCH###');
         $loop_t_ad = trim($match1);
         $loop_t_e = trim($match2);
 
@@ -2057,14 +2064,14 @@ class BaseView extends BaseService
     public function _draw_month($page, $offset = '+0', $type)
     {
         $viewTarget = $this->conf['view.']['monthLinkTarget'];
-        $monthTemplate = $this->cObj->getSubpart($page, '###MONTH_TEMPLATE###');
+        $monthTemplate = $this->markerBasedTemplateService->getSubpart($page, '###MONTH_TEMPLATE###');
         if ($monthTemplate != '') {
-            $loop_wd = $this->cObj->getSubpart($monthTemplate, '###LOOPWEEKDAY###');
-            $t_month = $this->cObj->getSubpart($monthTemplate, '###SWITCHMONTHDAY###');
-            $startweek = $this->cObj->getSubpart($monthTemplate, '###LOOPMONTHWEEKS_DAYS###');
-            $endweek = $this->cObj->getSubpart($monthTemplate, '###LOOPMONTHDAYS_WEEKS###');
-            $weeknum = $this->cObj->getSubpart($monthTemplate, '###LOOPWEEK_NUMS###');
-            $corner = $this->cObj->getSubpart($monthTemplate, '###CORNER###');
+            $loop_wd = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###LOOPWEEKDAY###');
+            $t_month = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###SWITCHMONTHDAY###');
+            $startweek = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###LOOPMONTHWEEKS_DAYS###');
+            $endweek = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###LOOPMONTHDAYS_WEEKS###');
+            $weeknum = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###LOOPWEEK_NUMS###');
+            $corner = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###CORNER###');
 
             /* 11.12.2008 Franz:
             * why is there a limitation that only MEDIUM calendar sheets can have absolute offsets and vice versa?
@@ -2170,11 +2177,11 @@ class BaseView extends BaseService
                 $weekday = $start_day->format($langtype);
                 $weekdayLong = $start_day->format('%A');
                 if ($typeSize) {
-                    $weekday = $this->cs_convert->substr(
-                        Functions::getCharset(),
+                    $weekday = mb_substr(
                         $weekday,
                         0,
-                        $typeSize
+                        $typeSize,
+                        Functions::getCharset()
                     );
                 }
                 $start_day->addSeconds(86400);
@@ -2458,7 +2465,7 @@ class BaseView extends BaseService
             );
         }
 
-        $listTemplate = $this->cObj->getSubpart($page, '###LIST###');
+        $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST###');
         if ($listTemplate != '') {
             $tx_cal_listview = &GeneralUtility::makeInstanceService('cal_view', 'list', 'list');
             $starttime = gmmktime(0, 0, 0, $this_month, 1, $this_year);

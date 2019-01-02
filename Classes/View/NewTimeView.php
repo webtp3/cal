@@ -6,6 +6,7 @@ use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -37,6 +38,16 @@ abstract class NewTimeView
     private $parentMonth;
 
     /**
+     * @var MarkerBasedTemplateService
+     */
+    protected $markerBasedTemplateService;
+
+    public function __construct()
+    {
+        $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+    }
+
+    /**
      * @param $event
      * @return mixed
      */
@@ -52,9 +63,8 @@ abstract class NewTimeView
         $rems = [];
         $sims = [];
         $wrapped = [];
-        $cObj = &Registry::Registry('basic', 'cobj');
 
-        $subpart = $cObj->getSubpart($template, $this->getMySubpart());
+        $subpart = $this->markerBasedTemplateService->getSubpart($template, $this->getMySubpart());
         $this->getMarker($subpart, $sims, $rems, $wrapped);
         return $this->finish(Functions::substituteMarkerArrayNotCached(
             $subpart,
@@ -374,8 +384,7 @@ abstract class NewTimeView
             $this->cs_convert = new CharsetConverter();
         }
         $conf = &Registry::Registry('basic', 'conf');
-        return $this->cs_convert->substr(
-            Functions::getCharset(),
+        return mb_substr(
             strftime($this->getWeekDayFormat(), $timestamp),
             0,
             $this->getWeekDayLength()
@@ -517,7 +526,7 @@ abstract class NewTimeView
     {
         $cObj = &Registry::Registry('basic', 'cobj');
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-        $timesSubpart = $cObj->getSubpart($template, 'TIME_CELLS');
+        $timesSubpart = $this->markerBasedTemplateService->getSubpart($template, 'TIME_CELLS');
 
         $conf = &Registry::Registry('basic', 'conf');
 
@@ -600,7 +609,7 @@ abstract class NewTimeView
     public function getHourCellsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $cObj = &Registry::Registry('basic', 'cobj');
-        $hoursSubpart = $cObj->getSubpart($template, 'HOUR_CELLS');
+        $hoursSubpart = $this->markerBasedTemplateService->getSubpart($template, 'HOUR_CELLS');
 
         $conf = &Registry::Registry('basic', 'conf');
         $gridLength = $conf['view.']['day.']['gridLength'];

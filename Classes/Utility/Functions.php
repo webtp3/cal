@@ -14,10 +14,10 @@ namespace TYPO3\CMS\Cal\Utility;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 use TYPO3\CMS\Cal\Controller\UriHandler;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -229,8 +229,7 @@ class Functions
         $subpartContentArray = [],
         $wrappedSubpartContentArray = []
     ) {
-        $cObj = &Registry::Registry('basic', 'cobj');
-        // return $cObj->substituteMarkerArrayCached($content,$markContentArray,$subpartContentArray,$wrappedSubpartContentArray);
+        $markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
 
         // If not arrays then set them
         if (!is_array($markContentArray)) {
@@ -248,7 +247,7 @@ class Functions
 
         // Finding subparts and substituting them with the subpart as a marker
         foreach ($sPkeys as $key => $sPK) {
-            $content = $cObj->substituteSubpart($content, $sPK, $subpartContentArray[$sPK]);
+            $content = $markerBasedTemplateService->substituteSubpart($content, $sPK, $subpartContentArray[$sPK]);
         }
 
         // Finding subparts and wrapping them with markers
@@ -258,10 +257,10 @@ class Functions
             } else {
                 $parts = explode('|', $wrappedSubpartContentArray[$wPK]);
             }
-            $content = $cObj->substituteSubpart($content, $wPK, $parts);
+            $content = $markerBasedTemplateService->substituteSubpart($content, $wPK, $parts);
         }
 
-        return $cObj->substituteMarkerArray($content, $markContentArray);
+        return $markerBasedTemplateService->substituteMarkerArray($content, $markContentArray);
     }
 
     /**

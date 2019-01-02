@@ -184,7 +184,7 @@ class FeEditingBaseView extends BaseView
      */
     public function getFormStartMarker(& $template, & $sims, & $rems, & $wrapped)
     {
-        $rems['###FORM_START###'] = $this->cObj->getSubpart($template, '###FORM_START###');
+        $rems['###FORM_START###'] = $this->markerBasedTemplateService->getSubpart($template, '###FORM_START###');
     }
 
     /**
@@ -195,7 +195,7 @@ class FeEditingBaseView extends BaseView
      */
     public function getFormEndMarker(& $template, & $sims, & $rems, & $wrapped)
     {
-        $temp = $this->cObj->getSubpart($template, '###FORM_END###');
+        $temp = $this->markerBasedTemplateService->getSubpart($template, '###FORM_END###');
         $temp_sims = [];
         $linkParams = $this->controller->shortenLastViewAndGetTargetViewParameters();
         // $linkParams = array_merge($this->lastPiVars,$linkParams);

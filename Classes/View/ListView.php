@@ -68,7 +68,7 @@ class ListView extends BaseView
      */
     public function getListSubpart($page)
     {
-        $listTemplate = $this->cObj->getSubpart($page, '###LIST_TEMPLATE###');
+        $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST_TEMPLATE###');
         if ($listTemplate == '') {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             if ($confArr['useTeaser']) {
@@ -86,7 +86,7 @@ class ListView extends BaseView
                 $this->suggestMessage = 'Please make sure the path is correct and that you included the static template and double-check the path using the Typoscript Object Browser.';
                 return null;
             }
-            $listTemplate = $this->cObj->getSubpart($page, '###LIST_TEMPLATE###');
+            $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST_TEMPLATE###');
             if ($listTemplate == '') {
                 $this->error = true;
                 if ($confArr['useTeaser']) {
@@ -887,13 +887,13 @@ class ListView extends BaseView
             }
 
             // prepare pre- and post-list subparts
-            $listRems['###PRE_LIST_TEMPLATE###'] = $this->cObj->getSubpart($page, '###PRE_LIST_TEMPLATE###');
-            $listRems['###POST_LIST_TEMPLATE###'] = $this->cObj->getSubpart($page, '###POST_LIST_TEMPLATE###');
+            $listRems['###PRE_LIST_TEMPLATE###'] = $this->markerBasedTemplateService->getSubpart($page, '###PRE_LIST_TEMPLATE###');
+            $listRems['###POST_LIST_TEMPLATE###'] = $this->markerBasedTemplateService->getSubpart($page, '###POST_LIST_TEMPLATE###');
 
             $sims['###FOUND###'] = $this->cObj->stdWrap($this->count, $this->conf['view.']['list.']['found_stdWrap.']);
             // render pagebrowser
             if (($this->count > $this->recordsPerPage && $this->conf['view.']['list.']['pageBrowser.']['onlyShowIfNeeded']) || !$this->conf['view.']['list.']['pageBrowser.']['onlyShowIfNeeded']) {
-                $pageBrowser = $this->cObj->getSubpart($page, '###PAGEBROWSER###');
+                $pageBrowser = $this->markerBasedTemplateService->getSubpart($page, '###PAGEBROWSER###');
                 $rems['###PAGEBROWSER###'] = $this->getPageBrowser($pageBrowser);
             }
         }

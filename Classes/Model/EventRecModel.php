@@ -302,8 +302,6 @@ class EventRecModel extends Model
      */
     public function fillTemplate($subpartMarker)
     {
-        $cObj = &Registry::Registry('basic', 'cobj');
-
         $templatePath = $this->parentEvent->conf['view.']['event.']['eventModelTemplate'];
 
         $page = Functions::getContent($templatePath);
@@ -311,7 +309,7 @@ class EventRecModel extends Model
         if ($page == '') {
             return '<h3>calendar: no event model template file found:</h3>' . $templatePath;
         }
-        $page = $cObj->getSubpart($page, $subpartMarker);
+        $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
                     '###',

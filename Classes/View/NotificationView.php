@@ -261,13 +261,13 @@ class NotificationView extends BaseService
     ) {
         $absFile = GeneralUtility::getFileAbsFileName($templatePath);
         $template = GeneralUtility::getUrl($absFile);
-        $htmlTemplate = $this->cObj->getSubpart($template, '###HTML###');
-        $oldEventHTMLSubpart = $this->cObj->getSubpart($htmlTemplate, '###OLD_EVENT###');
-        $newEventHTMLSubpart = $this->cObj->getSubpart($htmlTemplate, '###NEW_EVENT###');
+        $htmlTemplate = $this->markerBasedTemplateService->getSubpart($template, '###HTML###');
+        $oldEventHTMLSubpart = $this->markerBasedTemplateService->getSubpart($htmlTemplate, '###OLD_EVENT###');
+        $newEventHTMLSubpart = $this->markerBasedTemplateService->getSubpart($htmlTemplate, '###NEW_EVENT###');
 
-        $plainTemplate = $this->cObj->getSubpart($template, '###PLAIN###');
-        $oldEventPlainSubpart = $this->cObj->getSubpart($plainTemplate, '###OLD_EVENT###');
-        $newEventPlainSubpart = $this->cObj->getSubpart($plainTemplate, '###NEW_EVENT###');
+        $plainTemplate = $this->markerBasedTemplateService->getSubpart($template, '###PLAIN###');
+        $oldEventPlainSubpart = $this->markerBasedTemplateService->getSubpart($plainTemplate, '###OLD_EVENT###');
+        $newEventPlainSubpart = $this->markerBasedTemplateService->getSubpart($plainTemplate, '###NEW_EVENT###');
 
         $this->fillTemplate($event_old, $oldEventHTMLSubpart, $oldEventPlainSubpart);
         $this->fillTemplate($event_new, $newEventHTMLSubpart, $newEventPlainSubpart);
@@ -317,7 +317,7 @@ class NotificationView extends BaseService
      */
     public function getModifyingUser($template)
     {
-        $currentUserSubpart = $this->cObj->getSubpart($template, '###CURRENT_USER_SUBPART###');
+        $currentUserSubpart = $this->markerBasedTemplateService->getSubpart($template, '###CURRENT_USER_SUBPART###');
 
         if (TYPO3_MODE == 'FE') {
             $feUser = $GLOBALS['TSFE']->fe_user->user;
@@ -571,8 +571,8 @@ class NotificationView extends BaseService
     ) {
         $absFile = GeneralUtility::getFileAbsFileName($templatePath);
         $template = GeneralUtility::getUrl($absFile);
-        $htmlTemplate = $this->cObj->getSubpart($template, '###HTML###');
-        $plainTemplate = $this->cObj->getSubpart($template, '###PLAIN###');
+        $htmlTemplate = $this->markerBasedTemplateService->getSubpart($template, '###HTML###');
+        $plainTemplate = $this->markerBasedTemplateService->getSubpart($template, '###PLAIN###');
 
         $switch = [];
         $rems = [];

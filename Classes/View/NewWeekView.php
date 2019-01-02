@@ -50,6 +50,7 @@ class NewWeekView extends NewTimeView
      */
     public function __construct($week, $year, $parentMonth = -1)
     {
+        parent::__construct();
         $this->setMySubpart('WEEK_SUBPART');
         if (DATE_CALC_BEGIN_WEEKDAY == 0) {
             $this->setMySubpart('SUNDAY_WEEK_SUBPART');

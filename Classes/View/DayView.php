@@ -85,7 +85,7 @@ class DayView extends BaseView
             return '<h3>day: no template file found:</h3>' . $this->conf['view.']['day.']['dayTemplate'] . "<br />Please check your template record and add both cal items at 'include static (from extension)'";
         }
 
-        $dayTemplate = $this->cObj->getSubpart($page, '###DAY_TEMPLATE###');
+        $dayTemplate = $this->markerBasedTemplateService->getSubpart($page, '###DAY_TEMPLATE###');
         if ($dayTemplate == '') {
             $rems = [];
             return $this->finish($page, $rems);
@@ -173,7 +173,7 @@ class DayView extends BaseView
         ];
 
         // Replaces the daysofweek
-        $loop_dof = $this->cObj->getSubpart($dayTemplate, '###DAYSOFWEEK###');
+        $loop_dof = $this->markerBasedTemplateService->getSubpart($dayTemplate, '###DAYSOFWEEK###');
 
         // Build the body
         $dayborder = 0;
@@ -383,7 +383,7 @@ class DayView extends BaseView
         // Replaces the allday events
         $replace = '';
         if (is_array($view_array[$getdate]['-1'])) {
-            $loop_ad = $this->cObj->getSubpart($dayTemplate, '###LOOPALLDAY###');
+            $loop_ad = $this->markerBasedTemplateService->getSubpart($dayTemplate, '###LOOPALLDAY###');
             foreach ($view_array[$getdate]['-1'] as $uid => $allday) {
                 $replace .= $eventArray[$allday]->renderEventForAllDay();
             }

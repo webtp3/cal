@@ -400,7 +400,6 @@ class CategoryModel extends BaseModel
         // cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','cobj');
         $modelObj = &Registry::Registry('basic', 'modelController');
         // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
-        $cObj = &$this->controller->cObj;
 
         foreach ($piVars as $key => $value) {
             switch ($key) {

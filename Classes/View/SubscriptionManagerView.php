@@ -69,7 +69,7 @@ class SubscriptionManagerView extends BaseView
                 $local_sims = [];
                 $local_wrapped = [];
 
-                $status = $this->cObj->getSubpart($page, '###STATUS###');
+                $status = $this->markerBasedTemplateService->getSubpart($page, '###STATUS###');
                 switch ($this->conf['monitor']) {
                     case 'stop': /* Unsubscribe a user */
                         if ($this->unsubscribe($email, $event, $subscriptionHash)) {
@@ -88,7 +88,7 @@ class SubscriptionManagerView extends BaseView
                         break;
                     case 'start': /* Subscribe a user */
                         if ($this->subscribe($email, $event, $subscriptionHash)) {
-                            $status = $this->cObj->getSubpart($page, '###STATUS_START###');
+                            $status = $this->markerBasedTemplateService->getSubpart($page, '###STATUS_START###');
                             $sims['###STATUS###'] = sprintf(
                                 $this->controller->pi_getLL('l_monitor_event_subscribe_successful'),
                                 $event->getTitle()
@@ -109,7 +109,7 @@ class SubscriptionManagerView extends BaseView
         } else {
             /* If there's a logged in user, show the subscription container */
             if ($this->conf['subscribeFeUser'] && $this->rightsObj->isLoggedIn()) {
-                $subscriptionContainer = $this->cObj->getSubpart($page, '###SUBSCRIPTION_CONTAINER###');
+                $subscriptionContainer = $this->markerBasedTemplateService->getSubpart($page, '###SUBSCRIPTION_CONTAINER###');
                 $return = '';
 
                 $select = '*';
@@ -128,7 +128,7 @@ class SubscriptionManagerView extends BaseView
                     $local_rems = [];
                     $local_sims = [];
                     $local_wrapped = [];
-                    $subscriptionContainer = $this->cObj->getSubpart($page, '###SUBSCRIPTION_CONTAINER###');
+                    $subscriptionContainer = $this->markerBasedTemplateService->getSubpart($page, '###SUBSCRIPTION_CONTAINER###');
                     $event = $this->modelObj->findEvent(
                         $row['uid'],
                         'tx_cal_phpicalendar',

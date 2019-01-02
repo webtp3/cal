@@ -1070,7 +1070,7 @@ class CreateEventView extends FeEditingBaseView
      */
     public function getFormStartMarker(& $template, & $sims, & $rems, & $wrapped)
     {
-        $temp = $this->cObj->getSubpart($template, '###FORM_START###');
+        $temp = $this->markerBasedTemplateService->getSubpart($template, '###FORM_START###');
         $temp_sims = [];
 
         $temp_sims['###L_WRONG_SPLIT_SYMBOL_MSG###'] = str_replace(

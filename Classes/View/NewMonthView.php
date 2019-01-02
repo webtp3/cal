@@ -36,7 +36,7 @@ class NewMonthView extends NewTimeView
         $this->setYear(intval($year));
         $this->generateWeeks();
         $controller = &Registry::Registry('basic', 'controller');
-        $controller->cache->set($month . '_' . $year, serialize($this), 'month', 60 * 60 * 24 * 365 * 100);
+        $controller->cache->set($month . '_' . $year, serialize($this), 'month');
     }
 
     /**
