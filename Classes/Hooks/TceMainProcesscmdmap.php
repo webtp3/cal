@@ -14,6 +14,8 @@ namespace TYPO3\CMS\Cal\Hooks;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+
+use BackendUtilityReplacementUtility;
 use OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Api;
@@ -96,7 +98,7 @@ class TceMainProcesscmdmap
 
                 if ($command == 'delete') {
                     /* Using getRecordRaw rather than getRecord since the record has already been deleted. */
-                    $calendarRow = BackendUtility::getRecordRaw('tx_cal_calendar', 'uid=' . $id);
+                    $calendarRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_calendar', 'uid=' . $id);
                     /* If the calendar is an External URL or ICS file, then we need to clean up */
                     if (($calendarRow['type'] == 1) or ($calendarRow['type'] == 2)) {
                         $service = new ICalendarService();

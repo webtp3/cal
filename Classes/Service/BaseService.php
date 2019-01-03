@@ -290,21 +290,14 @@ abstract class BaseService extends AbstractService
 
                 if (!$this->fileFunc) {
                     $this->fileFunc = new BasicFileUtility();
-                    $all_files = [];
-                    $all_files['webspace']['allow'] = '*';
-                    $all_files['webspace']['deny'] = '';
-                    $this->fileFunc->init('', $all_files);
                 }
                 $allowedExt = [];
                 $denyExt = [];
                 if ($type == 'file') {
                     $allowedExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']);
                 } elseif ($type == 'attachment') {
-                    $allowedExt = explode(
-                        ',',
-                        $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['allow']
-                    );
-                    $denyExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['deny']);
+                    $allowedExt = ['*'];
+                    $denyExt = explode(',', PHP_EXTENSIONS_DEFAULT);
                 }
                 $removeFiles = $this->controller->piVars['remove_' . $type] ? $this->controller->piVars['remove_' . $type] : [];
 

@@ -603,8 +603,8 @@ class CalDate extends Date
             return $value;
         }
         if (TYPO3_MODE == 'FE') {
-            return mb_substr($value, 0, $length, $GLOBALS['TSFE']->renderCharset);
+            return mb_substr($value, 0, $length);
         }
-        return mb_substr($value, 0, $length, $GLOBALS['LANG']->charSet);
+        return mb_substr($value, 0, $length);
     }
 }

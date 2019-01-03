@@ -118,15 +118,7 @@ class Functions
      */
     public static function getCharset()
     {
-        if ($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset']) { // First priority: forceCharset! If set, this will be authoritative!
-            $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'];
-        } elseif (is_object($GLOBALS['LANG'])) {
-            $charset = $GLOBALS['LANG']->charSet; // If "LANG" is around, that will hold the current charset
-        } else {
-            $charset = 'utf-8'; // THIS is just a hopeful guess!
-        }
-
-        return $charset;
+        return 'utf-8';
     }
 
     /**

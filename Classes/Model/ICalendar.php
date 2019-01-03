@@ -2,6 +2,9 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Class representing iCalendar files.
  *
@@ -675,21 +678,8 @@ class ICalendar
             }
         }
 
-        if (is_object($GLOBALS['LANG'])) {
-            $csConvObj = &$GLOBALS['LANG']->csConvObj;
-        } elseif (is_object($GLOBALS['TSFE'])) {
-            $csConvObj = &$GLOBALS['TSFE']->csConvObj;
-        } else {
-            require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang') . 'lang.php');
-            $LANG = new language();
-            if (TYPO3_MODE == 'BE') {
-                $LANG->init($GLOBALS['BE_USER']->uc['lang']);
-                $csConvObj = &$LANG->csConvObj;
-            } else {
-                $LANG->init($GLOBALS['TSFE']->config['config']['language']);
-                $csConvObj = &$GLOBALS['TSFE']->csConvObj;
-            }
-        }
+        $csConvObj = GeneralUtility::makeInstance(CharsetConverter::class);
+
         $renderCharset = $csConvObj->parse_charset($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $this->defaultCharSet);
 
         // Parse the remaining attributes.

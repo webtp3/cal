@@ -120,7 +120,7 @@ class RssView extends BaseView
 
         // header data
         $markerArray = $this->getXmlHeader($lastBuildTimestamp);
-        $subpartArray['###HEADER###'] = $this->cObj->substituteMarkerArray($this->getNewsSubpart(
+        $subpartArray['###HEADER###'] = $this->markerBasedTemplateService->substituteMarkerArray($this->getNewsSubpart(
             $t['total'],
             '###HEADER###'
         ), $markerArray);

@@ -333,7 +333,7 @@ class UriHandler
         if (is_array($this->theParts['html']['media'])) {
             foreach ($this->theParts['html']['media'] as $key => $val) {
                 if ($val['use_jumpurl'] && $this->jumperURL_prefix) {
-                    $subst = $this->jumperURL_prefix . GeneralUtility::rawUrlEncodeFP($val['absRef']);
+                    $subst = $this->jumperURL_prefix . str_replace('%2F', '/', rawurlencode($val['absRef']));
                 } else {
                     $subst = ($absolute) ? $val['absRef'] : 'cid:part' . $key . '.' . $this->messageid;
                 }
@@ -363,7 +363,7 @@ class UriHandler
                 if ($this->jumperURL_useId) {
                     $substVal = $this->jumperURL_prefix . $key;
                 } else {
-                    $substVal = $this->jumperURL_prefix . GeneralUtility::rawUrlEncodeFP($val['absRef']);
+                    $substVal = $this->jumperURL_prefix . str_replace('%2F', '/', rawurlencode($val['absRef']));
                 }
             } else {
                 $substVal = $val['absRef'];

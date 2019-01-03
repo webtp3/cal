@@ -14,6 +14,8 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+
+use BackendUtilityReplacementUtility;
 use OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Cron\ReminderScheduler;
@@ -200,7 +202,7 @@ class ReminderView extends NotificationView
             /* Set up the scheduler event */
             $task = new ReminderScheduler();
             $task->setUID($calEventUID);
-            $taskGroup = BackendUtility::getRecordRaw('tx_scheduler_task_group', 'groupName="cal"');
+            $taskGroup = BackendUtilityReplacementUtility::getRawRecord('tx_scheduler_task_group', 'groupName="cal"');
             if ($taskGroup['uid']) {
                 $task->setTaskGroup($taskGroup['uid']);
             } else {
@@ -242,7 +244,7 @@ class ReminderView extends NotificationView
     public function deleteReminder($eventUid)
     {
         if (ExtensionManagementUtility::isLoaded('scheduler')) {
-            $eventRow = BackendUtility::getRecordRaw('tx_cal_fe_user_event_monitor_mm', 'uid_local=' . $eventUid);
+            $eventRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_fe_user_event_monitor_mm', 'uid_local=' . $eventUid);
             $taskId = $eventRow['schedulerId'];
             if ($taskId > 0) {
                 $scheduler = new Scheduler();

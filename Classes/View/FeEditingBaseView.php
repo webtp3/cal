@@ -409,16 +409,13 @@ class FeEditingBaseView extends BaseView
             $sims['###' . strtoupper($marker) . '###'] = '';
 
             $fileFunc = new BasicFileUtility();
-            $all_files = [];
-            $all_files['webspace']['allow'] = '*';
-            $all_files['webspace']['deny'] = '';
             $allowedExt = [];
             $denyExt = [];
             if ($marker == 'image') {
                 $allowedExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']);
             } elseif ($marker == 'attachment') {
-                $allowedExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['allow']);
-                $denyExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['deny']);
+                $allowedExt = ['*'];
+                $denyExt = explode(',', PHP_EXTENSIONS_DEFAULT);
             }
             $i = 0;
 

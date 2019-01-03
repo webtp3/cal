@@ -14,6 +14,8 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+
+use BackendUtilityReplacementUtility;
 use Doctrine\Common\Proxy\Exception\OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Controller;
@@ -244,7 +246,7 @@ class ICalendarService extends BaseService
             $recurring = $refreshInterval * 60;
             /* If calendar has a refresh time, schedule recurring gabriel event for refresh */
             if ($recurring) {
-                $calendarRow = BackendUtility::getRecordRaw('tx_cal_calendar', 'uid=' . $uid);
+                $calendarRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_calendar', 'uid=' . $uid);
                 $taskId = $calendarRow['schedulerId'];
 
                 $scheduler = new Scheduler();
@@ -279,7 +281,7 @@ class ICalendarService extends BaseService
         /* Set up the scheduler event */
         $task = new CalendarScheduler();
         $task->setUID($calendarUid);
-        $taskGroup = BackendUtility::getRecordRaw('tx_scheduler_task_group', 'groupName="cal"');
+        $taskGroup = BackendUtilityReplacementUtility::getRawRecord('tx_scheduler_task_group', 'groupName="cal"');
         if ($taskGroup['uid']) {
             $task->setTaskGroup($taskGroup['uid']);
         } else {
@@ -322,7 +324,7 @@ class ICalendarService extends BaseService
     public function deleteSchedulerTask($calendarUid)
     {
         if (ExtensionManagementUtility::isLoaded('scheduler')) {
-            $calendarRow = BackendUtility::getRecordRaw('tx_cal_calendar', 'uid=' . $calendarUid);
+            $calendarRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_calendar', 'uid=' . $calendarUid);
             $taskId = $calendarRow['schedulerId'];
             if ($taskId > 0) {
                 $scheduler = new Scheduler();
@@ -666,7 +668,7 @@ class ICalendarService extends BaseService
             $recurrenceIdStart->convertTZbyID($timezone);
         }
 
-        $indexEntry = BackendUtility::getRecordRaw(
+        $indexEntry = BackendUtilityReplacementUtility::getRawRecord(
             'tx_cal_index',
             'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('%Y%m%d%H%M%S') . '"'
         );
@@ -929,10 +931,6 @@ class ICalendarService extends BaseService
     {
         if (!$this->fileFunc) {
             $this->fileFunc = new BasicFileUtility();
-            $all_files = [];
-            $all_files['webspace']['allow'] = '*';
-            $all_files['webspace']['deny'] = '';
-            $this->fileFunc->init('', $all_files);
         }
 
         $qParts = parse_url($externalUrl);
@@ -954,12 +952,8 @@ class ICalendarService extends BaseService
         if ($type == 'image') {
             $allowedExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']);
         } elseif ($type == 'attachment') {
-            if (isset($GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['allow']) && strlen($GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['allow']) > 0) {
-                $allowedExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['allow']);
-            }
-            if (isset($GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['deny']) && strlen($GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['deny']) > 0) {
-                $denyExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['BE']['fileExtensions']['webspace']['deny']);
-            }
+            $allowedExt = ['*'];
+            $denyExt = explode(',', PHP_EXTENSIONS_DEFAULT);
         }
 
         if ((string)$content === '' || (!empty($denyExt) && in_array(
@@ -1040,7 +1034,7 @@ class ICalendarService extends BaseService
 
                 $insertFields['icsUid'] = $component->getAttribute('UID');
 
-                $eventRow = BackendUtility::getRecordRaw('tx_cal_event', 'icsUid="' . $insertFields['icsUid'] . '"');
+                $eventRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_event', 'icsUid="' . $insertFields['icsUid'] . '"');
 
                 $tstamp = $this->getTstamp($component);
 
@@ -1257,7 +1251,7 @@ class ICalendarService extends BaseService
      */
     private function createExceptionRule($pid, $cruserId, $eventUid, $exceptionRuleDescription)
     {
-        $event = BackendUtility::getRecordRaw('tx_cal_event', 'uid=' . $eventUid);
+        $event = BackendUtilityReplacementUtility::getRawRecord('tx_cal_event', 'uid=' . $eventUid);
 
         $insertFields = [];
         $insertFields['tstamp'] = time();

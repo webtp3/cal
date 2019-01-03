@@ -812,13 +812,7 @@ class NotificationView extends BaseService
      */
     public function createTempIcsFile($content, $filename)
     {
-        $fileFunc = new BasicFileUtility();
-        $all_files = [];
-        $all_files['webspace']['allow'] = '*';
-        $all_files['webspace']['deny'] = '';
-        $fileFunc->init('', $all_files);
         $theDestFile = GeneralUtility::getFileAbsFileName('uploads/tx_cal/' . $filename);
-        // $theDestFile = $fileFunc->getUniqueName($filename, 'uploads/tx_cal');
         $fh = fopen($theDestFile, 'w');
         fwrite($fh, $content);
         fclose($fh);
