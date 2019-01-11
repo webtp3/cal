@@ -1,58 +1,72 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace TYPO3\CMS\Cal\Backend\Form\RenderType;
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 
-class StylesElement extends AbstractFormElement {
+/**
+ * Class StylesElement
+ */
+class StylesElement extends AbstractFormElement
+{
+    /**
+     * @return array
+     */
+    public function render()
+    {
+        ElementHelper::init();
 
-	public function render() {
-		ElementHelper::init();
+        $result = $this->initializeResultArray();
 
-		$result = $this->initializeResultArray();
+        $params = $this->data['parameterArray']['fieldConf']['config']['parameters'];
+        $part = $params['stylesFor'];
 
-		$params = $this->data['parameterArray']['fieldConf']['config']['parameters'];
-		$part = $params['stylesFor'];
+        $table = $this->data['tableName'];
+        $row = $this->data['databaseRow'];
 
-		$table = $this->data['tableName'];
-		$row = $this->data['databaseRow'];
+        $uid = $row['uid'];
+        $pid = $row['pid'];
 
-		$uid = $row['uid'];
-		$pid = $row['pid'];
+        $result['html'] = $this->getStyles($part, $table, $uid, $pid, $row[$part . 'style']);
 
-		$result['html'] = $this->getStyles($part, $table, $uid, $pid, $row[$part.'style']);
+        return $result;
+    }
 
-		return $result;
-	}
+    /**
+     * @param $part
+     * @param $table
+     * @param $uid
+     * @param $pid
+     * @param $value
+     * @return string
+     */
+    protected function getStyles($part, $table, $uid, $pid, $value): string
+    {
+        $html = '<div class="cal-row">';
 
-	protected function getStyles($part, $table, $uid, $pid, $value) {
-		$html = '<div class="cal-row">';
+        $pageTSConf = \TYPO3\CMS\Backend\Utility\BackendUtility::getPagesTSconfig($pid);
 
-		$pageTSConf = \TYPO3\CMS\Backend\Utility\BackendUtility::getPagesTSconfig($pid);
+        if ($pageTSConf ['options.'] ['tx_cal_controller.'] [$part . 'Styles']) {
+            $html .= '<select class="select" name="data[' . $table . '][' . $uid . '][' . $part . 'style]">';
+            $html .= '<option value=""></option>';
 
-		if ($pageTSConf ['options.'] ['tx_cal_controller.'] [$part.'Styles']) {
-			$html .= '<select class="select" name="data['.$table.']['.$uid.']['.$part.'style]">';
-			$html .= '<option value=""></option>';
+            $options = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $pageTSConf ['options.'] ['tx_cal_controller.'] [$part . 'Styles'], 1);
 
-			$options = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $pageTSConf ['options.'] ['tx_cal_controller.'] [$part.'Styles'], 1);
+            foreach ($options as $option) {
+                $nameAndColor = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('=', $option, 1);
+                $selected = '';
+                if ($value == $nameAndColor [0]) {
+                    $selected = ' selected="selected"';
+                }
+                $html .= '<option value="' . $nameAndColor [0] . '" style="background-color:' . $nameAndColor [1] . ';"' . $selected . '>' . $nameAndColor [0] . '</option>';
+            }
+            $html .= '</select>';
+        } else {
+            $html .= '<input class="input" maxlength="30" size="20" name="data[' . $table . '][' . $uid . '][' . $part . 'style]" value="' . $value . '">';
+        }
+        $html .= '</div>';
 
-			foreach ($options as $option) {
-				$nameAndColor = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('=', $option, 1);
-				$selected = '';
-				if ($value == $nameAndColor [0]) {
-					$selected = ' selected="selected"';
-				}
-				$html .= '<option value="'.$nameAndColor [0].'" style="background-color:'.$nameAndColor [1].';"'.$selected.'>'.$nameAndColor [0].'</option>';
-			}
-			$html .= '</select>';
-		} else {
-			$html .= '<input class="input" maxlength="30" size="20" name="data['.$table.']['.$uid.']['.$part.'style]" value="'.$value.'">';
-		}
-		$html .= '</div>';
-
-		return $html;
-	}
+        return $html;
+    }
 }
-
-?>

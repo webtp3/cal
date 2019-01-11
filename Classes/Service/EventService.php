@@ -186,7 +186,6 @@ class EventService extends BaseService
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
         $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
 
-
         $events = [];
 
         $select = 'tx_cal_calendar.uid AS calendar_uid, ' . 'tx_cal_calendar.owner AS calendar_owner, ' . 'tx_cal_calendar.headerstyle AS calendar_headerstyle, ' . 'tx_cal_calendar.bodystyle AS calendar_bodystyle, ' . 'tx_cal_event.*';
@@ -539,7 +538,6 @@ class EventService extends BaseService
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
         $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
-
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -1719,7 +1717,6 @@ class EventService extends BaseService
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
         $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
-
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,

@@ -261,14 +261,14 @@ $tx_cal_location = [
     ]
 ];
 
-$dummy = array(
+$dummy = [
     'exclude' => 1,
     'label' => 'dummy',
-    'config' => array(
+    'config' => [
         'type' => 'text',
         'default' => '',
-    )
-);
+    ]
+];
 
 $tx_cal_location['columns']['imagecaption'] = $dummy;
 $tx_cal_location['columns']['imagealttext'] = $dummy;

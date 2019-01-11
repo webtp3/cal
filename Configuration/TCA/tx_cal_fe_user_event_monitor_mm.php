@@ -9,7 +9,7 @@ $tx_cal_fe_user_event_monitor_mm = [
         'label_alt' => 'tablenames,offset',
         'label_alt_force' => 1,
         'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_fe_user_event_monitor_mm.gif',
-        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class .'->getMonitoringRecordLabel'
+        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class . '->getMonitoringRecordLabel'
     ],
     'feInterface' => [
         'fe_admin_fieldList' => ''

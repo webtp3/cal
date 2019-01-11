@@ -38,7 +38,7 @@ $tx_cal_event_deviation = [
         'versioningWS' => true,
         'hideTable' => $configuration['hideDeviationRecords'],
         'searchFields' => 'title,organizer,organizer_link,location,location_link,teaser,description,image,imagecaption,imagealttext,imagetitletext,attachment,attachmentcaption',
-        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class .'->getDeviationRecordLabel'
+        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class . '->getDeviationRecordLabel'
     ],
     'interface' => [
         'showRecordFieldList' => 'hidden,title,start_date,start_time,allday,end_date,end_time,organizer,location,description,image,attachment'

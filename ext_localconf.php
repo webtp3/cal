@@ -1276,37 +1276,37 @@ mod.wizards.newContentElement.wizardItems.plugins.show := addToList(tx_cal)
 ');
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1542311227] = [
-	'nodeName' => 'calRDateElement',
-	'priority' => 40,
-	'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\RDateElement::class,
+    'nodeName' => 'calRDateElement',
+    'priority' => 40,
+    'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\RDateElement::class,
 ];
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1542311228] = [
-	'nodeName' => 'calByMonthElement',
-	'priority' => 40,
-	'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\ByMonthElement::class,
+    'nodeName' => 'calByMonthElement',
+    'priority' => 40,
+    'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\ByMonthElement::class,
 ];
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1542311229] = [
-	'nodeName' => 'calByMonthDayElement',
-	'priority' => 40,
-	'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\ByMonthDayElement::class,
+    'nodeName' => 'calByMonthDayElement',
+    'priority' => 40,
+    'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\ByMonthDayElement::class,
 ];
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1542311230] = [
-	'nodeName' => 'calByDayElement',
-	'priority' => 40,
-	'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\ByDayElement::class,
+    'nodeName' => 'calByDayElement',
+    'priority' => 40,
+    'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\ByDayElement::class,
 ];
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1542311231] = [
-	'nodeName' => 'calExtUrlElement',
-	'priority' => 40,
-	'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\ExtUrlElement::class,
+    'nodeName' => 'calExtUrlElement',
+    'priority' => 40,
+    'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\ExtUrlElement::class,
 ];
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1542311232] = [
-	'nodeName' => 'calStylesElement',
-	'priority' => 40,
-	'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\StylesElement::class,
+    'nodeName' => 'calStylesElement',
+    'priority' => 40,
+    'class'    => \TYPO3\CMS\Cal\Backend\Form\RenderType\StylesElement::class,
 ];

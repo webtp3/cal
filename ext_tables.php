@@ -26,7 +26,7 @@ $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal');
 /**
  * Register icons
  */
-$iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance( \TYPO3\CMS\Core\Imaging\IconRegistry::class );
+$iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
 $iconRegistry->registerIcon(
     'tx-cal-wizard',
     \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,

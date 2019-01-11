@@ -16,7 +16,7 @@ $tx_cal_attendee = [
         ],
         'versioningWS' => true,
         'searchFields' => 'email',
-        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class .'->getAttendeeRecordLabel'
+        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class . '->getAttendeeRecordLabel'
     ],
     'interface' => [
         'showRecordFieldList' => 'hidden,fe_user_id,email,attendance,status'

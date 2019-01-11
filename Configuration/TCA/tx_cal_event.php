@@ -54,13 +54,13 @@ $tx_cal_event = [
         'languageField' => 'sys_language_uid',
         'type' => 'type',
         'typeicon_column' => 'type',
-        'typeicon_classes' => array(
+        'typeicon_classes' => [
             0 => 'cal-eventtype-standard',
             1 => 'cal-eventtype-intlnk',
             2 => 'cal-eventtype-exturl',
             3 => 'cal-eventtype-meeting',
             4 => 'cal-eventtype-todo'
-        ),
+        ],
         'dividers2tabs' => $configuration['noTabDividers'] ? false : true,
         'enablecolumns' => [
             'disabled' => 'hidden',
@@ -131,7 +131,7 @@ $tx_cal_event = [
                 'size' => 1,
                 'minitems' => 1,
                 'maxitems' => 1,
-                'itemsProcFunc' => \TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc::class .'->getRecords',
+                'itemsProcFunc' => \TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc::class . '->getRecords',
                 'itemsProcFunc_config' => [
                     'table' => 'tx_cal_calendar',
                     'orderBy' => 'tx_cal_calendar.title'

@@ -127,7 +127,6 @@ abstract class BaseService extends AbstractService
         $this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->extConf['categoryService'] = 'sys_category';
-
     }
 
     /**

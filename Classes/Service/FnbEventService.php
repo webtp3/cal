@@ -75,7 +75,6 @@ class FnbEventService extends EventService
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
         $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
 
-
         $calendarSearchString = $this->getFreeAndBusyCalendarSearchString(
             $pidList,
             true,

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace TYPO3\CMS\Cal\Updates;
 
@@ -113,18 +113,36 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard implements UpgradeWizardIn
             ->fetchAll();
 
         foreach ($newCategories as $newCategory) {
-            $sysCategoryConnection->update('sys_category', ['parent' => $mappingArray[$newCategory['parent']]],
-                ['uid' => $newCategory['uid']]);
-            $sysCategoryConnection->update('sys_category', ['t3ver_oid' => $mappingArray[$newCategory['t3ver_oid']]],
-                ['uid' => $newCategory['uid']]);
-            $sysCategoryConnection->update('sys_category', ['t3ver_id' => $mappingArray[$newCategory['t3ver_id']]],
-                ['uid' => $newCategory['uid']]);
-            $sysCategoryConnection->update('sys_category',
-                ['t3ver_move_id' => $mappingArray[$newCategory['t3ver_move_id']]], ['uid' => $newCategory['uid']]);
-            $sysCategoryConnection->update('sys_category', ['t3_origuid' => $mappingArray[$newCategory['t3_origuid']]],
-                ['uid' => $newCategory['uid']]);
-            $sysCategoryConnection->update('sys_category',
-                ['l10n_parent' => $mappingArray[$newCategory['l10n_parent']]], ['uid' => $newCategory['uid']]);
+            $sysCategoryConnection->update(
+                'sys_category',
+                ['parent' => $mappingArray[$newCategory['parent']]],
+                ['uid' => $newCategory['uid']]
+            );
+            $sysCategoryConnection->update(
+                'sys_category',
+                ['t3ver_oid' => $mappingArray[$newCategory['t3ver_oid']]],
+                ['uid' => $newCategory['uid']]
+            );
+            $sysCategoryConnection->update(
+                'sys_category',
+                ['t3ver_id' => $mappingArray[$newCategory['t3ver_id']]],
+                ['uid' => $newCategory['uid']]
+            );
+            $sysCategoryConnection->update(
+                'sys_category',
+                ['t3ver_move_id' => $mappingArray[$newCategory['t3ver_move_id']]],
+                ['uid' => $newCategory['uid']]
+            );
+            $sysCategoryConnection->update(
+                'sys_category',
+                ['t3_origuid' => $mappingArray[$newCategory['t3_origuid']]],
+                ['uid' => $newCategory['uid']]
+            );
+            $sysCategoryConnection->update(
+                'sys_category',
+                ['l10n_parent' => $mappingArray[$newCategory['l10n_parent']]],
+                ['uid' => $newCategory['uid']]
+            );
         }
 
         $calCategoryMmConnection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_category');
