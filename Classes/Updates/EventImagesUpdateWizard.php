@@ -18,6 +18,7 @@ namespace TYPO3\CMS\Cal\Updates;
 /**
  * Upgrade wizard which goes through all files referenced in the tx_cal_event.image filed
  * and creates sys_file records as well as sys_file_reference records for the individual usages.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class EventImagesUpdateWizard extends AbstractImagesUpdateWizard
 {

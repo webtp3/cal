@@ -27,6 +27,7 @@ use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 /**
  * Basic upgrade wizard which goes through all files referenced in the {defined} field
  * and creates sys_file records as well as sys_file_reference records for the individual usages.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 abstract class AbstractUpdateWizard extends AbstractUpdate
 {
@@ -102,6 +103,8 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
      */
     public function checkForUpdate(&$description)
     {
+        trigger_error('As \TYPO3\CMS\Install\Updates\AbstractUpdate will be removed in TYPO3 v10.0, this wizard will go as well with v3.0 of ext:cal. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $updateNeeded = false;
         // Fetch records where the field media does not contain a plain integer value
         // * check whether media field is not empty
@@ -142,6 +145,8 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
      */
     public function performUpdate(array &$dbQueries, &$customMessages)
     {
+        trigger_error('As \TYPO3\CMS\Install\Updates\AbstractUpdate will be removed in TYPO3 v10.0, this wizard will go as well with v3.0 of ext:cal. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $this->init();
         $records = $this->getRecordsFromTable($this->getRecordTableName());
         $this->checkPrerequisites();
@@ -237,7 +242,6 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
     protected function getDbalCompliantUpdateWhereClause()
     {
         $mapping = $this->getTableColumnMapping();
-        $this->quoteIdentifiers($mapping);
 
         $where = sprintf(
                 'WHERE %s <> \'\'',
@@ -254,20 +258,4 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
      */
     abstract protected function getTableColumnMapping();
 
-    /**
-     * Quotes identifiers for DBAL-compliant query.
-     *
-     * @param array &$mapping
-     */
-    protected function quoteIdentifiers(array &$mapping)
-    {
-        if ($GLOBALS['TYPO3_DB'] instanceof DatabaseConnection) {
-            if (!$GLOBALS['TYPO3_DB']->runningNative() && !$GLOBALS['TYPO3_DB']->runningADOdbDriver('mysql')) {
-                $mapping['mapTableName'] = '"' . $mapping['mapTableName'] . '"';
-                foreach ($mapping['mapFieldNames'] as $key => &$value) {
-                    $value = '"' . $value . '"';
-                }
-            }
-        }
-    }
 }
