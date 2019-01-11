@@ -63,7 +63,7 @@ abstract class BaseService extends AbstractService
     /**
      * The category service object
      *
-     * @var CategoryService
+     * @var SysCategoryService
      */
     public $categoryService;
 
@@ -126,9 +126,8 @@ abstract class BaseService extends AbstractService
         $this->cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
         $this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        if (!isset($this->extConf['categoryService'])) {
-            $this->extConf['categoryService'] = 'tx_cal_category';
-        }
+        $this->extConf['categoryService'] = 'sys_category';
+
     }
 
     /**

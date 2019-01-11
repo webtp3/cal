@@ -22,17 +22,10 @@ $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist'][$pluginSi
 $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignature] = 'pi_flexform';
 
 $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-if ($extConf['categoryService'] == 'sys_category') {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
-        $pluginSignature,
-        'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal_sys_category.xml'
-    );
-} else {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
-        $pluginSignature,
-        'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal.xml'
-    );
-}
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
+    $pluginSignature,
+    'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal_sys_category.xml'
+);
 
 /***************
  * Default TypoScript

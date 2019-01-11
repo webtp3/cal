@@ -1420,7 +1420,7 @@ class BaseView extends BaseService
         $this->conf['view.']['category.']['tree.']['calendar'] = '0,' . $this->conf['calendar'];
         $categoryArray = $this->modelObj->findAllCategories(
             'cal_category_model',
-            $this->extConf['categoryService'],
+            'sys_category',
             $this->conf['pidList']
         );
 

@@ -396,16 +396,6 @@ class TceMainProcessdatamap
             }
         }
 
-        if ($table == 'tx_cal_category' && array_key_exists('calendar_id', $incomingFieldArray) && !strstr(
-                $id,
-                'NEW'
-            )) {
-            $category = BackendUtility::getRecord('tx_cal_category', $id);
-            if ($incomingFieldArray['calendar_id'] != $category['calendar_id']) {
-                $incomingFieldArray['parent_category'] = 0;
-            }
-        }
-
         /* If an existing calendar is updated */
         if ($table == 'tx_cal_calendar' && array_key_exists('type', $incomingFieldArray) && !strstr($id, 'NEW')) {
             /* Get the calendar info from the db */

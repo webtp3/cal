@@ -182,22 +182,22 @@
             </label>
             <label index="tx_cal_calendar_private">The users private calendar</label>
             <label index="tx_cal_calendar.schedulerId">Scheduler ID (scheduler needed)</label>
-            <label index="tx_cal_category">Calendar Category</label>
-            <label index="tx_cal_category.title">Category title</label>
-            <label index="tx_cal_category.headerstyle">Header style</label>
-            <label index="tx_cal_category.bodystyle">Body style</label>
-            <label index="tx_cal_category.headercolor">Header Color (e.g. green or #15E337)</label>
-            <label index="tx_cal_category.bodycolor">Body Color (e.g. green or #15E337)</label>
-            <label index="tx_cal_category.calendar">Calendar</label>
-            <label index="tx_cal_category.none">None</label>
-            <label index="tx_cal_category.parent_category">Parent category</label>
-            <label index="tx_cal_category.shared_user_allowed">Allow shared user to select this category</label>
-            <label index="tx_cal_category.single_pid">Event view page for events from this category</label>
-            <label index="tx_cal_category.createNew">create a new category</label>
-            <label index="tx_cal_category.edit">edit selected category</label>
-            <label index="tx_cal_category.notification_emails">Notification emails (comma separated)</label>
-            <label index="tx_cal_category.icon">Icon</label>
-            <label index="tx_cal_category.global">Global categories</label>
+            <label index="sys_category">Calendar Category</label>
+            <label index="sys_category.title">Category title</label>
+            <label index="sys_category.headerstyle">Header style</label>
+            <label index="sys_category.bodystyle">Body style</label>
+            <label index="sys_category.headercolor">Header Color (e.g. green or #15E337)</label>
+            <label index="sys_category.bodycolor">Body Color (e.g. green or #15E337)</label>
+            <label index="sys_category.calendar">Calendar</label>
+            <label index="sys_category.none">None</label>
+            <label index="sys_category.parent_category">Parent category</label>
+            <label index="sys_category.shared_user_allowed">Allow shared user to select this category</label>
+            <label index="sys_category.single_pid">Event view page for events from this category</label>
+            <label index="sys_category.createNew">create a new category</label>
+            <label index="sys_category.edit">edit selected category</label>
+            <label index="sys_category.notification_emails">Notification emails (comma separated)</label>
+            <label index="sys_category.icon">Icon</label>
+            <label index="sys_category.global">Global categories</label>
             <label index="tx_cal_organizer">Calendar Event Organizer</label>
             <label index="tx_cal_organizer.name">Name</label>
             <label index="tx_cal_organizer.description">Description</label>
@@ -277,7 +277,7 @@
             <label index="rdate_type.period">Period</label>
             <label index="tx_cal_enable_accesscontroll">Enable Cal Access Control</label>
             <label index="tx_cal_calendar_accesscontroll">Select allowed Calendar</label>
-            <label index="tx_cal_category_accesscontroll">Select allowed Categories (attention)</label>
+            <label index="sys_category_accesscontroll">Select allowed Categories (attention)</label>
             <label index="tx_cal_attendee">Event attendee</label>
             <label index="tx_cal_attendee.attendance.NON">-</label>
             <label index="tx_cal_attendee.attendance.OPT-PARTICIPANT">Optional</label>
@@ -367,10 +367,10 @@
             <label index="tx_cal_fe_group_event.fe_group">Gruppe</label>
             <label index="tx_cal_fe_group_event.event">Begivenhed</label>
             <label index="tx_cal_fe_user_event.monitor">Rapporter ¾ndringer</label>
-            <label index="tx_cal_category">Kalender kategori</label>
-            <label index="tx_cal_category.title">Kategori titel</label>
-            <label index="tx_cal_category.headercolor">Sidehoved farve (eks. green eller #15E337)</label>
-            <label index="tx_cal_category.bodycolor">Br¿dtekst farve (eks. green eller #15E337)</label>
+            <label index="sys_category">Kalender kategori</label>
+            <label index="sys_category.title">Kategori titel</label>
+            <label index="sys_category.headercolor">Sidehoved farve (eks. green eller #15E337)</label>
+            <label index="sys_category.bodycolor">Br¿dtekst farve (eks. green eller #15E337)</label>
             <label index="tt_content.list_type">TYPO3 Kalender</label>
             <label index="tx_cal_controller_flexform.sheet_general">[ Generelle Indstillinger ]</label>
             <label index="tx_cal_controller_flexform.sheet_general-mode">Plugin Mode:</label>
@@ -561,26 +561,26 @@
             <label index="tx_cal_calendar.createNew">Neuen Kalender anlegen</label>
             <label index="tx_cal_calendar.edit">Ausgew&amp;auml;hlten Kalender bearbeiten</label>
             <label index="tx_cal_calendar_private">Privater Kalender des Benutzers</label>
-            <label index="tx_cal_category">Kalender Kategorie</label>
-            <label index="tx_cal_category.title">Kategorietitel</label>
-            <label index="tx_cal_category.headerstyle">Überschriften Style</label>
-            <label index="tx_cal_category.bodystyle">Textkörper Style</label>
-            <label index="tx_cal_category.headercolor">Header Farbe (z.B. green oder #15E337)</label>
-            <label index="tx_cal_category.bodycolor">Body Farbe (z.B. green oder #15E337)</label>
-            <label index="tx_cal_category.calendar">Kalender</label>
-            <label index="tx_cal_category.parent_category">&amp;Uuml;bergeordnete Kategorie</label>
-            <label index="tx_cal_category.shared_user_allowed">Erlaube freigegebenen Benutzern, diese Kategorie
+            <label index="sys_category">Kalender Kategorie</label>
+            <label index="sys_category.title">Kategorietitel</label>
+            <label index="sys_category.headerstyle">Überschriften Style</label>
+            <label index="sys_category.bodystyle">Textkörper Style</label>
+            <label index="sys_category.headercolor">Header Farbe (z.B. green oder #15E337)</label>
+            <label index="sys_category.bodycolor">Body Farbe (z.B. green oder #15E337)</label>
+            <label index="sys_category.calendar">Kalender</label>
+            <label index="sys_category.parent_category">&amp;Uuml;bergeordnete Kategorie</label>
+            <label index="sys_category.shared_user_allowed">Erlaube freigegebenen Benutzern, diese Kategorie
                 auszuw&amp;auml;hlen
             </label>
-            <label index="tx_cal_category.single_pid">Einzelansichtsseite f&amp;uuml;r Events mit dieser
+            <label index="sys_category.single_pid">Einzelansichtsseite f&amp;uuml;r Events mit dieser
                 Kategorie
             </label>
-            <label index="tx_cal_category.createNew">Neue Kategorie anlegen</label>
-            <label index="tx_cal_category.edit">Ausgew&amp;auml;hlte Kategorie bearbeiten</label>
-            <label index="tx_cal_category.notification_emails">Benachrichtigungs-Emailadressen (getrennt mit
+            <label index="sys_category.createNew">Neue Kategorie anlegen</label>
+            <label index="sys_category.edit">Ausgew&amp;auml;hlte Kategorie bearbeiten</label>
+            <label index="sys_category.notification_emails">Benachrichtigungs-Emailadressen (getrennt mit
                 Komma)
             </label>
-            <label index="tx_cal_category.icon">Icon</label>
+            <label index="sys_category.icon">Icon</label>
             <label index="tx_cal_organizer">Kalender Organisation</label>
             <label index="tx_cal_organizer.name">Name</label>
             <label index="tx_cal_organizer.description">Beschreibung</label>
@@ -659,7 +659,7 @@
             <label index="frequency.year">jährlich</label>
             <label index="tx_cal_enable_accesscontroll">Aktiviere Kalender Zugriffskontrolle</label>
             <label index="tx_cal_calendar_accesscontroll">Wähle erlaubte Kalender aus</label>
-            <label index="tx_cal_category_accesscontroll">Wähle erlaubte Kategorien aus (Achtung)</label>
+            <label index="sys_category_accesscontroll">Wähle erlaubte Kategorien aus (Achtung)</label>
             <label index="tx_cal_attendee">Teilnehmer</label>
             <label index="tx_cal_attendee.attendance.NON">-</label>
             <label index="tx_cal_attendee.attendance.OPT-PARTICIPANT">Optional</label>
@@ -678,12 +678,12 @@
             <label index="tx_cal_attendee.status">Status</label>
             <label index="tx_cal_attendee.createNew">Neuen Teilnehmer anlegen</label>
             <label index="tx_cal_attendee.edit">Ausgew&amp;auml;hlten Teilnehmer bearbeiten</label>
-            <label index="tx_cal_category.type">Ereignis Typ</label>
-            <label index="tx_cal_category.type.I.0">Standard Kategorie (Datenbank)</label>
-            <label index="tx_cal_category.type.I.1">Externer Kalender</label>
-            <label index="tx_cal_category.type.I.2">ICS-Datei einbinden</label>
-            <label index="tx_cal_category.ext_url">externe Kalender-URL</label>
-            <label index="tx_cal_category.ics_file">ICS-Datei</label>
+            <label index="sys_category.type">Ereignis Typ</label>
+            <label index="sys_category.type.I.0">Standard Kategorie (Datenbank)</label>
+            <label index="sys_category.type.I.1">Externer Kalender</label>
+            <label index="sys_category.type.I.2">ICS-Datei einbinden</label>
+            <label index="sys_category.ext_url">externe Kalender-URL</label>
+            <label index="sys_category.ics_file">ICS-Datei</label>
         </languageKey>
         <languageKey index="no" type="array">
             <label index="tx_cal_event">Kalender hendelse</label>
@@ -744,10 +744,10 @@
             <label index="tx_cal_fe_group_event.fe_group">Gruppe</label>
             <label index="tx_cal_fe_group_event.event">Hendelse</label>
             <label index="tx_cal_fe_user_event.monitor">Varsle ved endring</label>
-            <label index="tx_cal_category">Kalender kategori</label>
-            <label index="tx_cal_category.title">Kategori tittel</label>
-            <label index="tx_cal_category.headercolor">Overskift farge (f.eks. green eller #15E337)</label>
-            <label index="tx_cal_category.bodycolor">Tekstomr&amp;aring;de farge (f.eks. green eller
+            <label index="sys_category">Kalender kategori</label>
+            <label index="sys_category.title">Kategori tittel</label>
+            <label index="sys_category.headercolor">Overskift farge (f.eks. green eller #15E337)</label>
+            <label index="sys_category.bodycolor">Tekstomr&amp;aring;de farge (f.eks. green eller
                 #15E337)
             </label>
             <label index="tx_cal_organizer">Kalender organisator</label>
@@ -797,9 +797,9 @@
             <label index="tx_cal_fe_group_event.fe_group">Gruppo</label>
             <label index="tx_cal_fe_group_event.event">Evento</label>
             <label index="tx_cal_fe_user_event.monitor">Notifica in caso di modifica</label>
-            <label index="tx_cal_category">Categoria Calendario</label>
-            <label index="tx_cal_category.title">Titolo Categoria</label>
-            <label index="tx_cal_category.color">Colore (es. green o #15E337)</label>
+            <label index="sys_category">Categoria Calendario</label>
+            <label index="sys_category.title">Titolo Categoria</label>
+            <label index="sys_category.color">Colore (es. green o #15E337)</label>
             <label index="tx_cal_organizer">Organizzatore Calendario</label>
             <label index="tx_cal_organizer.name">Nome</label>
             <label index="tx_cal_organizer.description">Descrizione</label>
@@ -877,9 +877,9 @@
             <label index="tx_cal_fe_group_event.fe_group">Groupe frontal</label>
             <label index="tx_cal_fe_group_event.event">Evènement</label>
             <label index="tx_cal_fe_user_event.monitor">Notification en cas de changement</label>
-            <label index="tx_cal_category">Catégorie de calendrier</label>
-            <label index="tx_cal_category.title">Titre de catégorie</label>
-            <label index="tx_cal_category.color">Couleur (ex. vert ou #15E337)</label>
+            <label index="sys_category">Catégorie de calendrier</label>
+            <label index="sys_category.title">Titre de catégorie</label>
+            <label index="sys_category.color">Couleur (ex. vert ou #15E337)</label>
             <label index="tx_cal_organizer">Organisateur calendrier</label>
             <label index="tx_cal_organizer.name">Nom</label>
             <label index="tx_cal_organizer.description">Description</label>
@@ -966,18 +966,18 @@
             <label index="tx_cal_fe_group_event.fe_group">Grupo</label>
             <label index="tx_cal_fe_group_event.event">Evento</label>
             <label index="tx_cal_fe_user_event.monitor">Notificar al Cambio</label>
-            <label index="tx_cal_category">Categoría de Calendario</label>
-            <label index="tx_cal_category.title">Título de Categoría</label>
-            <label index="tx_cal_category.headercolor">Color del Encabezado (e.g. green o #15E337)</label>
-            <label index="tx_cal_category.bodycolor">Color del Cuerpo</label>
-            <label index="tx_cal_category.headertextcolor">Color del Texto del Encabezado</label>
-            <label index="tx_cal_category.bodytextcolor">Color del Texto del Cuerpo</label>
-            <label index="tx_cal_category.type">Tipo de Evento</label>
-            <label index="tx_cal_category.type.I.0">Categoría normal (base de datos)</label>
-            <label index="tx_cal_category.type.I.1">Calendario externo</label>
-            <label index="tx_cal_category.type.I.2">Incluir archivo ICS</label>
-            <label index="tx_cal_category.ext_url">URL del Calendario Externo</label>
-            <label index="tx_cal_category.ics_file">Archivo ICS</label>
+            <label index="sys_category">Categoría de Calendario</label>
+            <label index="sys_category.title">Título de Categoría</label>
+            <label index="sys_category.headercolor">Color del Encabezado (e.g. green o #15E337)</label>
+            <label index="sys_category.bodycolor">Color del Cuerpo</label>
+            <label index="sys_category.headertextcolor">Color del Texto del Encabezado</label>
+            <label index="sys_category.bodytextcolor">Color del Texto del Cuerpo</label>
+            <label index="sys_category.type">Tipo de Evento</label>
+            <label index="sys_category.type.I.0">Categoría normal (base de datos)</label>
+            <label index="sys_category.type.I.1">Calendario externo</label>
+            <label index="sys_category.type.I.2">Incluir archivo ICS</label>
+            <label index="sys_category.ext_url">URL del Calendario Externo</label>
+            <label index="sys_category.ics_file">Archivo ICS</label>
             <label index="tt_content.list_type">Calendario TYPO3</label>
             <label index="tx_cal_controller_flexform.sheet_general">[ Ajustes Generales ]</label>
             <label index="tx_cal_controller_flexform.sheet_general-mode">Modo de Plugin:</label>
@@ -1063,10 +1063,10 @@
             <label index="tx_cal_fe_group_event.fe_group">Groep</label>
             <label index="tx_cal_fe_group_event.event">Gebeurtenis</label>
             <label index="tx_cal_fe_user_event.monitor">Op de hoogte stellen bij wijziging</label>
-            <label index="tx_cal_category">Kalender categorien</label>
-            <label index="tx_cal_category.title">Titel van categorie</label>
-            <label index="tx_cal_category.headercolor">Kleur (b.v. green[CSS kleuren] of #15E337[HEX])</label>
-            <label index="tx_cal_category.bodycolor">Kleur (b.v. green[CSS kleuren] of #15E337[HEX])</label>
+            <label index="sys_category">Kalender categorien</label>
+            <label index="sys_category.title">Titel van categorie</label>
+            <label index="sys_category.headercolor">Kleur (b.v. green[CSS kleuren] of #15E337[HEX])</label>
+            <label index="sys_category.bodycolor">Kleur (b.v. green[CSS kleuren] of #15E337[HEX])</label>
             <label index="tx_cal_organizer">Kalender organisator</label>
             <label index="tx_cal_organizer.name">Naam</label>
             <label index="tx_cal_organizer.description">Omschrijving</label>
@@ -1185,15 +1185,15 @@
                 dla wybranych użytkowników/grup użytkowników (w przeciwnym wypadku
                 widok jest publiczny)
             </label>
-            <label index="tx_cal_category">Kalendarz - Kategorie</label>
-            <label index="tx_cal_category.title">Tytuł kategorii</label>
-            <label index="tx_cal_category.headerstyle">Styl nagłówka</label>
-            <label index="tx_cal_category.bodystyle">Styl body</label>
-            <label index="tx_cal_category.headercolor">Kolor nagłówka (np. green or #15E337)</label>
-            <label index="tx_cal_category.bodycolor">Kolor body (np. green or #15E337)</label>
-            <label index="tx_cal_category.calendar">Kalendarz</label>
-            <label index="tx_cal_category.parent_category">Katergoria rodzic</label>
-            <label index="tx_cal_category.shared_user_allowed">Zezwól użytkownikom wybrać tę kategorię (shared
+            <label index="sys_category">Kalendarz - Kategorie</label>
+            <label index="sys_category.title">Tytuł kategorii</label>
+            <label index="sys_category.headerstyle">Styl nagłówka</label>
+            <label index="sys_category.bodystyle">Styl body</label>
+            <label index="sys_category.headercolor">Kolor nagłówka (np. green or #15E337)</label>
+            <label index="sys_category.bodycolor">Kolor body (np. green or #15E337)</label>
+            <label index="sys_category.calendar">Kalendarz</label>
+            <label index="sys_category.parent_category">Katergoria rodzic</label>
+            <label index="sys_category.shared_user_allowed">Zezwól użytkownikom wybrać tę kategorię (shared
                 user)
             </label>
             <label index="tx_cal_organizer">Kalendarz - Organizatorzy</label>
@@ -1256,7 +1256,7 @@
             <label index="frequency.year">Rok</label>
             <label index="tx_cal_enable_accesscontroll">Włącz kontrolę dostępu do kalendarza</label>
             <label index="tx_cal_calendar_accesscontroll">Wybierz dozwolone Kalendarze</label>
-            <label index="tx_cal_category_accesscontroll">Wybierz dozwolone Kategorie (uwaga)</label>
+            <label index="sys_category_accesscontroll">Wybierz dozwolone Kategorie (uwaga)</label>
             <label index="tx_cal_event.general_sheet">Ogólne</label>
             <label index="tx_cal_event.recurrence_sheet">Rekurencja</label>
             <label index="tx_cal_event.location_sheet">Lokalizacja</label>
@@ -1627,18 +1627,18 @@
             <label index="tx_cal_calendar.createNew" type="integer">262412790</label>
             <label index="tx_cal_calendar.edit" type="integer">69922238</label>
             <label index="tx_cal_calendar_private" type="integer">72101171</label>
-            <label index="tx_cal_category" type="integer">131600806</label>
-            <label index="tx_cal_category.title" type="integer">96882397</label>
-            <label index="tx_cal_category.headerstyle" type="integer">86915426</label>
-            <label index="tx_cal_category.bodystyle" type="integer">110767857</label>
-            <label index="tx_cal_category.headercolor" type="integer">71224712</label>
-            <label index="tx_cal_category.bodycolor" type="integer">180471136</label>
-            <label index="tx_cal_category.calendar" type="integer">150966827</label>
-            <label index="tx_cal_category.parent_category" type="integer">86730922</label>
-            <label index="tx_cal_category.shared_user_allowed" type="integer">97709827</label>
-            <label index="tx_cal_category.single_pid" type="integer">113923463</label>
-            <label index="tx_cal_category.createNew" type="integer">197729245</label>
-            <label index="tx_cal_category.edit" type="integer">10946716</label>
+            <label index="sys_category" type="integer">131600806</label>
+            <label index="sys_category.title" type="integer">96882397</label>
+            <label index="sys_category.headerstyle" type="integer">86915426</label>
+            <label index="sys_category.bodystyle" type="integer">110767857</label>
+            <label index="sys_category.headercolor" type="integer">71224712</label>
+            <label index="sys_category.bodycolor" type="integer">180471136</label>
+            <label index="sys_category.calendar" type="integer">150966827</label>
+            <label index="sys_category.parent_category" type="integer">86730922</label>
+            <label index="sys_category.shared_user_allowed" type="integer">97709827</label>
+            <label index="sys_category.single_pid" type="integer">113923463</label>
+            <label index="sys_category.createNew" type="integer">197729245</label>
+            <label index="sys_category.edit" type="integer">10946716</label>
             <label index="tx_cal_organizer" type="integer">113175833</label>
             <label index="tx_cal_organizer.name" type="integer">77521672</label>
             <label index="tx_cal_organizer.description" type="integer">190479069</label>
@@ -1756,7 +1756,7 @@
             <label index="frequency.year" type="integer">217442937</label>
             <label index="tx_cal_enable_accesscontroll" type="integer">161970726</label>
             <label index="tx_cal_calendar_accesscontroll" type="integer">171985195</label>
-            <label index="tx_cal_category_accesscontroll" type="integer">37281293</label>
+            <label index="sys_category_accesscontroll" type="integer">37281293</label>
             <label index="tx_cal_attendee" type="integer">64936888</label>
             <label index="tx_cal_attendee.attendance.NON" type="integer">53925355</label>
             <label index="tx_cal_attendee.attendance.OPT-PARTICIPANT" type="integer">247137817</label>
@@ -1983,18 +1983,18 @@
             <label index="tx_cal_calendar.createNew">create a new calendar</label>
             <label index="tx_cal_calendar.edit">edit selected calendar</label>
             <label index="tx_cal_calendar_private">The users private calendar</label>
-            <label index="tx_cal_category">Calendar Category</label>
-            <label index="tx_cal_category.title">Category title</label>
-            <label index="tx_cal_category.headerstyle">Header style</label>
-            <label index="tx_cal_category.bodystyle">Body style</label>
-            <label index="tx_cal_category.headercolor">Header Color (e.g. green or #15E337)</label>
-            <label index="tx_cal_category.bodycolor">Body Color (e.g. green or #15E337)</label>
-            <label index="tx_cal_category.calendar">Calendar</label>
-            <label index="tx_cal_category.parent_category">Parent category</label>
-            <label index="tx_cal_category.shared_user_allowed">Allow shared user to select this category</label>
-            <label index="tx_cal_category.single_pid">Single-view page for events from this category</label>
-            <label index="tx_cal_category.createNew">create a new category</label>
-            <label index="tx_cal_category.edit">edit selected category</label>
+            <label index="sys_category">Calendar Category</label>
+            <label index="sys_category.title">Category title</label>
+            <label index="sys_category.headerstyle">Header style</label>
+            <label index="sys_category.bodystyle">Body style</label>
+            <label index="sys_category.headercolor">Header Color (e.g. green or #15E337)</label>
+            <label index="sys_category.bodycolor">Body Color (e.g. green or #15E337)</label>
+            <label index="sys_category.calendar">Calendar</label>
+            <label index="sys_category.parent_category">Parent category</label>
+            <label index="sys_category.shared_user_allowed">Allow shared user to select this category</label>
+            <label index="sys_category.single_pid">Single-view page for events from this category</label>
+            <label index="sys_category.createNew">create a new category</label>
+            <label index="sys_category.edit">edit selected category</label>
             <label index="tx_cal_organizer">Calendar Event Organizer</label>
             <label index="tx_cal_organizer.name">Name</label>
             <label index="tx_cal_organizer.description">Description</label>
@@ -2066,7 +2066,7 @@
             <label index="frequency.year">Yearly</label>
             <label index="tx_cal_enable_accesscontroll">Enable Cal Access Control</label>
             <label index="tx_cal_calendar_accesscontroll">Select allowed Calendar</label>
-            <label index="tx_cal_category_accesscontroll">Select allowed Categories (attention)</label>
+            <label index="sys_category_accesscontroll">Select allowed Categories (attention)</label>
             <label index="tx_cal_attendee">Event attendee</label>
             <label index="tx_cal_attendee.attendance.NON">-</label>
             <label index="tx_cal_attendee.attendance.OPT-PARTICIPANT">Optional</label>

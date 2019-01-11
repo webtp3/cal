@@ -217,7 +217,7 @@ class CreateCategoryView extends FeEditingBaseView
 
             $categoryArray = $this->modelObj->findAllCategories(
                 'cal_category_model',
-                $this->extConf['categoryService'],
+                'sys_category',
                 $this->conf['pidList']
             );
 
@@ -268,7 +268,7 @@ class CreateCategoryView extends FeEditingBaseView
             $temp_sims['###L_CREATE_CATEGORY###'] = $this->controller->pi_getLL('l_edit_category');
             $temp_sims['###UID###'] = $this->object->getUid();
         }
-        $temp_sims['###TYPE###'] = 'tx_cal_category';
+        $temp_sims['###TYPE###'] = 'sys_category';
 
         $rems['###FORM_START###'] = Functions::substituteMarkerArrayNotCached(
             $temp,

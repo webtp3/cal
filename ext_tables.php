@@ -10,7 +10,6 @@ $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal');
 
 // Allow all calendar records on standard pages, in addition to SysFolders.
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_cal_event');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_cal_category');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_cal_calendar');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_cal_exception_event');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_cal_exception_event_group');
@@ -33,10 +32,7 @@ $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal');
     'tx_cal_calendar',
     'EXT:cal/Resources/Private/Help/locallang_csh_txcalcal.php'
 );
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-    'tx_cal_category',
-    'EXT:cal/Resources/Private/Help/locallang_csh_txcalcat.php'
-);
+
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
     'tx_cal_exception_event',
     'EXT:cal/Resources/Private/Help/locallang_csh_txcalexceptionevent.php'

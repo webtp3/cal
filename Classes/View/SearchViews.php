@@ -149,7 +149,7 @@ class SearchViews extends ListView
         $sims['###CATEGORY_IDS###'] = '<option value="">' . $this->controller->pi_getLL('l_all_category') . '</option>';
         $catArrayArray = $this->modelObj->findAllCategories(
             'cal_category_model',
-            $this->confArr['categoryService'],
+            'sys_category',
             $this->conf['pidList']
         );
 

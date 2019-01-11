@@ -113,7 +113,7 @@ class TodoService extends EventService
         $categories = &$this->modelObj->findAllCategories('cal_category_model', '', $this->conf['pidList']);
         $categories = [];
 
-        $categoryService = &$this->modelObj->getServiceObjByKey('cal_category_model', 'category', 'tx_cal_category');
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
         $categoryService->getCategoryArray($this->conf['pidList'], $categories);
 
         $calendarSearchString = '';

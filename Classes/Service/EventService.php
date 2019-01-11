@@ -124,11 +124,8 @@ class EventService extends BaseService
         }
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = &$this->modelObj->getServiceObjByKey(
-            'cal_category_model',
-            'category',
-            $this->extConf['categoryService']
-        );
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
             true,
@@ -187,11 +184,8 @@ class EventService extends BaseService
         $eventType = '0,1,2,3'
     ) {
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = &$this->modelObj->getServiceObjByKey(
-            'cal_category_model',
-            'category',
-            $this->extConf['categoryService']
-        );
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+
 
         $events = [];
 
@@ -544,11 +538,8 @@ class EventService extends BaseService
         $formattedEndtime = $this->endtime->format('%Y%m%d');
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = &$this->modelObj->getServiceObjByKey(
-            'cal_category_model',
-            'category',
-            $this->extConf['categoryService']
-        );
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -661,11 +652,8 @@ class EventService extends BaseService
 
         $categories = [];
 
-        $categoryService = &$this->modelObj->getServiceObjByKey(
-            'cal_category_model',
-            'category',
-            $this->extConf['categoryService']
-        );
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+
         $categoryService->getCategoryArray($pidList, $categories);
 
         $calendarSearchString = '';
@@ -1011,12 +999,8 @@ class EventService extends BaseService
             );
         }
 
-        $category_mm_relation_table = 'tx_cal_event_category_mm';
-        $switchUidLocalForeign = false;
-        if ($this->extConf['categoryService'] == 'sys_category') {
-            $category_mm_relation_table = 'sys_category_record_mm';
-            $switchUidLocalForeign = true;
-        }
+        $category_mm_relation_table = 'sys_category_record_mm';
+        $switchUidLocalForeign = true;
         if ($this->rightsObj->isAllowedToCreateEventCategory()) {
             $categoryIds = [];
             foreach ((array)$object->getCategories() as $category) {
@@ -1195,15 +1179,9 @@ class EventService extends BaseService
 
         if ($this->rightsObj->isAllowedToEditEventCategory()) {
             $where = 'uid_local = ' . $uid;
-            $category_mm_relation_table = 'tx_cal_event_category_mm';
-            $switchUidLocalForeign = false;
-            if ($this->extConf['categoryService'] == 'sys_category') {
-                $category_mm_relation_table = 'sys_category_record_mm';
-                $switchUidLocalForeign = true;
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery($category_mm_relation_table, $where);
-            } else {
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery($category_mm_relation_table, $where);
-            }
+            $category_mm_relation_table = 'sys_category_record_mm';
+            $switchUidLocalForeign = true;
+            $GLOBALS['TYPO3_DB']->exec_DELETEquery($category_mm_relation_table, $where);
 
             $categoryIds = [];
             foreach ($object->getCategories() as $category) {
@@ -1740,11 +1718,8 @@ class EventService extends BaseService
         $includePublic = 1;
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = &$this->modelObj->getServiceObjByKey(
-            'cal_category_model',
-            'category',
-            $this->extConf['categoryService']
-        );
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -2935,11 +2910,8 @@ class EventService extends BaseService
                 'calendar',
                 'tx_cal_calendar'
             );
-            $categoryService = &$this->modelObj->getServiceObjByKey(
-                'cal_category_model',
-                'category',
-                $this->extConf['categoryService']
-            );
+            $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+
             $calendarSearchString = $calendarService->getCalendarSearchString(
                 $pidList,
                 true,
@@ -3100,11 +3072,8 @@ class EventService extends BaseService
      */
     public function findAllWithAdditionalWhere($where = '')
     {
-        $categoryService = &$this->modelObj->getServiceObjByKey(
-            'cal_category_model',
-            'category',
-            $this->extConf['categoryService']
-        );
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+
         // putting everything together
         //
         // Franz: added simple check/include for rdate events at the end of this where clause.

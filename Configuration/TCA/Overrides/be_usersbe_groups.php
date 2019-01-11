@@ -42,7 +42,7 @@ $tempColumns = [
             'maxitems' => 100,
             'autoSizeMax' => 20,
             'itemListStyle' => 'height:270px;',
-            'foreign_table' => 'tx_cal_category'
+            'foreign_table' => 'sys_category'
         ]
     ]
 ];

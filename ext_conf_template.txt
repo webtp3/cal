@@ -26,9 +26,6 @@ useTeaser = 0
 # cat=basic/enable/295; type=boolean; label= Hide Event Deviation records: Event deviation records should be changed only through IRRE editing; the records themselfs can be hidden.
 hideDeviationRecords = 1
 
-# cat=basic/enable/300; type=options[tx_cal_category,sys_category]; label= Use tx_cal_category or sys_category records
-categoryService = tx_cal_category
-
 # cat=basic/enable/310; type=text; label= Recurring Event Start Date:  This is the earliest date recurring events will occur. The date format is YYYYMMDD.
 recurrenceStart = 20140101
 

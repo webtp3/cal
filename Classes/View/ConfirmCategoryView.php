@@ -140,7 +140,7 @@ class ConfirmCategoryView extends FeEditingBaseView
             $parentUid = $this->object->getParentUid();
             if ($parentUid) {
                 /* Get parent category title */
-                $category = $this->modelObj->findCategory($parentUid, 'tx_cal_category', $this->conf['pidList']);
+                $category = $this->modelObj->findCategory($parentUid, 'sys_category', $this->conf['pidList']);
                 $sims['###PARENT_CATEGORY###'] = $this->applyStdWrap($category->getTitle(), 'parent_category_stdWrap');
                 $sims['###PARENT_CATEGORY_VALUE###'] = $parentUid;
             }

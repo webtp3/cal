@@ -75,10 +75,10 @@ class TceFuncSelectTreeView extends AbstractTreeView
     public function getIcon($row)
     {
         if (in_array($row['uid'], $this->MOUNTS)) {
-            $this->table = 'tx_cal_calendar';
+            $this->table = 'sys_category';
         }
         $return = parent::getIcon($row);
-        $this->table = 'tx_cal_category';
+        $this->table = 'sys_category';
         return $return;
     }
 

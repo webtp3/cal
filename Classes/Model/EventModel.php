@@ -15,6 +15,7 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Controller\Controller;
+use TYPO3\CMS\Cal\Service\SysCategoryService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Mail\MailMessage;
@@ -109,11 +110,7 @@ class EventModel extends Model
                     $this->setCategories([]);
                     $categories = [];
                     $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-                    $categoryService = &$modelObj->getServiceObjByKey(
-                        'cal_category_model',
-                        'category',
-                        $confArr['categoryService']
-                    );
+                    $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
                     $categoryService->getCategoryArray($this->conf['pidList'], $categories);
                     $piVarsCaregoryArray = explode(
                         ',',

@@ -59,9 +59,6 @@ class TceFormsGetmainfields
             /* If we have a calendar, set the category query to take this calendar into account */
             if ($row['calendar_id']) {
                 $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-                if ($confArr['categoryService'] == 'tx_cal_category') {
-                    $GLOBALS['TCA']['tx_cal_event']['columns']['category_id']['config']['foreign_table_where'] = 'AND tx_cal_category.calendar_id IN (' . $row['calendar_id'] . ',0) ORDER BY tx_cal_category.title';
-                }
             }
         }
 

@@ -100,7 +100,7 @@ class AdminView extends BaseView
                 $this->local_cObj->data,
                 [
                     'view' => 'create_category',
-                    'type' => 'tx_cal_category'
+                    'type' => 'sys_category'
                 ],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
@@ -274,11 +274,11 @@ class AdminView extends BaseView
         // CATEGORY
         $categoryArrays = $this->modelObj->findAllCategories(
             'cal_category_model',
-            'tx_cal_category',
+            'sys_category',
             $this->conf['pidList']
         );
 
-        $categoryArray = $categoryArrays['tx_cal_category'][0][0];
+        $categoryArray = $categoryArrays['sys_category'][0][0];
         $editCategoryOptions = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
         foreach ($categoryArray as $category) {
             if ($category->isUserAllowedToEdit() || $category->isUserAllowedToDelete()) {
@@ -287,7 +287,7 @@ class AdminView extends BaseView
         }
         $params = [
             'view' => 'edit_category',
-            'type' => 'tx_cal_category'
+            'type' => 'sys_category'
         ];
         $editCategoryParams = '';
         foreach ($params as $key => $value) {

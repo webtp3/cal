@@ -23,6 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Base model for the category.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class CategoryService extends BaseService
 {
@@ -32,6 +33,12 @@ class CategoryService extends BaseService
     public $allCateogryIdsByParentId;
     public $categoryArrayCached = [];
     public static $categoryToFilter;
+
+    public function __construct()
+    {
+        parent::__construct();
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+    }
 
     /**
      * Looks for a category with a given uid on a certain pid-list
@@ -44,6 +51,8 @@ class CategoryService extends BaseService
      */
     public function find($uid, $pidList)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $categoryIds = [];
         $this->getCategoryArray($pidList, $categoryIds, true);
         return $this->categoryArrayByUid[$uid];
@@ -58,6 +67,8 @@ class CategoryService extends BaseService
      */
     public function findAll($pidList, &$categoryArrayToBeFilled)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $this->getCategoryArray($pidList, $categoryArrayToBeFilled, true);
     }
 
@@ -67,6 +78,8 @@ class CategoryService extends BaseService
      */
     public function updateCategory($uid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $insertFields = [
             'tstamp' => time()
         ];
@@ -89,6 +102,8 @@ class CategoryService extends BaseService
      */
     public function removeCategory($uid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         if ($this->rightsObj->isAllowedToDeleteCategory()) {
             // 'delete' the category object
             $updateFields = [
@@ -108,6 +123,8 @@ class CategoryService extends BaseService
      */
     private function retrievePostData(&$insertFields)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $hidden = 0;
         if ($this->controller->piVars['hidden'] == '1' && ($this->rightsObj->isAllowedToEditCategoryHidden() || $this->rightsObj->isAllowedToCreateCategoryHidden())) {
             $hidden = 1;
@@ -145,6 +162,8 @@ class CategoryService extends BaseService
      */
     public function saveCategory($pid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $crdate = time();
         $insertFields = [
             'pid' => $this->conf['rights.']['create.']['calendar.']['saveCategoryToPid'] ? $this->conf['rights.']['create.']['calendar.']['saveCategoryToPid'] : $pid,
@@ -167,6 +186,8 @@ class CategoryService extends BaseService
      */
     private function _saveCategory(&$insertFields)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $table = 'tx_cal_category';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
@@ -186,6 +207,8 @@ class CategoryService extends BaseService
      */
     public function getCategorySearchString($pidList, $includePublic)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         if ($this->conf['category'] != '') {
             $categorySearchString .= ' AND tx_cal_event_category_mm.uid_foreign IN (' . $this->conf['category'] . ')';
         }
@@ -243,6 +266,8 @@ class CategoryService extends BaseService
      */
     public function getCategoryArray($pidList, &$categoryArrayToBeFilled, $showPublicCategories = true)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         if (!empty($this->categoryArrayCached[md5($this->conf['view.']['categoryMode'] . $this->conf['view.']['allowedCategories'])])) {
             $categoryArrayToBeFilled[] = $this->categoryArrayCached[md5($this->conf['view.']['categoryMode'] . $this->conf['view.']['allowedCategories'])];
             return;
@@ -460,7 +485,6 @@ class CategoryService extends BaseService
             $where .= $this->cObj->enableFields('tx_cal_calendar') . $this->cObj->enableFields('tx_cal_category') . $this->cObj->enableFields('tx_cal_event');
             $where .= $this->getAdditionalWhereForLocalizationAndVersioning('tx_cal_category');
             $table = 'tx_cal_event LEFT JOIN tx_cal_event_shared_user_mm ON tx_cal_event.uid = tx_cal_event_shared_user_mm.uid_local ' . 'LEFT JOIN tx_cal_calendar ON tx_cal_event.calendar_id = tx_cal_calendar.uid ' . 'LEFT JOIN tx_cal_category ON tx_cal_calendar.uid = tx_cal_category.calendar_id';
-            // $groupby = 'tx_cal_category.uid';
 
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby);
             if ($result) {
@@ -510,6 +534,8 @@ class CategoryService extends BaseService
      */
     public function addChildCategories(&$categoryArray)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $calTreeView = new TreeView();
 
         $ids = [];
@@ -532,6 +558,8 @@ class CategoryService extends BaseService
      */
     public function getAllCategoryIdsByParentId()
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         if ($this->allCateogryIdsByParentId == null) {
             $categories = [];
             $select = 'tx_cal_category.uid, tx_cal_category.parent_category';
@@ -556,6 +584,8 @@ class CategoryService extends BaseService
      */
     public function getCategoriesForSharedUser()
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $categories = [];
         $select = '*';
         $table = 'tx_cal_event LEFT JOIN tx_cal_event_shared_user_mm ON tx_cal_event.uid = tx_cal_event_shared_user_mm.uid_local ' . 'LEFT JOIN tx_cal_calendar ON tx_cal_event.calendar_id = tx_cal_calendar.uid ' . 'LEFT JOIN tx_cal_category ON tx_cal_calendar.uid = tx_cal_category.calendar_id';
@@ -575,6 +605,8 @@ class CategoryService extends BaseService
      */
     public function getCategoriesFromTable($select, $table, $where, $groupby = '')
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $categories = [];
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby);
         if ($result) {
@@ -611,6 +643,8 @@ class CategoryService extends BaseService
      */
     public function createCategory($row)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         return new CategoryModel($row, $this->getServiceKey());
     }
 
@@ -620,6 +654,8 @@ class CategoryService extends BaseService
      */
     public function getCategoriesForEvent($eventUid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         if (count($this->categoryArrayByEventUid) == 0) {
             $cats = [];
             $this->findAll($this->conf['pidList'], $cats);
@@ -632,6 +668,8 @@ class CategoryService extends BaseService
      */
     public function checkStyles(&$category)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $headerStyle = $category->getHeaderStyle();
         if ($headerStyle == '') {
             $parentUid = $category->getParentUid();
@@ -653,6 +691,8 @@ class CategoryService extends BaseService
 
     public function unsetPiVars()
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         unset($this->controller->piVars['hidden'], $this->controller->piVars['uid'], $this->controller->piVars['calendar'], $this->controller->piVars['type'], $this->controller->piVars['calendar_id'], $this->controller->piVars['category'], $this->controller->piVars['shared_user_allowed'], $this->controller->piVars['headerstyle'], $this->controller->piVars['bodystyle'], $this->controller->piVars['parent_category'], $this->controller->piVars['title']);
     }
 
@@ -662,6 +702,8 @@ class CategoryService extends BaseService
      */
     public function createTranslation($uid, $overlay)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $table = 'tx_cal_category';
         $select = $table . '.*';
         $where = $table . '.uid = ' . $uid;
@@ -691,6 +733,8 @@ class CategoryService extends BaseService
      */
     public function enhanceEventQuery(&$select, &$table, &$where, &$groupBy, &$orderBy)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $select .= ', tx_cal_event_category_mm.uid_foreign AS category_uid ';
         $table .= ' LEFT JOIN tx_cal_event_category_mm ON tx_cal_event_category_mm.uid_local = tx_cal_event.uid';
         $where .= $this->getCategorySearchString($this->conf['pidList'], true);
@@ -714,6 +758,8 @@ class CategoryService extends BaseService
      */
     public function getUidsOfEventsWithCategories()
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $uidCollector = [];
         $select = 'tx_cal_event_category_mm.*, tx_cal_event.pid, tx_cal_event.uid';
         $table = 'tx_cal_event_category_mm LEFT JOIN tx_cal_event ON tx_cal_event.uid = tx_cal_event_category_mm.uid_local';

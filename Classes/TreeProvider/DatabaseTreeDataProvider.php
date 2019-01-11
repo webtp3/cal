@@ -84,31 +84,6 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     }
 
     /**
-     * Loads the tree data (all possible children)
-     */
-    protected function loadTreeData()
-    {
-        if ($this->calConfiguration['categoryService'] == 'sys_category') {
-            parent::loadTreeData();
-            return;
-        }
-        $this->treeData->setId($this->getRootUid());
-        $this->treeData->setParentNode(null);
-        $level = 1;
-
-        if ($this->levelMaximum >= $level) {
-            $childNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
-
-            $this->appendGlobalCategories($level, $childNodes);
-            $this->appendCalendarCategories($level, $childNodes);
-
-            if ($childNodes !== null) {
-                $this->treeData->setChildNodes($childNodes);
-            }
-        }
-    }
-
-    /**
      * @param $level
      * @param $parentChildNodes
      */
@@ -315,64 +290,12 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
      */
     protected function isCategoryAllowed($child)
     {
-        if ($this->calConfiguration['categoryService'] == 'sys_category') {
-            $mounts = $this->backendUserAuthentication->getCategoryMountPoints();
-            if (empty($mounts)) {
-                return true;
-            }
-
-            return in_array($child->getId(), $mounts);
-        }
-        if ($child->getId() === GLOBAL_PREFIX) {
+        $mounts = $this->backendUserAuthentication->getCategoryMountPoints();
+        if (empty($mounts)) {
             return true;
         }
 
-        if ($GLOBALS['BE_USER']->user['admin']) {
-            return true;
-        }
-
-        $be_userCategories = [];
-        $be_userCalendars = [];
-
-        if ($GLOBALS['BE_USER']->user['tx_cal_enable_accesscontroll']) {
-            $be_userCategories = GeneralUtility::trimExplode(',', $GLOBALS['BE_USER']->user['tx_cal_category'], 1);
-            $be_userCalendars = GeneralUtility::trimExplode(',', $GLOBALS['BE_USER']->user['tx_cal_calendar'], 1);
-        } else {
-            $allGroupsHaveEnableFalse = true;
-            if (is_array($GLOBALS['BE_USER']->userGroups)) {
-                foreach ($GLOBALS['BE_USER']->userGroups as $gid => $group) {
-                    if ($group['tx_cal_enable_accesscontroll']) {
-                        $allGroupsHaveEnableFalse = false;
-                        break;
-                    }
-                }
-            }
-            if ($allGroupsHaveEnableFalse) {
-                return true;
-            }
-        }
-        if (is_array($GLOBALS['BE_USER']->userGroups)) {
-            foreach ($GLOBALS['BE_USER']->userGroups as $gid => $group) {
-                if ($group['tx_cal_enable_accesscontroll']) {
-                    if ($group['tx_cal_category']) {
-                        $groupCategories = GeneralUtility::trimExplode(',', $group['tx_cal_category'], 1);
-                        $be_userCategories = array_merge($be_userCategories, $groupCategories);
-                    }
-                    if ($group['tx_cal_calendar']) {
-                        $groupCalendars = GeneralUtility::trimExplode(',', $group['tx_cal_calendar'], 1);
-                        $be_userCalendars = array_merge($be_userCalendars, $groupCalendars);
-                    }
-                }
-            }
-        }
-
-        if (strrpos($child->getId(), CALENDAR_PREFIX, -strlen($child->getId())) !== false) {
-            $allow = in_array(substr($child->getId(), strlen(CALENDAR_PREFIX)), $be_userCalendars);
-        } else {
-            $allow = in_array($child->getId(), $be_userCategories);
-        }
-
-        return $allow;
+        return in_array($child->getId(), $mounts);
     }
 
     /**

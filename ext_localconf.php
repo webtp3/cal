@@ -9,7 +9,6 @@ use TYPO3\CMS\Cal\Hooks\TceMainProcesscmdmap;
 use TYPO3\CMS\Cal\Hooks\TceMainProcessdatamap;
 use TYPO3\CMS\Cal\Service\AttendeeService;
 use TYPO3\CMS\Cal\Service\CalendarService;
-use TYPO3\CMS\Cal\Service\CategoryService;
 use TYPO3\CMS\Cal\Service\EventService;
 use TYPO3\CMS\Cal\Service\FnbEventService;
 use TYPO3\CMS\Cal\Service\LocationAddressService;
@@ -334,24 +333,6 @@ $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         'os' => '',
         'exec' => '',
         'className' => CalendarService::class
-    ]
-);
-
-/* Cal Example Concrete Model */
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
-    'cal',
-    'cal_category_model' /* sv type */,
-    'tx_cal_category' /* sv key */,
-    [
-        'title' => 'Cal Category Model',
-        'description' => '',
-        'subtype' => 'category',
-        'available' => true,
-        'priority' => 50,
-        'quality' => 50,
-        'os' => '',
-        'exec' => '',
-        'className' => CategoryService::class
     ]
 );
 

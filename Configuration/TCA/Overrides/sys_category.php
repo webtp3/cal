@@ -12,7 +12,7 @@ $newCalSysCategoryColumns = [
     'images' => [
         'exclude' => 1,
         'l10n_mode' => 'mergeIfNotBlank',
-        'label' => $ll . 'tx_cal_category.image',
+        'label' => $ll . 'sys_category.image',
         'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
             'images',
             [
@@ -35,7 +35,7 @@ $newCalSysCategoryColumns = [
     'single_pid' => [
         'exclude' => 1,
         'l10n_mode' => 'mergeIfNotBlank',
-        'label' => $ll . 'tx_cal_category.single_pid',
+        'label' => $ll . 'sys_category.single_pid',
         'config' => [
             'type' => 'group',
             'internal_type' => 'db',
@@ -48,7 +48,7 @@ $newCalSysCategoryColumns = [
     'shortcut' => [
         'exclude' => 1,
         'l10n_mode' => 'mergeIfNotBlank',
-        'label' => $ll . 'tx_cal_category.shortcut',
+        'label' => $ll . 'sys_category.shortcut',
         'config' => [
             'type' => 'group',
             'internal_type' => 'db',
@@ -60,7 +60,7 @@ $newCalSysCategoryColumns = [
     ],
     'headerstyle' => [
         'exclude' => 1,
-        'label' => $ll . 'tx_cal_category.headerstyle',
+        'label' => $ll . 'sys_category.headerstyle',
         'config' => [
             'type' => 'user',
             'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getHeaderStyles'
@@ -68,7 +68,7 @@ $newCalSysCategoryColumns = [
     ],
     'bodystyle' => [
         'exclude' => 1,
-        'label' => $ll . 'tx_cal_category.bodystyle',
+        'label' => $ll . 'sys_category.bodystyle',
         'config' => [
             'type' => 'user',
             'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getBodyStyles'
@@ -76,7 +76,7 @@ $newCalSysCategoryColumns = [
     ],
     'calendar_id' => [
         'exclude' => 1,
-        'label' => $ll . 'tx_cal_category.calendar',
+        'label' => $ll . 'sys_category.calendar',
         'config' => [
             'renderType' => 'selectSingle',
             'type' => 'select',
@@ -98,7 +98,7 @@ $newCalSysCategoryColumns = [
         ]
     ],
     'shared_user_allowed' => [
-        'label' => $ll . 'tx_cal_category.shared_user_allowed',
+        'label' => $ll . 'sys_category.shared_user_allowed',
         'config' => [
             'type' => 'check'
         ]
@@ -106,7 +106,7 @@ $newCalSysCategoryColumns = [
 
     'notification_emails' => [
         'exclude' => 0,
-        'label' => $ll . 'tx_cal_category.notification_emails',
+        'label' => $ll . 'sys_category.notification_emails',
         'config' => [
             'type' => 'input',
             'size' => '30'

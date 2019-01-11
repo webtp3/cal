@@ -153,7 +153,7 @@ class DeleteCategoryView extends FeEditingBaseView
 
         if ($parentUid) {
             /* Get parent category title */
-            $category = $this->modelObj->findCategory($parentUid, 'tx_cal_category', $this->conf['pidList']);
+            $category = $this->modelObj->findCategory($parentUid, 'sys_category', $this->conf['pidList']);
             $parentCategory = $category->getTitle();
             $sims['###PARENT_CATEGORY###'] = $this->cObj->stdWrap(
                 $parentCategory,

@@ -5,6 +5,7 @@ namespace TYPO3\CMS\Cal\Service;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -72,11 +73,8 @@ class FnbEventService extends EventService
         $formattedStarttime = $this->starttime->format('%Y%m%d');
         $formattedEndtime = $this->endtime->format('%Y%m%d');
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = &$this->modelObj->getServiceObjByKey(
-            'cal_category_model',
-            'category',
-            $this->extConf['categoryService']
-        );
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+
 
         $calendarSearchString = $this->getFreeAndBusyCalendarSearchString(
             $pidList,

@@ -515,9 +515,9 @@ class Controller extends AbstractPlugin
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
 
         // et all categories
-        $categoryArray = $modelObj->findAllCategories($this->confArr['categoryService'], '', $this->conf['pidList']);
+        $categoryArray = $modelObj->findAllCategories('sys_category', '', $this->conf['pidList']);
 
-        foreach ((array)$categoryArray[$this->confArr['categoryService']][0][0] as $category) {
+        foreach ((array)$categoryArray['sys_category'][0][0] as $category) {
             $row = $category->row;
             $allCategoryByParentId[$row['parent_category']][] = $row;
             $catIDs[] = $row['uid'];
@@ -3173,7 +3173,7 @@ class Controller extends AbstractPlugin
         $ajaxStringArray = [];
         $categoryArray = $modelObj->findAllCategories(
             'cal_category_model',
-            $this->confArr['categoryService'],
+            'sys_category',
             $this->conf['pidList']
         );
 

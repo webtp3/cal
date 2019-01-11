@@ -230,7 +230,7 @@ class CreateEventView extends FeEditingBaseView
 
                 $globalCategoryArrays = $this->modelObj->findAllCategories(
                     '',
-                    'tx_cal_category',
+                    'sys_category',
                     $this->conf['pidList']
                 );
                 $serviceKeyArray = [];
@@ -298,7 +298,7 @@ class CreateEventView extends FeEditingBaseView
 
             $categoryArray = $this->modelObj->findAllCategories(
                 'cal_category_model',
-                $this->extConf['categoryService'],
+                'sys_category',
                 $this->conf['pidList']
             );
 

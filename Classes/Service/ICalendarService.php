@@ -469,7 +469,7 @@ class ICalendarService extends BaseService
     {
         /* Delete the calendar categories */
         $where = ' calendar_id=' . $uid;
-        $GLOBALS['TYPO3_DB']->exec_DELETEquery($this->extConf['categoryService'], $where);
+        $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_category', $where);
     }
 
     /**
@@ -589,7 +589,7 @@ class ICalendarService extends BaseService
         foreach ($categories as $category) {
             $category = trim($category);
             $categorySelect = '*';
-            $categoryTable = 'tx_cal_category';
+            $categoryTable = 'sys_category';
             $categoryWhere = 'calendar_id = ' . intval($calId) . ' AND title =' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
                     $category,
                     $categoryTable
@@ -847,7 +847,7 @@ class ICalendarService extends BaseService
                 array_unique($insertedOrUpdatedCategoryUids);
                 $where .= ' AND uid NOT IN (' . implode(',', $insertedOrUpdatedCategoryUids) . ')';
             }
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery($this->extConf['categoryService'], $where);
+            $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_category', $where);
         }
     }
 

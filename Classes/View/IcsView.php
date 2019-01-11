@@ -92,7 +92,7 @@ class IcsView extends BaseView
         $categoryLinkLoop = $this->markerBasedTemplateService->getSubpart($page, '###CATEGORYLINK_LOOP###');
 
         // by category
-        $categories = $master_array['tx_cal_category'][0][0];
+        $categories = $master_array['sys_category'][0][0];
         foreach ((array)$categories as $category) {
             if (is_object($category)) {
                 if (in_array($category->getUid(), $rememberUid)) {
@@ -287,7 +287,7 @@ END:VCALENDAR
     {
         if ($this->controller->piVars['category']) {
             foreach (explode(',', $this->controller->piVars['category']) as $categoryId) {
-                $category = $this->modelObj->findCategory($categoryId, 'tx_cal_category', $this->conf['pidList']);
+                $category = $this->modelObj->findCategory($categoryId, 'sys_category', $this->conf['pidList']);
                 if (is_object($category)) {
                     if ($title != '') {
                         $title .= '_';

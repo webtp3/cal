@@ -174,7 +174,7 @@ class ListView extends BaseView
                 $categoryArray = [];
                 if ($this->conf['view.']['list.']['enableCategoryWrapper']) {
                     $allCategoryArray = $this->modelObj->findAllCategories('', '', $this->conf['pidList']);
-                    $categoryArray = (array)$allCategoryArray['tx_cal_category'][0][0];
+                    $categoryArray = (array)$allCategoryArray['sys_category'][0][0];
                 }
                 $calendarGroupArray = [];
                 $calendarArray = [];

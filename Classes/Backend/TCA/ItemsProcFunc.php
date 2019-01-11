@@ -172,51 +172,6 @@ class ItemsProcFunc
         $languageWhere = '';
         $limitViewOnlyToPidsWhere = '';
 
-        /* If we're grabbing calendar or category records, check access control settings */
-        if ($table == 'tx_cal_calendar' or $table == 'tx_cal_category') {
-
-            /* If we have a non-admin backend user, check access control settings */
-            if (is_object($GLOBALS['BE_USER']) && !$GLOBALS['BE_USER']->user['admin']) {
-
-                /* Get access control settings for the user */
-                if ($GLOBALS['BE_USER']->user['tx_cal_enable_accesscontroll']) {
-                    $enableAccessControl = true;
-                    $be_userCategories = GeneralUtility::trimExplode(
-                        ',',
-                        $GLOBALS['BE_USER']->user['tx_cal_category'],
-                        1
-                    );
-                    $be_userCalendars = GeneralUtility::trimExplode(
-                        ',',
-                        $GLOBALS['BE_USER']->user['tx_cal_calendar'],
-                        1
-                    );
-                }
-
-                /* Get access control settings for all groups */
-                if (is_array($GLOBALS['BE_USER']->userGroups)) {
-                    foreach ($GLOBALS['BE_USER']->userGroups as $gid => $group) {
-                        if ($group['tx_cal_enable_accesscontroll']) {
-                            $enableAccessControl = true;
-                            if ($group['tx_cal_category']) {
-                                $groupCategories = GeneralUtility::trimExplode(',', $group['tx_cal_category'], 1);
-                                $be_userCategories = array_merge($be_userCategories, $groupCategories);
-                            }
-                            if ($group['tx_cal_calendar']) {
-                                $groupCalendars = GeneralUtility::trimExplode(',', $group['tx_cal_calendar'], 1);
-                                $be_userCalendars = array_merge($be_userCalendars, $groupCalendars);
-                            }
-                        }
-                    }
-                }
-
-                /* If access control was enabled for the user or groups, add a WHERE clause */
-                if ($enableAccessControl) {
-                    $accessControlWhere = ' AND tx_cal_calendar.uid IN (' . implode(',', $be_userCalendars) . ')';
-                }
-            }
-        }
-
         // Load cache from BE User data
         $cache = $GLOBALS['BE_USER']->getSessionData('cal_itemsProcFunc');
         if (!$cache) {
