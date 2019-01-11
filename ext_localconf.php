@@ -25,6 +25,7 @@ use TYPO3\CMS\Cal\Service\SysCategoryService;
 use TYPO3\CMS\Cal\Service\TodoService;
 use TYPO3\CMS\Cal\Updates\EventImagesUpdateWizard;
 use TYPO3\CMS\Cal\Updates\LocationImagesUpdateWizard;
+use TYPO3\CMS\Cal\Updates\MigrateCalCategoriesToSysCategoriesUpdateWizard;
 use TYPO3\CMS\Cal\Updates\OrganizerImagesUpdateWizard;
 use TYPO3\CMS\Cal\Updates\TypoScriptUpdateWizard;
 use TYPO3\CMS\Cal\Updates\UploadsUpdateWizard;
@@ -1274,3 +1275,5 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_event_im
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_location_images'] = LocationImagesUpdateWizard::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_organizer_images'] = OrganizerImagesUpdateWizard::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_sys_template'] = TypoScriptUpdateWizard::class;
+
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'][MigrateCalCategoriesToSysCategoriesUpdateWizard::class] = MigrateCalCategoriesToSysCategoriesUpdateWizard::class;

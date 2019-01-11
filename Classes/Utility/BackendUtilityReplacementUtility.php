@@ -51,5 +51,4 @@ class BackendUtilityReplacementUtility
     {
         return GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
     }
-
 }

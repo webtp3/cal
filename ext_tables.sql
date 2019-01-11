@@ -47,14 +47,14 @@ CREATE TABLE tx_cal_event (
 	shared_user_cnt int(11) unsigned DEFAULT '0' NOT NULL,
 	type tinyint(4) DEFAULT '0' NOT NULL,
 	page int(11) DEFAULT '0' NOT NULL,
-	ext_url tinytext NOT NULL,
+	ext_url VARCHAR(255) DEFAULT '' NOT NULL,
 	isTemp tinyint(1) DEFAULT '0' NOT NULL,
 	icsUid text,
-	image tinyblob NOT NULL,
+	image VARCHAR(255) DEFAULT '' NOT NULL,
 	attachment text NOT NULL,
 	ref_event_id int(11) unsigned DEFAULT '0',
 	send_invitation tinyint(1) DEFAULT '0' NOT NULL,
-	attendee tinyblob NOT NULL,
+	attendee VARCHAR(255) DEFAULT '' NOT NULL,
 	status varchar(12) DEFAULT '' NOT NULL,
 	priority tinyint(1) DEFAULT '0' NOT NULL,
 	completed tinyint(3) DEFAULT '0' NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE tx_cal_calendar (
 	type tinyint(4) DEFAULT '0' NOT NULL,
 	ext_url text NOT NULL,
 	ext_url_notes text NOT NULL,
-	ics_file tinytext NOT NULL,
+	ics_file VARCHAR(255) DEFAULT '' NOT NULL,
 	refresh int(11) unsigned DEFAULT '0' NOT NULL,
 	md5 varchar(32) DEFAULT '' NOT NULL,
 	headerstyle varchar(30) DEFAULT '' NOT NULL,
@@ -465,27 +465,27 @@ CREATE TABLE tx_cal_location_shared_user_mm (
 CREATE TABLE tt_address (
 	tx_cal_controller_isorganizer tinyint(4) DEFAULT '0' NOT NULL,
 	tx_cal_controller_islocation tinyint(4) DEFAULT '0' NOT NULL,
-	tx_cal_controller_latitude tinytext NOT NULL,
-	tx_cal_controller_longitude tinytext NOT NULL,
+	tx_cal_controller_latitude VARCHAR(255) DEFAULT '' NOT NULL,
+	tx_cal_controller_longitude VARCHAR(255) DEFAULT '' NOT NULL,
 	sys_language_uid int(11) DEFAULT '0' NOT NULL,
 	l18n_parent int(11) DEFAULT '0' NOT NULL
 );
 
 CREATE TABLE be_users (
 	tx_cal_enable_accesscontroll tinyint(4) DEFAULT '0' NOT NULL,
-	tx_cal_calendar tinyblob NOT NULL,
-	tx_cal_category tinyblob NOT NULL
+	tx_cal_calendar VARCHAR(255) DEFAULT '' NOT NULL,
+	tx_cal_category VARCHAR(255) DEFAULT '' NOT NULL
 );
 
 CREATE TABLE be_groups (
 	tx_cal_enable_accesscontroll tinyint(4) DEFAULT '0' NOT NULL,
-	tx_cal_calendar tinyblob NOT NULL,
-	tx_cal_category tinyblob NOT NULL
+	tx_cal_calendar VARCHAR(255) DEFAULT '' NOT NULL,
+	tx_cal_category VARCHAR(255) DEFAULT '' NOT NULL
 );
 
 CREATE TABLE fe_users (
-	tx_cal_calendar tinytext NOT NULL,
-	tx_cal_calendar_subscription tinyblob NOT NULL
+	tx_cal_calendar VARCHAR(255) DEFAULT '' NOT NULL,
+	tx_cal_calendar_subscription VARCHAR(255) DEFAULT '' NOT NULL
 );
 
 CREATE TABLE tx_cal_attendee (
@@ -566,7 +566,7 @@ CREATE TABLE tx_cal_event_deviation (
 	description text,
 	isTemp tinyint(1) DEFAULT '0' NOT NULL,
 	icsUid text,
-	image tinyblob NOT NULL,
+	image VARCHAR(255) DEFAULT '' NOT NULL,
 	imagecaption text NOT NULL,
 	imagealttext text NOT NULL,
 	imagetitletext text NOT NULL,

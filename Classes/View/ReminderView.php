@@ -14,7 +14,6 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 use BackendUtilityReplacementUtility;
 use OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
