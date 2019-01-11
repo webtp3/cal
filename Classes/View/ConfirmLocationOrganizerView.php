@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use SJBR\StaticInfoTables\PiBaseApi;
 use SJBR\StaticInfoTables\Utility\LocalizationUtility;
 use TYPO3\CMS\Cal\Model\Location;
 use TYPO3\CMS\Cal\Model\Organizer;
@@ -105,7 +106,7 @@ class ConfirmLocationOrganizerView extends FeEditingBaseView
         $sims['###COUNTRY_VALUE###'] = '';
         if ($this->isAllowed('country')) {
             if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+                $staticInfo = Functions::makeInstance(PiBaseApi::class);
                 $staticInfo->init();
                 $current = LocalizationUtility::translate(
                     ['uid' => $this->object->getCountry()],
@@ -133,7 +134,7 @@ class ConfirmLocationOrganizerView extends FeEditingBaseView
         $sims['###COUNTRYZONE_VALUE###'] = '';
         if ($this->isAllowed('countryzone')) {
             if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+                $staticInfo = Functions::makeInstance(PiBaseApi::class);
                 $staticInfo->init();
                 $current = LocalizationUtility::translate(
                     ['uid' => $this->object->getCountryzone()],

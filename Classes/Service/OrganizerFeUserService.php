@@ -2,6 +2,7 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use RuntimeException;
 use TYPO3\CMS\Cal\Model\OrganizerFeUser;
 use TYPO3\CMS\Cal\Utility\Functions;
 
@@ -328,7 +329,7 @@ class OrganizerFeUserService extends BaseService
     /**
      * Does the database save
      * @param array $insertFields
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return int the uid of the saved organizer
      */
     private function _saveOrganizer(&$insertFields)
@@ -336,7 +337,7 @@ class OrganizerFeUserService extends BaseService
         $table = 'fe_users';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458155
             );

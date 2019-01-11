@@ -15,8 +15,10 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use JBartels\WecMap\MapService\Google\Map;
+use SJBR\StaticInfoTables\PiBaseApi;
 use SJBR\StaticInfoTables\Utility\LocalizationUtility;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -394,7 +396,7 @@ class LocationModel extends BaseModel
     {
         $this->initLocalCObject();
         if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
-            $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+            $staticInfo = Functions::makeInstance(PiBaseApi::class);
             $staticInfo->init();
             $current = LocalizationUtility::translate(
                 ['uid' => $this->getCountry()],
@@ -427,7 +429,7 @@ class LocationModel extends BaseModel
     {
         $this->initLocalCObject();
         if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
-            $staticInfo = Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+            $staticInfo = Functions::makeInstance(PiBaseApi::class);
             $staticInfo->init();
             $current = LocalizationUtility::translate(
                 ['uid' => $this->getCountryzone()],
@@ -576,7 +578,7 @@ class LocationModel extends BaseModel
         if ($linktext == '') {
             $linktext = 'no title';
         }
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if ($rightsObj->isViewEnabled($this->conf['view.'][$this->getObjectType() . 'LinkTarget']) || $this->conf['view.'][$this->getObjectType() . '.'][$this->getObjectType() . 'ViewPid']) {
             return $this->controller->pi_linkTP_keepPIvars(
                 $linktext,
@@ -598,7 +600,7 @@ class LocationModel extends BaseModel
      */
     public function updateWithPIVars(&$piVars)
     {
-        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelController');
+        $modelObj = &Registry::Registry('basic', 'modelController');
         $cObj = &$this->controller->cObj;
 
         foreach ($piVars as $key => $value) {

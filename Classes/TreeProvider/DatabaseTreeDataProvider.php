@@ -14,9 +14,13 @@ namespace TYPO3\CMS\Cal\TreeProvider;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use Doctrine\DBAL\FetchMode;
+use TYPO3\CMS\Backend\Tree\SortedTreeNodeCollection;
+use TYPO3\CMS\Backend\Tree\TreeNode;
+use TYPO3\CMS\Backend\Tree\TreeNodeCollection;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -93,7 +97,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $level = 1;
 
         if ($this->levelMaximum >= $level) {
-            $childNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+            $childNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
             $this->appendGlobalCategories($level, $childNodes);
             $this->appendCalendarCategories($level, $childNodes);
@@ -106,10 +110,10 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
 
     protected function appendGlobalCategories($level, $parentChildNodes)
     {
-        $node = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
+        $node = GeneralUtility::makeInstance(TreeNode::class);
         $node->setId(self::GLOBAL_PREFIX);
 
-        $childNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+        $childNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
         $where = 'l18n_parent = 0 and deleted = 0 and parent_category = 0 and calendar_id = 0';
         $this->appendCategories($level, $childNodes, $where);
@@ -132,12 +136,12 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
                 ->where($this->getCalendarWhere($calendarId))->execute();
             if ($calres) {
                 while ($calrow = $calres->fetch(FetchMode::ASSOCIATIVE)) {
-                    $node = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
+                    $node = GeneralUtility::makeInstance(TreeNode::class);
                     $node->setId(self::CALENDAR_PREFIX . $calrow['uid']);
 
                     if ($level < $this->levelMaximum) {
                         $where = 'l18n_parent = 0 and tx_cal_category.deleted = 0 and tx_cal_category.calendar_id = ' . $calrow['uid'];
-                        $calendarChildNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+                        $calendarChildNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
                         $this->appendCategories($level + 1, $calendarChildNodes, $where);
                         if ($calendarChildNodes !== null) {
@@ -158,7 +162,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $usedCategories = [];
         if ($categoryResult) {
             while (($categoryRow = $categoryResult->fetch(FetchMode::ASSOCIATIVE))) {
-                $categoryNode = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
+                $categoryNode = GeneralUtility::makeInstance(TreeNode::class);
                 $categoryNode->setId($categoryRow['uid']);
                 if ($level < $this->levelMaximum) {
                     $children = $this->getChildrenOf($categoryNode, $level + 1);
@@ -190,23 +194,23 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     /**
      * Builds a complete node including children
      *
-     * @param \TYPO3\CMS\Backend\Tree\TreeNode|\TYPO3\CMS\Backend\Tree\TreeNode $basicNode
-     * @param \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode|null $parent
+     * @param TreeNode|TreeNode $basicNode
+     * @param DatabaseTreeNode|null $parent
      * @param int $level
      * @param bool $restriction
-     * @return \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode $node
+     * @return DatabaseTreeNode $node
      */
-    protected function buildRepresentationForNode(\TYPO3\CMS\Backend\Tree\TreeNode $basicNode, \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode $parent = null, $level = 0, $restriction = false)
+    protected function buildRepresentationForNode(TreeNode $basicNode, DatabaseTreeNode $parent = null, $level = 0, $restriction = false)
     {
-        /** @var $node \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode */
-        $node = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode::class);
+        /** @var $node DatabaseTreeNode */
+        $node = GeneralUtility::makeInstance(DatabaseTreeNode::class);
         $row = [];
         $node->setSelected(false);
         $node->setExpanded(true);
         $node->setSelectable(false);
 
         /** @var IconFactory $iconFactory */
-        $iconFactory = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconFactory::class);
+        $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
 
         if (strrpos($basicNode->getId(), self::CALENDAR_PREFIX, -strlen($basicNode->getId())) !== false) {
             $id = intval(substr($basicNode->getId(), strlen(self::CALENDAR_PREFIX)));
@@ -247,8 +251,8 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $node->setParentNode($parent);
         if ($basicNode->hasChildNodes()) {
 
-            /** @var \TYPO3\CMS\Backend\Tree\SortedTreeNodeCollection $childNodes */
-            $childNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\SortedTreeNodeCollection::class);
+            /** @var SortedTreeNodeCollection $childNodes */
+            $childNodes = GeneralUtility::makeInstance(SortedTreeNodeCollection::class);
             $foundSomeChild = false;
             foreach ($basicNode->getChildNodes() as $child) {
                 // Change in custom TreeDataProvider by adding the if clause
@@ -277,7 +281,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     /**
      * Check if given category is allowed by the access rights
      *
-     * @param \TYPO3\CMS\Backend\Tree\TreeNode $child
+     * @param TreeNode $child
      * @return bool
      */
     protected function isCategoryAllowed($child)

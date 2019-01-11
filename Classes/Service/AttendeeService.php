@@ -2,6 +2,7 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use RuntimeException;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
 
 /**
@@ -213,7 +214,7 @@ class AttendeeService extends BaseService
         $table = 'tx_cal_attendee';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458138
             );

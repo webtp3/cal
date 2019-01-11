@@ -15,24 +15,29 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use Doctrine\DBAL\FetchMode;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\TimeTracker\TimeTracker;
+use TYPO3\CMS\Core\TypoScript\ExtendedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\Page\PageRepository;
 
 /**
  * API for calendar base (cal)
  */
 class Api
 {
-    /** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer */
+    /** @var ContentObjectRenderer */
     public $cObj;
     /** @var \TYPO3\CMS\Cal\Service\RightsService */
     public $rightsObj;
-    /** @var \TYPO3\CMS\Cal\Controller\ModelController */
+    /** @var ModelController */
     public $modelObj;
-    /** @var \TYPO3\CMS\Cal\Controller\ViewController */
+    /** @var ViewController */
     public $viewObj;
-    /** @var \TYPO3\CMS\Cal\Controller\Controller */
+    /** @var Controller */
     public $controller;
     /** @var array */
     public $conf;
@@ -68,7 +73,7 @@ class Api
 
         $GLOBALS ['TSFE']->settingLocale();
 
-        $this->controller = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Controller\Controller::class);
+        $this->controller = GeneralUtility::makeInstance(Controller::class);
         $this->controller->cObj = &$this->cObj;
         $this->controller->conf = &$this->conf;
 
@@ -80,30 +85,32 @@ class Api
         $this->controller->initCaching();
         $this->controller->initConfigs();
 
-        \TYPO3\CMS\Cal\Utility\Registry::init($this->controller);
-        $this->rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        $this->rightsObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstanceService('cal_rights_model', 'rights');
+        Registry::init($this->controller);
+        $this->rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $this->rightsObj = GeneralUtility::makeInstanceService('cal_rights_model', 'rights');
         $this->rightsObj->setDefaultSaveToPage();
 
-        $this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
-        $this->modelObj = new \TYPO3\CMS\Cal\Controller\ModelController();
+        $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
+        $this->modelObj = new ModelController();
 
-        $this->viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'viewcontroller');
-        $this->viewObj = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Controller\ViewController::class);
+        $this->viewObj = &Registry::Registry('basic', 'viewcontroller');
+        $this->viewObj = GeneralUtility::makeInstance(ViewController::class);
 
-        /*
-         * $this->rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','rightscontroller');
-         * $this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','modelcontroller');
-         * $this->viewObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','viewcontroller');
-         */
         return $this;
     }
 
-    public function tx_cal_api_without($pid, $feUserObj = '')
+    /**
+     * @param $pid
+     * @param string $feUserObj
+     * @return Api
+     * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     */
+    public function tx_cal_api_without($pid, $feUserObj = ''): Api
     {
-        $cObj = new \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer();
+        $cObj = new ContentObjectRenderer();
 
-        $GLOBALS ['TT'] = new \TYPO3\CMS\Core\TimeTracker\TimeTracker();
+        $GLOBALS ['TT'] = new TimeTracker();
 
         // ***********************************
         // Creating a fake $TSFE object
@@ -111,7 +118,7 @@ class Api
         $this->unsetTSFEOnDestruct = true;
 
         $GLOBALS ['TSFE'] = GeneralUtility::makeInstance(
-            \TYPO3\CMS\Cal\Controller\Tsfe::class,
+            Tsfe::class,
             $GLOBALS ['TYPO3_CONF_VARS'],
             $pid,
             '0',
@@ -137,11 +144,11 @@ class Api
         $GLOBALS ['TSFE']->settingLocale();
 
         // we need to get the plugin setup to create correct source URLs
-        $template = new \TYPO3\CMS\Core\TypoScript\ExtendedTemplateService(); // Defined global here!
+        $template = new ExtendedTemplateService(); // Defined global here!
         $template->tt_track = 0;
         // Do not log time-performance information
         $template->init();
-        $sys_page = new \TYPO3\CMS\Frontend\Page\PageRepository();
+        $sys_page = new PageRepository();
         $rootLine = $sys_page->getRootLine($pid);
         $template->runThroughTemplates($rootLine); // This generates the constants/config + hierarchy info for the template.
         $template->generateConfig(); //
@@ -192,152 +199,313 @@ class Api
         }
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     * @return \TYPO3\CMS\Cal\Model\EventModel|null
+     */
     public function findEvent($uid, $type, $pidList = '')
     {
         return $this->modelObj->findEvent($uid, $type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function saveEvent($uid, $type, $pidList = '')
     {
         return $this->modelObj->saveEvent($uid, $type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeEvent($uid, $type)
     {
         return $this->modelObj->removeEvent($uid, $type);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function saveExceptionEvent($uid, $type, $pidList = '')
     {
         return $this->modelObj->saveExceptionEvent($uid, $type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     */
     public function findLocation($uid, $type, $pidList = '')
     {
         return $this->modelObj->findLocation($uid, $type, $pidList);
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function findAllLocations($type = '', $pidList = '')
     {
         return $this->modelObj->findAllLocations($type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function saveLocation($uid, $type, $pidList = '')
     {
         return $this->modelObj->saveLocation($uid, $type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeLocation($uid, $type)
     {
         return $this->modelObj->removeLocation($uid, $type);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     */
     public function findOrganizer($uid, $type, $pidList = '')
     {
         return $this->modelObj->findOrganizer($uid, $type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     */
     public function findCalendar($uid, $type, $pidList = '')
     {
         return $this->modelObj->findCalendar($uid, $type, $pidList);
     }
 
-    public function findAllCalendar($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findAllCalendar($type = '', $pidList = ''): array
     {
         return $this->modelObj->findAllCalendar($type, $pidList);
     }
 
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function findAllOrganizer($type = '', $pidList = '')
     {
         return $this->modelObj->findAllOrganizer($type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function saveOrganizer($uid, $type, $pidList = '')
     {
         return $this->modelObj->saveOrganizer($uid, $type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeOrganizer($uid, $type)
     {
         return $this->modelObj->removeOrganizer($uid, $type);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function saveCalendar($uid, $type, $pidList = '')
     {
         return $this->modelObj->saveCalendar($uid, $type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeCalendar($uid, $type)
     {
         return $this->modelObj->removeCalendar($uid, $type);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     * @param string $pidList
+     * @return mixed
+     */
     public function saveCategory($uid, $type, $pidList = '')
     {
         return $this->modelObj->saveCategory($uid, $type, $pidList);
     }
 
+    /**
+     * @param $uid
+     * @param $type
+     */
     public function removeCategory($uid, $type)
     {
         return $this->modelObj->removeCategory($uid, $type);
     }
 
-    public function findEventsWithin($startTimestamp, $endTimestamp, $type = '', $pidList = '')
+    /**
+     * @param $startTimestamp
+     * @param $endTimestamp
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findEventsWithin($startTimestamp, $endTimestamp, $type = '', $pidList = ''): array
     {
         return $this->modelObj->findAllWithin('cal_event_model', $startTimestamp, $endTimestamp, $type, 'event', $pidList);
     }
 
-    public function findEventsForDay($timestamp, $type = '', $pidList = '')
+    /**
+     * @param $timestamp
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findEventsForDay($timestamp, $type = '', $pidList = ''): array
     {
         return $this->modelObj->findEventsForDay($timestamp, $type, $pidList);
     }
 
-    public function findEventsForWeek($timestamp, $type = '', $pidList = '')
+    /**
+     * @param $timestamp
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findEventsForWeek($timestamp, $type = '', $pidList = ''): array
     {
         return $this->modelObj->findEventsForWeek($timestamp, $type, $pidList);
     }
 
-    public function findEventsForMonth($timestamp, $type = '', $pidList = '')
+    /**
+     * @param $timestamp
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findEventsForMonth($timestamp, $type = '', $pidList = ''): array
     {
         return $this->modelObj->findEventsForMonth($timestamp, $type, $pidList);
     }
 
-    public function findEventsForYear($timestamp, $type = '', $pidList = '')
+    /**
+     * @param $timestamp
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findEventsForYear($timestamp, $type = '', $pidList = ''): array
     {
         return $this->modelObj->findEventsForYear($timestamp, $type, $pidList);
     }
 
-    public function findEventsForList($timestamp, $type = '', $pidList = '')
+    /**
+     * @param $timestamp
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findEventsForList($timestamp, $type = '', $pidList = ''): array
     {
         return $this->modelObj->findEventsForList($timestamp, $type, $pidList);
     }
 
-    public function findCategoriesForList($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findCategoriesForList($type = '', $pidList = ''): array
     {
         return $this->modelObj->findCategoriesForList($type, $pidList);
     }
 
-    public function findEventsForIcs($timestamp, $type, $pidList)
+    /**
+     * @param $timestamp
+     * @param $type
+     * @param $pidList
+     * @return array
+     */
+    public function findEventsForIcs($timestamp, $type, $pidList): array
     {
         return $this->modelObj->findEventsForIcs($timestamp, $type, $pidList);
     }
 
-    public function searchEvents($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function searchEvents($type = '', $pidList = ''): array
     {
         return $this->modelObj->searchEvents($type, $pidList);
     }
 
-    public function searchLocation($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function searchLocation($type = '', $pidList = ''): array
     {
         return $this->modelObj->searchLocation($type, $pidList);
     }
 
-    public function searchOrganizer($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function searchOrganizer($type = '', $pidList = ''): array
     {
         return $this->modelObj->searchOrganizer($type, $pidList);
     }
 
-    public function drawIcs($master_array, $getdate, $sendHeaders = true)
+    /**
+     * @param $master_array
+     * @param $getdate
+     * @param bool $sendHeaders
+     * @return string
+     */
+    public function drawIcs($master_array, $getdate, $sendHeaders = true): string
     {
         return $this->viewObj->drawIcs($master_array, $getdate, $sendHeaders);
     }
@@ -413,8 +581,8 @@ class Api
      *
      * @return PageRenderer
      */
-    protected function getPageRenderer()
+    protected function getPageRenderer(): PageRenderer
     {
-        return GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
+        return GeneralUtility::makeInstance(PageRenderer::class);
     }
 }

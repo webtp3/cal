@@ -1,4 +1,8 @@
 <?php
+
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 defined('TYPO3_MODE') or die();
 
 /**
@@ -12,7 +16,7 @@ $tempColumns = [
     'attachment' => [
         'exclude' => 1,
         'label' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:media',
-        'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('attachment', [
+        'config' => ExtensionManagementUtility::getFileFieldTCAConfig('attachment', [
             'maxitems' => 5,
             'foreign_types' => [
                 '0' => [
@@ -20,27 +24,27 @@ $tempColumns = [
                         --palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
                         --palette--;;filePalette'
                 ],
-                \TYPO3\CMS\Core\Resource\File::FILETYPE_TEXT => [
+                File::FILETYPE_TEXT => [
                     'showitem' => '
                         --palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
                         --palette--;;filePalette'
                 ],
-                \TYPO3\CMS\Core\Resource\File::FILETYPE_IMAGE => [
+                File::FILETYPE_IMAGE => [
                     'showitem' => '
                         --palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
                         --palette--;;filePalette'
                 ],
-                \TYPO3\CMS\Core\Resource\File::FILETYPE_AUDIO => [
+                File::FILETYPE_AUDIO => [
                     'showitem' => '
                         --palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
                         --palette--;;filePalette'
                 ],
-                \TYPO3\CMS\Core\Resource\File::FILETYPE_VIDEO => [
+                File::FILETYPE_VIDEO => [
                     'showitem' => '
                         --palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
                         --palette--;;filePalette'
                 ],
-                \TYPO3\CMS\Core\Resource\File::FILETYPE_APPLICATION => [
+                File::FILETYPE_APPLICATION => [
                     'showitem' => '
                         --palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
                         --palette--;;filePalette'
@@ -51,4 +55,4 @@ $tempColumns = [
     ],
 ];
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('tx_cal_event', $tempColumns);
+ExtensionManagementUtility::addTCAcolumns('tx_cal_event', $tempColumns);

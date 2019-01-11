@@ -15,6 +15,7 @@
 namespace TYPO3\CMS\Cal\Cron;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -97,8 +98,8 @@ class ReminderScheduler extends AbstractTask
         $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
         if ($page ['doktype'] != 254) {
-            /** @var \TYPO3\CMS\Cal\Controller\Api $calAPI */
-            $calAPI = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Controller\Api::class);
+            /** @var Api $calAPI */
+            $calAPI = GeneralUtility::makeInstance(Api::class);
             $calAPI = &$calAPI->tx_cal_api_without($pageIDForPlugin);
 
             $eventObject = $calAPI->modelObj->findEvent($event ['uid'], 'tx_cal_phpicalendar', $calAPI->conf ['pidList'], false, false, false, false);

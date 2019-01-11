@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\Slot;
  */
 use TYPO3\CMS\Backend\Form\DataPreprocessor;
 use TYPO3\CMS\Cal\Hooks\TceFormsGetmainfields;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
@@ -27,7 +28,7 @@ class FormDataPreprocessorSlot
 {
     public static function register()
     {
-        \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(Dispatcher::class)->connect(
+        GeneralUtility::makeInstance(Dispatcher::class)->connect(
             DataPreprocessor::class,
             'fetchRecordPostProcessing',
             __CLASS__,

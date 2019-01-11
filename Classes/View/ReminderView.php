@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\View;
  */
 use BackendUtilityReplacementUtility;
 use OutOfBoundsException;
+use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Cron\ReminderScheduler;
 use TYPO3\CMS\Cal\Model\CalDate;
@@ -216,7 +217,7 @@ class ReminderView extends NotificationView
                 $table = 'tx_scheduler_task_group';
                 $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
                 if (false === $result) {
-                    throw new \RuntimeException(
+                    throw new RuntimeException(
                         'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                         1431458160
                     );

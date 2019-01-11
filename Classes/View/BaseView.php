@@ -20,6 +20,7 @@ use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Service\BaseService;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -2572,7 +2573,7 @@ class BaseView extends BaseService
     public function initLocalCObject($customData = false)
     {
         if (!is_object($this->local_cObj)) {
-            $this->local_cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'local_cObj');
+            $this->local_cObj = &Registry::Registry('basic', 'local_cObj');
         }
         if ($customData && is_array($customData)) {
             $this->local_cObj->data = $customData;

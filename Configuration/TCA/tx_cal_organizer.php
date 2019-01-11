@@ -1,4 +1,8 @@
 <?php
+
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 defined('TYPO3_MODE') or die();
 
 $tx_cal_organizer = [
@@ -131,7 +135,7 @@ $tx_cal_organizer = [
         'image' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_organizer.image',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('image', [
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig('image', [
                 'maxitems' => 5,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
                 'foreign_types' => [
@@ -140,7 +144,7 @@ $tx_cal_organizer = [
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_IMAGE => [
+                    File::FILETYPE_IMAGE => [
                         'showitem' => '
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
@@ -250,7 +254,7 @@ $tx_cal_organizer = [
     ]
 ];
 
-if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
+if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
     $tx_cal_organizer['columns']['country_zone'] = [
         'exclude' => 1,
         'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_organizer.countryzone',

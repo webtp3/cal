@@ -14,12 +14,19 @@ namespace TYPO3\CMS\Cal\Hooks;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use Doctrine\DBAL\FetchMode;
+use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Service\ICalendarService;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-define('ICALENDAR_PATH', \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'Classes/Model/ICalendar.php');
+define('ICALENDAR_PATH', ExtensionManagementUtility::extPath('cal') . 'Classes/Model/ICalendar.php');
 
 /**
  * This hook extends the tcemain class.
@@ -76,15 +83,15 @@ class TceMainProcessdatamap
 
                     if ($page ['doktype'] != 254) {
                         /* Notify of changes to existing event */
-                        $tx_cal_api = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Controller\Api::class);
+                        $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                         $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
-                        $fieldArray ['icsUid'] = \TYPO3\CMS\Cal\Utility\Functions::getIcsUid($tx_cal_api->conf, $event);
+                        $fieldArray ['icsUid'] = Functions::getIcsUid($tx_cal_api->conf, $event);
 
-                        $notificationService = & \TYPO3\CMS\Cal\Utility\Functions::getNotificationService();
+                        $notificationService = & Functions::getNotificationService();
 
                         $oldPath = &$notificationService->conf ['view.'] ['event.'] ['eventModelTemplate'];
-                        $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal');
+                        $extPath = ExtensionManagementUtility::extPath('cal');
 
                         $oldPath = str_replace('EXT:cal/', $extPath, $oldPath);
                         // $oldPath = str_replace(PATH_site, '', $oldPath);
@@ -94,7 +101,7 @@ class TceMainProcessdatamap
                         $fileInfo = GeneralUtility::split_fileref($oldPath);
                         $GLOBALS ['TSFE']->tmpl->allowedPaths [] = $fileInfo ['path'];
 
-                        $notificationService->controller->getDateTimeObject = new \TYPO3\CMS\Cal\Model\CalDate($event ['start_date'] . '000000');
+                        $notificationService->controller->getDateTimeObject = new CalDate($event ['start_date'] . '000000');
                         $notificationService->notifyOfChanges($event, $fieldArray);
                         if ($fieldArray ['send_invitation']) {
                             $notificationService->invite($event);
@@ -130,8 +137,8 @@ class TceMainProcessdatamap
         if ($table == 'tx_cal_calendar') {
             $calendar = BackendUtility::getRecord('tx_cal_calendar', $id);
 
-            /** @var \TYPO3\CMS\Cal\Service\ICalendarService $service */
-            $service = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Service\ICalendarService::class);
+            /** @var ICalendarService $service */
+            $service = GeneralUtility::makeInstance(ICalendarService::class);
 
             if ($calendar ['type'] == 1 or $calendar ['type'] == 2) {
                 self::processICS($calendar, $fieldArray, $service);
@@ -144,7 +151,7 @@ class TceMainProcessdatamap
             $fieldArray ['tablenames'] = implode('_', $values);
         }
 
-        if ($table == 'tx_cal_location' && count($fieldArray) > 0 && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')) {
+        if ($table == 'tx_cal_location' && count($fieldArray) > 0 && ExtensionManagementUtility::isLoaded('wec_map')) {
             $location = BackendUtility::getRecord('tx_cal_location', $id);
             if (is_array($location)) {
                 $location = array_merge($location, $fieldArray);
@@ -153,7 +160,7 @@ class TceMainProcessdatamap
             }
 
             /* Geocode the address */
-            $lookupTable = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('JBartels\WecMap\Utility\Cache');
+            $lookupTable = Functions::makeInstance('JBartels\WecMap\Utility\Cache');
             $latlong = $lookupTable->lookup($location ['street'], $location ['city'], $location ['state'], $location ['zip'], $location ['country']);
             $fieldArray ['latitude'] = $latlong ['lat'];
             $fieldArray ['longitude'] = $latlong ['long'];
@@ -175,21 +182,21 @@ class TceMainProcessdatamap
                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
                 if ($page ['doktype'] != 254) {
-                    $tx_cal_api = new \TYPO3\CMS\Cal\Controller\Api();
+                    $tx_cal_api = new Api();
                     $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
                     if ($event ['event_type'] == 3 && ! $event ['ref_event_id']) {
-                        $modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+                        $modelObj = &Registry::Registry('basic', 'modelcontroller');
                         $modelObj->updateEventAttendees($event ['uid'], 'tx_cal_phpicalendar');
                     }
 
                     if ($table == 'tx_cal_event' && ($status == 'new' || $fieldArray ['send_invitation'])) {
                         /* Notify of new event */
-                        $notificationService = & \TYPO3\CMS\Cal\Utility\Functions::getNotificationService();
+                        $notificationService = & Functions::getNotificationService();
 
                         $oldPath = &$notificationService->conf ['view.'] ['event.'] ['eventModelTemplate'];
 
-                        $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal');
+                        $extPath = ExtensionManagementUtility::extPath('cal');
 
                         $oldPath = str_replace('EXT:cal/', $extPath, $oldPath);
                         // $oldPath = str_replace(PATH_site, '', $oldPath);
@@ -199,7 +206,7 @@ class TceMainProcessdatamap
                         $fileInfo = GeneralUtility::split_fileref($oldPath);
                         $GLOBALS ['TSFE']->tmpl->allowedPaths [] = $fileInfo ['path'];
 
-                        $notificationService->controller->getDateTimeObject = new \TYPO3\CMS\Cal\Model\CalDate($event ['start_date'] . '000000');
+                        $notificationService->controller->getDateTimeObject = new CalDate($event ['start_date'] . '000000');
 
                         if ($status == 'new') {
                             $notificationService->notify($event);
@@ -212,13 +219,13 @@ class TceMainProcessdatamap
                         $GLOBALS ['TSFE']->tmpl->getFileName_backPath = $oldBackPath;
                     }
 
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                    $rgc = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Utility\RecurrenceGenerator::class, $pageIDForPlugin);
+                    /** @var RecurrenceGenerator $rgc */
+                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
                     $rgc->generateIndexForUid($event ['uid'], $table);
 
                     if ($table == 'tx_cal_event' && $tx_cal_api->conf ['view.'] ['event.'] ['remind']) {
                         /* Schedule reminders for new and changed events */
-                        $reminderService = &\TYPO3\CMS\Cal\Utility\Functions::getReminderService();
+                        $reminderService = &Functions::getReminderService();
                         $reminderService->scheduleReminder($event ['uid']);
                     }
                 }
@@ -231,15 +238,15 @@ class TceMainProcessdatamap
             if (is_array($deviationRow)) {
                 $startDate = null;
                 if ($deviationRow['start_date']) {
-                    $startDate = new  \TYPO3\CMS\Cal\Model\CalDate($deviationRow['start_date']);
+                    $startDate = new  CalDate($deviationRow['start_date']);
                 } else {
-                    $startDate = new \TYPO3\CMS\Cal\Model\CalDate($deviationRow['orig_start_date']);
+                    $startDate = new CalDate($deviationRow['orig_start_date']);
                 }
                 $endDate = null;
                 if ($deviationRow['end_date']) {
-                    $endDate = new  \TYPO3\CMS\Cal\Model\CalDate($deviationRow['end_date']);
+                    $endDate = new  CalDate($deviationRow['end_date']);
                 } else {
-                    $endDate = new \TYPO3\CMS\Cal\Model\CalDate($deviationRow['orig_end_date']);
+                    $endDate = new CalDate($deviationRow['orig_end_date']);
                 }
 
                 if (! $deviationRow['allday']) {
@@ -359,10 +366,10 @@ class TceMainProcessdatamap
 
             if ($page ['doktype'] != 254) {
                 /* Notify of changes to existing event */
-                $tx_cal_api = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Controller\Api::class);
+                $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                 $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
-                $incomingFieldArray ['icsUid'] = \TYPO3\CMS\Cal\Utility\Functions::getIcsUid($tx_cal_api->conf, $event);
+                $incomingFieldArray ['icsUid'] = Functions::getIcsUid($tx_cal_api->conf, $event);
             }
         }
 
@@ -378,7 +385,7 @@ class TceMainProcessdatamap
             /* Get the calendar info from the db */
             $calendar = BackendUtility::getRecord('tx_cal_calendar', $id);
 
-            $service = new \TYPO3\CMS\Cal\Service\ICalendarService();
+            $service = new ICalendarService();
 
             // Here we have to check if the calendar belongs to the type
             // problem with case 2 & 3 -> what to do with events of type database? delete them without warning? keep them and assign them to a default category?
@@ -390,8 +397,8 @@ class TceMainProcessdatamap
                         $service->deleteSchedulerTask($id);
                         $calendar['schedulerId'] = 0;
 
-                        /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                        $rgc = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Utility\RecurrenceGenerator::class);
+                        /** @var RecurrenceGenerator $rgc */
+                        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
                         $rgc->cleanIndexTableOfCalendarUid($id);
                     }
                     break;
@@ -411,10 +418,10 @@ class TceMainProcessdatamap
                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
                 if ($page ['doktype'] != 254) {
-                    $tx_cal_api = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Controller\Api::class);
+                    $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                     $tx_cal_api = $tx_cal_api->tx_cal_api_without($pageIDForPlugin);
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                    $rgc = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Utility\RecurrenceGenerator::class);
+                    /** @var RecurrenceGenerator $rgc */
+                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
                     $rgc->cleanIndexTableOfExceptionGroupUid($id);
                 }
             }
@@ -473,7 +480,7 @@ class TceMainProcessdatamap
                     $connection = $connectionPool->getConnectionForTable('tx_cal_attendee');
                     $result =  $connection->insert('tx_cal_attendee', $incomingFieldArray);
                     if (0 === $result) {
-                        throw new \RuntimeException('Could not write attendee record to database: ' . $connection->errorCode(), 1431458136);
+                        throw new RuntimeException('Could not write attendee record to database: ' . $connection->errorCode(), 1431458136);
                     }
                     $attendeeUids [] = $connection->lastInsertId('tx_cal_attendee');
                 }
@@ -488,6 +495,7 @@ class TceMainProcessdatamap
 
     /**
      * @param int $pid
+     * @return int
      */
     private static function getPageIDForPlugin($pid)
     {
@@ -504,7 +512,7 @@ class TceMainProcessdatamap
     /**
      *  @param array $calendar
      *  @param array $fieldArray
-     *  @param \TYPO3\CMS\Cal\Service\ICalendarService $service
+     *  @param ICalendarService $service
      **/
     public static function processICS($calendar, &$fieldArray, &$service)
     {
@@ -524,8 +532,8 @@ class TceMainProcessdatamap
                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
                 if ($page ['doktype'] != 254) {
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                    $rgc = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Utility\RecurrenceGenerator::class, $pageIDForPlugin);
+                    /** @var RecurrenceGenerator $rgc */
+                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
                     $rgc->generateIndexForCalendarUid($calendar ['uid']);
                 }
             }
@@ -555,7 +563,7 @@ class TceMainProcessdatamap
     public static function convertBackendDateToPear($dateString)
     {
         $ymdString = self::convertBackendDateToYMD($dateString);
-        return new \TYPO3\CMS\Cal\Model\CalDate($ymdString . '000000');
+        return new CalDate($ymdString . '000000');
     }
 
     /**
@@ -567,7 +575,7 @@ class TceMainProcessdatamap
      */
     public static function convertBackendDateToYMD($dateString)
     {
-        $date = new \TYPO3\CMS\Cal\Model\CalDate($dateString);
+        $date = new CalDate($dateString);
         return $date->format('%Y%m%d');
     }
 }

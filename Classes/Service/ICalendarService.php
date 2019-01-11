@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\Service;
  */
 use BackendUtilityReplacementUtility;
 use Doctrine\Common\Proxy\Exception\OutOfBoundsException;
+use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Cron\CalendarScheduler;
@@ -125,7 +126,7 @@ class ICalendarService extends BaseService
     /**
      * @param int $uid
      *            The calendar record uid
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function update($uid)
     {
@@ -148,7 +149,7 @@ class ICalendarService extends BaseService
             ];
             $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_cal_calendar', 'uid=' . $uid, $insertFields);
             if (false === $result) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Could not write new md5 hash to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                     1456171285
                 );
@@ -273,7 +274,7 @@ class ICalendarService extends BaseService
      * @param unknown $scheduler
      * @param unknown $offset
      * @param unknown $calendarUid
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function createSchedulerTask(&$scheduler, $offset, $calendarUid)
     {
@@ -295,7 +296,7 @@ class ICalendarService extends BaseService
             $table = 'tx_scheduler_task_group';
             $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
             if (false === $result) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                     1431458142
                 );
@@ -498,14 +499,14 @@ class ICalendarService extends BaseService
      * @param string $text
      *            The ics content
      * @return ICalendar
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getiCalendarFromIcsFile($text)
     {
         require_once(ICALENDAR_PATH);
         $iCalendar = new ICalendar();
         if (!$iCalendar->parsevCalendar($text)) {
-            throw new \RuntimeException('Could not parse vCalendar data ' . $text, 1451245373);
+            throw new RuntimeException('Could not parse vCalendar data ' . $text, 1451245373);
         }
         return $iCalendar;
     }
@@ -613,7 +614,7 @@ class ICalendarService extends BaseService
                     'calendar_id' => $calId
                 ]);
                 if (false === $result) {
-                    throw new \RuntimeException(
+                    throw new RuntimeException(
                         'Could not write ' . $categoryTable . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                         1431458143
                     );
@@ -692,7 +693,7 @@ class ICalendarService extends BaseService
             } else {
                 $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
                 if (false === $result) {
-                    throw new \RuntimeException(
+                    throw new RuntimeException(
                         'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                         1431458145
                     );
@@ -825,7 +826,7 @@ class ICalendarService extends BaseService
                 'sorting' => $i++
             ]);
             if (false === $result) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Could not write tx_cal_event_category_mm record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                     1431458146
                 );
@@ -865,7 +866,7 @@ class ICalendarService extends BaseService
         }
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458144
             );
@@ -996,7 +997,7 @@ class ICalendarService extends BaseService
      * @param string $deleteNotUsedCategories
      *            Should not assigned categories be deleted
      * @return array The inserted or updated event uids
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function insertCalEventsIntoDB(
         $iCalendarComponentArray = [],
@@ -1207,7 +1208,7 @@ class ICalendarService extends BaseService
      * @param unknown $cruserId
      * @param unknown $eventUid
      * @param unknown $exceptionDescription
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     private function createException($pid, $cruserId, $eventUid, $exceptionDescription)
     {
@@ -1223,7 +1224,7 @@ class ICalendarService extends BaseService
 
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_cal_exception_event', $insertFields);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write tx_cal_exception_event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458147
             );
@@ -1234,7 +1235,7 @@ class ICalendarService extends BaseService
             'uid_foreign' => $GLOBALS['TYPO3_DB']->sql_insert_id()
         ]);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write tx_cal_exception_event_mm record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458148
             );
@@ -1246,7 +1247,7 @@ class ICalendarService extends BaseService
      * @param unknown $cruserId
      * @param unknown $eventUid
      * @param unknown $exceptionRuleDescription
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     private function createExceptionRule($pid, $cruserId, $eventUid, $exceptionRuleDescription)
     {
@@ -1263,7 +1264,7 @@ class ICalendarService extends BaseService
 
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_cal_exception_event', $insertFields);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write tx_cal_exception_event_mm record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458149
             );
@@ -1274,7 +1275,7 @@ class ICalendarService extends BaseService
             'uid_foreign' => $GLOBALS['TYPO3_DB']->sql_insert_id()
         ]);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write tx_cal_exception_event_mm record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458150
             );

@@ -1,4 +1,7 @@
 <?php
+
+use TYPO3\CMS\Cal\Backend\TCA\Labels;
+
 defined('TYPO3_MODE') or die();
 
 $tx_cal_fe_user_event_monitor_mm = [
@@ -9,7 +12,7 @@ $tx_cal_fe_user_event_monitor_mm = [
         'label_alt' => 'tablenames,offset',
         'label_alt_force' => 1,
         'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_fe_user_event_monitor_mm.gif',
-        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class . '->getMonitoringRecordLabel'
+        'label_userFunc' => Labels::class . '->getMonitoringRecordLabel'
     ],
     'feInterface' => [
         'fe_admin_fieldList' => ''

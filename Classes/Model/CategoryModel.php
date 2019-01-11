@@ -3,6 +3,7 @@
 namespace TYPO3\CMS\Cal\Model;
 
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -65,7 +66,7 @@ class CategoryModel extends BaseModel
         $this->setSharedUserAllowed($row['shared_user_allowed']);
         $this->setCalendarUid($row['calendar_id']);
         $this->setSinglePid($row['single_pid']);
-        $this->setNotificationEmails(\TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+        $this->setNotificationEmails(GeneralUtility::trimExplode(
             ',',
             $row['notification_emails'],
             1
@@ -397,9 +398,7 @@ class CategoryModel extends BaseModel
      */
     public function updateWithPIVars(&$piVars)
     {
-        // cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','cobj');
         $modelObj = &Registry::Registry('basic', 'modelController');
-        // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
 
         foreach ($piVars as $key => $value) {
             switch ($key) {

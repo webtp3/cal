@@ -2,6 +2,7 @@
 
 namespace TYPO3\CMS\Cal\Updates;
 
+use RuntimeException;
 use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -60,7 +61,7 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
     /**
      * Initialize all required repository and factory objects.
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function init()
     {
@@ -82,7 +83,7 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
             }
         }
         if (!isset($this->storage)) {
-            throw new \RuntimeException('Local default storage could not be initialized - might be due to missing sys_file* tables.');
+            throw new RuntimeException('Local default storage could not be initialized - might be due to missing sys_file* tables.');
         }
         $this->fileFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         $this->fileIndexRepository = GeneralUtility::makeInstance(FileIndexRepository::class);

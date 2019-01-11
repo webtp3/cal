@@ -1,4 +1,7 @@
 <?php
+
+use TYPO3\CMS\Cal\TreeProvider\TreeView;
+
 defined('TYPO3_MODE') or die();
 
 // Define the TCA for a checkbox and calendar-/category selector to enable access control.
@@ -35,7 +38,7 @@ $tempColumns = [
             'renderType' => 'selectMultipleSideBySide',
             'type' => 'select',
             'form_type' => 'user',
-            'userFunc' => \TYPO3\CMS\Cal\TreeProvider\TreeView::class . '->displayCategoryTree',
+            'userFunc' => TreeView::class . '->displayCategoryTree',
             'treeView' => 1,
             'size' => 20,
             'minitems' => 0,

@@ -1,9 +1,12 @@
 <?php
+
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
-$extensionName = \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToUpperCamelCase('cal');
+$extensionName = GeneralUtility::underscoredToUpperCamelCase('cal');
 $pluginSignature = strtolower($extensionName) . '_controller';
 
 /***************

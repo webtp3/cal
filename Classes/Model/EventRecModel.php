@@ -725,7 +725,6 @@ class EventRecModel extends Model
             );
         }
         if ($this->parentEvent->isUserAllowedToDelete()) {
-            // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
             $linkConf = $this->parentEvent->getValuesAsArray();
             if ($this->parentEvent->conf['view.']['enableAjax']) {
                 $temp = sprintf(

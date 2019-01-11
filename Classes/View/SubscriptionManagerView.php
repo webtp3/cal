@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -344,7 +345,7 @@ class SubscriptionManagerView extends BaseView
             ];
             $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($mmTable, $fields_values);
             if (false === $result) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Could not write ' . $mmTable . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                     1431458161
                 );
@@ -390,7 +391,7 @@ class SubscriptionManagerView extends BaseView
             ];
             $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values);
             if (false === $result) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                     1431458162
                 );

@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\DateParser;
@@ -823,7 +824,7 @@ class EventService extends BaseService
         $table = 'tx_cal_event';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458130
             );
@@ -1154,7 +1155,7 @@ class EventService extends BaseService
         $where = 'uid = ' . $uid;
         $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $eventData);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458130
             );
@@ -1436,7 +1437,7 @@ class EventService extends BaseService
             $where = 'uid = ' . $uid;
             $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
             if (false === $result) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Could not delete event record from database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                     1431458133
                 );
@@ -2050,7 +2051,7 @@ class EventService extends BaseService
                         $this->updateEventDataWithDeviations($event, $eventData);
                         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
                         if (false === $result) {
-                            throw new \RuntimeException(
+                            throw new RuntimeException(
                                 'Could not write event index record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                                 1431458131
                             );
@@ -2127,7 +2128,7 @@ class EventService extends BaseService
                         $this->updateEventDataWithDeviations($event, $eventData);
                         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
                         if (false === $result) {
-                            throw new \RuntimeException(
+                            throw new RuntimeException(
                                 'Could not write event index record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                                 1431458132
                             );
@@ -2169,7 +2170,7 @@ class EventService extends BaseService
                         $this->updateEventDataWithDeviations($event, $eventData);
                         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
                         if (false === $result) {
-                            throw new \RuntimeException(
+                            throw new RuntimeException(
                                 'Could not write event index record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                                 1431458133
                             );
@@ -2282,7 +2283,7 @@ class EventService extends BaseService
 
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write exception event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458134
             );
@@ -2676,7 +2677,7 @@ class EventService extends BaseService
                         $this->updateEventDataWithDeviations($event, $eventData);
                         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
                         if (false === $result) {
-                            throw new \RuntimeException(
+                            throw new RuntimeException(
                                 'Could not write event index record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                                 1431458135
                             );

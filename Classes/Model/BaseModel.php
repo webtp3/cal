@@ -502,7 +502,6 @@ abstract class BaseModel extends AbstractModel
      */
     public function getHeadingMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         $sims['###HEADING###'] = $this->controller->pi_getLL('l_' . $this->getObjectType());
     }
 
@@ -515,7 +514,6 @@ abstract class BaseModel extends AbstractModel
      */
     public function getEditPanelMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         $sims['###EDIT_PANEL###'] = $this->controller->pi_getEditPanel($this->row, 'tx_cal_' . $this->getObjectType());
     }
 
@@ -529,7 +527,6 @@ abstract class BaseModel extends AbstractModel
      */
     public function getMarker(& $template, & $sims, & $rems, & $wrapped, $view = '', $base = 'view')
     {
-        // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         if ($view == '' && $base == 'view') {
             $view = !empty($this->conf['alternateRenderingView']) && is_array($this->conf[$base . '.'][$this->conf['alternateRenderingView'] . '.']) ? $this->conf['alternateRenderingView'] : $this->conf['view'];
         }

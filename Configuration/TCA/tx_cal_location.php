@@ -1,4 +1,8 @@
 <?php
+
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 defined('TYPO3_MODE') or die();
 
 $tx_cal_location = [
@@ -133,7 +137,7 @@ $tx_cal_location = [
         'image' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.image',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('image', [
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig('image', [
                 'maxitems' => 5,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
                 'foreign_types' => [
@@ -142,7 +146,7 @@ $tx_cal_location = [
 						--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 						--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_IMAGE => [
+                    File::FILETYPE_IMAGE => [
                         'showitem' => '
 						--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 						--palette--;;filePalette'
@@ -275,7 +279,7 @@ $tx_cal_location['columns']['imagealttext'] = $dummy;
 $tx_cal_location['columns']['imagetitletext'] = $dummy;
 
 /* If wec_map is present, define the address fields */
-if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')) {
+if (ExtensionManagementUtility::isLoaded('wec_map')) {
     $tx_cal_location['ctrl']['EXT']['wec_map'] = [
         'isMappable' => 1,
         'addressFields' => [
@@ -309,7 +313,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')) {
     $tx_cal_location['types']['0']['showitem'] .= ', tx_wecmap_map';
 }
 
-if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
+if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
     $tx_cal_location['columns']['country_zone'] = [
         'exclude' => 1,
         'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.countryzone',

@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use RuntimeException;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Controller\Registry;
 use TYPO3\CMS\Cal\Model\ModelController;
@@ -161,7 +162,7 @@ abstract class BaseService extends AbstractService
                 ], $additionalParams);
                 $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($mm_table, $insertFields);
                 if (false === $result) {
-                    throw new \RuntimeException(
+                    throw new RuntimeException(
                         'Could not write ' . $mm_table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                         1431458138
                     );
@@ -339,7 +340,7 @@ abstract class BaseService extends AbstractService
                 ) . ')';
             $result = $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_file_reference', $where);
             if (false === $result) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Could not write sys_file_reference record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                     1431458138
                 );
@@ -373,7 +374,7 @@ abstract class BaseService extends AbstractService
             }
         }
         if (!isset($storage)) {
-            throw new \RuntimeException('Local default storage could not be initialized - might be due to missing sys_file* tables.');
+            throw new RuntimeException('Local default storage could not be initialized - might be due to missing sys_file* tables.');
         }
         $fileFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         $fileIndexRepository = GeneralUtility::makeInstance(FileIndexRepository::class);
@@ -410,7 +411,7 @@ abstract class BaseService extends AbstractService
         );
         $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($objectType, 'uid = ' . $uid, [$type => $count]);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write sys_file_reference record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458138
             );
@@ -476,7 +477,7 @@ abstract class BaseService extends AbstractService
 
                 $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery('sys_file_reference', $dataArray);
                 if (false === $result) {
-                    throw new \RuntimeException(
+                    throw new RuntimeException(
                         'Could not write sys_file_reference record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                         1431458138
                     );
@@ -499,7 +500,7 @@ abstract class BaseService extends AbstractService
             if (!empty($dataArray)) {
                 $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_reference', 'uid=' . $fileOrig, $dataArray);
                 if (false === $result) {
-                    throw new \RuntimeException(
+                    throw new RuntimeException(
                         'Could not write sys_file_reference record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                         1431458138
                     );

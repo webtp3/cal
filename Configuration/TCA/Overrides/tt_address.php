@@ -1,7 +1,10 @@
 <?php
+
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 defined('TYPO3_MODE') or die();
 
-if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tt_address')) {
+if (ExtensionManagementUtility::isLoaded('tt_address')) {
     $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 
     // Append backend search configuration for tt_address:
@@ -23,8 +26,8 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tt_address')) 
                 ]
             ]
         ];
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('tt_address', $tempColumns);
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+        ExtensionManagementUtility::addTCAcolumns('tt_address', $tempColumns);
+        ExtensionManagementUtility::addToAllTCAtypes(
             'tt_address',
             'tx_cal_controller_islocation,'
         );
@@ -42,8 +45,8 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('tt_address')) 
             ]
         ];
 
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('tt_address', $tempColumns);
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+        ExtensionManagementUtility::addTCAcolumns('tt_address', $tempColumns);
+        ExtensionManagementUtility::addToAllTCAtypes(
             'tt_address',
             'tx_cal_controller_isorganizer,'
         );

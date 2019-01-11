@@ -3,6 +3,9 @@ declare(strict_types = 1);
 
 namespace TYPO3\CMS\Cal\Backend\Form\RenderType;
 
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 /**
  * Class ElementHelper
  */
@@ -46,7 +49,7 @@ class ElementHelper
      */
     public static function getWeekStartDay($pageID): string
     {
-        $tsConfig = \TYPO3\CMS\Backend\Utility\BackendUtility::getModTSconfig($pageID, 'options.tx_cal_controller.weekStartDay');
+        $tsConfig = BackendUtility::getModTSconfig($pageID, 'options.tx_cal_controller.weekStartDay');
         $weekStartDay = strtolower($tsConfig ['value']);
 
         switch ($weekStartDay) {
@@ -143,6 +146,6 @@ class ElementHelper
 
     public static function init()
     {
-        $GLOBALS['LANG']->includeLLFile(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_db.xml');
+        $GLOBALS['LANG']->includeLLFile(ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_db.xml');
     }
 }

@@ -1,4 +1,7 @@
 <?php
+
+use TYPO3\CMS\Cal\Backend\TCA\Labels;
+
 defined('TYPO3_MODE') or die();
 
 $tx_cal_attendee = [
@@ -16,7 +19,7 @@ $tx_cal_attendee = [
         ],
         'versioningWS' => true,
         'searchFields' => 'email',
-        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class . '->getAttendeeRecordLabel'
+        'label_userFunc' => Labels::class . '->getAttendeeRecordLabel'
     ],
     'interface' => [
         'showRecordFieldList' => 'hidden,fe_user_id,email,attendance,status'

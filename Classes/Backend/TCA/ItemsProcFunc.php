@@ -18,6 +18,7 @@ use Doctrine\DBAL\FetchMode;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\QueryGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ItemsProcFunc
@@ -215,7 +216,7 @@ class ItemsProcFunc
                 $pidlist = $cache [$GLOBALS ['BE_USER']->user ['uid']] ['pidlist'];
             } else {
                 $mounts = $GLOBALS ['BE_USER']->returnWebmounts();
-                $qG = new \TYPO3\CMS\Core\Database\QueryGenerator();
+                $qG = new QueryGenerator();
                 $pidlist = '';
                 foreach ($mounts as $idx => $uid) {
                     $list = $qG->getTreeList($uid, 99, 0, $GLOBALS ['BE_USER']->getPagePermsClause(1));

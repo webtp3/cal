@@ -1,4 +1,10 @@
 <?php
+
+use TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc;
+use TYPO3\CMS\Cal\Backend\TCA\Labels;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 defined('TYPO3_MODE') or die();
 
 $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
@@ -8,7 +14,7 @@ $sPid = '###CURRENT_PID###'; // storage pid????
 $useLocationStructure = $configuration['useLocationStructure'] ?: 'tx_cal_location';
 $useOrganizerStructure = $configuration['useOrganizerStructure'] ?: 'tx_cal_organizer';
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::makeCategorizable(
+ExtensionManagementUtility::makeCategorizable(
     'cal',
     'tx_cal_event',
     'category_id',
@@ -69,7 +75,7 @@ $tx_cal_event = [
         ],
         'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events.gif',
         'searchFields' => 'title,organizer,organizer_link,location,location_link,teaser,description,ext_url,image,imagecaption,imagealttext,imagetitletext,attachment,attachmentcaption',
-        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class . '->getEventRecordLabel'
+        'label_userFunc' => Labels::class . '->getEventRecordLabel'
     ],
     'feInterface' => [
         'fe_admin_fieldList' => 'hidden, title, starttime, endtime, start_date, start_time, end_date, end_time, relation_cnt, organizer, organizer_id, organizer_pid, location, location_id, location_pid, description, freq, byday, bymonthday, bymonth, until, count, interval, rdate_type, rdate, notify_cnt'
@@ -131,7 +137,7 @@ $tx_cal_event = [
                 'size' => 1,
                 'minitems' => 1,
                 'maxitems' => 1,
-                'itemsProcFunc' => \TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc::class . '->getRecords',
+                'itemsProcFunc' => ItemsProcFunc::class . '->getRecords',
                 'itemsProcFunc_config' => [
                     'table' => 'tx_cal_calendar',
                     'orderBy' => 'tx_cal_calendar.title'
@@ -678,7 +684,7 @@ $tx_cal_event = [
         'image' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.images',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('image', [
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig('image', [
                 'maxitems' => 5,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
                 'foreign_types' => [
@@ -687,7 +693,7 @@ $tx_cal_event = [
 											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_IMAGE => [
+                    File::FILETYPE_IMAGE => [
                         'showitem' => '
 											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
@@ -700,7 +706,7 @@ $tx_cal_event = [
         'attachment' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:media',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('attachment', [
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig('attachment', [
                 'maxitems' => 5,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
                 'foreign_types' => [
@@ -709,27 +715,27 @@ $tx_cal_event = [
 											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_TEXT => [
+                    File::FILETYPE_TEXT => [
                         'showitem' => '
 											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_IMAGE => [
+                    File::FILETYPE_IMAGE => [
                         'showitem' => '
 											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_AUDIO => [
+                    File::FILETYPE_AUDIO => [
                         'showitem' => '
 											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_VIDEO => [
+                    File::FILETYPE_VIDEO => [
                         'showitem' => '
 											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_APPLICATION => [
+                    File::FILETYPE_APPLICATION => [
                         'showitem' => '
 											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
@@ -952,7 +958,7 @@ $tx_cal_event = [
     ]
 ];
 
-$tx_cal_event['columns']['attachment']['config'] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
+$tx_cal_event['columns']['attachment']['config'] = ExtensionManagementUtility::getFileFieldTCAConfig(
     'attachment',
     [
         'appearance' => [

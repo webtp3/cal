@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use RuntimeException;
 use TYPO3\CMS\Cal\Model\Location;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -447,7 +448,7 @@ class LocationService extends BaseService
         $table = 'tx_cal_location';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458153
             );

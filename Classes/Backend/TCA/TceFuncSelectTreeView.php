@@ -1,6 +1,7 @@
 <?php
 namespace TYPO3\CMS\Cal\Backend\TCA;
 
+use TYPO3\CMS\Backend\Tree\View\AbstractTreeView;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -26,7 +27,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * extend class \TYPO3\CMS\Backend\Tree\View\AbstractTreeView to change function wrapTitle().
  */
-class TceFuncSelectTreeView extends \TYPO3\CMS\Backend\Tree\View\AbstractTreeView
+class TceFuncSelectTreeView extends AbstractTreeView
 {
     public $TCEforms_itemFormElName = '';
     public $TCEforms_nonSelectableItemsArray = [];

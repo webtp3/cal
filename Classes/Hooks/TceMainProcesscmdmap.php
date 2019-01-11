@@ -16,8 +16,13 @@ namespace TYPO3\CMS\Cal\Hooks;
 use Doctrine\DBAL\FetchMode;
 use OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\Api;
+use TYPO3\CMS\Cal\Service\ICalendarService;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Scheduler\Scheduler;
 
 /**
  * This hook extends the tcemain class.
@@ -45,10 +50,10 @@ class TceMainProcesscmdmap
 
                             $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
                             if ($page ['doktype'] != 254) {
-                                $tx_cal_api = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Controller\Api::class);
+                                $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                                 $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
-                                $notificationService = \TYPO3\CMS\Cal\Utility\Functions::getNotificationService();
+                                $notificationService = Functions::getNotificationService();
                                 if ($command == 'delete') {
                                     /* If the deleted event is temporary, reset the MD5 of the parent calendar */
                                     if ($row ['isTemp']) {
@@ -60,8 +65,8 @@ class TceMainProcesscmdmap
                                         $update->update('tx_cal_calendar', $insertFields, ['uid' => $calendar_id]);
                                     }
 
-                                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                                    $rgc = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Utility\RecurrenceGenerator::class);
+                                    /** @var RecurrenceGenerator $rgc */
+                                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
                                     $rgc->cleanIndexTableOfUid($id, $table);
 
                                     /* Delete all deviations of the event */
@@ -85,7 +90,7 @@ class TceMainProcesscmdmap
                     $calendarRow = BackendUtility::getRecord('tx_cal_calendar', $id, '*', '', false);
                     /* If the calendar is an External URL or ICS file, then we need to clean up */
                     if (($calendarRow ['type'] == 1) or ($calendarRow ['type'] == 2)) {
-                        $service = new \TYPO3\CMS\Cal\Service\ICalendarService();
+                        $service = new ICalendarService();
                         $service->deleteTemporaryEvents($id);
                         $service->deleteTemporaryCategories($id);
                         $service->deleteScheduledUpdates($id);
@@ -99,8 +104,8 @@ class TceMainProcesscmdmap
                     // check if source of copy has a scheduler task attached
                     $calendarRow = BackendUtility::getRecord('tx_cal_calendar', $id);
                     if ($calendarRow ['schedulerId'] > 0) {
-                        $scheduler = new \TYPO3\CMS\Scheduler\Scheduler();
-                        $service = new \TYPO3\CMS\Cal\Service\ICalendarService();
+                        $scheduler = new Scheduler();
+                        $service = new ICalendarService();
                         foreach ($newCalendarIds as $newCalendarId) {
                             $service->createSchedulerTask($scheduler, 0, $newCalendarId);
                         }
@@ -123,11 +128,11 @@ class TceMainProcesscmdmap
 
                                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
                                 if ($page ['doktype'] != 254) {
-                                    $tx_cal_api = new \TYPO3\CMS\Cal\Controller\Api();
+                                    $tx_cal_api = new Api();
                                     $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
-                                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                                    $rgc = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Utility\RecurrenceGenerator::class);
+                                    /** @var RecurrenceGenerator $rgc */
+                                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
                                     $rgc->cleanIndexTableOfUid($id, $table);
                                 }
                             }
@@ -177,10 +182,10 @@ class TceMainProcesscmdmap
 
                                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
                                 if ($page ['doktype'] != 254) {
-                                    $tx_cal_api = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Controller\Api::class);
+                                    $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                                     $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
-                                    $notificationService = & \TYPO3\CMS\Cal\Utility\Functions::getNotificationService();
+                                    $notificationService = & Functions::getNotificationService();
                                     // Need to enforce deletion mode
                                     $notificationService->notify($row, 1);
                                 }
@@ -191,7 +196,7 @@ class TceMainProcesscmdmap
                     // its related tx_cal_fe_user_event_monitor_mm records are gone
 
                     /* Clean up any pending reminders for this event */
-                    $reminderService = &\TYPO3\CMS\Cal\Utility\Functions::getReminderService();
+                    $reminderService = &Functions::getReminderService();
                     try {
                         $reminderService->deleteReminderForEvent($id);
                     } catch (OutOfBoundsException $e) {
@@ -205,7 +210,7 @@ class TceMainProcesscmdmap
                     // its related tx_cal_fe_user_event_monitor_mm records are gone
 
                     /* Clean up any pending reminders for this event */
-                    $reminderService = &\TYPO3\CMS\Cal\Utility\Functions::getReminderService();
+                    $reminderService = &Functions::getReminderService();
                     try {
                         $reminderService->deleteReminder($relationRecord ['uid_local']);
                     } catch (OutOfBoundsException $e) {
@@ -224,11 +229,11 @@ class TceMainProcesscmdmap
 
             $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
             if ($page ['doktype'] != 254) {
-                $tx_cal_api = new \TYPO3\CMS\Cal\Controller\Api();
+                $tx_cal_api = new Api();
                 $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
-                /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                $rgc = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Utility\RecurrenceGenerator::class);
+                /** @var RecurrenceGenerator $rgc */
+                $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
                 $rgc->generateIndexForUid($eventUid, 'tx_cal_event');
             }
         }

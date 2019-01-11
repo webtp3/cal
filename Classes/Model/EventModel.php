@@ -14,6 +14,8 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use RuntimeException;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Service\SysCategoryService;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -996,9 +998,7 @@ class EventModel extends Model
         $sims_temp['L_CAPTCHA_START_SUCCESS'] = '';
         $sims_temp['L_CAPTCHA_STOP_SUCCESS'] = '';
 
-        // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-        // cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','cobj');
         if (($this->conf['allowSubscribe'] == 1 || ($this->conf['subscribeFeUser'] == 1 && $rightsObj->isLoggedIn())) && $uid) {
             if ($monitoring != null && $monitoring != '') {
                 $user_uid = $rightsObj->getUserId();
@@ -1017,13 +1017,13 @@ class EventModel extends Model
                                 ];
                                 $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values);
                                 if (false === $result) {
-                                    throw new \RuntimeException(
+                                    throw new RuntimeException(
                                         'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                                         1431458137
                                     );
                                 }
 
-                                $pageTSConf = \TYPO3\CMS\Backend\Utility\BackendUtility::getPagesTSconfig($this->conf['rights.']['create.']['event.']['saveEventToPid']);
+                                $pageTSConf = BackendUtility::getPagesTSconfig($this->conf['rights.']['create.']['event.']['saveEventToPid']);
                                 $offset = is_numeric($pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time']) ? $pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time'] * 60 : 0;
                                 $date = new CalDate($insertFields['start_date'] . '000000');
                                 $date->setTZbyID('UTC');
@@ -1382,7 +1382,6 @@ class EventModel extends Model
      */
     public function getStartAndEndMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         $this->initLocalCObject();
 
         $eventStart = $this->getStart();
@@ -1825,7 +1824,6 @@ class EventModel extends Model
         $sims['###EDIT_LINK###'] = '';
 
         if ($this->isUserAllowedToEdit()) {
-            // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
             $linkConf = $this->getValuesAsArray();
             if ($this->conf['view.']['enableAjax']) {
                 $temp = sprintf(
@@ -1849,7 +1847,6 @@ class EventModel extends Model
             );
         }
         if ($this->isUserAllowedToDelete()) {
-            // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
             $linkConf = $this->getValuesAsArray();
             if ($this->conf['view.']['enableAjax']) {
                 $temp = sprintf(
@@ -2157,7 +2154,6 @@ class EventModel extends Model
             if ($rightsObj->isLoggedIn() && !empty($globalAttendeeArray)) {
                 $formattedArray = [];
                 $partOf = false;
-                // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
                 foreach ($globalAttendeeArray as $serviceKey => $attendeeArray) {
                     foreach ($attendeeArray as $attendee) {
                         if ($attendee->getFeUserId()) {
@@ -2279,7 +2275,6 @@ class EventModel extends Model
     public function getLinkToEvent($linktext, $view, $date, $urlOnly = false)
     {
         /* new */
-        // controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic','controller');
         if ($linktext == '') {
             $linktext = $this->controller->pi_getLL('l_no_title');
         }

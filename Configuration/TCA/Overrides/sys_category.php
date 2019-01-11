@@ -1,4 +1,8 @@
 <?php
+
+use TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
@@ -13,7 +17,7 @@ $newCalSysCategoryColumns = [
         'exclude' => 1,
         'l10n_mode' => 'mergeIfNotBlank',
         'label' => $ll . 'sys_category.image',
-        'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
+        'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
             'images',
             [
                 'appearance' => [
@@ -90,7 +94,7 @@ $newCalSysCategoryColumns = [
         'config' => [
             'renderType' => 'selectSingle',
             'type' => 'select',
-            'itemsProcFunc' => \TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc::class . '->getRecords',
+            'itemsProcFunc' => ItemsProcFunc::class . '->getRecords',
             'itemsProcFunc_config' => [
                 'table' => 'tx_cal_calendar',
                 'orderBy' => 'tx_cal_calendar.title'
@@ -127,45 +131,45 @@ $newCalSysCategoryColumns = [
     ],
 ];
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('sys_category', $newCalSysCategoryColumns);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+ExtensionManagementUtility::addTCAcolumns('sys_category', $newCalSysCategoryColumns);
+ExtensionManagementUtility::addToAllTCAtypes(
     'sys_category',
     '--div--;LLL:EXT:frontend/Resources/Private/Language/locallang_tca.xlf:pages.tabs.options, images',
     '',
     'before:description'
 );
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+ExtensionManagementUtility::addToAllTCAtypes(
     'sys_category',
     'single_pid',
     '',
     'after:description'
 );
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('sys_category', 'shortcut', '', 'after:shortcut');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+ExtensionManagementUtility::addToAllTCAtypes('sys_category', 'shortcut', '', 'after:shortcut');
+ExtensionManagementUtility::addToAllTCAtypes(
     'sys_category',
     'headerstyle',
     '',
     'after:single_pid'
 );
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+ExtensionManagementUtility::addToAllTCAtypes(
     'sys_category',
     'bodystyle',
     '',
     'after:headerstyle'
 );
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+ExtensionManagementUtility::addToAllTCAtypes(
     'sys_category',
     'calendar_id',
     '',
     'after:bodystyle'
 );
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+ExtensionManagementUtility::addToAllTCAtypes(
     'sys_category',
     'shared_user_allowed',
     '',
     'after:calendar_id'
 );
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+ExtensionManagementUtility::addToAllTCAtypes(
     'sys_category',
     'notification_emails',
     '',

@@ -3,6 +3,9 @@
 namespace TYPO3\CMS\Cal\Utility;
 
 use Doctrine\DBAL\FetchMode;
+use Memcache;
+use RuntimeException;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -58,7 +61,7 @@ class Cache
 
     public function initMemcached()
     {
-        $this->tx_cal_cache = new \Memcache();
+        $this->tx_cal_cache = new Memcache();
         $this->tx_cal_cache->connect('localhost', 11211);
     }
 
@@ -67,7 +70,7 @@ class Cache
         try {
             $GLOBALS ['typo3CacheFactory']->create(
                 'tx_cal_cache',
-                \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class,
+                VariableFrontend::class,
                 $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['backend'],
                 $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['options']
             );
@@ -101,7 +104,7 @@ class Cache
             $connection->delete($table, ['identifier' => $hash]);
             $result = $connection->insert($table, $fields_values);
             if ($result !== 1) {
-                throw new \RuntimeException('Could not write cache record to database: ' . $connection->errorCode(), 1431458130);
+                throw new RuntimeException('Could not write cache record to database: ' . $connection->errorCode(), 1431458130);
             }
         }
     }

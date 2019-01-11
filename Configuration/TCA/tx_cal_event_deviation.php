@@ -1,4 +1,9 @@
 <?php
+
+use TYPO3\CMS\Cal\Backend\TCA\Labels;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 defined('TYPO3_MODE') or die();
 
 $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
@@ -38,7 +43,7 @@ $tx_cal_event_deviation = [
         'versioningWS' => true,
         'hideTable' => $configuration['hideDeviationRecords'],
         'searchFields' => 'title,organizer,organizer_link,location,location_link,teaser,description,image,imagecaption,imagealttext,imagetitletext,attachment,attachmentcaption',
-        'label_userFunc' => \TYPO3\CMS\Cal\Backend\TCA\Labels::class . '->getDeviationRecordLabel'
+        'label_userFunc' => Labels::class . '->getDeviationRecordLabel'
     ],
     'interface' => [
         'showRecordFieldList' => 'hidden,title,start_date,start_time,allday,end_date,end_time,organizer,location,description,image,attachment'
@@ -355,7 +360,7 @@ $tx_cal_event_deviation = [
         'image' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.images',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('image', [
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig('image', [
                 'maxitems' => 5,
                 'default' => 0,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
@@ -365,7 +370,7 @@ $tx_cal_event_deviation = [
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_IMAGE => [
+                    File::FILETYPE_IMAGE => [
                         'showitem' => '
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
@@ -376,7 +381,7 @@ $tx_cal_event_deviation = [
         'attachment' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:media',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('attachment', [
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig('attachment', [
                 'maxitems' => 5,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
                 'foreign_types' => [
@@ -385,27 +390,27 @@ $tx_cal_event_deviation = [
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_TEXT => [
+                    File::FILETYPE_TEXT => [
                         'showitem' => '
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_IMAGE => [
+                    File::FILETYPE_IMAGE => [
                         'showitem' => '
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_AUDIO => [
+                    File::FILETYPE_AUDIO => [
                         'showitem' => '
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_VIDEO => [
+                    File::FILETYPE_VIDEO => [
                         'showitem' => '
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_APPLICATION => [
+                    File::FILETYPE_APPLICATION => [
                         'showitem' => '
 												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
@@ -468,7 +473,7 @@ $tx_cal_event_deviation = [
     ]
 ];
 
-$tx_cal_event_deviation['columns']['attachment']['config'] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
+$tx_cal_event_deviation['columns']['attachment']['config'] = ExtensionManagementUtility::getFileFieldTCAConfig(
     'attachment',
     [
         'appearance' => [

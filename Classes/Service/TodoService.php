@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use RuntimeException;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Model;
@@ -239,7 +240,7 @@ class TodoService extends EventService
         $table = 'tx_cal_event';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458159
             );
@@ -470,7 +471,7 @@ class TodoService extends EventService
         $where = 'uid = ' . $uid;
         $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $eventData);
         if (false === $result) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Could not write todo record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1453825432
             );
@@ -633,7 +634,7 @@ class TodoService extends EventService
             $where = 'uid = ' . $uid;
             $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
             if (false === $result) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     'Could not write todo record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                     1453825617
                 );
