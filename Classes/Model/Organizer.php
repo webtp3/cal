@@ -51,7 +51,7 @@ class Organizer extends LocationModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderOrganizer()
     {
@@ -176,7 +176,7 @@ class Organizer extends LocationModel
     /**
      * @param $viewType
      * @param string $subpartSuffix
-     * @return string|processed
+     * @return string
      */
     public function renderOrganizerFor($viewType, $subpartSuffix = '')
     {

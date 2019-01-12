@@ -27,8 +27,8 @@ class Calendar
      * Takes iCalendar 2 day format and makes it into 3 characters
      * if $txt is true, it returns the 3 letters, otherwise it returns the
      * integer of that day; 0=Sun, 1=Mon, etc.
-     * @param unknown $day
-     * @param string $txt
+     * @param string $day
+     * @param bool $txt
      * @return string
      */
     public static function two2threeCharDays($day, $txt = true)
@@ -52,8 +52,8 @@ class Calendar
     }
 
     /**
-     * @param unknown $date
-     * @return The year
+     * @param $date
+     * @return mixed
      */
     public static function getYear($date)
     {
@@ -63,8 +63,8 @@ class Calendar
     }
 
     /**
-     * @param unknown $date
-     * @return The month
+     * @param $date
+     * @return mixed
      */
     public static function getMonth($date)
     {
@@ -74,8 +74,8 @@ class Calendar
     }
 
     /**
-     * @param unknown $date
-     * @return The day
+     * @param $date
+     * @return mixed
      */
     public static function getDay($date)
     {
@@ -198,7 +198,7 @@ class Calendar
     }
 
     /**
-     * @param unknown $time
+     * @param $time
      * @return string
      */
     public static function getHourFromTime($time)
@@ -212,7 +212,7 @@ class Calendar
     }
 
     /**
-     * @param unknown $time
+     * @param $time
      * @return string
      */
     public static function getMinutesFromTime($time)

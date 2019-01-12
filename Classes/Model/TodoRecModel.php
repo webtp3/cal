@@ -34,7 +34,7 @@ class TodoRecModel extends EventRecModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEvent()
     {
@@ -43,7 +43,7 @@ class TodoRecModel extends EventRecModel
 
     /**
      * @param $viewType
-     * @return string|processed
+     * @return string
      */
     public function renderEventFor($viewType)
     {
@@ -58,7 +58,7 @@ class TodoRecModel extends EventRecModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventPreview()
     {
@@ -67,7 +67,7 @@ class TodoRecModel extends EventRecModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderTomorrowsEvent()
     {
@@ -77,7 +77,7 @@ class TodoRecModel extends EventRecModel
 
     /**
      * @param $subpartMarker
-     * @return string|processed
+     * @return string
      */
     public function fillTemplate($subpartMarker)
     {

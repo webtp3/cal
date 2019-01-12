@@ -42,9 +42,9 @@ class TceFuncSelectTreeView extends AbstractTreeView
     /**
      * wraps the record titles in the tree with links or not depending on if they are in the TCEforms_nonSelectableItemsArray.
      *
-     * @param $title    string title
-     * @param $v        array  array with uid and title of the current item.
-     * @param $bank     unused
+     * @param $title string title
+     * @param $v array  array with uid and title of the current item.
+     * @param $bank int
      * @return string wrapped title
      */
     public function wrapTitle($title, $v, $bank = 0)

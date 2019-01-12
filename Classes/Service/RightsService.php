@@ -1487,8 +1487,6 @@ class RightsService extends BaseService
      * If the Typoscript
      * is not set and there's only one page in the pidList, then we can set this
      * page be default.
-     *
-     * @return none
      */
     public function setDefaultSaveToPage()
     {

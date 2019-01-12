@@ -3615,7 +3615,7 @@ class Controller extends AbstractPlugin
 
     /**
      * @param string $takeFirstInsteadOfLast
-     * @return Ambigous <multitype:NULL string Ambigous <NULL, string> , \TYPO3\CMS\Cal\Controller\multitype:>
+     * @return mixed
      */
     public function shortenLastViewAndGetTargetViewParameters($takeFirstInsteadOfLast = false)
     {

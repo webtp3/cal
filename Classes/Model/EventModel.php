@@ -797,7 +797,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForOrganizer()
     {
@@ -805,7 +805,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForLocation()
     {
@@ -813,7 +813,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForDay()
     {
@@ -821,7 +821,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForWeek()
     {
@@ -829,7 +829,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForAllDay()
     {
@@ -837,7 +837,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForMonth()
     {
@@ -848,7 +848,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForMiniMonth()
     {
@@ -859,7 +859,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForMediumMonth()
     {
@@ -870,7 +870,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForYear()
     {
@@ -878,7 +878,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEvent()
     {
@@ -887,7 +887,7 @@ class EventModel extends Model
 
     /**
      * @param string $subpartSuffix
-     * @return string|processed
+     * @return string
      */
     public function renderEventForList($subpartSuffix = 'LIST_ODD')
     {
@@ -897,7 +897,7 @@ class EventModel extends Model
     /**
      * @param $viewType
      * @param string $subpartSuffix
-     * @return string|processed
+     * @return string
      */
     public function renderEventFor($viewType, $subpartSuffix = '')
     {
@@ -927,7 +927,7 @@ class EventModel extends Model
 
     /**
      * @param $subpartMarker
-     * @return string|processed
+     * @return string
      */
     public function fillTemplate($subpartMarker)
     {
@@ -959,7 +959,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventPreview()
     {
@@ -968,7 +968,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderTomorrowsEvent()
     {

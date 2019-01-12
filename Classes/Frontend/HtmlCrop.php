@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Frontend;
 
+use DOMDocument;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *

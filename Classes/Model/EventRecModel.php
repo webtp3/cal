@@ -162,7 +162,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForOrganizer()
     {
@@ -170,7 +170,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForLocation()
     {
@@ -178,7 +178,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForDay()
     {
@@ -186,7 +186,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForWeek()
     {
@@ -194,7 +194,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForAllDay()
     {
@@ -202,7 +202,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForMonth()
     {
@@ -213,7 +213,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForMiniMonth()
     {
@@ -224,7 +224,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventForYear()
     {
@@ -232,7 +232,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEvent()
     {
@@ -241,7 +241,7 @@ class EventRecModel extends Model
 
     /**
      * @param string $subpartSuffix
-     * @return string|processed
+     * @return string
      */
     public function renderEventForList($subpartSuffix = 'LIST_ODD')
     {
@@ -251,7 +251,7 @@ class EventRecModel extends Model
     /**
      * @param $viewType
      * @param string $subpartSuffix
-     * @return string|processed
+     * @return string
      */
     public function renderEventFor($viewType, $subpartSuffix = '')
     {
@@ -279,7 +279,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventPreview()
     {
@@ -288,7 +288,7 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderTomorrowsEvent()
     {
@@ -298,7 +298,7 @@ class EventRecModel extends Model
 
     /**
      * @param $subpartMarker
-     * @return string|processed
+     * @return string
      */
     public function fillTemplate($subpartMarker)
     {

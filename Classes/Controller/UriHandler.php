@@ -476,7 +476,7 @@ class UriHandler
      *
      * @param string $url :
      *            URL to load
-     * @return the content
+     * @return string
      */
     public function getStrippedURL($url)
     {

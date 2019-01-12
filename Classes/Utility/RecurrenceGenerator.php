@@ -19,11 +19,11 @@ use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Controller\DateParser;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Service\EventService;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 
 class RecurrenceGenerator
 {

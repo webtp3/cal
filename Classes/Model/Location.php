@@ -43,7 +43,7 @@ class Location extends LocationModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderLocation()
     {
@@ -51,7 +51,7 @@ class Location extends LocationModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderOrganizer()
     {
@@ -178,7 +178,7 @@ class Location extends LocationModel
     /**
      * @param $viewType
      * @param string $subpartSuffix
-     * @return string|processed
+     * @return string
      */
     public function renderLocationFor($viewType, $subpartSuffix = '')
     {
@@ -188,7 +188,7 @@ class Location extends LocationModel
     /**
      * @param $viewType
      * @param string $subpartSuffix
-     * @return string|processed
+     * @return string
      */
     public function renderOrganizerFor($viewType, $subpartSuffix = '')
     {

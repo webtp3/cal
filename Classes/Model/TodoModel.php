@@ -47,7 +47,7 @@ class TodoModel extends EventModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEvent()
     {
@@ -55,7 +55,7 @@ class TodoModel extends EventModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderTodo()
     {
@@ -64,7 +64,7 @@ class TodoModel extends EventModel
 
     /**
      * @param $viewType
-     * @return string|processed
+     * @return string
      */
     public function renderTodoFor($viewType)
     {
@@ -73,7 +73,7 @@ class TodoModel extends EventModel
 
     /**
      * @param $viewType
-     * @return string|processed
+     * @return string
      */
     public function renderEventFor($viewType)
     {
@@ -88,7 +88,7 @@ class TodoModel extends EventModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderEventPreview()
     {
@@ -97,7 +97,7 @@ class TodoModel extends EventModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderTodoPreview()
     {
@@ -105,7 +105,7 @@ class TodoModel extends EventModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderTomorrowsEvent()
     {
@@ -114,7 +114,7 @@ class TodoModel extends EventModel
     }
 
     /**
-     * @return string|processed
+     * @return string
      */
     public function renderTomorrowsTodo()
     {
@@ -123,7 +123,7 @@ class TodoModel extends EventModel
 
     /**
      * @param $subpartMarker
-     * @return string|processed
+     * @return string
      */
     public function fillTemplate($subpartMarker)
     {

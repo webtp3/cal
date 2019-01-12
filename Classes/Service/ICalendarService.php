@@ -271,9 +271,9 @@ class ICalendarService extends BaseService
     }
 
     /**
-     * @param unknown $scheduler
-     * @param unknown $offset
-     * @param unknown $calendarUid
+     * @param $scheduler
+     * @param $offset
+     * @param $calendarUid
      * @throws RuntimeException
      */
     public function createSchedulerTask(&$scheduler, $offset, $calendarUid)
@@ -1135,7 +1135,7 @@ class ICalendarService extends BaseService
     }
 
     /**
-     * @param unknown $rule
+     * @param $rule
      * @param array $insertFields
      */
     private function insertRuleValues($rule, &$insertFields)
@@ -1204,10 +1204,10 @@ class ICalendarService extends BaseService
     }
 
     /**
-     * @param unknown $pid
-     * @param unknown $cruserId
-     * @param unknown $eventUid
-     * @param unknown $exceptionDescription
+     * @param $pid
+     * @param $cruserId
+     * @param $eventUid
+     * @param $exceptionDescription
      * @throws RuntimeException
      */
     private function createException($pid, $cruserId, $eventUid, $exceptionDescription)
@@ -1243,10 +1243,10 @@ class ICalendarService extends BaseService
     }
 
     /**
-     * @param unknown $pid
-     * @param unknown $cruserId
-     * @param unknown $eventUid
-     * @param unknown $exceptionRuleDescription
+     * @param $pid
+     * @param $cruserId
+     * @param $eventUid
+     * @param $exceptionRuleDescription
      * @throws RuntimeException
      */
     private function createExceptionRule($pid, $cruserId, $eventUid, $exceptionRuleDescription)

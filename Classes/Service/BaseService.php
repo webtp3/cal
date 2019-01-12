@@ -16,9 +16,9 @@ namespace TYPO3\CMS\Cal\Service;
  */
 use RuntimeException;
 use TYPO3\CMS\Cal\Controller\Controller;
-use TYPO3\CMS\Cal\Controller\Registry;
-use TYPO3\CMS\Cal\Model\ModelController;
+use TYPO3\CMS\Cal\Controller\ModelController;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
@@ -90,13 +90,6 @@ abstract class BaseService extends AbstractService
     public $locationAddressService;
 
     /**
-     * The locationPartner service object
-     *
-     * @var LocationPartnerService
-     */
-    public $locationPartnerService;
-
-    /**
      * The organizer service object
      *
      * @var OrganizerService
@@ -110,22 +103,16 @@ abstract class BaseService extends AbstractService
      */
     public $organizerAddressService;
 
-    /**
-     * The organizerPartner service object
-     *
-     * @var OrganizerPartnerService
-     */
-    public $organizerPartnerService;
     public $fileFunc;
     public $extConf;
 
     public function __construct()
     {
-        $this->controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
-        $this->conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        $this->rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        $this->cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
-        $this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+        $this->controller = &Registry::Registry('basic', 'controller');
+        $this->conf = &Registry::Registry('basic', 'conf');
+        $this->rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $this->cObj = &Registry::Registry('basic', 'cobj');
+        $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->extConf['categoryService'] = 'sys_category';
     }

@@ -246,8 +246,7 @@ class CalDate extends Date
      * the week is counted as the last of the previous year.
      * <code>%W</code>
      *
-     * @param string $format
-     *            the format string for returned date/time
+     * @param string $format the format string for returned date/time
      *
      * @return string date/time in given format
      */
@@ -496,7 +495,7 @@ class CalDate extends Date
     /**
      * @param bool $abbr
      * @param bool $length
-     * @return string|processed
+     * @return string
      */
     public function getDayName($abbr = false, $length = false)
     {
@@ -515,7 +514,7 @@ class CalDate extends Date
     /**
      * @param bool $abbr
      * @param bool $length
-     * @return string|processed
+     * @return string
      */
     public function getMonthName($abbr = false, $length = false)
     {
@@ -558,9 +557,8 @@ class CalDate extends Date
     /**
      * Applys the default date_stdWrap to the given string.
      *
-     * @param string $value
-     *            string that should be processed
-     * @return processed string
+     * @param string $value string that should be processed
+     * @return string
      */
     public function applyStdWrap($value = '')
     {
@@ -591,18 +589,16 @@ class CalDate extends Date
      * uses a bytesafe cropping function if possible in order to not destroy multibyte chars from strings (e.g.
      * names in UTF-8)
      *
-     * @param string $value
-     *            The value to crop
-     * @param bool $length
-     *            The length
-     * @return the cropped string
+     * @param string $value The value to crop
+     * @param bool $length The length
+     * @return string
      */
     public function crop($value = '', $length = false)
     {
         if ($length === false) {
             return $value;
         }
-        if (TYPO3_MODE == 'FE') {
+        if (TYPO3_MODE === 'FE') {
             return mb_substr($value, 0, $length);
         }
         return mb_substr($value, 0, $length);
