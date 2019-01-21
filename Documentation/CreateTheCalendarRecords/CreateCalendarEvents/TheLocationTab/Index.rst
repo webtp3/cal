@@ -7,8 +7,7 @@ The Location Tab
 
 .. include:: ../../../Includes.txt
 
-The Location Tab works either independently or in conjunction with the :ref:`LocationsRecord`. By creating
-Location records, you are presented with the option of using the WEC Map extension that will generate a Google Map complete with directions for the location.
+The Location Tab works either independently or in conjunction with the :ref:`LocationsRecord`.
 
 |img-30|
 **Illustration 23: The Calendar Event: Location Tab**

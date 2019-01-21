@@ -22,10 +22,10 @@ Cal: Calendar Base
       2005-2015
 
 :Author:
-      Mario Matzulla, Jeff Segars, Franz Koch, Thomas Kowtsch
+      Jan Helke, Mario Matzulla
 
 :Email:
-      mario@matzullas.de, jeff@webempoweredchurch.org, franz.koch@elements-net.de, typo3@thomas-kowtsch.de
+      cal@typo3.helke.de, mario@matzullas.de
 
 :License:
       This document is published under the Open Content License available from http://www.opencontent.org/opl.shtml
@@ -43,9 +43,6 @@ The content of this document is related to TYPO3, a GNU/GPL CMS/Framework availa
    Introduction/Index
    Overview/Index
    Installation/Index
-   UpdatingToVersion14/Index
-   UpdatingToVersion15/Index
-   UpdatingToVersion170/Index
    ConfigureThePlugin/Index
    CreateTheCalendarRecords/Index
    UsingTheSuggestedExtensions/Index

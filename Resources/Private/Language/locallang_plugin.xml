@@ -10,9 +10,7 @@
     <data type="array">
         <languageKey index="default" type="array">
             <label index="pi1_title">Calendar</label>
-            <label index="pi1_plus_wiz_description">A Calendar designed to fit the needs of a
-                community, FE and BE entries
-            </label>
+            <label index="pi1_plus_wiz_description">A Calendar designed to fit the needs of a community, FE and BE entries</label>
             <label index="extmng.useInternalCaching">Internal caching: If enabled cal caches some
                 processing intensive information (archive period count,
                 category count, categories) in an internal cache.

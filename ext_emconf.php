@@ -7,11 +7,11 @@ $EM_CONF['cal'] = [
     'version' => '2.0.0-dev',
     'state' => 'stable',
     'createDirs' => 'uploads/tx_cal/pics,uploads/tx_cal/ics,uploads/tx_cal/media',
-    'author' => 'Mario Matzulla, Jeff Segars, Franz Koch, Thomas Kowtsch',
-    'author_email' => 'mario@matzullas.de, jeff@webempoweredchurch.org, franz.koch@elements-net.de, typo3@thomas-kowtsch.de',
+    'author' => 'Jan Helke, Mario Matzulla',
+    'author_email' => 'cal@typo3.helke.de, mario@matzullas.de',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.9.99 - 10.9.99'
+            'typo3' => '8.7.99 - 9.5.99'
         ],
         'suggests' => []
     ]

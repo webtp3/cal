@@ -13,8 +13,5 @@ Using the Suggested Extensions
 
    TheCaptchaLibrary/Index
    TheAddressListExtension/Index
-   ThePartnerManagementExtension/Index
    Notification/Index
-   SchedulerExtension/Index
-   WecMaps/Index
 
