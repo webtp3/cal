@@ -17,6 +17,7 @@ use TYPO3\CMS\Cal\Hooks\DateEval;
 use TYPO3\CMS\Cal\Hooks\RealUrl;
 use TYPO3\CMS\Cal\Hooks\TceMainProcesscmdmap;
 use TYPO3\CMS\Cal\Hooks\TceMainProcessdatamap;
+use TYPO3\CMS\Cal\Hooks\WecMap;
 use TYPO3\CMS\Cal\Service\AttendeeService;
 use TYPO3\CMS\Cal\Service\CalendarService;
 use TYPO3\CMS\Cal\Service\EventService;
@@ -114,12 +115,10 @@ $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['cal_ajax'] = 'EXT:cal/Classes/
  * each have the key 'default'. Custom views tied to a specific model should
  * have service keys identical to the key of that model.
  */
-
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_event_model' /* sv type */,
-    'tx_cal_fnb' /* sv key */,
+    'cal_event_model',
+    'tx_cal_fnb',
     [
         'title' => 'Cal Free and Busy Model',
         'description' => '',
@@ -135,8 +134,8 @@ ExtensionManagementUtility::addService(
 
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_event_model' /* sv type */,
-    'tx_cal_phpicalendar' /* sv key */,
+    'cal_event_model',
+    'tx_cal_phpicalendar',
     [
         'title' => 'Cal PHPiCalendar Model',
         'description' => '',
@@ -156,8 +155,8 @@ $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 /* Cal Todo Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_event_model' /* sv type */,
-    'tx_cal_todo' /* sv key */,
+    'cal_event_model',
+    'tx_cal_todo',
     [
         'title' => 'Cal Todo Model',
         'description' => '',
@@ -174,8 +173,8 @@ ExtensionManagementUtility::addService(
 /* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_organizer_model' /* sv type */,
-    'tx_partner_main' /* sv key */,
+    'cal_organizer_model',
+    'tx_partner_main',
     [
         'title' => 'Cal Organizer Model',
         'description' => '',
@@ -189,11 +188,10 @@ ExtensionManagementUtility::addService(
     ]
 );
 
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_organizer_model' /* sv type */,
-    'tx_cal_organizer' /* sv key */,
+    'cal_organizer_model',
+    'tx_cal_organizer',
     [
         'title' => 'Cal Organizer Model',
         'description' => '',
@@ -207,11 +205,10 @@ ExtensionManagementUtility::addService(
     ]
 );
 
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_organizer_model' /* sv type */,
-    'tx_tt_address' /* sv key */,
+    'cal_organizer_model',
+    'tx_tt_address',
     [
         'title' => 'Cal Organizer Model',
         'description' => '',
@@ -225,11 +222,10 @@ ExtensionManagementUtility::addService(
     ]
 );
 
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_organizer_model' /* sv type */,
-    'tx_feuser' /* sv key */,
+    'cal_organizer_model',
+    'tx_feuser',
     [
         'title' => 'Frontend User Organizer Model',
         'description' => '',
@@ -243,11 +239,10 @@ ExtensionManagementUtility::addService(
     ]
 );
 
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_location_model' /* sv type */,
-    'tx_partner_main' /* sv key */,
+    'cal_location_model',
+    'tx_partner_main',
     [
         'title' => 'Cal Location Model',
         'description' => '',
@@ -261,11 +256,10 @@ ExtensionManagementUtility::addService(
     ]
 );
 
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_location_model' /* sv type */,
-    'tx_tt_address' /* sv key */,
+    'cal_location_model',
+    'tx_tt_address',
     [
         'title' => 'Cal Location Model',
         'description' => '',
@@ -279,11 +273,10 @@ ExtensionManagementUtility::addService(
     ]
 );
 
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_location_model' /* sv type */,
-    'tx_cal_location' /* sv key */,
+    'cal_location_model',
+    'tx_cal_location',
     [
         'title' => 'Cal Location Model',
         'description' => '',
@@ -297,11 +290,10 @@ ExtensionManagementUtility::addService(
     ]
 );
 
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_attendee_model' /* sv type */,
-    'tx_cal_attendee' /* sv key */,
+    'cal_attendee_model',
+    'tx_cal_attendee',
     [
         'title' => 'Cal Attendee Model',
         'description' => '',
@@ -315,11 +307,10 @@ ExtensionManagementUtility::addService(
     ]
 );
 
-/* Cal Example Concrete Model */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_calendar_model' /* sv type */,
-    'tx_cal_calendar' /* sv key */,
+    'cal_calendar_model',
+    'tx_cal_calendar',
     [
         'title' => 'Cal Calendar Model',
         'description' => '',
@@ -335,8 +326,8 @@ ExtensionManagementUtility::addService(
 
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_category_model' /* sv type */,
-    'sys_category' /* sv key */,
+    'cal_category_model',
+    'sys_category',
     [
         'title' => 'System Category Model',
         'description' => '',
@@ -353,8 +344,8 @@ ExtensionManagementUtility::addService(
 /* Default day View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_event' /* sv key */,
+    'cal_view',
+    'tx_default_event',
     [
         'title' => 'Default Event View',
         'description' => '',
@@ -371,8 +362,8 @@ ExtensionManagementUtility::addService(
 /* Default day View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_day' /* sv key */,
+    'cal_view',
+    'tx_default_day',
     [
         'title' => 'Default Day View',
         'description' => '',
@@ -389,8 +380,8 @@ ExtensionManagementUtility::addService(
 /* Default week View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_week' /* sv key */,
+    'cal_view',
+    'tx_default_week',
     [
         'title' => 'Default Week View',
         'description' => '',
@@ -407,8 +398,8 @@ ExtensionManagementUtility::addService(
 /* Default month View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_month' /* sv key */,
+    'cal_view',
+    'tx_default_month',
     [
         'title' => 'Default Month View',
         'description' => '',
@@ -425,8 +416,8 @@ ExtensionManagementUtility::addService(
 /* Default year View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_year' /* sv key */,
+    'cal_view',
+    'tx_default_year',
     [
         'title' => 'Default Year View',
         'description' => '',
@@ -443,8 +434,8 @@ ExtensionManagementUtility::addService(
 /* Default list View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_list' /* sv key */,
+    'cal_view',
+    'tx_default_list',
     [
         'title' => 'Default List View',
         'description' => '',
@@ -461,8 +452,8 @@ ExtensionManagementUtility::addService(
 /* Default ics View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_ics' /* sv key */,
+    'cal_view',
+    'tx_default_ics',
     [
         'title' => 'Default Ics View',
         'description' => '',
@@ -479,8 +470,8 @@ ExtensionManagementUtility::addService(
 /* Default icslist View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_icslist' /* sv key */,
+    'cal_view',
+    'tx_default_icslist',
     [
         'title' => 'Default Ics List View',
         'description' => '',
@@ -497,8 +488,8 @@ ExtensionManagementUtility::addService(
 /* Default rss View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_rss' /* sv key */,
+    'cal_view',
+    'tx_default_rss',
     [
         'title' => 'Default Rss View',
         'description' => '',
@@ -515,8 +506,8 @@ ExtensionManagementUtility::addService(
 /* Default admin View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_admin' /* sv key */,
+    'cal_view',
+    'tx_default_admin',
     [
         'title' => 'Default Admin View',
         'description' => '',
@@ -533,8 +524,8 @@ ExtensionManagementUtility::addService(
 /* Default location View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_location' /* sv key */,
+    'cal_view',
+    'tx_default_location',
     [
         'title' => 'Default Location View',
         'description' => '',
@@ -551,8 +542,8 @@ ExtensionManagementUtility::addService(
 /* Default organizer View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_organizer' /* sv key */,
+    'cal_view',
+    'tx_default_organizer',
     [
         'title' => 'Default Organizer View',
         'description' => '',
@@ -569,8 +560,8 @@ ExtensionManagementUtility::addService(
 /* Default create event View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_create_event' /* sv key */,
+    'cal_view',
+    'tx_default_create_event',
     [
         'title' => 'Default Create Event View',
         'description' => '',
@@ -587,8 +578,8 @@ ExtensionManagementUtility::addService(
 /* Default confirm event View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_confirm_event' /* sv key */,
+    'cal_view',
+    'tx_default_confirm_event',
     [
         'title' => 'Default Confirm Event View',
         'description' => '',
@@ -605,8 +596,8 @@ ExtensionManagementUtility::addService(
 /* Default delete event View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_delete_event' /* sv key */,
+    'cal_view',
+    'tx_default_delete_event',
     [
         'title' => 'Default Delete Event View',
         'description' => '',
@@ -623,8 +614,8 @@ ExtensionManagementUtility::addService(
 /* Default remove event service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_remove_event' /* sv key */,
+    'cal_view',
+    'tx_default_remove_event',
     [
         'title' => 'Default Remove Event View',
         'description' => '',
@@ -641,8 +632,8 @@ ExtensionManagementUtility::addService(
 /* Default create location View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_create_location' /* sv key */,
+    'cal_view',
+    'tx_default_create_location',
     [
         'title' => 'Default Create Location View',
         'description' => '',
@@ -659,8 +650,8 @@ ExtensionManagementUtility::addService(
 /* Default confirm location View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_confirm_location' /* sv key */,
+    'cal_view',
+    'tx_default_confirm_location',
     [
         'title' => 'Default Confirm Location View',
         'description' => '',
@@ -677,8 +668,8 @@ ExtensionManagementUtility::addService(
 /* Default delete location View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_delete_location' /* sv key */,
+    'cal_view',
+    'tx_default_delete_location',
     [
         'title' => 'Default Delete Location View',
         'description' => '',
@@ -695,8 +686,8 @@ ExtensionManagementUtility::addService(
 /* Default remove location service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_remove_location' /* sv key */,
+    'cal_view',
+    'tx_default_remove_location',
     [
         'title' => 'Default Remove Location View',
         'description' => '',
@@ -713,8 +704,8 @@ ExtensionManagementUtility::addService(
 /* Default create organizer View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_create_organizer' /* sv key */,
+    'cal_view',
+    'tx_default_create_organizer',
     [
         'title' => 'Default Create Organizer View',
         'description' => '',
@@ -731,8 +722,8 @@ ExtensionManagementUtility::addService(
 /* Default confirm organizer View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_confirm_organizer' /* sv key */,
+    'cal_view',
+    'tx_default_confirm_organizer',
     [
         'title' => 'Default Confirm Organizer View',
         'description' => '',
@@ -749,8 +740,8 @@ ExtensionManagementUtility::addService(
 /* Default delete organizer View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_delete_organizer' /* sv key */,
+    'cal_view',
+    'tx_default_delete_organizer',
     [
         'title' => 'Default Delete Organizer View',
         'description' => '',
@@ -767,8 +758,8 @@ ExtensionManagementUtility::addService(
 /* Default remove organizer service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_remove_organizer' /* sv key */,
+    'cal_view',
+    'tx_default_remove_organizer',
     [
         'title' => 'Default Remove Organizer View',
         'description' => '',
@@ -785,8 +776,8 @@ ExtensionManagementUtility::addService(
 /* Default create calendar View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_create_calendar' /* sv key */,
+    'cal_view',
+    'tx_default_create_calendar',
     [
         'title' => 'Default Create Location View',
         'description' => '',
@@ -803,8 +794,8 @@ ExtensionManagementUtility::addService(
 /* Default confirm calendar View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_confirm_calendar' /* sv key */,
+    'cal_view',
+    'tx_default_confirm_calendar',
     [
         'title' => 'Default Confirm Location View',
         'description' => '',
@@ -821,8 +812,8 @@ ExtensionManagementUtility::addService(
 /* Default delete calendar View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_delete_calendar' /* sv key */,
+    'cal_view',
+    'tx_default_delete_calendar',
     [
         'title' => 'Default Delete Location View',
         'description' => '',
@@ -839,8 +830,8 @@ ExtensionManagementUtility::addService(
 /* Default remove calendar service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_remove_calendar' /* sv key */,
+    'cal_view',
+    'tx_default_remove_calendar',
     [
         'title' => 'Default Remove Location View',
         'description' => '',
@@ -857,8 +848,8 @@ ExtensionManagementUtility::addService(
 /* Default create category View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_create_category' /* sv key */,
+    'cal_view',
+    'tx_default_create_category',
     [
         'title' => 'Default Create Location View',
         'description' => '',
@@ -875,8 +866,8 @@ ExtensionManagementUtility::addService(
 /* Default confirm category View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_confirm_category' /* sv key */,
+    'cal_view',
+    'tx_default_confirm_category',
     [
         'title' => 'Default Confirm Location View',
         'description' => '',
@@ -893,8 +884,8 @@ ExtensionManagementUtility::addService(
 /* Default delete category View */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_delete_category' /* sv key */,
+    'cal_view',
+    'tx_default_delete_category',
     [
         'title' => 'Default Delete Location View',
         'description' => '',
@@ -911,8 +902,8 @@ ExtensionManagementUtility::addService(
 /* Default remove category service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_remove_category' /* sv key */,
+    'cal_view',
+    'tx_default_remove_category',
     [
         'title' => 'Default Remove Location View',
         'description' => '',
@@ -929,8 +920,8 @@ ExtensionManagementUtility::addService(
 /* Default search service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_searchall' /* sv key */,
+    'cal_view',
+    'tx_default_searchall',
     [
         'title' => 'Default Search View',
         'description' => '',
@@ -947,8 +938,8 @@ ExtensionManagementUtility::addService(
 /* Default search service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_searchevent' /* sv key */,
+    'cal_view',
+    'tx_default_searchevent',
     [
         'title' => 'Default Search View',
         'description' => '',
@@ -965,8 +956,8 @@ ExtensionManagementUtility::addService(
 /* Default search service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_searchlocation' /* sv key */,
+    'cal_view',
+    'tx_default_searchlocation',
     [
         'title' => 'Default Search View',
         'description' => '',
@@ -983,8 +974,8 @@ ExtensionManagementUtility::addService(
 /* Default search service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_searchorganizer' /* sv key */,
+    'cal_view',
+    'tx_default_searchorganizer',
     [
         'title' => 'Default Search View',
         'description' => '',
@@ -1001,8 +992,8 @@ ExtensionManagementUtility::addService(
 /* Default notification service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_notification' /* sv key */,
+    'cal_view',
+    'tx_default_notification',
     [
         'title' => 'Default notification service',
         'description' => '',
@@ -1019,8 +1010,8 @@ ExtensionManagementUtility::addService(
 /* Default reminder service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_default_reminder' /* sv key */,
+    'cal_view',
+    'tx_default_reminder',
     [
         'title' => 'Default reminder service',
         'description' => '',
@@ -1037,8 +1028,8 @@ ExtensionManagementUtility::addService(
 /* Default rights service */
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_rights_model' /* sv type */,
-    'tx_cal_rights' /* sv key */,
+    'cal_rights_model',
+    'tx_cal_rights',
     [
         'title' => 'Default rights service',
         'description' => '',
@@ -1054,8 +1045,8 @@ ExtensionManagementUtility::addService(
 // Example for a module
 ExtensionManagementUtility::addService(
     'cal',
-    'TEST' /* sv type */,
-    'tx_cal_module' /* sv key */,
+    'TEST',
+    'tx_cal_module',
     [
         'title' => 'Test module',
         'description' => '',
@@ -1072,8 +1063,8 @@ ExtensionManagementUtility::addService(
 // Example for a module
 ExtensionManagementUtility::addService(
     'cal',
-    'LOCATIONLOADER' /* sv type */,
-    'tx_cal_module' /* sv key */,
+    'LOCATIONLOADER',
+    'tx_cal_module',
     [
         'title' => 'Location loader module',
         'description' => '',
@@ -1089,8 +1080,8 @@ ExtensionManagementUtility::addService(
 
 ExtensionManagementUtility::addService(
     'cal',
-    'ORGANIZERLOADER' /* sv type */,
-    'tx_cal_module' /* sv key */,
+    'ORGANIZERLOADER',
+    'tx_cal_module',
     [
         'title' => 'Organizer loader module',
         'description' => '',
@@ -1106,8 +1097,8 @@ ExtensionManagementUtility::addService(
 
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_cal_subscription' /* sv key */,
+    'cal_view',
+    'tx_cal_subscription',
     [
         'title' => 'Subscription Manager',
         'description' => '',
@@ -1123,8 +1114,8 @@ ExtensionManagementUtility::addService(
 
 ExtensionManagementUtility::addService(
     'cal',
-    'cal_view' /* sv type */,
-    'tx_cal_meeting' /* sv key */,
+    'cal_view',
+    'tx_cal_meeting',
     [
         'title' => 'Meeting Manager',
         'description' => '',
