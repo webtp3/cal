@@ -50,16 +50,12 @@ class ElementHelper
     public static function getWeekStartDay($pageID): string
     {
         $tsConfig = BackendUtility::getModTSconfig($pageID, 'options.tx_cal_controller.weekStartDay');
-        $weekStartDay = strtolower($tsConfig ['value']);
+        $weekStartDay = strtolower($tsConfig ['value'] ?? '');
 
-        switch ($weekStartDay) {
-            case 'sunday':
-                $startDay = 'su';
-                break;
-            /* If there's any value other than sunday, assume we want Monday */
-            default:
-                $startDay = 'mo';
-                break;
+        if ($weekStartDay === 'sunday') {
+            $startDay = 'su';
+        } else {
+            $startDay = 'mo';
         }
 
         return $startDay;
@@ -73,14 +69,14 @@ class ElementHelper
         self::init();
 
         return [
-            '1'  => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_first'),
-            '2'  => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_second'),
-            '3'  => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_third'),
-            '4'  => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_fourth'),
-            '5'  => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_fifth'),
-            '-3' => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_thirdtolast'),
-            '-2' => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_secondtolast'),
-            '-1' => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_last')
+            1 => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_first'),
+            2 => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_second'),
+            3 => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_third'),
+            4 => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_fourth'),
+            5 => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_fifth'),
+            -3 => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_thirdtolast'),
+            -2 => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_secondtolast'),
+            -1 => $GLOBALS['LANG']->getLL('tx_cal_event.byday_count_last')
         ];
     }
 
@@ -120,18 +116,18 @@ class ElementHelper
         self::init();
 
         return [
-            '1'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_january'),
-            '2'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_february'),
-            '3'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_march'),
-            '4'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_april'),
-            '5'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_may'),
-            '6'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_june'),
-            '7'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_july'),
-            '8'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_august'),
-            '9'  => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_september'),
-            '10' => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_october'),
-            '11' => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_november'),
-            '12' => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_december')
+            1 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_january'),
+            2 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_february'),
+            3 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_march'),
+            4 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_april'),
+            5 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_may'),
+            6 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_june'),
+            7 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_july'),
+            8 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_august'),
+            9 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_september'),
+            10 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_october'),
+            11 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_november'),
+            12 => $GLOBALS['LANG']->getLL('tx_cal_event.bymonth_december')
         ];
     }
 

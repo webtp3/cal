@@ -13,7 +13,7 @@ class ByDayElement extends AbstractFormElement
     /**
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         ElementHelper::init();
 
@@ -23,6 +23,8 @@ class ByDayElement extends AbstractFormElement
         $row = $this->data['databaseRow'];
 
         $uid = $row['uid'];
+        $html = '';
+        $callback = '';
 
         $startDay = ElementHelper::getWeekStartDay($row['pid']);
 
@@ -78,14 +80,14 @@ EOJ;
     {
         $html = '<div class="cal-row">';
 
-        $html .= '<select class="count" onchange="byDay.save()">';
+        $html .= '<select class="form-control count" style="width: 48px; display: inline;" onchange="byDay.save()">';
         $html .= '<option value="" />';
         foreach (ElementHelper::getCountsArray() as $value => $label) {
             $html .= '<option value="' . $value . '">' . $label . '</option>';
         }
-        $html .= '</select>';
+        $html .= '</select>&nbsp;&nbsp;';
 
-        $html .= '<select class="day" onchange="byDay.save()">';
+        $html .= '<select class="form-control day" style="width: 48px; display: inline;" onchange="byDay.save()">';
         $html .= '<option value="" />';
 
         foreach (ElementHelper::getWeekdaysArray($startDay) as $value => $label) {
@@ -97,14 +99,14 @@ EOJ;
         $html .= '<a id="garbage" href="#" onclick="byDay.removeRecurrence(this);">' . ElementHelper::getGarbageIcon() . '</a>';
         $html .= '</div>';
 
-        return ElementHelper::removeNewLines($html);
+        return ElementHelper::removeNewlines($html);
     }
 
     /**
      * @param $startDay
      * @return string
      */
-    public function byDay_checkbox($startDay)
+    public function byDay_checkbox($startDay): string
     {
         $out = [];
 
@@ -120,13 +122,13 @@ EOJ;
         }
         $out [] = '</div>';
 
-        return implode(chr(10), $out);
+        return implode(LF, $out);
     }
 
     /**
      * @return string
      */
-    public function byDay_select()
+    public function byDay_select(): string
     {
         $out = [];
 
@@ -134,6 +136,6 @@ EOJ;
         $out [] = '<div style="padding: 5px 0"><a href="javascript:byDay.addRecurrence();">' . ElementHelper::getNewIcon() .
             $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '</a></div>';
 
-        return implode(chr(10), $out);
+        return implode(LF, $out);
     }
 }

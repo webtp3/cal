@@ -38,7 +38,7 @@ class FormDateDataProvider implements FormDataProviderInterface
      * @param array $result
      * @return array
      */
-    public function addData(array $result)
+    public function addData(array $result): array
     {
         $processedTcaColumns = $result['processedTca']['columns'];
         foreach ($processedTcaColumns as $column => $columnConfig) {

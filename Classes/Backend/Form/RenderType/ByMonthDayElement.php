@@ -13,7 +13,7 @@ class ByMonthDayElement extends AbstractFormElement
     /**
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         ElementHelper::init();
 
@@ -23,6 +23,8 @@ class ByMonthDayElement extends AbstractFormElement
         $row = $this->data['databaseRow'];
 
         $uid = $row['uid'];
+        $dayRow = '';
+        $html = '';
 
         switch ($row['freq'][0]) {
             case 'week':
@@ -60,7 +62,7 @@ EOJ;
     /**
      * @return string
      */
-    public function byMonthDay_select()
+    public function byMonthDay_select(): string
     {
         $out = [];
 
@@ -68,7 +70,7 @@ EOJ;
         $out [] = '<div style="padding: 5px 0"><a href="javascript:byMonthDay.addRecurrence();">' . ElementHelper::getNewIcon() .
             $GLOBALS['LANG']->getLL('tx_cal_event.add_recurrence') . '</a></div>';
 
-        return implode(chr(10), $out);
+        return implode(LF, $out);
     }
 
     /**
@@ -80,7 +82,7 @@ EOJ;
         $html = '<div class="cal-row">';
 
         $html .= $GLOBALS['LANG']->getLL('tx_cal_event.recurs_day') . ' ';
-        $html .= '<select class="day" onchange="byMonthDay.save()">';
+        $html .= '<select class="form-control day" style="width: 48px; display: inline;" onchange="byMonthDay.save()">';
         $html .= '<option value=""></option>';
         for ($i = 1; $i < 32; $i++) {
             $html .= '<option value="' . $i . '">' . $i . '</option>';
@@ -91,6 +93,6 @@ EOJ;
         $html .= '<a id="garbage" href="#" onclick="byMonthDay.removeRecurrence(this);">' . ElementHelper::getGarbageIcon() . '</a>';
         $html .= '</div>';
 
-        return ElementHelper::removeNewLines($html);
+        return ElementHelper::removeNewlines($html);
     }
 }

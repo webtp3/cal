@@ -13,7 +13,7 @@ class ByMonthElement extends AbstractFormElement
     /**
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         ElementHelper::init();
 

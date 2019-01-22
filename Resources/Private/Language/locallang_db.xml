@@ -163,9 +163,9 @@
             <label index="tx_cal_calendar.title">Calendar Title</label>
             <label index="tx_cal_calendar.type">Calendar Type</label>
             <label index="tx_cal_calendar.type.I.0">Standard Calendar (database)</label>
-            <label index="tx_cal_calendar.type.I.1">External Calendar</label>
-            <label index="tx_cal_calendar.type.I.2">Include ICS File</label>
-            <label index="tx_cal_calendar.ext_url">External Calendar URL</label>
+            <label index="tx_cal_calendar.type.I.1">External iCalendar</label>
+            <label index="tx_cal_calendar.type.I.2">Include iCalendar File</label>
+            <label index="tx_cal_calendar.ext_url">External iCalendar URL</label>
             <label index="tx_cal_calendar.ext_url_url">URL</label>
             <label index="tx_cal_calendar.ext_url_note">Note</label>
             <label index="tx_cal_calendar.ics_file">ICS File</label>

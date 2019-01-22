@@ -15,7 +15,7 @@ class StylesElement extends AbstractFormElement
     /**
      * @return array
      */
-    public function render()
+    public function render(): array
     {
         ElementHelper::init();
 
@@ -50,7 +50,7 @@ class StylesElement extends AbstractFormElement
         $pageTSConf = BackendUtility::getPagesTSconfig($pid);
 
         if ($pageTSConf ['options.'] ['tx_cal_controller.'] [$part . 'Styles']) {
-            $html .= '<select class="select" name="data[' . $table . '][' . $uid . '][' . $part . 'style]">';
+            $html .= '<select class="form-control form-control-adapt" name="data[' . $table . '][' . $uid . '][' . $part . 'style]">';
             $html .= '<option value=""></option>';
 
             $options = GeneralUtility::trimExplode(',', $pageTSConf ['options.'] ['tx_cal_controller.'] [$part . 'Styles'], 1);
@@ -58,10 +58,10 @@ class StylesElement extends AbstractFormElement
             foreach ($options as $option) {
                 $nameAndColor = GeneralUtility::trimExplode('=', $option, 1);
                 $selected = '';
-                if ($value == $nameAndColor [0]) {
+                if ($value === $nameAndColor [0]) {
                     $selected = ' selected="selected"';
                 }
-                $html .= '<option value="' . $nameAndColor [0] . '" style="background-color:' . $nameAndColor [1] . ';"' . $selected . '>' . $nameAndColor [0] . '</option>';
+                $html .= '<option value="' . $nameAndColor [0] . '" style="background-color:' . $nameAndColor [1] . ';" ' . $selected . ' >' . $nameAndColor [0] . '</option>';
             }
             $html .= '</select>';
         } else {

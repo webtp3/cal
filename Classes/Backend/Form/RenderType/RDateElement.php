@@ -16,7 +16,7 @@ class RDateElement extends AbstractFormElement
      * @return array
      * @throws \TYPO3\CMS\Backend\Form\Exception
      */
-    public function render()
+    public function render(): array
     {
         ElementHelper::init();
 
@@ -34,6 +34,10 @@ class RDateElement extends AbstractFormElement
         $rdateValues[] = '';
 
         $out = [];
+        $out[] = '<div class="formengine-field-item t3js-formengine-field-item">';
+        $out[] =   '<div class="form-wizards-wrap">';
+        $out[] =       '<div class="form-wizards-element">';
+        $out[] =           '<div class="form-control-wrap">';
 
         $jsDate = $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['USdateFormat'] ? '%m-%d-%Y' : '%d-%m-%Y';
 
@@ -86,20 +90,66 @@ class RDateElement extends AbstractFormElement
                 if (is_string($splittedPeriod [1])) {
                     preg_match('/P((\d+)Y)?((\d+)M)?((\d+)W)?((\d+)D)?T((\d+)H)?((\d+)M)?((\d+)S)?/', $splittedPeriod [1], $periodArray);
                 }
-                $out [] .= '<span style="padding-left:10px;">' . $GLOBALS['LANG']->getLL('l_duration') . ':</span>' . $GLOBALS['LANG']->getLL('l_year') .
-                    ':<input type="text" value="' . intval($periodArray [2]) . '" class="rdateChanged" name="rdateYear' . $key . '" id="rdateYear' . $key . '" size="2"/>' . $GLOBALS['LANG']->getLL('l_month') .
-                    ':<input type="text" value="' . intval($periodArray [4]) . '" class="rdateChanged" name="rdateMonth' . $key . '" id="rdateMonth' . $key . '" size="2"/>' . $GLOBALS['LANG']->getLL('l_week') .
-                    ':<input type="text" value="' . intval($periodArray [6]) . '" class="rdateChanged" name="rdateWeek' . $key . '" id="rdateWeek' . $key . '" size="2"/>' . $GLOBALS['LANG']->getLL('l_day') .
-                    ':<input type="text" value="' . intval($periodArray [8]) . '" class="rdateChanged" name="rdateDay' . $key . '" id="rdateDay' . $key . '" size="2"/>' . $GLOBALS['LANG']->getLL('l_hour') .
-                    ':<input type="text" value="' . intval($periodArray [10]) . '" class="rdateChanged" name="rdateHour' . $key . '" id="rdateHour' . $key . '" size="2"/>' . $GLOBALS['LANG']->getLL('l_minute') .
-                    ':<input type="text" value="' . intval($periodArray [12]) . '" class="rdateChanged" name="rdateMinute' . $key . '" id="rdateMinute' . $key . '" size="2"/>' .
-                    '<br/>';
+
+                $out [] .= '<label class="t3js-formengine-label">' . $GLOBALS['LANG']->getLL('l_duration') . '</label>'
+                    . '<div class="row">'
+                    . '<div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col-sm-4">'
+                    . '<label class="t3js-formengine-label">' . $GLOBALS['LANG']->getLL('l_year') . '</label>'
+                    . '<div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 192px">'
+                    . '<input type="text" value="' . intval($periodArray [2]) . '" class="form-control rdateChanged" name="rdateYear' . $key . '" id="rdateYear' . $key . '"/>'
+                    . '</div>'
+                    . '</div>'
+                    . '</div>'
+                    . '<div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col-sm-4">'
+                    . '<label class="t3js-formengine-label">' . $GLOBALS['LANG']->getLL('l_month') . '</label>'
+                    . '<div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 192px">'
+                    . '<input type="text" value="' . intval($periodArray [4]) . '" class="form-control rdateChanged" name="rdateMonth' . $key . '" id="rdateMonth' . $key . '"/>'
+                    . '</div>'
+                    . '</div>'
+                    . '</div>'
+                    . '<div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col-sm-4">'
+                    . '<label class="t3js-formengine-label">' . $GLOBALS['LANG']->getLL('l_week') . '</label>'
+                    . '<div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 192px">'
+                    . '<input type="text" value="' . intval($periodArray [6]) . '" class="form-control rdateChanged" name="rdateWeek' . $key . '" id="rdateWeek' . $key . '"/>'
+                    . '</div>'
+                    . '</div>'
+                    . '</div>'
+                    . '</div>'
+                    . '<div class="row">'
+                    . '<div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col-sm-4">'
+                    . '<label class="t3js-formengine-label">' . $GLOBALS['LANG']->getLL('l_day') . '</label>'
+                    . '<div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 192px">'
+                    . '<input type="text" value="' . intval($periodArray [8]) . '" class="form-control rdateChanged" name="rdateDay' . $key . '" id="rdateDay' . $key . '"/>'
+                    . '</div>'
+                    . '</div>'
+                    . '</div>'
+                    . '<div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col-sm-4">'
+                    . '<label class="t3js-formengine-label">' . $GLOBALS['LANG']->getLL('l_hour') . '</label>'
+                    . '<div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 192px">'
+                    . '<input type="text" value="' . intval($periodArray [10]) . '" class="form-control rdateChanged" name="rdateHour' . $key . '" id="rdateHour' . $key . '"/>'
+                    . '</div>'
+                    . '</div>'
+                    . '</div>'
+                    . '<div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col-sm-4">'
+                    . '<label class="t3js-formengine-label">' . $GLOBALS['LANG']->getLL('l_minute') . '</label>'
+                    . '<div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 192px">'
+                    . '<input type="text" value="' . intval($periodArray [12]) . '" class="form-control rdateChanged" name="rdateMinute' . $key . '" id="rdateMinute' . $key . '"/>'
+                    . '</div>'
+                    . '</div>'
+                    . '</div>'
+                    . '</div>'
+                ;
             }
 
             $key++;
         }
 
         $out [] = '<input type="hidden" name="data[' . $table . '][' . $uid . '][rdate]" id="data_' . $table . '_' . $uid . '_rdate" value="' . $row ['rdate'] . '" />';
+
+        $out[] =           '</div>';
+        $out[] =       '</div>';
+        $out[] =   '</div>';
+        $out[] = '</div>';
 
         $rDateCount = count($rdateValues);
 
@@ -116,7 +166,7 @@ function(RDate) {
 }
 EOJ;
 
-        $result['html'] = implode("\n", $out);
+        $result['html'] = implode(LF, $out);
         $result['requireJsModules'][] = ['TYPO3/CMS/Cal/RDate' => $callback];
 
         return $result;

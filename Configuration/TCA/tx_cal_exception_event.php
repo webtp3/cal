@@ -125,6 +125,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'type' => 'user',
                 'renderType' => 'calByDayElement',
+                'default' => ''
             ]
         ],
 
@@ -135,6 +136,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'type' => 'user',
                 'renderType' => 'calByMonthDayElement',
+                'default' => ''
             ]
         ],
 
@@ -145,6 +147,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'type' => 'user',
                 'renderType' => 'calByMonthElement',
+                'default' => ''
             ]
         ],
 
@@ -174,7 +177,7 @@ $tx_cal_exception_event = [
                         'period'
                     ]
                 ],
-                'default' => 0
+                'default' => 'none'
             ]
         ],
 
@@ -185,6 +188,7 @@ $tx_cal_exception_event = [
             'config' => [
                 'type' => 'user',
                 'renderType' => 'calRDateElement',
+                'default' => ''
             ]
         ],
 

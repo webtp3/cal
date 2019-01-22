@@ -2587,7 +2587,7 @@ class EventModel extends Model
         }
 
         if (count($exceptionDates)) {
-            $sims['###EXDATE###'] = implode(chr(10), $exceptionDates);
+            $sims['###EXDATE###'] = implode(LF, $exceptionDates);
         }
     }
 

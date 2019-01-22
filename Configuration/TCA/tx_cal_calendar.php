@@ -185,7 +185,7 @@ $tx_cal_calendar = [
                 'type' => 'input',
                 'size' => 5,
                 'readOnly' => 1,
-                'default' => '',
+                'default' => 0,
             ]
         ],
 
@@ -235,7 +235,8 @@ $tx_cal_calendar = [
                         'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.default_value',
                         0
                     ]
-                ]
+                ],
+                'default' => 0
             ]
         ],
         'l18n_parent' => [
