@@ -149,7 +149,7 @@ CREATE TABLE tx_cal_calendar_fnb_user_group_mm (
 # Extend table structure of table 'sys_category'
 #
 CREATE TABLE sys_category (
-	images int(11) unsigned DEFAULT '0',
+	icon varchar(128) DEFAULT '' NOT NULL,
 	single_pid int(11) unsigned DEFAULT '0' NOT NULL,
 	shortcut int(11) DEFAULT '0' NOT NULL,
 

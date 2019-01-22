@@ -45,7 +45,7 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard implements UpgradeWizardIn
      */
     public function getTitle(): string
     {
-        return 'Migrate cal categories to sys_cotegories';
+        return '[ext:cal] Migrate cal categories to sys_categories';
     }
 
     /**
@@ -55,7 +55,7 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard implements UpgradeWizardIn
      */
     public function getDescription(): string
     {
-        return 'As the current version kicks out the old tree wizard (yay), we take the opportunity to finaly get our whole categorizatiom in order.';
+        return 'As the current version of TYPO3 kicks out the old tree wizard (yay), we take the opportunity to finally get our whole categorization in order.';
     }
 
     /**
@@ -115,32 +115,32 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard implements UpgradeWizardIn
         foreach ($newCategories as $newCategory) {
             $sysCategoryConnection->update(
                 'sys_category',
-                ['parent' => $mappingArray[$newCategory['parent']]],
+                ['parent' => $mappingArray[$newCategory['parent']] ?? 0],
                 ['uid' => $newCategory['uid']]
             );
             $sysCategoryConnection->update(
                 'sys_category',
-                ['t3ver_oid' => $mappingArray[$newCategory['t3ver_oid']]],
+                ['t3ver_oid' => $mappingArray[$newCategory['t3ver_oid']] ?? 0],
                 ['uid' => $newCategory['uid']]
             );
             $sysCategoryConnection->update(
                 'sys_category',
-                ['t3ver_id' => $mappingArray[$newCategory['t3ver_id']]],
+                ['t3ver_id' => $mappingArray[$newCategory['t3ver_id']] ?? 0],
                 ['uid' => $newCategory['uid']]
             );
             $sysCategoryConnection->update(
                 'sys_category',
-                ['t3ver_move_id' => $mappingArray[$newCategory['t3ver_move_id']]],
+                ['t3ver_move_id' => $mappingArray[$newCategory['t3ver_move_id']] ?? 0],
+                ['uid' => $newCategory['uid'] ?? 0]
+            );
+            $sysCategoryConnection->update(
+                'sys_category',
+                ['t3_origuid' => $mappingArray[$newCategory['t3_origuid']] ?? 0],
                 ['uid' => $newCategory['uid']]
             );
             $sysCategoryConnection->update(
                 'sys_category',
-                ['t3_origuid' => $mappingArray[$newCategory['t3_origuid']]],
-                ['uid' => $newCategory['uid']]
-            );
-            $sysCategoryConnection->update(
-                'sys_category',
-                ['l10n_parent' => $mappingArray[$newCategory['l10n_parent']]],
+                ['l10n_parent' => $mappingArray[$newCategory['l10n_parent']] ?? 0],
                 ['uid' => $newCategory['uid']]
             );
         }
@@ -158,12 +158,12 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard implements UpgradeWizardIn
                 ->insert(
                     'sys_category_record_mm',
                     [
-                        'uid_local' => $mappingArray[$row['uid_foreign']],
-                        'uid_foreign' => $mappingArray[$row['uid_local']],
+                        'uid_local' => $mappingArray[$row['uid_foreign']] ?? 0,
+                        'uid_foreign' => $row['uid_local'],
                         'tablenames' => 'tx_cal_event',
                         'fieldname' => 'category_id',
                         'sorting' => 0,
-                        'sorting_foreign' => $mappingArray[$row['sorting']],
+                        'sorting_foreign' => $mappingArray[$row['sorting']] ?? 0,
                     ]
                 );
         }

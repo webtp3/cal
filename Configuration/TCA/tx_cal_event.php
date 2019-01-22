@@ -445,7 +445,8 @@ $tx_cal_event = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.byday_short',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byDay'
+                'renderType' => 'calByDayElement',
+                'default' => ''
             ]
         ],
         'bymonthday' => [
@@ -454,7 +455,8 @@ $tx_cal_event = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.bymonthday_short',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byMonthDay'
+                'renderType' => 'calByMonthDayElement',
+                'default' => ''
             ]
         ],
         'bymonth' => [
@@ -463,7 +465,8 @@ $tx_cal_event = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.bymonth_short',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byMonth'
+                'renderType' => 'calByMonthElement',
+                'default' => ''
             ]
         ],
         'until' => [
@@ -534,7 +537,8 @@ $tx_cal_event = [
             'displayCond' => 'FIELD:rdate_type:IN:date_time,date,period',
             'config' => [
                 'type' => 'user',
-                'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->rdate'
+                'renderType' => 'calRDateElement',
+                'default' => ''
             ]
         ],
         'deviation' => [
