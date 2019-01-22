@@ -11,7 +11,7 @@ $tx_cal_fe_user_event_monitor_mm = [
         'label' => 'tablenames',
         'label_alt' => 'tablenames,offset',
         'label_alt_force' => 1,
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_fe_user_event_monitor_mm.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_fe_user_event_monitor_mm.svg',
         'label_userFunc' => Labels::class . '->getMonitoringRecordLabel'
     ],
     'feInterface' => [

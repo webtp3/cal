@@ -61,6 +61,7 @@ $tx_cal_event = [
         'type' => 'type',
         'typeicon_column' => 'type',
         'typeicon_classes' => [
+            'default' => 'cal-eventtype-standard',
             0 => 'cal-eventtype-standard',
             1 => 'cal-eventtype-intlnk',
             2 => 'cal-eventtype-exturl',
@@ -73,7 +74,7 @@ $tx_cal_event = [
             'starttime' => 'starttime',
             'endtime' => 'endtime'
         ],
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_event.svg',
         'searchFields' => 'title,organizer,organizer_link,location,location_link,teaser,description,ext_url,image,imagecaption,imagealttext,imagetitletext,attachment,attachmentcaption',
         'label_userFunc' => Labels::class . '->getEventRecordLabel'
     ],

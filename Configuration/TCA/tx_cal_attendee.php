@@ -13,7 +13,7 @@ $tx_cal_attendee = [
         'cruser_id' => 'cruser_id',
         'default_sortby' => 'uid',
         'delete' => 'deleted',
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_attendee.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_attendee.svg',
         'enablecolumns' => [
             'disabled' => 'hidden'
         ],

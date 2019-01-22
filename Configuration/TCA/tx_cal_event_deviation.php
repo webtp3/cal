@@ -36,7 +36,7 @@ $tx_cal_event_deviation = [
         'cruser_id' => 'cruser_id',
         'default_sortby' => 'start_date',
         'delete' => 'deleted',
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_event_deviation.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_event_deviation.svg',
         'enablecolumns' => [
             'disabled' => 'hidden'
         ],

@@ -14,7 +14,7 @@ $tx_cal_organizer = [
         'cruser_id' => 'cruser_id',
         'default_sortby' => 'ORDER BY name',
         'delete' => 'deleted',
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_organizer.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_organizer.svg',
         'enablecolumns' => [
             'disabled' => 'hidden'
         ],

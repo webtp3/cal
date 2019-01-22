@@ -14,7 +14,7 @@ $tx_cal_location = [
         'cruser_id' => 'cruser_id',
         'default_sortby' => 'ORDER BY name',
         'delete' => 'deleted',
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_location.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_location.svg',
         'enablecolumns' => [
             'disabled' => 'hidden'
         ],

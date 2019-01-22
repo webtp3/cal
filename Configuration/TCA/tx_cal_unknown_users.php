@@ -12,7 +12,7 @@ $tx_cal_unknown_users = [
         'delete' => 'deleted',
         'enablecolumns' => [],
         'versioningWS' => true,
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_unknown_users.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_unknown_users.svg',
         'searchFields' => 'email'
     ],
     'feInterface' => [

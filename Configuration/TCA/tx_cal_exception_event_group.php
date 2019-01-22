@@ -10,7 +10,7 @@ $tx_cal_exception_event_group = [
         'cruser_id' => 'cruser_id',
         'default_sortby' => 'ORDER BY title',
         'delete' => 'deleted',
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_exception_event_group.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_exception_event_group.svg',
         'enablecolumns' => [
             'disabled' => 'hidden'
         ],

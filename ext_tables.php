@@ -1,8 +1,7 @@
 <?php
 
-use TYPO3\CMS\Cal\Backend\CalWizIcon;
 use TYPO3\CMS\Cal\Backend\Modul\CalIndexer;
-use TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider;
+use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -34,66 +33,65 @@ ExtensionManagementUtility::addToInsertRecords('tx_cal_event');
 $iconRegistry = GeneralUtility::makeInstance(IconRegistry::class);
 $iconRegistry->registerIcon(
     'tx-cal-wizard',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/ce_wiz.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_calendar.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-pagetree-root',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_calendar.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-eventtype-standard',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_event.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-eventtype-intlnk',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_intlnk.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_event_link.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-eventtype-exturl',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_exturl.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_event_link.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-eventtype-meeting',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_meeting.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_event_meeting.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-eventtype-todo',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_events_todo.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_event_todo.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-calendar-standard',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_calendar.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-calendar-exturl',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_exturl.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_calendar_link.svg' ]
 );
 
 $iconRegistry->registerIcon(
     'cal-calendar-ics',
-    BitmapIconProvider::class,
-    [ 'source' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar_ics.gif' ]
+    SvgIconProvider::class,
+    [ 'source' => 'EXT:cal/Resources/Public/Icons/tx_cal_calendar_link.svg' ]
 );
 
 if (TYPO3_MODE === 'BE') {
-    $GLOBALS['TBE_MODULES_EXT']['xMOD_db_new_content_el']['addElClasses'][CalWizIcon::class] = $extPath . 'Classes/Backend/CalWizIcon.php';
     // Add module
     ExtensionManagementUtility::addModule(
         'tools',
@@ -104,7 +102,7 @@ if (TYPO3_MODE === 'BE') {
             'routeTarget' => CalIndexer::class . '::mainAction',
             'access' => 'admin',
             'name' => 'tools_txcalM1',
-            'icon' => 'EXT:cal/Classes/Backend/Modul/icon_tx_cal_indexer2.svg',
+            'icon' => 'EXT:cal/Resources/Public/Icons/Module.svg',
             'labels' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer_mod.xml'
         ]
     );

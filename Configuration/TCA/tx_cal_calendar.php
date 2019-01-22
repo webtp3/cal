@@ -20,6 +20,7 @@ $tx_cal_calendar = [
         'type' => 'type',
         'typeicon_column' => 'type',
         'typeicon_classes' => [
+            'default' => 'cal-calendar-standard',
             0 => 'cal-calendar-standard',
             1 => 'cal-calendar-exturl',
             2 => 'cal-calendar-ics'
@@ -30,7 +31,7 @@ $tx_cal_calendar = [
         'transOrigPointerField' => 'l18n_parent',
         'transOrigDiffSourceField' => 'l18n_diffsource',
         'languageField' => 'sys_language_uid',
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_calendar.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_calendar.svg',
         'searchFields' => 'title,ext_url,ext_url_notes,ics_file'
     ],
     'feInterface' => [

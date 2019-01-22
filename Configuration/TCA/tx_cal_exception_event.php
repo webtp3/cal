@@ -16,7 +16,7 @@ $tx_cal_exception_event = [
             'endtime' => 'endtime'
         ],
         'versioningWS' => true,
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_exception_event.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_event_deviation.svg',
         'searchFields' => 'title'
     ],
     'feInterface' => [
