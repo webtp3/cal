@@ -89,19 +89,4 @@ class TreeHelperElement extends AbstractFormElement
     ) {
         return $this->renderWizards($itemKinds, $wizConf, $table, $row, $field, $PA, $itemName, $specConf, $RTE);
     }
-
-    /**
-     * Dummy handler
-     *
-     * @param string $table The table name of the record
-     * @param string $field The field name which this element is supposed to edit
-     * @param array $row The record data array where the value(s) for the field can be found
-     * @param array $additionalInformation An array with additional configuration options.
-     * @return string The HTML code for the TCEform field
-     */
-    public function render($table, $field, $row, &$additionalInformation)
-    {
-        // deliberately empty as this class is not used the same way
-        return '';
-    }
 }

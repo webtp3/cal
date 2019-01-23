@@ -75,7 +75,7 @@ class DeleteCategoryView extends FeEditingBaseView
      * @param $sims
      * @param $rems
      */
-    public function getHiddenMarker(& $template, & $sims, & $rems)
+    public function getHiddenMarker(& $template, & $sims, & $rems, $view)
     {
         $sims['###HIDDEN###'] = $this->cObj->stdWrap(
             $this->category->isHidden() ? $this->controller->pi_getLL('l_true') : $this->controller->pi_getLL('l_false'),
@@ -101,7 +101,7 @@ class DeleteCategoryView extends FeEditingBaseView
      * @param $sims
      * @param $rems
      */
-    public function getCalendarMarker(& $template, & $sims, & $rems)
+    public function getCalendarMarker(&$page, &$sims, &$rems, $view)
     {
         $calendarUid = $this->category->getCalendarUid();
         if ($calendarUid) {

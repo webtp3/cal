@@ -75,7 +75,7 @@ class TodoModel extends EventModel
      * @param $viewType
      * @return string
      */
-    public function renderEventFor($viewType)
+    public function renderEventFor($viewType, $subpartSuffix = '')
     {
         if ($this->conf['view.']['freeAndBusy.']['enable'] == 1) {
             $viewType .= '_FNB';

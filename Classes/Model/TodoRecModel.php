@@ -45,7 +45,7 @@ class TodoRecModel extends EventRecModel
      * @param $viewType
      * @return string
      */
-    public function renderEventFor($viewType)
+    public function renderEventFor($viewType, $subpartSuffix = '')
     {
         if ($this->parentEvent->conf['view.']['freeAndBusy.']['enable'] == 1) {
             $viewType .= '_FNB';
