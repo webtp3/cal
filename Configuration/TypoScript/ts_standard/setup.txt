@@ -949,10 +949,6 @@ plugin.tx_cal_controller {
 
             location {
 
-                # @description    Enables the rendering of the wec_map.
-                # @also            Constants
-                showMap = {$plugin.tx_cal_controller.view.location.showMap}
-
                 map {
                     # @description    API Key for Google Maps.
                     # @see    http://www.google.com/apis/maps/signup.html
@@ -1272,13 +1268,6 @@ plugin.tx_cal_controller {
             # @description    Page view configured for deleting an calendar. If this is not configured,
             #                then the current page will be used instead.
             deleteCalendarViewPid =
-
-            # @description    The distance for events in a nearby calendar
-            # @also flexform
-            nearbyDistance = 50
-
-            nearbyAdditionalTable = tx_cal_location
-            nearbyAdditionalWhere = AND tx_cal_calendar.nearby = 1 AND tx_cal_event.location_id > 0 AND tx_cal_event.location_id = tx_cal_location.uid AND 6367.41*SQRT(2*(1-cos(RADIANS(tx_cal_location.latitude))*cos(RADIANS(###LATITUDE###))*(sin(RADIANS(tx_cal_location.longitude))*sin(RADIANS(###LONGITUDE###))+cos(RADIANS(tx_cal_location.longitude))*cos(RADIANS(###LONGITUDE###)))-sin(RADIANS(tx_cal_location.latitude))*sin(RADIANS(###LATITUDE###)))) <= ###DISTANCE###
 
             calendar {
                 # @description    Image tag for icon used in link to frontend creation of a calendar.

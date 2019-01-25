@@ -398,19 +398,6 @@ class LocationService extends BaseService
             $insertFields['link'] = strip_tags($this->controller->piVars['link']);
         }
 
-        if (ExtensionManagementUtility::isLoaded('wec_map') && ($insertFields['street'] != '' || $insertFields['city'] != '' || $insertFields['country_zone'] != '' || $insertFields['zip'] != '' || $insertFields['country'])) {
-            /* Geocode the address */
-            $lookupTable = Functions::makeInstance('JBartels\WecMap\Utility\Cache');
-            $latlong = $lookupTable->lookup(
-                $insertFields['street'],
-                $insertFields['city'],
-                $insertFields['country_zone'],
-                $insertFields['zip'],
-                $insertFields['country']
-            );
-            $insertFields['latitude'] = $latlong['lat'];
-            $insertFields['longitude'] = $latlong['long'];
-        }
     }
 
     /**

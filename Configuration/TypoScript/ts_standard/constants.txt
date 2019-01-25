@@ -30,9 +30,6 @@ plugin.tx_cal_controller {
     # cat=Calendar Base (General)/general/18; type=string; label=Meeting status Page: Page ID where the meeting-status view is allowed. This has to be a public page in order to get the link generated
     view.event.meeting.statusViewPid =
 
-    # cat=Calendar Base (General)/general/19; type=boolean; label=Enable the google map (wec_map needed)
-    view.location.showMap = 0
-
     # cat=Calendar Base (General)/general/20; type=boolean; label=Enable reminding of events (gabriel needed)
     view.event.remind = 1
 

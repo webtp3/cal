@@ -177,9 +177,6 @@
             </label>
             <label index="tx_cal_calendar.createNew">create a new calendar</label>
             <label index="tx_cal_calendar.edit">edit selected calendar</label>
-            <label index="tx_cal_calendar.nearby">Show only events within a certain distance of a
-                user (wec_map needed)
-            </label>
             <label index="tx_cal_calendar_private">The users private calendar</label>
             <label index="tx_cal_calendar.schedulerId">Scheduler ID (scheduler needed)</label>
             <label index="sys_category">Calendar Category</label>

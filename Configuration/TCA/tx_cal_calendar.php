@@ -38,7 +38,7 @@ $tx_cal_calendar = [
         'fe_admin_fieldList' => 'hidden, title, starttime, endtime'
     ],
     'interface' => [
-        'showRecordFieldList' => 'hidden,title,headerstyle,bodystyle,activate_fnb,fnb_user_cnt,nearby'
+        'showRecordFieldList' => 'hidden,title,headerstyle,bodystyle,activate_fnb,fnb_user_cnt'
     ],
     'columns' => [
         'hidden' => [
@@ -94,13 +94,6 @@ $tx_cal_calendar = [
                 'minitems' => 0,
                 'maxitems' => 100,
                 'allowed' => 'fe_users,fe_groups',
-                'default' => 0,
-            ]
-        ],
-        'nearby' => [
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.nearby',
-            'config' => [
-                'type' => 'check',
                 'default' => 0,
             ]
         ],
@@ -273,13 +266,13 @@ $tx_cal_calendar = [
     ],
     'types' => [
         '0' => [
-            'showitem' => 'type,title, --palette--;;1,owner,headerstyle,bodystyle,activate_fnb,fnb_user_cnt,nearby'
+            'showitem' => 'type,title, --palette--;;1,owner,headerstyle,bodystyle,activate_fnb,fnb_user_cnt'
         ],
         '1' => [
-            'showitem' => 'type,title, --palette--;;1,owner,headerstyle,bodystyle,activate_fnb,fnb_user_cnt,nearby,ext_url,refresh,schedulerId'
+            'showitem' => 'type,title, --palette--;;1,owner,headerstyle,bodystyle,activate_fnb,fnb_user_cnt,ext_url,refresh,schedulerId'
         ],
         '2' => [
-            'showitem' => 'type,title, --palette--;;1,owner,headerstyle,bodystyle,activate_fnb,fnb_user_cnt,nearby,ics_file,refresh,schedulerId'
+            'showitem' => 'type,title, --palette--;;1,owner,headerstyle,bodystyle,activate_fnb,fnb_user_cnt,ics_file,refresh,schedulerId'
         ]
     ],
     'palettes' => [

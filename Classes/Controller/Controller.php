@@ -3427,12 +3427,6 @@ class Controller extends AbstractPlugin
                 $this->pi_getFFvalue($piFlexForm, 'allowedViews')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['general.'] ['calendarDistance'] != 1) {
-            Controller::updateIfNotEmpty(
-                $this->conf ['view.'] ['calendar.'] ['nearbyDistance'],
-                intval($this->pi_getFFvalue($piFlexForm, 'calendarDistance'))
-            );
-        }
 
         if ($this->conf ['dontListenToFlexForm.'] ['day.'] ['dayViewPid'] != 1) {
             Controller::updateIfNotEmpty(

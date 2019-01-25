@@ -151,20 +151,6 @@ class TceMainProcessdatamap
             $fieldArray ['tablenames'] = implode('_', $values);
         }
 
-        if ($table == 'tx_cal_location' && count($fieldArray) > 0 && ExtensionManagementUtility::isLoaded('wec_map')) {
-            $location = BackendUtility::getRecord('tx_cal_location', $id);
-            if (is_array($location)) {
-                $location = array_merge($location, $fieldArray);
-            } else {
-                $location = $fieldArray;
-            }
-
-            /* Geocode the address */
-            $lookupTable = Functions::makeInstance('JBartels\WecMap\Utility\Cache');
-            $latlong = $lookupTable->lookup($location ['street'], $location ['city'], $location ['state'], $location ['zip'], $location ['country']);
-            $fieldArray ['latitude'] = $latlong ['lat'];
-            $fieldArray ['longitude'] = $latlong ['long'];
-        }
     }
 
     public static function processDatamap_afterDatabaseOperations($status, $table, $id, &$fieldArray, &$tcemain)

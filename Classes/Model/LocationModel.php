@@ -14,7 +14,6 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use JBartels\WecMap\MapService\Google\Map;
 use SJBR\StaticInfoTables\PiBaseApi;
 use SJBR\StaticInfoTables\Utility\LocalizationUtility;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -304,85 +303,11 @@ class LocationModel extends BaseModel
      * @param $rems
      * @param $wrapped
      * @param $view
+     * @deprecated
      */
     public function getMapMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims['###MAP###'] = '';
-        if ($this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['showMap'] && ExtensionManagementUtility::isLoaded('wec_map')) {
-            $apiKey = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['apiKey'];
-            $width = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['mapWidth'];
-            $height = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['mapHeight'];
-
-            $centerLat = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['centerLat'];
-            $centerLong = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['centerLong'];
-            $zoomLevel = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['zoomLevel'];
-            $initialMapType = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['initialMapType'];
-
-            $showMapType = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['showMapType'];
-            $showScale = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['showScale'];
-            $showInfoOnLoad = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['showInfoOnLoad'];
-            $showDirections = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['showDirections'];
-            $showWrittenDirections = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['showWrittenDirections'];
-            $prefillAddress = $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['map.']['prefillAddress'];
-
-            $mapName = 'map' . $this->getUid();
-            /** @var Map $map */
-            $map = GeneralUtility::makeInstance(
-                Map::class,
-                null,
-                $width,
-                $height,
-                $centerLat,
-                $centerLong,
-                $zoomLevel,
-                $mapName
-            );
-
-            // evaluate config to see which map controls we need to show
-            $map->addControl('zoom');
-
-            if ($showScale) {
-                $map->addControl('scale');
-            }
-            if ($showMapType) {
-                $map->addControl('mapType');
-            }
-            if ($initialMapType) {
-                $map->setType($initialMapType);
-            }
-
-            // check whether to show the directions tab and/or prefill addresses and/or written directions
-            if ($showDirections && $showWrittenDirections && $prefillAddress) {
-                $map->enableDirections(true, 'directions-' . $mapName);
-            }
-            if ($showDirections && $showWrittenDirections && !$prefillAddress) {
-                $map->enableDirections(false, '-directions-' . $mapName);
-            }
-            if ($showDirections && !$showWrittenDirections && $prefillAddress) {
-                $map->enableDirections(true);
-            }
-            if ($showDirections && !$showWrittenDirections && !$prefillAddress) {
-                $map->enableDirections();
-            }
-
-            // see if we need to open the marker bubble on load
-            if ($showInfoOnLoad) {
-                $map->showInfoOnLoad();
-            }
-
-            $map->addMarkerByAddress(
-                $this->getStreet(),
-                $this->getCity(),
-                $this->getCountryZone(),
-                $this->getZip(),
-                $this->getCountry(),
-                '<h3>' . $this->getName() . '</h3>',
-                '<p>' . $this->getDescription() . '</p>'
-            );
-
-            /* Draw the map */
-            $sims['###MAP###'] = $map->drawMap();
-        }
+        $sims['###MAP###'] = 'The mapping abilities are currently unavailable.';
     }
 
     /**

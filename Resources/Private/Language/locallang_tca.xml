@@ -155,9 +155,6 @@
             <label index="cal.pi_flexform.showTomorrowEvents">Show tomorrows events</label>
             <label index="cal.pi_flexform.sheetTSView">Typoscript</label>
             <label index="cal.pi_flexform.tsconfig">plugin.tx_cal_controller:</label>
-            <label index="cal.pi_flexform.calendarDistance">Distance (Km) for events in a nearby calendar (wec_map
-                needed)
-            </label>
         </languageKey>
         <languageKey index="de" type="array">
             <label index="cal.pi_flexform.sheetGeneral">Allgemeine Einstellungen</label>

@@ -38,7 +38,7 @@ class EventService extends BaseService
     public $calnumber = 1;
     public $starttime;
     public $endtime;
-    public $internalAdditionWhere = ' AND tx_cal_calendar.nearby = 0';
+    public $internalAdditionWhere = '';
     public $internalAdditionTable = '';
 
     /**
@@ -3078,7 +3078,7 @@ class EventService extends BaseService
         // But we need to find a way to only include rdate events within the searched timerange
         // - otherwise we'll flood the results after some time. I think we need a mm-table for that!
         $additionalWhere = $where . ' AND tx_cal_event.pid IN (' . $this->conf['pidList'] . ') ' . $this->cObj->enableFields('tx_cal_event');
-        $additionalWhere .= ' AND tx_cal_calendar.nearby = 0';
+        $additionalWhere .= '';
         // creating the arrays the user is allowed to see
         $categories = [];
 

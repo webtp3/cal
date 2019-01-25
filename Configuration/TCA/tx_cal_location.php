@@ -278,41 +278,6 @@ $tx_cal_location['columns']['imagecaption'] = $dummy;
 $tx_cal_location['columns']['imagealttext'] = $dummy;
 $tx_cal_location['columns']['imagetitletext'] = $dummy;
 
-/* If wec_map is present, define the address fields */
-if (ExtensionManagementUtility::isLoaded('wec_map')) {
-    $tx_cal_location['ctrl']['EXT']['wec_map'] = [
-        'isMappable' => 1,
-        'addressFields' => [
-            'street' => 'street',
-            'city' => 'city',
-            'state' => 'country_zone',
-            'zip' => 'zip',
-            'country' => 'country'
-        ]
-    ];
-    $tx_cal_location['columns']['tx_wecmap_geocode'] = [
-        'exclude' => 1,
-        'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xml:berecord_geocodelabel',
-        'config' => [
-            'type' => 'user',
-            'userFunc' => 'JBartels\\WecMap\\Utility\\Backend->checkGeocodeStatus'
-        ]
-    ];
-    $tx_cal_location['interface']['showRecordFieldList'] .= ', tx_wecmap_geocode';
-    $tx_cal_location['types']['0']['showitem'] .= ', tx_wecmap_geocode';
-
-    $tx_cal_location['columns']['tx_wecmap_map'] = [
-        'exclude' => 1,
-        'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xml:berecord_maplabel',
-        'config' => [
-            'type' => 'user',
-            'userFunc' => 'JBartels\\WecMap\\Utility\\Backend->drawMap'
-        ]
-    ];
-    $tx_cal_location['interface']['showRecordFieldList'] .= ', tx_wecmap_map';
-    $tx_cal_location['types']['0']['showitem'] .= ', tx_wecmap_map';
-}
-
 if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
     $tx_cal_location['columns']['country_zone'] = [
         'exclude' => 1,

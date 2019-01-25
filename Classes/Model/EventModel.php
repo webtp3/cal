@@ -1693,18 +1693,6 @@ class EventModel extends Model
     public function getMapMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###MAP###'] = '';
-        if ($this->conf['view.'][$view . '.']['event.']['showMap'] && $this->getLocationId()) {
-            /* Pull values from Flexform object into individual variables */
-            $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-            $useLocationStructure = ($this->confArr['useLocationStructure'] ? $this->confArr['useLocationStructure'] : 'tx_cal_location');
-            $modelObj = &Registry::Registry('basic', 'modelcontroller');
-            $location = $modelObj->findLocation($this->getLocationId(), $useLocationStructure);
-            $local_sims = [];
-            $local_rems = [];
-            $local_wrapped = [];
-            $location->getMarker('###MAP###', $local_sims, $local_rems, $local_wrapped);
-            $sims['###MAP###'] = $local_sims['###MAP###'];
-        }
     }
 
     /**

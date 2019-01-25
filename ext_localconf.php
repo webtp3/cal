@@ -17,7 +17,6 @@ use TYPO3\CMS\Cal\Hooks\DateEval;
 use TYPO3\CMS\Cal\Hooks\RealUrl;
 use TYPO3\CMS\Cal\Hooks\TceMainProcesscmdmap;
 use TYPO3\CMS\Cal\Hooks\TceMainProcessdatamap;
-use TYPO3\CMS\Cal\Hooks\WecMap;
 use TYPO3\CMS\Cal\Service\AttendeeService;
 use TYPO3\CMS\Cal\Service\CalendarService;
 use TYPO3\CMS\Cal\Service\EventService;
@@ -169,23 +168,6 @@ ExtensionManagementUtility::addService(
         'os' => '',
         'exec' => '',
         'className' => TodoService::class
-    ]
-);
-
-ExtensionManagementUtility::addService(
-    'cal',
-    'cal_event_model' /* sv type */,
-    'tx_cal_nearby' /* sv key */,
-    [
-        'title' => 'Cal Nearby Model',
-        'description' => '',
-        'subtype' => 'event',
-        'available' => true,
-        'priority' => 50,
-        'quality' => 50,
-        'os' => '',
-        'exec' => '',
-        'className' => NearbyEventService::class
     ]
 );
 
@@ -1162,7 +1144,6 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['proc
 FormDateDataProvider::register();
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_content.php']['typolinkLinkHandler']['calendar'] = EventLinkHandler::class;
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_wecmap_pi3']['markerHook']['cal'] = WecMap::class . '->getMarkerContent';
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tce']['formevals']['tx_cal_dateeval'] = DateEval::class;
 // $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['loginFormOnSubmitFuncs'][] = 'TYPO3\\CMS\\Cal\\Hooks\\LogoffPostProcessing:LogoffPostProcessing->clearSessionApiAfterLogoff';
 // $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['felogin']['login_confirmed'][] = 'TYPO3\\CMS\\Cal\\Hooks\\LogoffPostProcessing:LogoffPostProcessing->clearSessionApiAfterLogin';

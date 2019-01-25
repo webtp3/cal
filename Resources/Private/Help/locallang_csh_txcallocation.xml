@@ -47,8 +47,6 @@
             <label index="imagecaption.details">If you have multiple images, captions must be
                 listed on separate lines.
             </label>
-            <label index="tx_wecmap_geocode.description">Latitute and longitude of the location.</label>
-            <label index="tx_wecmap_map.description">Map of the location.</label>
         </languageKey>
         <languageKey index="de" type="array">
             <label index=".description">Orte an denen Ereignisse des Kalenders
