@@ -1360,7 +1360,7 @@ class CreateEventView extends FeEditingBaseView
     {
         $sims['###SENDOUT_INVITATION###'] = '';
 
-        if ($this->isAllowed(sendout_invitation)) {
+        if ($this->isAllowed('sendout_invitation')) {
             $sendoutInvitation = '';
             if ($this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.'][$this->objectString . '.']['fields.']['sendout_invitation.']['default'] || $this->controller->piVars['sendout_invitation']) {
                 $sendoutInvitation = ' checked="checked" ';
