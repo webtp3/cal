@@ -19,6 +19,10 @@ List of versions
    :titlesonly:
    :glob:
 
+   2.0/Breaking-NaN-RemovalOfOldTYPO3CoreCode.rst
+   2.0/Breaking-NaN-RemovalOfPartnerExtensionStuff.rst
+   2.0/Breaking-NaN-RemovalOfWecMapExtensionStuff.rst
+   2.0/Deprecation-NaN-DeprecationOfCal_categories.rst
    1-10-3
    1-10-2
    1-10-1
