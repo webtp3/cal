@@ -29,9 +29,7 @@ class Organizer extends LocationModel
      * Constructor
      *
      * @param array $row
-     *            array
      * @param string $pidList
-     *            to search in
      */
     public function __construct($row, $pidList)
     {
@@ -53,7 +51,7 @@ class Organizer extends LocationModel
     /**
      * @return string
      */
-    public function renderOrganizer()
+    public function renderOrganizer(): string
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_ORGANIZER###');
     }
@@ -63,7 +61,7 @@ class Organizer extends LocationModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_organizer')) {
@@ -73,7 +71,7 @@ class Organizer extends LocationModel
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -95,7 +93,7 @@ class Organizer extends LocationModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_organizer')) {
@@ -105,7 +103,7 @@ class Organizer extends LocationModel
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -128,7 +126,7 @@ class Organizer extends LocationModel
      * @param $view
      * @return string
      */
-    public function getEditLink(& $template, & $sims, & $rems, $view)
+    public function getEditLink(& $template, & $sims, & $rems, $view): string
     {
         $editlink = '';
         if ($this->isUserAllowedToEdit()) {
@@ -178,7 +176,7 @@ class Organizer extends LocationModel
      * @param string $subpartSuffix
      * @return string
      */
-    public function renderOrganizerFor($viewType, $subpartSuffix = '')
+    public function renderOrganizerFor($viewType, $subpartSuffix = ''): string
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }

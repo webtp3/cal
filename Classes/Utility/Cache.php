@@ -5,6 +5,7 @@ namespace TYPO3\CMS\Cal\Utility;
 use Doctrine\DBAL\FetchMode;
 use Memcache;
 use RuntimeException;
+use TYPO3\CMS\Core\Cache\Exception\DuplicateIdentifierException;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -74,23 +75,29 @@ class Cache
                 $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['backend'],
                 $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['options']
             );
-        } catch (\TYPO3\CMS\Core\Cache\Exception\DuplicateIdentifierException $e) {
+        } catch (DuplicateIdentifierException $e) {
             // do nothing, a cal_cache cache already exists
         }
 
         $this->tx_cal_cache = $GLOBALS ['typo3CacheManager']->getCache('tx_cal_cache');
     }
 
+    /**
+     * @param $hash
+     * @param $content
+     * @param $ident
+     * @param int $lifetime
+     */
     public function set($hash, $content, $ident, $lifetime = 0)
     {
-        if ($lifetime == 0) {
+        if ($lifetime === 0) {
             $lifetime = $this->lifetime;
         }
-        if ($this->cachingEngine == 'cachingFramework') {
+        if ($this->cachingEngine === 'cachingFramework') {
             $this->tx_cal_cache->set($hash, $content, [
                 'ident_' . $ident
             ], $lifetime);
-        } elseif ($this->cachingEngine == 'memcached') {
+        } elseif ($this->cachingEngine === 'memcached') {
             $this->tx_cal_cache->set($hash, $content, false, $lifetime);
         } else {
             $table = 'tx_cal_cache';
@@ -112,7 +119,7 @@ class Cache
     public function get($hash)
     {
         $cacheEntry = false;
-        if ($this->cachingEngine == 'cachingFramework' || $this->cachingEngine == 'memcached') {
+        if ($this->cachingEngine === 'cachingFramework' || $this->cachingEngine === 'memcached') {
             $cacheEntry = $this->tx_cal_cache->get($hash);
         } else {
             $select_fields = 'content';

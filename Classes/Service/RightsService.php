@@ -31,7 +31,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isLoggedIn()
+    public function isLoggedIn(): bool
     {
         return $GLOBALS['TSFE']->loginUser;
     }
@@ -39,7 +39,7 @@ class RightsService extends BaseService
     /**
      * @return array
      */
-    public function getUserGroups()
+    public function getUserGroups(): array
     {
         if ($this->isLoggedIn()) {
             return $GLOBALS['TSFE']->fe_user->groupData['uid'];
@@ -50,9 +50,9 @@ class RightsService extends BaseService
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
-        if ($this->isLoggedIn() && !empty($GLOBALS['TSFE']->fe_user->user['uid'])) {
+        if (!empty($GLOBALS['TSFE']->fe_user->user['uid']) && $this->isLoggedIn()) {
             $val = intval($GLOBALS['TSFE']->fe_user->user['uid']);
             return $val;
         }
@@ -62,7 +62,7 @@ class RightsService extends BaseService
     /**
      * @return int
      */
-    public function getUserName()
+    public function getUserName(): int
     {
         if ($this->isLoggedIn()) {
             $val = $GLOBALS['TSFE']->fe_user->user['username'];
@@ -74,25 +74,25 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isCalEditable()
+    public function isCalEditable(): bool
     {
-        return $this->conf['rights.']['edit'] == 1;
+        return (int)$this->conf['rights.']['edit'] === 1;
     }
 
     /**
      * @return bool
      */
-    public function isCalAdmin()
+    public function isCalAdmin(): bool
     {
         if ($this->isLoggedIn()) {
             $users = explode(',', $this->conf['rights.']['admin.']['user']);
             $groups = explode(',', $this->conf['rights.']['admin.']['group']);
-            if (array_search($this->getUserId(), $users) !== false) {
+            if (in_array($this->getUserId(), $users, true)) {
                 return true;
             }
             $userGroups = $this->getUserGroups();
             foreach ($groups as $key => $group) {
-                if (array_search(ltrim($group), $userGroups) !== false) {
+                if (in_array(ltrim($group), $userGroups, true)) {
                     return true;
                 }
             }
@@ -103,7 +103,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEvent()
+    public function isAllowedToCreateEvent(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['event.']);
     }
@@ -111,7 +111,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventInPast()
+    public function isAllowedToCreateEventInPast(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['event.']['inPast.']);
     }
@@ -119,7 +119,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventForTodayAndFuture()
+    public function isAllowedToCreateEventForTodayAndFuture(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['event.']['forTodayAndFuture.']);
     }
@@ -127,7 +127,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventInPast()
+    public function isAllowedToEditEventInPast(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['inPast.']);
     }
@@ -135,7 +135,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteEventInPast()
+    public function isAllowedToDeleteEventInPast(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['event.']['inPast.']);
     }
@@ -143,7 +143,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventHidden()
+    public function isAllowedToCreateEventHidden(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['hidden.']['public']) {
             return true;
@@ -157,7 +157,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventCategory()
+    public function isAllowedToCreateEventCategory(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['fields.']['category.']['public']) {
             return true;
@@ -171,7 +171,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventCalendar()
+    public function isAllowedToCreateEventCalendar(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['fields.']['calendar_id.']['public']) {
             return true;
@@ -185,7 +185,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreatePublicEvent()
+    public function isAllowedToCreatePublicEvent(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['event.']['publicEvents.']);
     }
@@ -193,7 +193,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventDateTime()
+    public function isAllowedToCreateEventDateTime(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && ($this->conf['rights.']['create.']['event.']['fields.']['startdate.']['public'] || $this->conf['rights.']['create.']['event.']['fields.']['enddate.']['public'] || $this->conf['rights.']['create.']['event.']['fields.']['starttime.']['public'] || $this->conf['rights.']['create.']['event.']['fields.']['endtime.']['public'])) {
             return true;
@@ -207,7 +207,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventTitle()
+    public function isAllowedToCreateEventTitle(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['title.']['public']) {
             return true;
@@ -221,7 +221,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventOrganizer()
+    public function isAllowedToCreateEventOrganizer(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['organizer.']['public']) {
             return true;
@@ -235,7 +235,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventLocation()
+    public function isAllowedToCreateEventLocation(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['location.']['public']) {
             return true;
@@ -249,7 +249,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventDescription()
+    public function isAllowedToCreateEventDescription(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['description.']['public']) {
             return true;
@@ -263,7 +263,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventTeaser()
+    public function isAllowedToCreateEventTeaser(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['teaser.']['public']) {
             return true;
@@ -277,7 +277,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventRecurring()
+    public function isAllowedToCreateEventRecurring(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['recurring.']['public']) {
             return true;
@@ -291,7 +291,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventNotify()
+    public function isAllowedToCreateEventNotify(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['notify.']['public']) {
             return true;
@@ -305,7 +305,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventException()
+    public function isAllowedToCreateEventException(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['exception.']['public']) {
             return true;
@@ -319,7 +319,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateEventShared()
+    public function isAllowedToCreateEventShared(): bool
     {
         if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['shared.']['public']) {
             return true;
@@ -333,7 +333,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEvent()
+    public function isAllowedToEditEvent(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']);
     }
@@ -341,15 +341,15 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isPublicAllowedToEditEvents()
+    public function isPublicAllowedToEditEvents(): bool
     {
-        return $this->conf['rights.']['edit.']['event.']['public'] == 1;
+        return (int)$this->conf['rights.']['edit.']['event.']['public'] === 1;
     }
 
     /**
      * @return bool
      */
-    public function isAllowedToEditStartedEvent()
+    public function isAllowedToEditStartedEvent(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['startedEvents.']);
     }
@@ -357,7 +357,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOnlyOwnEvent()
+    public function isAllowedToEditOnlyOwnEvent(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['onlyOwnEvents.']);
     }
@@ -365,7 +365,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventHidden()
+    public function isAllowedToEditEventHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['hidden.']);
     }
@@ -373,7 +373,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventCalendar()
+    public function isAllowedToEditEventCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['calendar_id.']);
     }
@@ -381,7 +381,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventCategory()
+    public function isAllowedToEditEventCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['category.']);
     }
@@ -389,7 +389,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventDateTime()
+    public function isAllowedToEditEventDateTime(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['startdate.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['enddate.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['starttime.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['endtime.']);
     }
@@ -397,7 +397,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventTitle()
+    public function isAllowedToEditEventTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['title.']);
     }
@@ -405,7 +405,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventOrganizer()
+    public function isAllowedToEditEventOrganizer(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['organizer.']);
     }
@@ -413,7 +413,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventLocation()
+    public function isAllowedToEditEventLocation(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['location.']);
     }
@@ -421,7 +421,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventDescription()
+    public function isAllowedToEditEventDescription(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['description.']);
     }
@@ -429,7 +429,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventTeaser()
+    public function isAllowedToEditEventTeaser(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['teaser.']);
     }
@@ -437,7 +437,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventRecurring()
+    public function isAllowedToEditEventRecurring(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['recurring.']);
     }
@@ -445,7 +445,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventNotify()
+    public function isAllowedToEditEventNotify(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['notify.']);
     }
@@ -453,7 +453,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditEventException()
+    public function isAllowedToEditEventException(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['exception.']);
     }
@@ -461,7 +461,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteEvents()
+    public function isAllowedToDeleteEvents(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['event.']);
     }
@@ -469,7 +469,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteOnlyOwnEvents()
+    public function isAllowedToDeleteOnlyOwnEvents(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['event.']['onlyOwnEvents.']);
     }
@@ -477,7 +477,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteStartedEvents()
+    public function isAllowedToDeleteStartedEvents(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['event.']['startedEvents.']);
     }
@@ -485,7 +485,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateExceptionEvent()
+    public function isAllowedToCreateExceptionEvent(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['exceptionEvent.']);
     }
@@ -493,7 +493,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditExceptionEvent()
+    public function isAllowedToEditExceptionEvent(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['exceptionEvent.']);
     }
@@ -501,7 +501,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteExceptionEvents()
+    public function isAllowedToDeleteExceptionEvents(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['exceptionEvent.']);
     }
@@ -509,7 +509,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocations()
+    public function isAllowedToCreateLocations(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']);
     }
@@ -517,7 +517,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationHidden()
+    public function isAllowedToCreateLocationHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['hidden.']);
     }
@@ -525,7 +525,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationTitle()
+    public function isAllowedToCreateLocationTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['title.']);
     }
@@ -533,7 +533,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationDescription()
+    public function isAllowedToCreateLocationDescription(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['description.']);
     }
@@ -541,7 +541,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationName()
+    public function isAllowedToCreateLocationName(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['name.']);
     }
@@ -549,7 +549,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationStreet()
+    public function isAllowedToCreateLocationStreet(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['street.']);
     }
@@ -557,7 +557,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationZip()
+    public function isAllowedToCreateLocationZip(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['zip.']);
     }
@@ -565,7 +565,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationCity()
+    public function isAllowedToCreateLocationCity(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['city.']);
     }
@@ -573,7 +573,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationCountryZone()
+    public function isAllowedToCreateLocationCountryZone(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['countryZone.']);
     }
@@ -581,7 +581,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationCountry()
+    public function isAllowedToCreateLocationCountry(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['country.']);
     }
@@ -589,7 +589,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationPhone()
+    public function isAllowedToCreateLocationPhone(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['phone.']);
     }
@@ -597,7 +597,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationEmail()
+    public function isAllowedToCreateLocationEmail(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['email.']);
     }
@@ -605,7 +605,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationImage()
+    public function isAllowedToCreateLocationImage(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['image.']);
     }
@@ -613,7 +613,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateLocationLink()
+    public function isAllowedToCreateLocationLink(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['link.']);
     }
@@ -621,7 +621,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocation()
+    public function isAllowedToEditLocation(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']);
     }
@@ -629,7 +629,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationHidden()
+    public function isAllowedToEditLocationHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['hidden.']);
     }
@@ -637,7 +637,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationTitle()
+    public function isAllowedToEditLocationTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['title.']);
     }
@@ -645,7 +645,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationDescription()
+    public function isAllowedToEditLocationDescription(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['description.']);
     }
@@ -653,7 +653,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationName()
+    public function isAllowedToEditLocationName(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['name.']);
     }
@@ -661,7 +661,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationStreet()
+    public function isAllowedToEditLocationStreet(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['street.']);
     }
@@ -669,7 +669,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationZip()
+    public function isAllowedToEditLocationZip(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['zip.']);
     }
@@ -677,7 +677,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationCity()
+    public function isAllowedToEditLocationCity(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['city.']);
     }
@@ -685,7 +685,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationCountryZone()
+    public function isAllowedToEditLocationCountryZone(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['countryZone.']);
     }
@@ -693,7 +693,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationCountry()
+    public function isAllowedToEditLocationCountry(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['country.']);
     }
@@ -701,7 +701,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationPhone()
+    public function isAllowedToEditLocationPhone(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['phone.']);
     }
@@ -709,7 +709,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationEmail()
+    public function isAllowedToEditLocationEmail(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['email.']);
     }
@@ -717,7 +717,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationLogo()
+    public function isAllowedToEditLocationLogo(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['logo.']);
     }
@@ -725,7 +725,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditLocationHomepage()
+    public function isAllowedToEditLocationHomepage(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['homepage.']);
     }
@@ -733,7 +733,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteLocation()
+    public function isAllowedToDeleteLocation(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['location.']);
     }
@@ -743,7 +743,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteLocations()
+    public function isAllowedToDeleteLocations(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['location.']);
     }
@@ -751,7 +751,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOnlyOwnLocation()
+    public function isAllowedToEditOnlyOwnLocation(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['location.']['onlyOwnLocation.']);
     }
@@ -759,7 +759,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteOnlyOwnLocation()
+    public function isAllowedToDeleteOnlyOwnLocation(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['location.']['onlyOwnLocation.']);
     }
@@ -767,7 +767,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizer()
+    public function isAllowedToCreateOrganizer(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']);
     }
@@ -775,7 +775,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerHidden()
+    public function isAllowedToCreateOrganizerHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['hidden.']);
     }
@@ -783,7 +783,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerTitle()
+    public function isAllowedToCreateOrganizerTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['title.']);
     }
@@ -791,7 +791,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerDescription()
+    public function isAllowedToCreateOrganizerDescription(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['description.']);
     }
@@ -799,7 +799,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerName()
+    public function isAllowedToCreateOrganizerName(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['name.']);
     }
@@ -807,7 +807,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerStreet()
+    public function isAllowedToCreateOrganizerStreet(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['street.']);
     }
@@ -815,7 +815,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerZip()
+    public function isAllowedToCreateOrganizerZip(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['zip.']);
     }
@@ -823,7 +823,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerCity()
+    public function isAllowedToCreateOrganizerCity(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['city.']);
     }
@@ -831,7 +831,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerPhone()
+    public function isAllowedToCreateOrganizerPhone(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['phone.']);
     }
@@ -839,7 +839,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerEmail()
+    public function isAllowedToCreateOrganizerEmail(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['email.']);
     }
@@ -847,7 +847,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerImage()
+    public function isAllowedToCreateOrganizerImage(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['image.']);
     }
@@ -855,7 +855,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateOrganizerLink()
+    public function isAllowedToCreateOrganizerLink(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['link.']);
     }
@@ -863,7 +863,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizer()
+    public function isAllowedToEditOrganizer(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']);
     }
@@ -871,7 +871,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerHidden()
+    public function isAllowedToEditOrganizerHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['hidden.']);
     }
@@ -879,7 +879,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerTitle()
+    public function isAllowedToEditOrganizerTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['title.']);
     }
@@ -887,7 +887,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerDescription()
+    public function isAllowedToEditOrganizerDescription(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['description.']);
     }
@@ -895,7 +895,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerName()
+    public function isAllowedToEditOrganizerName(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['name.']);
     }
@@ -903,7 +903,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerStreet()
+    public function isAllowedToEditOrganizerStreet(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['street.']);
     }
@@ -911,7 +911,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerZip()
+    public function isAllowedToEditOrganizerZip(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['zip.']);
     }
@@ -919,7 +919,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerCity()
+    public function isAllowedToEditOrganizerCity(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['city.']);
     }
@@ -927,7 +927,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerPhone()
+    public function isAllowedToEditOrganizerPhone(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['phone.']);
     }
@@ -935,7 +935,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerEmail()
+    public function isAllowedToEditOrganizerEmail(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['email.']);
     }
@@ -943,7 +943,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerLogo()
+    public function isAllowedToEditOrganizerLogo(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['logo.']);
     }
@@ -951,7 +951,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOrganizerHomepage()
+    public function isAllowedToEditOrganizerHomepage(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['homepage.']);
     }
@@ -959,7 +959,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteOrganizer()
+    public function isAllowedToDeleteOrganizer(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['organizer.']);
     }
@@ -967,7 +967,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOnlyOwnOrganizer()
+    public function isAllowedToEditOnlyOwnOrganizer(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['onlyOwnOrganizer.']);
     }
@@ -975,7 +975,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteOnlyOwnOrganizer()
+    public function isAllowedToDeleteOnlyOwnOrganizer(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['organizer.']['onlyOwnOrganizer.']);
     }
@@ -983,7 +983,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCalendar()
+    public function isAllowedToCreateCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['calendar.']);
     }
@@ -991,7 +991,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCalendarHidden()
+    public function isAllowedToCreateCalendarHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['hidden.']);
     }
@@ -999,7 +999,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCalendarTitle()
+    public function isAllowedToCreateCalendarTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['title.']);
     }
@@ -1007,7 +1007,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCalendarOwner()
+    public function isAllowedToCreateCalendarOwner(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['owner.']);
     }
@@ -1015,7 +1015,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCalendarActivateFreeAndBusy()
+    public function isAllowedToCreateCalendarActivateFreeAndBusy(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['activateFreeAndBusy.']);
     }
@@ -1023,7 +1023,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCalendarFreeAndBusyUser()
+    public function isAllowedToCreateCalendarFreeAndBusyUser(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['freeAndBusyUser.']);
     }
@@ -1031,7 +1031,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCalendarType()
+    public function isAllowedToCreateCalendarType(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['type.']);
     }
@@ -1039,7 +1039,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCalendar()
+    public function isAllowedToEditCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']);
     }
@@ -1047,7 +1047,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOnlyOwnCalendar()
+    public function isAllowedToEditOnlyOwnCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['onlyOwnCalendar.']);
     }
@@ -1055,7 +1055,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditPublicCalendar()
+    public function isAllowedToEditPublicCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['publicCalendar.']);
     }
@@ -1063,7 +1063,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCalendarHidden()
+    public function isAllowedToEditCalendarHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['hidden.']);
     }
@@ -1071,7 +1071,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCalendarType()
+    public function isAllowedToEditCalendarType(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['type.']);
     }
@@ -1079,7 +1079,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCalendarTitle()
+    public function isAllowedToEditCalendarTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['title.']);
     }
@@ -1087,7 +1087,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCalendarOwner()
+    public function isAllowedToEditCalendarOwner(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['owner.']);
     }
@@ -1095,7 +1095,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCalendarActivateFreeAndBusy()
+    public function isAllowedToEditCalendarActivateFreeAndBusy(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['activateFreeAndBusy.']);
     }
@@ -1103,7 +1103,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCalendarFreeAndBusyUser()
+    public function isAllowedToEditCalendarFreeAndBusyUser(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['freeAndBusyUser.']);
     }
@@ -1111,7 +1111,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteCalendar()
+    public function isAllowedToDeleteCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['calendar.']);
     }
@@ -1119,7 +1119,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteOnlyOwnCalendar()
+    public function isAllowedToDeleteOnlyOwnCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['calendar.']['onlyOwnCalendar.']);
     }
@@ -1127,7 +1127,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeletePublicCalendar()
+    public function isAllowedToDeletePublicCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['calendar.']['publicCalendar.']);
     }
@@ -1135,7 +1135,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCategory()
+    public function isAllowedToCreateCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']);
     }
@@ -1143,7 +1143,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCategoryHidden()
+    public function isAllowedToCreateCategoryHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['hidden.']);
     }
@@ -1151,7 +1151,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCategoryTitle()
+    public function isAllowedToCreateCategoryTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['title.']);
     }
@@ -1159,7 +1159,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCategoryHeaderStyle()
+    public function isAllowedToCreateCategoryHeaderStyle(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['headerstyle.']);
     }
@@ -1167,7 +1167,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCategoryBodyStyle()
+    public function isAllowedToCreateCategoryBodyStyle(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['bodystyle.']);
     }
@@ -1175,7 +1175,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCategoryCalendar()
+    public function isAllowedToCreateCategoryCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['calendar.']);
     }
@@ -1183,7 +1183,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCategoryParent()
+    public function isAllowedToCreateCategoryParent(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['parent.']);
     }
@@ -1191,7 +1191,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateGeneralCategory()
+    public function isAllowedToCreateGeneralCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['generalCategory.']);
     }
@@ -1199,7 +1199,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreatePublicCategory()
+    public function isAllowedToCreatePublicCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['publicCategory.']);
     }
@@ -1207,7 +1207,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToCreateCategorySharedUser()
+    public function isAllowedToCreateCategorySharedUser(): bool
     {
         return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['sharedUser.']);
     }
@@ -1215,7 +1215,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCategory()
+    public function isAllowedToEditCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']);
     }
@@ -1223,7 +1223,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditOnlyOwnCategory()
+    public function isAllowedToEditOnlyOwnCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['onlyOwnCategory.']);
     }
@@ -1231,7 +1231,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditGeneralCategory()
+    public function isAllowedToEditGeneralCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['generalCategory.']);
     }
@@ -1239,7 +1239,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditPublicCategory()
+    public function isAllowedToEditPublicCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['publicCategory.']);
     }
@@ -1247,7 +1247,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCategoryHidden()
+    public function isAllowedToEditCategoryHidden(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['hidden.']);
     }
@@ -1255,7 +1255,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCategoryTitle()
+    public function isAllowedToEditCategoryTitle(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['title.']);
     }
@@ -1263,7 +1263,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCategoryHeaderstyle()
+    public function isAllowedToEditCategoryHeaderstyle(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['headerstyle.']);
     }
@@ -1271,7 +1271,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCategoryBodystyle()
+    public function isAllowedToEditCategoryBodystyle(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['bodystyle.']);
     }
@@ -1279,7 +1279,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCategoryCalendar()
+    public function isAllowedToEditCategoryCalendar(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['calendar.']);
     }
@@ -1287,7 +1287,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCategoryParent()
+    public function isAllowedToEditCategoryParent(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['parent.']);
     }
@@ -1295,7 +1295,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToEditCategorySharedUser()
+    public function isAllowedToEditCategorySharedUser(): bool
     {
         return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['sharedUser.']);
     }
@@ -1303,7 +1303,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteCategory()
+    public function isAllowedToDeleteCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['category.']);
     }
@@ -1311,7 +1311,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteOnlyOwnCategory()
+    public function isAllowedToDeleteOnlyOwnCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['category.']['onlyOwnCategory.']);
     }
@@ -1319,7 +1319,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeleteGeneralCategory()
+    public function isAllowedToDeleteGeneralCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['category.']['generalCategory.']);
     }
@@ -1327,7 +1327,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToDeletePublicCategory()
+    public function isAllowedToDeletePublicCategory(): bool
     {
         return $this->checkRights($this->conf['rights.']['delete.']['category.']['publicCategory.']);
     }
@@ -1335,7 +1335,7 @@ class RightsService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedToConfigure()
+    public function isAllowedToConfigure(): bool
     {
         return $this->isLoggedIn() && $this->isViewEnabled('admin') && ($this->isCalAdmin() || $this->isAllowedToCreateCalendar() || $this->isAllowedToEditCalendar() || $this->isAllowedToDeleteCalendar() || $this->isAllowedToCreateCategory() || $this->isAllowedToEditCategory() || $this->isAllowedToDeleteCategory() || $this->isAllowedTo(
                     'create',
@@ -1352,13 +1352,13 @@ class RightsService extends BaseService
      * @param string $field
      * @return bool
      */
-    public function isAllowedTo($type, $object, $field = '')
+    public function isAllowedTo($type, $object, $field = ''): bool
     {
         $field = strtolower($field);
         if ($field == '') {
             return $this->checkRights($this->conf['rights.'][$type . '.'][$object . '.']);
         }
-        if ($field == 'teaser' && !$this->confArr['useTeaser']) {
+        if ($field === 'teaser' && !$this->confArr['useTeaser']) {
             return false;
         }
 
@@ -1373,7 +1373,7 @@ class RightsService extends BaseService
      * @param $category
      * @return bool
      */
-    public function checkRights($category)
+    public function checkRights($category): bool
     {
         if ($this->isCalAdmin()) {
             return true;
@@ -1382,12 +1382,12 @@ class RightsService extends BaseService
             $users = explode(',', $category['user']);
             $groups = explode(',', $category['group']);
 
-            if (array_search($this->getUserId(), $users) !== false) {
+            if (in_array($this->getUserId(), $users, true)) {
                 return true;
             }
             $userGroups = $this->getUserGroups();
             foreach ($groups as $key => $group) {
-                if (array_search(ltrim($group), $userGroups) !== false) {
+                if (in_array(ltrim($group), $userGroups, true)) {
                     return true;
                 }
             }
@@ -1401,47 +1401,47 @@ class RightsService extends BaseService
      */
     public function checkView($view)
     {
-        if ($view == 'day' || $view == 'week' || $view == 'month' || $view == 'year' || $view == 'event' || $view == 'todo' || $view == 'location' || $view == 'organizer' || $view == 'list' || $view == 'icslist' || $view == 'search_all' || $view == 'search_event' || $view == 'search_location' || $view == 'search_organizer') {
+        if ($view === 'day' || $view === 'week' || $view === 'month' || $view === 'year' || $view === 'event' || $view === 'todo' || $view === 'location' || $view === 'organizer' || $view === 'list' || $view === 'icslist' || $view === 'search_all' || $view === 'search_event' || $view === 'search_location' || $view === 'search_organizer') {
             // catch all allowed standard view types
-        } elseif (($view == 'ics' || $view == 'single_ics') && $this->conf['view.']['ics.']['showIcsLinks'] && $this->isViewEnabled($view)) {
+        } elseif (($view === 'ics' || $view === 'single_ics') && $this->conf['view.']['ics.']['showIcsLinks'] && $this->isViewEnabled($view)) {
             $this->conf['view.']['allowedViews'] = [
                 0 => $view
             ];
             return $view;
-        } elseif ($view == 'rss') {
+        } elseif ($view === 'rss') {
             $this->conf['view.']['allowedViews'] = [
                 0 => $view
             ];
             return $view;
-        } elseif ($view == 'subscription' && $this->conf['allowSubscribe'] && $this->isViewEnabled($view)) {
-        } elseif ($view == 'translation' && $this->rightsObj->isAllowedTo(
+        } elseif ($view === 'subscription' && $this->conf['allowSubscribe'] && $this->isViewEnabled($view)) {
+        } elseif ($view === 'translation' && $this->rightsObj->isAllowedTo(
                 'create',
                 'translation'
             ) && $this->isViewEnabled($view)) {
-        } elseif ($view == 'meeting' && $this->isViewEnabled($view)) {
-        } elseif ($view == 'admin' && $this->rightsObj->isAllowedToConfigure()) {
-        } elseif (($view == 'load_events' || $view == 'load_todos' || $view == 'load_calendars' || $view == 'load_categories' || $view == 'load_rights' || $view == 'load_locations' || $view == 'load_organizers' || $view == 'search_user_and_group') && $this->conf['view.']['enableAjax']) {
+        } elseif ($view === 'meeting' && $this->isViewEnabled($view)) {
+        } elseif ($view === 'admin' && $this->rightsObj->isAllowedToConfigure()) {
+        } elseif (($view === 'load_events' || $view === 'load_todos' || $view === 'load_calendars' || $view === 'load_categories' || $view === 'load_rights' || $view === 'load_locations' || $view === 'load_organizers' || $view === 'search_user_and_group') && $this->conf['view.']['enableAjax']) {
             // catch all allowed standard view types
-        } elseif (($view == 'save_calendar' || $view == 'edit_calendar' || $view == 'confirm_calendar' || $view == 'delete_calendar' || $view == 'remove_calendar' || $view == 'create_calendar') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateCalendar() || $this->rightsObj->isAllowedToEditCalendar() || $this->rightsObj->isAllowedToDeleteCalendar())) {
-        } elseif (($view == 'save_category' || $view == 'edit_category' || $view == 'confirm_category' || $view == 'delete_category' || $view == 'remove_category' || $view == 'create_category') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateCalendar() || $this->rightsObj->isAllowedToEditCategory() || $this->rightsObj->isAllowedToDeleteCategory())) {
-        } elseif (($view == 'save_event' || $view == 'edit_event' || $view == 'confirm_event' || $view == 'delete_event' || $view == 'remove_event' || $view == 'create_event') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateEvent() || $this->rightsObj->isAllowedToEditEvent() || $this->rightsObj->isAllowedToDeleteEvents())) {
-        } elseif (($view == 'save_exception_event' || $view == 'edit_exception_event' || $view == 'confirm_exception_event' || $view == 'delete_exception_event' || $view == 'remove_exception_event' || $view == 'create_exception_event') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateExceptionEvent() || $this->rightsObj->isAllowedToEditExceptionEvent() || $this->rightsObj->isAllowedToDeleteExceptionEvents())) {
-        } elseif (($view == 'save_location' || $view == 'confirm_location' || $view == 'create_location' || $view == 'edit_location' || $view == 'delete_location' || $view == 'remove_location') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateLocations() || $this->rightsObj->isAllowedToEditLocation() || $this->rightsObj->isAllowedToDeleteLocation())) {
+        } elseif (($view === 'save_calendar' || $view === 'edit_calendar' || $view === 'confirm_calendar' || $view === 'delete_calendar' || $view === 'remove_calendar' || $view === 'create_calendar') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateCalendar() || $this->rightsObj->isAllowedToEditCalendar() || $this->rightsObj->isAllowedToDeleteCalendar())) {
+        } elseif (($view === 'save_category' || $view === 'edit_category' || $view === 'confirm_category' || $view === 'delete_category' || $view === 'remove_category' || $view === 'create_category') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateCalendar() || $this->rightsObj->isAllowedToEditCategory() || $this->rightsObj->isAllowedToDeleteCategory())) {
+        } elseif (($view === 'save_event' || $view === 'edit_event' || $view === 'confirm_event' || $view === 'delete_event' || $view === 'remove_event' || $view === 'create_event') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateEvent() || $this->rightsObj->isAllowedToEditEvent() || $this->rightsObj->isAllowedToDeleteEvents())) {
+        } elseif (($view === 'save_exception_event' || $view === 'edit_exception_event' || $view === 'confirm_exception_event' || $view === 'delete_exception_event' || $view === 'remove_exception_event' || $view === 'create_exception_event') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateExceptionEvent() || $this->rightsObj->isAllowedToEditExceptionEvent() || $this->rightsObj->isAllowedToDeleteExceptionEvents())) {
+        } elseif (($view === 'save_location' || $view === 'confirm_location' || $view === 'create_location' || $view === 'edit_location' || $view === 'delete_location' || $view === 'remove_location') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateLocations() || $this->rightsObj->isAllowedToEditLocation() || $this->rightsObj->isAllowedToDeleteLocation())) {
             // catch create_location view type and check all conditions
-        } elseif (($view == 'save_organizer' || $view == 'confirm_organizer' || $view == 'create_organizer' || $view == 'edit_organizer' || $view == 'delete_organizer' || $view == 'remove_organizer') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateOrganizer() || $this->rightsObj->isAllowedToEditOrganizer() || $this->rightsObj->isAllowedToDeleteOrganizer())) {
+        } elseif (($view === 'save_organizer' || $view === 'confirm_organizer' || $view === 'create_organizer' || $view === 'edit_organizer' || $view === 'delete_organizer' || $view === 'remove_organizer') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateOrganizer() || $this->rightsObj->isAllowedToEditOrganizer() || $this->rightsObj->isAllowedToDeleteOrganizer())) {
             // catch create_organizer view type and check all conditions
             // I'm not sure why this is in here, but I think it shouldn't, b/c you will get an empty create_event view even if you are not allowed to create events
             // } else if ($this->isViewEnabled($view)){
         } else {
             // a not wanted view type -> convert it
             $view = $this->conf['view.']['allowedViews'][0];
-            if ($view == '') {
+            if ($view === '') {
                 $view = 'month';
             }
             $this->conf['type'] = '';
             $this->controller->piVars['type'] = null;
         }
-        if (count($this->conf['view.']['allowedViews']) == 1) {
+        if (count($this->conf['view.']['allowedViews']) === 1) {
             $view = $this->conf['view.']['allowedViews'][0];
             if (!in_array($this->conf['view.']['allowedViews'][0], [
                 'event',
@@ -1452,19 +1452,22 @@ class RightsService extends BaseService
                 $this->piVars['uid'] = null;
                 $this->conf['type'] = '';
                 $this->piVars['type'] = null;
-            } elseif ($this->conf['view.']['allowedViews'][0] == 'event' && (($this->piVars['view'] == 'location' && !in_array(
-                            'location',
-                            $this->conf['view.']['allowedViews']
-                        )) || ($this->piVars['view'] == 'organizer' && !in_array(
-                            'organizer',
-                            $this->conf['view.']['allowedViews']
-                        )))) {
+            } elseif ($this->conf['view.']['allowedViews'][0] === 'event' && (($this->piVars['view'] === 'location' && !in_array(
+                'location',
+                            $this->conf['view.']['allowedViews'],
+                            true
+            )) || ($this->piVars['view'] === 'organizer' && !in_array(
+                                'organizer',
+                            $this->conf['view.']['allowedViews'],
+                                true
+                            )))) {
                 return;
             }
-        } elseif (!($view == 'admin' && $this->rightsObj->isAllowedToConfigure()) && !in_array(
-                $view,
-                $this->conf['view.']['allowedViews']
-            )) {
+        } elseif (!($view === 'admin' && $this->rightsObj->isAllowedToConfigure()) && !in_array(
+            $view,
+                $this->conf['view.']['allowedViews'],
+            true
+        )) {
             $view = $this->conf['view.']['allowedViews'][0];
         }
         if (!$view) {
@@ -1473,10 +1476,13 @@ class RightsService extends BaseService
         return $view;
     }
 
-    /* @todo Is there a way to check for allowed views on other pages that are specified by TS? */
-    public function isViewEnabled($view)
+    /* @todo Is there a way to check for allowed views on other pages that are specified by TS?
+     * @param $view
+     * @return bool
+     */
+    public function isViewEnabled($view): bool
     {
-        if (in_array($view, $this->conf['view.']['allowedViewsToLinkTo'])) {
+        if (in_array($view, $this->conf['view.']['allowedViewsToLinkTo'], true)) {
             return true;
         }
         return false;
@@ -1493,7 +1499,7 @@ class RightsService extends BaseService
         $pagesArray = explode(',', $this->conf['pidList']);
 
         /* If there's only one page in pidList */
-        if (count($pagesArray) == 1) {
+        if (count($pagesArray) === 1) {
             $pid = $pagesArray[0];
 
             /* If a saveTo page does not have a value set, set a default */
@@ -1509,11 +1515,8 @@ class RightsService extends BaseService
     /**
      * Sets a conf value if it is currently empty.
      * Helper function for setDefaultSaveToPage().
-     *
-     * @param
-     *            mixed        The conf value to be set.
-     * @param
-     *            mixed        The value to set.
+     * @param $conf
+     * @param $value
      */
     public function setPidIfEmpty(&$conf, $value)
     {

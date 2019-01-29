@@ -49,7 +49,7 @@ class TodoModel extends EventModel
     /**
      * @return string
      */
-    public function renderEvent()
+    public function renderEvent(): string
     {
         return $this->fillTemplate('###TEMPLATE_TODO###');
     }
@@ -57,7 +57,7 @@ class TodoModel extends EventModel
     /**
      * @return string
      */
-    public function renderTodo()
+    public function renderTodo(): string
     {
         return $this->renderEvent();
     }
@@ -66,22 +66,23 @@ class TodoModel extends EventModel
      * @param $viewType
      * @return string
      */
-    public function renderTodoFor($viewType)
+    public function renderTodoFor($viewType): string
     {
         return $this->renderEventFor($viewType);
     }
 
     /**
      * @param $viewType
+     * @param string $subpartSuffix
      * @return string
      */
-    public function renderEventFor($viewType, $subpartSuffix = '')
+    public function renderEventFor($viewType, $subpartSuffix = ''): string
     {
-        if ($this->conf['view.']['freeAndBusy.']['enable'] == 1) {
+        if ((int)$this->conf['view.']['freeAndBusy.']['enable'] === 1) {
             $viewType .= '_FNB';
         }
         // Need to check if _ALLDAY is already in viewType since handling changed from classic to new standard rendering
-        if (($this->isAllday()) && (strpos($viewType, '_ALLDAY') < 1)) {
+        if ($this->isAllDay() && (strpos($viewType, '_ALLDAY') < 1)) {
             $viewType .= '_ALLDAY';
         }
         return $this->fillTemplate('###TEMPLATE_TODO_' . strtoupper($viewType) . '###');
@@ -90,7 +91,7 @@ class TodoModel extends EventModel
     /**
      * @return string
      */
-    public function renderEventPreview()
+    public function renderEventPreview(): string
     {
         $this->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_TODO_PREVIEW###');
@@ -99,7 +100,7 @@ class TodoModel extends EventModel
     /**
      * @return string
      */
-    public function renderTodoPreview()
+    public function renderTodoPreview(): string
     {
         return $this->renderEventPreview();
     }
@@ -107,7 +108,7 @@ class TodoModel extends EventModel
     /**
      * @return string
      */
-    public function renderTomorrowsEvent()
+    public function renderTomorrowsEvent(): string
     {
         $this->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_TODO_TOMORROW###');
@@ -116,7 +117,7 @@ class TodoModel extends EventModel
     /**
      * @return string
      */
-    public function renderTomorrowsTodo()
+    public function renderTomorrowsTodo(): string
     {
         return $this->renderTomorrowsEvent();
     }
@@ -125,17 +126,16 @@ class TodoModel extends EventModel
      * @param $subpartMarker
      * @return string
      */
-    public function fillTemplate($subpartMarker)
+    public function fillTemplate($subpartMarker): string
     {
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        $page = '';
-        if ($confArr['todoSubtype'] == 'event') {
+        if ($confArr['todoSubtype'] === 'event') {
             $resourcePath = $this->conf['view.']['todo.']['todoInlineModelTemplate'];
         } else {
             $resourcePath = $this->conf['view.']['todo.']['todoSeparateModelTemplate'];
         }
         $page = Functions::getContent($resourcePath);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no todo model template file found:</h3>' . $resourcePath;
         }
         $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
@@ -168,7 +168,7 @@ class TodoModel extends EventModel
     public function getStatusMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###STATUS###'] = '';
-        if ($this->getEventType() == Model::EVENT_TYPE_TODO) {
+        if ($this->getEventType() === Model::EVENT_TYPE_TODO) {
             $this->initLocalCObject($this->getValuesAsArray());
             $this->local_cObj->setCurrentVal($this->getStatus());
             $sims['###STATUS###'] = $this->local_cObj->cObjGetSingle(
@@ -188,7 +188,7 @@ class TodoModel extends EventModel
     public function getPriorityMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###PRIORITY###'] = '';
-        if ($this->getEventType() == Model::EVENT_TYPE_TODO) {
+        if ($this->getEventType() === Model::EVENT_TYPE_TODO) {
             $this->initLocalCObject($this->getValuesAsArray());
             $this->local_cObj->setCurrentVal($this->getPriority());
             $sims['###PRIORITY###'] = $this->local_cObj->cObjGetSingle(
@@ -208,7 +208,7 @@ class TodoModel extends EventModel
     public function getCompletedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###COMPLETED###'] = '';
-        if ($this->getEventType() == Model::EVENT_TYPE_TODO) {
+        if ($this->getEventType() === Model::EVENT_TYPE_TODO) {
             $this->initLocalCObject($this->getValuesAsArray());
             $this->local_cObj->setCurrentVal($this->getCompleted());
             $sims['###COMPLETED###'] = $this->local_cObj->cObjGetSingle(

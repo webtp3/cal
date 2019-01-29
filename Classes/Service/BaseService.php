@@ -17,10 +17,10 @@ namespace TYPO3\CMS\Cal\Service;
 use RuntimeException;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Controller\ModelController;
+use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
@@ -167,16 +167,16 @@ abstract class BaseService extends AbstractService
     {
         foreach ($allIds as $value) {
             preg_match('/(^[ug])_(.*)/', $value, $idname);
-            if ($idname[1] == 'u') {
+            if ($idname[1] === 'u') {
                 $userArray[] = $idname[2];
-            } elseif ($idname[1] == 'g') {
+            } elseif ($idname[1] === 'g') {
                 $groupArray[] = $idname[2];
             }
         }
     }
 
     /**
-     * @param $event
+     * @param Model $event
      * @param $insertFields
      */
     protected static function _notifyOfChanges(&$event, &$insertFields)
@@ -197,7 +197,7 @@ abstract class BaseService extends AbstractService
     }
 
     /**
-     * @param $event
+     * @param Model $event
      */
     protected function _invite(&$event)
     {
@@ -266,7 +266,7 @@ abstract class BaseService extends AbstractService
      */
     protected function checkOnNewOrDeletableFiles($objectType, $type, &$insertFields, $uid)
     {
-        if ($this->conf['view.']['enableAjax'] || $this->conf['view.']['dontShowConfirmView'] == 1) {
+        if ($this->conf['view.']['enableAjax'] || (int)$this->conf['view.']['dontShowConfirmView'] === 1) {
             $insertFields[$type] = [];
             if (is_array($_FILES[$this->prefixId]['name'][$type])) {
                 $files = [];
@@ -279,13 +279,13 @@ abstract class BaseService extends AbstractService
                 }
                 $allowedExt = [];
                 $denyExt = [];
-                if ($type == 'file') {
+                if ($type === 'file') {
                     $allowedExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']);
-                } elseif ($type == 'attachment') {
+                } elseif ($type === 'attachment') {
                     $allowedExt = ['*'];
                     $denyExt = explode(',', PHP_EXTENSIONS_DEFAULT);
                 }
-                $removeFiles = $this->controller->piVars['remove_' . $type] ? $this->controller->piVars['remove_' . $type] : [];
+                $removeFiles = $this->controller->piVars['remove_' . $type] ?: [];
 
                 foreach ($_FILES[$this->prefixId]['name'][$type] as $id => $filename) {
                     if ($_FILES[$this->prefixId]['error'][$type][$id]) {
@@ -293,22 +293,22 @@ abstract class BaseService extends AbstractService
                     }
                     $theFile = GeneralUtility::upload_to_tempfile($_FILES[$this->prefixId]['tmp_name'][$type][$id]);
                     $fI = GeneralUtility::split_fileref($filename);
-                    if (in_array($fI['fileext'], $denyExt)) {
+                    if (in_array($fI['fileext'], $denyExt, true)) {
                         continue;
                     }
-                    if ($type == 'image' && !empty($allowedExt) && !in_array($fI['fileext'], $allowedExt)) {
+                    if ($type === 'image' && !empty($allowedExt) && !in_array($fI['fileext'], $allowedExt, true)) {
                         continue;
                     }
                     $theDestFile = $this->fileFunc->getUniqueName(
                         $this->fileFunc->cleanFileName($fI['file']),
-                        $uploadPath
+                        ''
                     );
                     GeneralUtility::upload_copy_move($theFile, $theDestFile);
                     $insertFields[$type][] = basename($theDestFile);
                 }
 
                 foreach ($files as $file) {
-                    if (in_array($file, $removeFiles)) {
+                    if (in_array($file, $removeFiles, true)) {
                         unlink('typo3temp/' . $file);
                     }
                 }
@@ -319,7 +319,7 @@ abstract class BaseService extends AbstractService
             $this->checkOnTempFile($type, $insertFields, $objectType, $uid);
         }
 
-        $removeFiles = $this->controller->piVars['remove_' . $type] ? $this->controller->piVars['remove_' . $type] : [];
+        $removeFiles = $this->controller->piVars['remove_' . $type] ?: [];
         if (!empty($removeFiles)) {
             $where = 'uid_foreign = ' . $uid . ' AND  tablenames=\'' . $objectType . '\' AND fieldname=\'' . $type . '\' AND uid in (' . implode(
                     ',',
@@ -363,7 +363,6 @@ abstract class BaseService extends AbstractService
         if (!isset($storage)) {
             throw new RuntimeException('Local default storage could not be initialized - might be due to missing sys_file* tables.');
         }
-        $fileFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         $fileIndexRepository = GeneralUtility::makeInstance(FileIndexRepository::class);
         $targetDirectory = PATH_site . $fileadminDirectory . 'user_upload/';
         if (is_array($insertFields[$type])) {
@@ -426,11 +425,11 @@ abstract class BaseService extends AbstractService
         $fileOrig,
         $uid
     ) {
-        if (strlen($fileOrig) == 0) {
+        if ($fileOrig === '') {
             return;
         }
         $fileObject = null;
-        if (substr($fileOrig, 0, 7) == '__NEW__') {
+        if (strpos($fileOrig, '__NEW__') === 0) {
             $file = substr($fileOrig, 7);
             if (file_exists(PATH_site . 'typo3temp/' . $file)) {
                 GeneralUtility::upload_copy_move(
@@ -451,7 +450,7 @@ abstract class BaseService extends AbstractService
                     'sorting_foreign' => 0
                 ];
                 foreach ($this->controller->piVars[$type] as $id => $image) {
-                    if ($image == $fileOrig) {
+                    if ($image === $fileOrig) {
                         if (isset($this->controller->piVars[$type . '_caption'][$id])) {
                             $dataArray['description'] = $this->controller->piVars[$type . '_caption'][$id];
                         }
@@ -474,7 +473,7 @@ abstract class BaseService extends AbstractService
         } else {
             $dataArray = [];
             foreach ($this->controller->piVars[$type] as $id => $image) {
-                if ($image == $fileOrig) {
+                if ($image === $fileOrig) {
                     if (isset($this->controller->piVars[$type . '_caption'][$id])) {
                         $dataArray['description'] = $this->controller->piVars[$type . '_caption'][$id];
                     }
@@ -500,14 +499,14 @@ abstract class BaseService extends AbstractService
      * @param $table
      * @return string
      */
-    protected function getAdditionalWhereForLocalizationAndVersioning($table)
+    protected function getAdditionalWhereForLocalizationAndVersioning($table): string
     {
         $localizationPrefix = 'l18n';
         $selectConf = [];
-        if ('sys_category' == $table) {
+        if ('sys_category' === $table) {
             $localizationPrefix = 'l10n';
         }
-        if ($GLOBALS['TSFE']->sys_language_mode == 'strict' && $GLOBALS['TSFE']->sys_language_content) {
+        if ($GLOBALS['TSFE']->sys_language_mode === 'strict' && $GLOBALS['TSFE']->sys_language_content) {
             // sys_language_mode == 'strict': If a certain language is requested, select only news-records from the default language which have a translation. The translated articles will be overlayed later in the list or single function.
 
             $querryArray = $this->cObj->getQuery($table, [
@@ -526,7 +525,7 @@ abstract class BaseService extends AbstractService
             $GLOBALS['TYPO3_DB']->sql_free_result($tmpres);
 
             $strStrictUids = implode(',', $strictUids);
-            $selectConf['where'] .= '(' . $table . '.uid IN (' . ($strStrictUids ? $strStrictUids : 0) . ') OR ' . $table . '.sys_language_uid=-1)'; // sys_language_uid=-1 =[all languages]
+            $selectConf['where'] .= '(' . $table . '.uid IN (' . ($strStrictUids ?: 0) . ') OR ' . $table . '.sys_language_uid=-1)'; // sys_language_uid=-1 =[all languages]
         } else {
             // sys_language_mode != 'strict': If a certain language is requested, select only news-records in the default language. The translated articles (if they exist) will be overlayed later in the list or single function.
             $selectConf['where'] .= $table . '.sys_language_uid IN (0,-1)';
@@ -569,40 +568,39 @@ abstract class BaseService extends AbstractService
      * @param $table
      * @return mixed
      */
-    protected static function checkUidForLanguageOverlay($uid, $table)
+    protected static function checkUidForLanguageOverlay($uid, $table): int
     {
         $select = $table . '.*';
         $where = $table . '.uid = ' . $uid;
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($GLOBALS['TSFE']->sys_language_content) {
-                    $row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
-                        $table,
-                        $row,
-                        $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
-                    );
-                }
-                if ($GLOBALS['TSFE']->sys_page->versioningPreview == true) {
-                    // get workspaces Overlay
-                    $GLOBALS['TSFE']->sys_page->versionOL($table, $row);
-                }
-                if ($row['_LOCALIZED_UID']) {
-                    $uid = $row['_LOCALIZED_UID'];
-                }
-                return $uid;
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
+            if ($GLOBALS['TSFE']->sys_language_content) {
+                $row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
+                    $table,
+                    $row,
+                    $GLOBALS['TSFE']->sys_language_content,
+                    $GLOBALS['TSFE']->sys_language_contentOL
+                );
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+            if ($GLOBALS['TSFE']->sys_page->versioningPreview == true) {
+                // get workspaces Overlay
+                $GLOBALS['TSFE']->sys_page->versionOL($table, $row);
+            }
+            if ($row['_LOCALIZED_UID']) {
+                $uid = $row['_LOCALIZED_UID'];
+            }
+            return $uid;
         }
-        return $uid;
+        $GLOBALS['TYPO3_DB']->sql_free_result($result);
+
+        return (int)$uid;
     }
 
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return get_class($this);
     }

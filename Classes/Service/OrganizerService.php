@@ -17,7 +17,6 @@ namespace TYPO3\CMS\Cal\Service;
 use RuntimeException;
 use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;
-use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -33,16 +32,11 @@ class OrganizerService extends BaseService
      * Looks for an organizer with a given uid on a certain pid-list
      *
      * @param int $uid
-     *            to search for
      * @param string $pidList
-     *            to search in
-     * @return object tx_cal_organizer object
+     * @return Organizer
      */
-    public function find($uid, $pidList)
+    public function find($uid, $pidList): Organizer
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $organizerArray = $this->getOrganizerFromTable($pidList, ' AND tx_cal_organizer.uid=' . $uid);
         return $organizerArray[0];
     }
@@ -51,14 +45,10 @@ class OrganizerService extends BaseService
      * Looks for an organizer with a given uid on a certain pid-list
      *
      * @param string $pidList
-     *            to search in
-     * @return array tx_cal_organizer object array
+     * @return array
      */
-    public function findAll($pidList)
+    public function findAll($pidList): array
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         return $this->getOrganizerFromTable($pidList);
     }
 
@@ -66,16 +56,11 @@ class OrganizerService extends BaseService
      * Search for organizer
      *
      * @param string $pidList
-     *            to search in
      * @param string $searchword
-     *            to search for
      * @return array containing the organizer objects
      */
-    public function search($pidList = '', $searchword)
+    public function search($pidList, $searchword): array
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         return $this->getOrganizerFromTable($pidList, $this->searchWhere($searchword));
     }
 
@@ -83,26 +68,20 @@ class OrganizerService extends BaseService
      * Generates the sql query and builds organizer objects out of the result rows
      *
      * @param string $pidList
-     *            to search in
      * @param string $additionalWhere
-     *            where clause
      * @return array containing the organizer objects
      */
-    public function getOrganizerFromTable($pidList = '', $additionalWhere = '')
+    public function getOrganizerFromTable($pidList, $additionalWhere = ''): array
     {
         $organizers = [];
         $orderBy = Functions::getOrderBy('tx_cal_organizer');
-        if ($pidList != '') {
+        if ($pidList !== '') {
             $additionalWhere .= ' AND tx_cal_organizer.pid IN (' . $pidList . ')';
         }
         $additionalWhere .= $this->getAdditionalWhereForLocalizationAndVersioning('tx_cal_organizer');
         $table = 'tx_cal_organizer';
         $select = '*';
         $where = ' l18n_parent = 0 ' . $additionalWhere . $this->cObj->enableFields('tx_cal_organizer');
-
-        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-        $feUserUid = $rightsObj->getUserId();
-        $feGroupsArray = $rightsObj->getUserGroups();
 
         $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_organizer_service',
@@ -123,8 +102,7 @@ class OrganizerService extends BaseService
                         'tx_cal_organizer',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
                 if ($GLOBALS['TSFE']->sys_page->versioningPreview == true) {
@@ -141,9 +119,9 @@ class OrganizerService extends BaseService
                 $sharedUserResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
                 if ($sharedUserResult) {
                     while ($sharedUserRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($sharedUserResult)) {
-                        if ($sharedUserRow['tablenames'] == 'fe_users') {
+                        if ($sharedUserRow['tablenames'] === 'fe_users') {
                             $lastOrganizer->addSharedUser($sharedUserRow['uid_foreign']);
-                        } elseif ($sharedUserRow['tablenames'] == 'fe_groups') {
+                        } elseif ($sharedUserRow['tablenames'] === 'fe_groups') {
                             $lastOrganizer->addSharedGroup($sharedUserRow['uid_foreign']);
                         }
                     }
@@ -162,11 +140,8 @@ class OrganizerService extends BaseService
      * @param string $sw :
      * @return string
      */
-    public function searchWhere($sw)
+    public function searchWhere($sw): string
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $where = $this->cObj->searchWhere(
             $sw,
             $this->conf['view.']['search.']['searchOrganizerFieldList'],
@@ -177,13 +152,10 @@ class OrganizerService extends BaseService
 
     /**
      * @param $uid
-     * @return object|void
+     * @return Organizer
      */
-    public function updateOrganizer($uid)
+    public function updateOrganizer($uid): Organizer
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $insertFields = [
             'tstamp' => time()
         ];
@@ -203,9 +175,9 @@ class OrganizerService extends BaseService
         }
         foreach ($values as $entry) {
             preg_match('/(^[a-z])_([0-9]+)/', $entry, $idname);
-            if ($idname[1] == 'u') {
+            if ($idname[1] === 'u') {
                 $sharedUsers[] = $idname[2];
-            } elseif ($idname[1] == 'g') {
+            } elseif ($idname[1] === 'g') {
                 $sharedGroups[] = $idname[2];
             }
         }
@@ -278,7 +250,7 @@ class OrganizerService extends BaseService
         // Creating DB records
         $table = 'tx_cal_organizer';
         $where = 'uid = ' . $uid;
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
         $this->unsetPiVars();
         return $this->find($uid, $this->conf['pidList']);
     }
@@ -288,9 +260,6 @@ class OrganizerService extends BaseService
      */
     public function removeOrganizer($uid)
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         if ($this->rightsObj->isAllowedToDeleteOrganizer()) {
             $updateFields = [
                 'tstamp' => time(),
@@ -298,7 +267,7 @@ class OrganizerService extends BaseService
             ];
             $table = 'tx_cal_organizer';
             $where = 'uid = ' . $uid;
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
         }
         $this->unsetPiVars();
     }
@@ -308,11 +277,8 @@ class OrganizerService extends BaseService
      */
     public function retrievePostData(&$insertFields)
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $hidden = 0;
-        if ($this->controller->piVars['hidden'] == 'true' && ($this->rightsObj->isAllowedToEditOrganizerHidden() || $this->rightsObj->isAllowedToCreateOrganizerHidden())) {
+        if ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedToEditOrganizerHidden() || $this->rightsObj->isAllowedToCreateOrganizerHidden())) {
             $hidden = 1;
         }
         $insertFields['hidden'] = $hidden;
@@ -322,7 +288,7 @@ class OrganizerService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerDescription() || $this->rightsObj->isAllowedToCreateOrganizerDescription()) {
-            $insertFields['description'] = $this->cObj->removeBadHTML(
+            $insertFields['description'] = htmlspecialchars(
                 $this->controller->piVars['description'],
                 $this->conf
             );
@@ -383,13 +349,10 @@ class OrganizerService extends BaseService
 
     /**
      * @param $pid
-     * @return object|void
+     * @return Organizer
      */
-    public function saveOrganizer($pid)
+    public function saveOrganizer($pid): Organizer
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $crdate = time();
         $insertFields = [
             'pid' => $pid,
@@ -437,9 +400,9 @@ class OrganizerService extends BaseService
         }
         foreach ($values as $entry) {
             preg_match('/(^[a-z])_([0-9]+)/', $entry, $idname);
-            if ($idname[1] == 'u') {
+            if ($idname[1] === 'u') {
                 $sharedUsers[] = $idname[2];
-            } elseif ($idname[1] == 'g') {
+            } elseif ($idname[1] === 'g') {
                 $sharedGroups[] = $idname[2];
             }
         }
@@ -477,7 +440,7 @@ class OrganizerService extends BaseService
             }
         } else {
             $idArray = [];
-            if ($this->conf['rights.']['create.']['organizer.']['fields.']['shared.']['defaultUser'] != '') {
+            if ($this->conf['rights.']['create.']['organizer.']['fields.']['shared.']['defaultUser'] !== '') {
                 $idArray = explode(
                     ',',
                     $this->conf['rights.']['create.']['organizer.']['fields.']['shared.']['defaultUser']
@@ -497,7 +460,7 @@ class OrganizerService extends BaseService
             }
 
             $groupArray = [];
-            if ($this->conf['rights.']['create.']['organizer.']['fields.']['shared.']['defaultGroup'] != '') {
+            if ($this->conf['rights.']['create.']['organizer.']['fields.']['shared.']['defaultGroup'] !== '') {
                 $groupArray = GeneralUtility::trimExplode(
                     ',',
                     $this->conf['rights.']['create.']['organizer.']['fields.']['shared.']['defaultGroup'],
@@ -531,14 +494,11 @@ class OrganizerService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedService()
+    public function isAllowedService(): bool
     {
-        $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        $useOrganizerStructure = ($this->confArr['useOrganizerStructure'] ? $this->confArr['useOrganizerStructure'] : 'tx_cal_organizer');
-        if ($useOrganizerStructure == $this->keyId) {
-            return true;
-        }
-        return false;
+        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $useOrganizerStructure = ($confArr['useOrganizerStructure'] ?: 'tx_cal_organizer');
+        return $useOrganizerStructure === $this->keyId;
     }
 
     /**
@@ -564,7 +524,6 @@ class OrganizerService extends BaseService
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
-        return;
     }
 
     public function unsetPiVars()

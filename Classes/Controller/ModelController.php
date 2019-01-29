@@ -15,7 +15,18 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use Doctrine\DBAL\FetchMode;
+use TYPO3\CMS\Cal\Model\AttendeeModel;
+use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Model\Location;
+use TYPO3\CMS\Cal\Model\Organizer;
+use TYPO3\CMS\Cal\Service\AttendeeService;
+use TYPO3\CMS\Cal\Service\CalendarService;
+use TYPO3\CMS\Cal\Service\EventService;
+use TYPO3\CMS\Cal\Service\LocationService;
+use TYPO3\CMS\Cal\Service\OrganizerService;
+use TYPO3\CMS\Cal\Service\SysCategoryService;
+use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -30,7 +41,7 @@ class ModelController extends BaseController
     /** @var ConnectionPool $connectionPool */
     public $connectionPool;
 
-    private $todoSubtype = 'event';
+    private $todoSubtype;
 
     public function __construct()
     {
@@ -41,9 +52,21 @@ class ModelController extends BaseController
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
     }
 
+    /**
+     * @param int $uid
+     * @param string $type
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
+     * @return EventModel
+     */
     public function findEvent(
         $uid,
-        $type = '',
+        $type = 'tx_cal_phpicalendar',
         $pidList = '',
         $showHiddenEvents = false,
         $showDeletedEvents = false,
@@ -51,11 +74,8 @@ class ModelController extends BaseController
         $disableCalendarSearchString = false,
         $disableCategorySearchString = false,
         $eventType = '0,1,2,3'
-    ) {
-        if ($uid == '') {
-            return null;
-        }
-        if ($type == '') {
+    ): EventModel {
+        if ($type === '') {
             $type = 'tx_cal_phpicalendar';
         }
         $event = $this->find(
@@ -74,6 +94,18 @@ class ModelController extends BaseController
         return $event;
     }
 
+    /**
+     * @param int $uid
+     * @param string $type
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
+     * @return EventModel
+     */
     public function findTodo(
         $uid,
         $type = 'tx_cal_todo',
@@ -84,10 +116,7 @@ class ModelController extends BaseController
         $disableCalendarSearchString = false,
         $disableCategorySearchString = false,
         $eventType = '0,1,2,3'
-    ) {
-        if ($uid == '') {
-            return null;
-        }
+    ): EventModel {
         $event = $this->find(
             'cal_event_model',
             $uid,
@@ -104,12 +133,28 @@ class ModelController extends BaseController
         return $event;
     }
 
-    public function createEvent($type)
+    /**
+     * @param $type
+     * @return EventModel
+     */
+    public function createEvent($type): EventModel
     {
         $event = $this->create('cal_event_model', $type, 'event');
         return $event;
     }
 
+    /**
+     * @param int $uid
+     * @param string $type
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
+     * @return EventModel
+     */
     public function findAllEventInstances(
         $uid,
         $type = '',
@@ -120,10 +165,7 @@ class ModelController extends BaseController
         $disableCalendarSearchString = false,
         $disableCategorySearchString = false,
         $eventType = '0,1,2,3'
-    ) {
-        if ($uid == '') {
-            return null;
-        }
+    ): EventModel {
         $event_s = $this->find(
             'cal_event_model',
             $uid,
@@ -140,53 +182,93 @@ class ModelController extends BaseController
         return $event_s;
     }
 
-    public function saveEvent($uid, $type, $pid = '')
+    /**
+     * @param int $uid
+     * @param $type
+     * @param string $pid
+     * @return EventModel
+     * @throws \TYPO3\CMS\Core\Exception
+     */
+    public function saveEvent($uid, $type, $pid = ''): EventModel
     {
+        /** @var EventService $service */
         $service = $this->getServiceObjByKey('cal_event_model', 'event', $type);
-        if (is_numeric($uid) && $uid != 0 && ($uid > 0)) {
+        if ($uid > 0) {
             return $service->updateEvent($uid);
         }
         return $service->saveEvent($pid);
     }
 
+    /**
+     * @param int $uid
+     * @param $type
+     */
     public function removeEvent($uid, $type)
     {
+        /** @var EventService $service */
         $service = $this->getServiceObjByKey('cal_event_model', 'event', $type);
-
-        if (is_numeric($uid) && $uid != 0 && ($uid > 0)) {
-            return $service->removeEvent($uid);
+        if ($uid > 0) {
+            $service->removeEvent($uid);
         }
-        return null;
     }
 
-    public function saveTodo($uid, $type, $pid = '')
+    /**
+     * @param int $uid
+     * @param $type
+     * @param string $pid
+     * @return EventModel
+     * @throws \TYPO3\CMS\Core\Exception
+     */
+    public function saveTodo(int $uid, $type, $pid = ''): EventModel
     {
+        /** @var EventService $service */
         $service = $this->getServiceObjByKey('cal_event_model', $this->todoSubtype, $type);
-        if (is_numeric($uid) && $uid != 0 && ($uid > 0)) {
+        if ($uid > 0) {
             return $service->updateEvent($uid);
         }
         return $service->saveEvent($pid);
     }
 
-    public function removeTodo($uid, $type)
+    /**
+     * @param int $uid
+     * @param $type
+     */
+    public function removeTodo(int $uid, $type)
     {
+        /** @var EventService $service */
         $service = $this->getServiceObjByKey('cal_event_model', $this->todoSubtype, $type);
-
-        if (is_numeric($uid) && $uid != 0 && ($uid > 0)) {
-            return $service->removeEvent($uid);
+        if ($uid > 0) {
+            $service->removeEvent($uid);
         }
-        return null;
     }
 
+    /**
+     * @param int $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveExceptionEvent($uid, $type, $pid = '')
     {
         $service = $this->getServiceObjByKey('cal_event_model', 'event', $type);
-        if (is_numeric($uid) && $uid != 0 && ($uid > 0)) {
+        if ($uid > 0) {
             return $service->updateExceptionEvent($uid);
         }
         return $service->saveExceptionEvent($pid);
     }
 
+    /**
+     * @param int $uid
+     * @param string $type
+     * @param string $pidList
+     * @param bool $showHiddenEvents
+     * @param bool $showDeletedEvents
+     * @param bool $getAllInstances
+     * @param bool $disableCalendarSearchString
+     * @param bool $disableCategorySearchString
+     * @param string $eventType
+     * @return EventModel
+     */
     public function findAllTodoInstances(
         $uid,
         $type = '',
@@ -197,7 +279,7 @@ class ModelController extends BaseController
         $disableCalendarSearchString = false,
         $disableCategorySearchString = false,
         $eventType = '4'
-    ) {
+    ): EventModel {
         return $this->find(
             'cal_event_model',
             $uid,
@@ -213,88 +295,102 @@ class ModelController extends BaseController
         );
     }
 
-    public function findLocation($uid, $type = '', $pidList = '')
+    /**
+     * @param int $uid
+     * @param string $type
+     * @param string $pidList
+     * @return Location
+     */
+    public function findLocation($uid, $type = 'tx_cal_location', $pidList = ''): Location
     {
-        if ($uid == '') {
-            return null;
-        }
-        if ($type == '') {
-            $type = 'tx_cal_location';
-        }
-        /* Gets the model for the provided service key */
+        /** @var LocationService $service */
         $service = $this->getServiceObjByKey('cal_location_model', 'location', $type);
-        /* Look up an event with a specific ID inside the model */
         $location = $service->find($uid, $pidList);
-
         return $location;
     }
 
-    public function findAllLocations($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findAllLocations($type = '', $pidList = ''): array
     {
-
-        /* Gets the model for the provided service key */
+        /** @var LocationService $service */
         $service = $this->getServiceObjByKey('cal_location_model', 'location', $type);
-        /* Look up an event with a specific ID inside the model */
         $locations = $service->findAll($pidList);
-
         return $locations;
     }
 
+    /**
+     * @param int $uid
+     * @param $type
+     * @param string $pid
+     * @return mixed
+     */
     public function saveLocation($uid, $type, $pid = '')
     {
+        /** @var LocationService $service */
         $service = $this->getServiceObjByKey('cal_location_model', 'location', $type);
-        if (is_numeric($uid) && $uid != 0) {
+        if ($uid > 0) {
             return $service->updateLocation($uid);
         }
         return $service->saveLocation($pid);
     }
 
+    /**
+     * @param int $uid
+     * @param $type
+     */
     public function removeLocation($uid, $type)
     {
+        /** @var LocationService $service */
         $service = $this->getServiceObjByKey('cal_location_model', 'location', $type);
-        if (is_numeric($uid) && $uid != 0) {
-            return $service->removeLocation($uid);
+        if ($uid > 0) {
+            $service->removeLocation($uid);
         }
-        return null;
     }
 
-    public function findOrganizer($uid, $type = '', $pidList = '')
+    /**
+     * @param int $uid
+     * @param string $type
+     * @param string $pidList
+     * @return Organizer
+     */
+    public function findOrganizer(int $uid, $type = 'tx_cal_organizer', $pidList = ''): Organizer
     {
-        if ($uid == '') {
-            return null;
-        }
-        if ($type == '') {
-            $type = 'tx_cal_organizer';
-        }
-        /* Gets the model for the provided service key */
+        /** @var OrganizerService $service */
         $service = $this->getServiceObjByKey('cal_organizer_model', 'organizer', $type);
-        /* Look up an event with a specific ID inside the model */
         $organizer = $service->find($uid, $pidList);
         return $organizer;
     }
 
-    public function findCalendar($uid, $type = 'tx_cal_calendar', $pidList = '')
+    /**
+     * @param int $uid
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findCalendar($uid, $type = 'tx_cal_calendar', $pidList = ''): array
     {
-        if ($uid == '') {
-            return null;
-        }
-        if ($type == '') {
-            $type = 'tx_cal_calendar';
-        }
-        /* Gets the model for the provided service key */
+        /** @var CalendarService $service */
         $service = $this->getServiceObjByKey('cal_calendar_model', 'calendar', $type);
-        /* Look up an event with a specific ID inside the model */
         $calendar = $service->find($uid, $pidList);
         return $calendar;
     }
 
-    public function findAllCalendar($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findAllCalendar($type = '', $pidList = ''): array
     {
         /* No key provided so return all events */
         $serviceName = 'cal_calendar_model';
         $calendar = [];
 
-        if ($type == '') {
+        if ($type === '') {
             $serviceChain = '';
 
             /* Iterate over all classes providing the cal_model service */
@@ -303,165 +399,256 @@ class ModelController extends BaseController
                 $serviceChain .= ',' . $service->getServiceKey();
             }
         } else {
-            /* Gets the model for the provided service key */
             $service = &$this->getServiceObjByKey($serviceName, 'calendar', $type);
-            /* Look up an event with a specific ID inside the model */
             $calendar [$type] = $service->findAll($pidList);
         }
 
         return $calendar;
     }
 
-    public function findAllOrganizer($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findAllOrganizer($type = '', $pidList = ''): array
     {
-
-        /* Gets the model for the provided service key */
         $service = $this->getServiceObjByKey('cal_organizer_model', 'organizer', $type);
-        /* Look up an event with a specific ID inside the model */
         $organizer = $service->findAll($pidList);
-
         return $organizer;
     }
 
-    public function saveOrganizer($uid, $type, $pid = '')
+    /**
+     * @param int $uid
+     * @param $type
+     * @param string $pid
+     * @return Organizer
+     */
+    public function saveOrganizer($uid, $type, $pid = ''): Organizer
     {
+        /** @var OrganizerService $service */
         $service = $this->getServiceObjByKey('cal_organizer_model', 'organizer', $type);
-        if (is_numeric($uid) && $uid != 0) {
+        if ($uid > 0) {
             return $service->updateOrganizer($uid);
         }
         return $service->saveOrganizer($pid);
     }
 
+    /**
+     * @param int $uid
+     * @param $type
+     */
     public function removeOrganizer($uid, $type)
     {
+        /** @var OrganizerService $service */
         $service = $this->getServiceObjByKey('cal_organizer_model', 'organizer', $type);
-        if (is_numeric($uid) && $uid != 0) {
-            return $service->removeOrganizer($uid);
+        if ($uid > 0) {
+            $service->removeOrganizer($uid);
         }
-        return null;
     }
 
-    public function saveCalendar($uid, $type, $pid = '')
+    /**
+     * @param int $uid
+     * @param $type
+     * @param string $pid
+     * @return array
+     */
+    public function saveCalendar($uid, $type, $pid = ''): array
     {
+        /** @var CalendarService $service */
         $service = $this->getServiceObjByKey('cal_calendar_model', 'calendar', $type);
-        if (is_numeric($uid) && $uid != 0) {
+        if ($uid > 0) {
             return $service->updateCalendar($uid);
         }
         return $service->saveCalendar($pid);
     }
 
+    /**
+     * @param int $uid
+     * @param $type
+     */
     public function removeCalendar($uid, $type)
     {
+        /** @var CalendarService $service */
         $service = $this->getServiceObjByKey('cal_calendar_model', 'calendar', $type);
-        if (is_numeric($uid) && $uid != 0) {
-            return $service->removeCalendar($uid);
+        if ($uid > 0) {
+            $service->removeCalendar($uid);
         }
-        return null;
     }
 
-    public function saveCategory($uid, $type, $pid = '')
+    /**
+     * @param int $uid
+     * @param $type
+     * @param string $pid
+     * @return CategoryModel
+     */
+    public function saveCategory($uid, $type, $pid = ''): CategoryModel
     {
+        /** @var SysCategoryService $service */
         $service = $this->getServiceObjByKey('cal_category_model', 'category', $type);
-        if (is_numeric($uid) && $uid != 0) {
+        if ($uid > 0) {
             return $service->updateCategory($uid);
         }
         return $service->saveCategory($pid);
     }
 
+    /**
+     * @param int $uid
+     * @param $type
+     */
     public function removeCategory($uid, $type)
     {
+        /** @var SysCategoryService $service */
         $service = $this->getServiceObjByKey('cal_category_model', 'category', $type);
-        if (is_numeric($uid) && $uid != 0) {
-            return $service->removeCategory($uid);
+        if ($uid > 0) {
+            $service->removeCategory($uid);
         }
-        return null;
     }
 
-    public function findAttendee($uid, $type = '', $pidList = '')
+    /**
+     * @param int $uid
+     * @param string $type
+     * @param string $pidList
+     * @return AttendeeModel
+     */
+    public function findAttendee($uid, $type = '', $pidList = ''): AttendeeModel
     {
-        if ($uid == '') {
-            return null;
-        }
-        /* Gets the model for the provided service key */
+        /** @var AttendeeService $service */
         $service = $this->getServiceObjByKey('cal_attendee_model', 'attendee', $type);
-        /* Look up an attendee with a specific ID inside the model */
         $attendee = $service->find($uid, $pidList);
-
         return $attendee;
     }
 
-    public function findAllAttendees($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findAllAttendees($type = '', $pidList = ''): array
     {
+        /** @var AttendeeService $service */
         $service = $this->getServiceObjByKey('cal_attendee_model', 'attendee', $type);
-
-        /* Look up an attendee with a specific ID inside the model */
-        $attendees = $service->findAllObjects('attendee', $type, $pidList);
-
+        $attendees = $service->findAll($pidList);
         return $attendees;
     }
 
-    public function findEventAttendees($eventUid, $type = '', $pidList = '')
+    /**
+     * @param $eventUid
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findEventAttendees($eventUid, $type = '', $pidList = ''): array
     {
-
-        /* Gets the model for the provided service key */
         $attendees = $this->findAllObjects('attendee', $type, $pidList, 'findEventAttendees', $eventUid);
         return $attendees;
     }
 
+    /**
+     * @param $eventUid
+     * @param string $type
+     * @param string $pidList
+     */
     public function updateEventAttendees($eventUid, $type = '', $pidList = '')
     {
-        /* Gets the model for the provided service key */
         $service = $this->getServiceObjByKey('cal_event_model', 'event', $type);
-        /* Look up an attendee with a specific ID inside the model */
         $service->updateAttendees($eventUid);
     }
 
-    public function saveAttendee($uid, $type, $pid = '')
+    /**
+     * @param int $uid
+     * @param $type
+     * @param string $pid
+     * @return AttendeeModel
+     */
+    public function saveAttendee($uid, $type, $pid = ''): AttendeeModel
     {
+        /** @var AttendeeService $service */
         $service = $this->getServiceObjByKey('cal_attendee_model', 'attendee', $type);
-        if (is_numeric($uid) && $uid != 0) {
+        if ($uid > 0) {
             return $service->updateAttendee($uid);
         }
         return $service->saveAttendee($pid);
     }
 
+    /**
+     * @param int $uid
+     * @param $type
+     */
     public function removeAttendee($uid, $type)
     {
+        /** @var AttendeeService $service */
         $service = $this->getServiceObjByKey('cal_attendee_model', 'attendee', $type);
-        if (is_numeric($uid) && $uid != 0) {
-            return $service->removeAttendee($uid);
+        if ($uid > 0) {
+            $service->removeAttendee($uid);
         }
-        return null;
     }
 
-    public function findEventsForDay(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3')
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findEventsForDay(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3'): array
     {
         $starttime = Calendar::calculateStartDayTime($dateObject);
         $endtime = Calendar::calculateEndDayTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
     }
 
-    public function findEventsForWeek(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3')
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findEventsForWeek(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3'): array
     {
         $starttime = Calendar::calculateStartWeekTime($dateObject);
         $endtime = Calendar::calculateEndWeekTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
     }
 
-    public function findEventsForMonth(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3')
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findEventsForMonth(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3'): array
     {
         $starttime = Calendar::calculateStartMonthTime($dateObject);
         $endtime = Calendar::calculateEndMonthTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
     }
 
-    public function findEventsForYear(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3')
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findEventsForYear(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3'): array
     {
         $starttime = Calendar::calculateStartYearTime($dateObject);
         $endtime = Calendar::calculateEndYearTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
     }
 
+    /**
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @param string $additionalWhere
+     * @return array
+     */
     public function findEventsForList(
         &$startDateObject,
         &$endDateObject,
@@ -469,74 +656,153 @@ class ModelController extends BaseController
         $pidList = '',
         $eventType = '0,1,2,3',
         $additionalWhere = ''
-    ) {
+    ): array {
         return $this->findAllWithin('cal_event_model', $startDateObject, $endDateObject, $type, 'event', $pidList, $eventType, $additionalWhere);
     }
 
-    public function findTodosForDay(&$dateObject, $type = '', $pidList = '', $eventType = '4')
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findTodosForDay(&$dateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
         $starttime = Calendar::calculateStartDayTime($dateObject);
         $endtime = Calendar::calculateEndDayTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
-    public function findTodosForWeek(&$dateObject, $type = '', $pidList = '', $eventType = '4')
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findTodosForWeek(&$dateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
         $starttime = Calendar::calculateStartWeekTime($dateObject);
         $endtime = Calendar::calculateEndWeekTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
-    public function findTodosForMonth(&$dateObject, $type = '', $pidList = '', $eventType = '4')
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findTodosForMonth(&$dateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
         $starttime = Calendar::calculateStartMonthTime($dateObject);
         $endtime = Calendar::calculateEndMonthTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
-    public function findTodosForYear(&$dateObject, $type = '', $pidList = '', $eventType = '4')
+    /**
+     * @param $dateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findTodosForYear(&$dateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
         $starttime = Calendar::calculateStartYearTime($dateObject);
         $endtime = Calendar::calculateEndYearTime($dateObject);
         return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
-    public function findTodosForList(&$startDateObject, &$endDateObject, $type = '', $pidList = '', $eventType = '4')
+    /**
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param string $type
+     * @param string $pidList
+     * @param string $eventType
+     * @return array
+     */
+    public function findTodosForList(&$startDateObject, &$endDateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
         return $this->findAllWithin('cal_event_model', $startDateObject, $endDateObject, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
-    public function findCurrentTodos($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findCurrentTodos($type = '', $pidList = ''): array
     {
-        /* Gets the model for the provided service key */
         return $this->findAllObjects($this->todoSubtype, $type, $pidList, 'findCurrentTodos');
     }
 
-    public function findCategoriesForList($type = '', $pidList = '')
+    /**
+     * @param string $type
+     * @param string $pidList
+     * @return array
+     */
+    public function findCategoriesForList($type = '', $pidList = ''): array
     {
         return $this->findAllCategories('cal_category_model', $type, $pidList);
     }
 
-    public function findEventsForIcs($type, $pidList)
+    /**
+     * @param $type
+     * @param $pidList
+     * @return array
+     */
+    public function findEventsForIcs($type, $pidList): array
     {
         return $this->findAll('cal_event_model', $type, 'event', $pidList, '0,1,2,3');
     }
 
-    public function findEventsForRss(&$startDateObject, &$endDateObject, $type, $pidList)
+    /**
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param $type
+     * @param $pidList
+     * @return array
+     */
+    public function findEventsForRss(&$startDateObject, &$endDateObject, $type, $pidList): array
     {
         return $this->findAllWithin('cal_event_model', $startDateObject, $endDateObject, $type, 'event', $pidList, '0,1,2,3');
     }
 
-    public function findTodosForIcs($type, $pidList)
+    /**
+     * @param $type
+     * @param $pidList
+     * @return array
+     */
+    public function findTodosForIcs($type, $pidList): array
     {
         return $this->findAll('cal_event_model', $type, 'event', $pidList, '4');
     }
 
-    public function findTodosForRss(&$startDateObject, &$endDateObject, $type, $pidList)
+    /**
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param $type
+     * @param $pidList
+     * @return array
+     */
+    public function findTodosForRss(&$startDateObject, &$endDateObject, $type, $pidList): array
     {
         return $this->findAllWithin('cal_event_model', $startDateObject, $endDateObject, $type, $this->todoSubtype, $pidList, '4');
     }
 
+    /**
+     * @param $type
+     * @param $pidList
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param $searchword
+     * @param $locationIds
+     * @param $organizerIds
+     * @return array
+     */
     public function searchEvents(
         $type,
         $pidList,
@@ -545,10 +811,20 @@ class ModelController extends BaseController
         $searchword,
         $locationIds,
         $organizerIds
-    ) {
+    ): array {
         return $this->_searchEvents('cal_event_model', $type, $pidList, $startDateObject, $endDateObject, $searchword, $locationIds, $organizerIds, '0,1,2,3');
     }
 
+    /**
+     * @param $type
+     * @param $pidList
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param $searchword
+     * @param $locationIds
+     * @param $organizerIds
+     * @return array
+     */
     public function searchTodos(
         $type,
         $pidList,
@@ -557,35 +833,52 @@ class ModelController extends BaseController
         $searchword,
         $locationIds,
         $organizerIds
-    ) {
+    ): array {
         return $this->_searchEvents('cal_event_model', $type, $pidList, $startDateObject, $endDateObject, $searchword, $locationIds, $organizerIds, '4');
     }
 
-    public function searchLocation($type, $pidList, $searchword)
+    /**
+     * @param $type
+     * @param $pidList
+     * @param $searchword
+     * @return array
+     */
+    public function searchLocation($type, $pidList, $searchword): array
     {
         return $this->_searchAddress('cal_location_model', $type, 'location', $pidList, $searchword);
     }
 
-    public function searchOrganizer($type, $pidList, $searchword)
+    /**
+     * @param $type
+     * @param $pidList
+     * @param $searchword
+     * @return array
+     */
+    public function searchOrganizer($type, $pidList, $searchword): array
     {
         return $this->_searchAddress('cal_organizer_model', $type, 'organizer', $pidList, $searchword);
     }
 
+    /**
+     * @param int $uid
+     * @param $overlay
+     * @param $serviceName
+     * @param $type
+     * @param $subtype
+     */
     public function createTranslation($uid, $overlay, $serviceName, $type, $subtype)
     {
-        /* Gets the model for the provided service key */
         $service = $this->getServiceObjByKey($serviceName, $subtype, $type);
-        /* Look up an event with a specific ID inside the model */
         $service->createTranslation($uid, $overlay);
     }
 
-    public function findFeUser($uid)
+    /**
+     * @param int $uid
+     * @return array
+     */
+    public function findFeUser($uid): array
     {
         $feUser = [];
-        if ($uid == '') {
-            return $feUser;
-        }
-
         $connection = $this->connectionPool->getConnectionForTable('fe_users');
         $query = $connection->select(['*'], 'fe_users', ['uid' => intval($uid)]);
         if ($query->rowCount() > 0) {
@@ -594,10 +887,18 @@ class ModelController extends BaseController
         return $feUser;
     }
 
-    /*
+    /**
      * Returns events from all calendar models or a specified model.
-     * @param		key		The optional service key to return events for. If no key is given, all events are returned.
-     * @return		array		Array of events.
+     *
+     * @param $serviceName
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param string $type
+     * @param string $subtype
+     * @param string $pidList
+     * @param string $eventType
+     * @param string $additionalWhere
+     * @return array
      */
     public function findAllWithin(
         $serviceName,
@@ -608,12 +909,11 @@ class ModelController extends BaseController
         $pidList = '',
         $eventType = '',
         $additionalWhere = ''
-    ) {
+    ): array {
         /* No key provided so return all events */
-        if ($type == '') {
+        if ($type === '') {
             $serviceChain = '';
             $events = [];
-            $eventsFromService = [];
 
             /* Iterate over all classes providing the cal_model service */
             while (is_object($service = GeneralUtility::makeInstanceService($serviceName, $subtype, $serviceChain))) {
@@ -626,10 +926,10 @@ class ModelController extends BaseController
                         $events = $eventsFromService;
                     } else {
                         foreach ($eventsFromService as $eventdaykey => $eventday) {
-                            if (array_key_exists($eventdaykey, $events) == 1) {
+                            if (array_key_exists($eventdaykey, $events)) {
                                 foreach ($eventday as $eventtimekey => $eventtime) {
                                     if (array_key_exists($eventtimekey, $events [$eventdaykey])) {
-                                        $events [$eventdaykey] [$eventtimekey] = $events [$eventdaykey] [$eventtimekey] + $eventtime;
+                                        $events [$eventdaykey] [$eventtimekey] += $eventtime;
                                     } else {
                                         $events [$eventdaykey] [$eventtimekey] = $eventtime;
                                     }
@@ -638,7 +938,7 @@ class ModelController extends BaseController
                                 $events [$eventdaykey] = $eventday;
                             }
                         }
-                        $events = $events + $eventsFromService;
+                        $events += $eventsFromService;
                     }
                 }
                 /* Flattens the array returned by the current model into the top level array */
@@ -668,18 +968,22 @@ class ModelController extends BaseController
         return $return;
     }
 
-    /*
+    /**
      * Returns events from all calendar models or a specified model.
-     * @param		key		The optional service key to return events for. If no key is given, all events are returned.
-     * @return		array		Array of events.
+     *
+     * @param $serviceName
+     * @param $type
+     * @param $subtype
+     * @param $pidList
+     * @param string $eventTypes
+     * @return array
      */
-    public function findAll($serviceName, $type, $subtype, $pidList, $eventTypes = '0,1,2,3')
+    public function findAll($serviceName, $type, $subtype, $pidList, $eventTypes = '0,1,2,3'): array
     {
         /* No key provided so return all events */
-        if ($type == '') {
+        if ($type === '') {
             $serviceChain = '';
             $events = [];
-            $eventsFromService = [];
 
             /* Iterate over all classes providing the cal_model service */
             while (is_object($service = GeneralUtility::makeInstanceService($serviceName, $subtype, $serviceChain))) {
@@ -691,10 +995,10 @@ class ModelController extends BaseController
                         $events = $eventsFromService;
                     } else {
                         foreach ($eventsFromService as $eventdaykey => $eventday) {
-                            if (array_key_exists($eventdaykey, $events) == 1) {
+                            if (array_key_exists($eventdaykey, $events)) {
                                 foreach ($eventday as $eventtimekey => $eventtime) {
                                     if (array_key_exists($eventtimekey, $events [$eventdaykey])) {
-                                        $events [$eventdaykey] [$eventtimekey] = $events [$eventdaykey] [$eventtimekey] + $eventtime;
+                                        $events [$eventdaykey] [$eventtimekey] += $eventtime;
                                     } else {
                                         $events [$eventdaykey] [$eventtimekey] = $eventtime;
                                     }
@@ -703,7 +1007,7 @@ class ModelController extends BaseController
                                 $events [$eventdaykey] = $eventday;
                             }
                         }
-                        $events = $events + $eventsFromService;
+                        $events += $eventsFromService;
                     }
                 }
             }
@@ -723,26 +1027,33 @@ class ModelController extends BaseController
         return $events;
     }
 
-    public function findCategory($uid = '', $type = '', $pidList = '')
+    /**
+     * @param string $uid
+     * @param string $type
+     * @param string $pidList
+     * @return CategoryModel
+     */
+    public function findCategory($uid, $type = '', $pidList = ''): CategoryModel
     {
-        if ($uid == '') {
-            return null;
-        }
-        /* Gets the model for the provided service key */
+        /** @var SysCategoryService $service */
         $service = $this->getServiceObjByKey('cal_category_model', 'category', $type);
-        /* Look up an event with a specific ID inside the model */
         $category = $service->find($uid, $pidList);
         return $category;
     }
 
-    public function findAllCategories($serviceName, $type, $pidList)
+    /**
+     * @param $serviceName
+     * @param $type
+     * @param $pidList
+     * @return array
+     */
+    public function findAllCategories($serviceName, $type, $pidList): array
     {
-        /* No key provided so return all events */
         $serviceName = 'cal_category_model';
         $categoryArrayToBeFilled = [];
         $categories = [];
 
-        if ($type == '') {
+        if ($type === '') {
             $serviceChain = '';
 
             /* Iterate over all classes providing the cal_model service */
@@ -753,9 +1064,8 @@ class ModelController extends BaseController
                 $serviceChain .= ',' . $service->getServiceKey();
             }
         } else {
-            /* Gets the model for the provided service key */
             $service = &$this->getServiceObjByKey($serviceName, 'category', $type);
-            /* Look up an event with a specific ID inside the model */
+
             $service->findAll($pidList, $categoryArrayToBeFilled);
             $categories [$type] = $categoryArrayToBeFilled;
         }
@@ -763,6 +1073,18 @@ class ModelController extends BaseController
         return $categories;
     }
 
+    /**
+     * @param $serviceName
+     * @param $type
+     * @param $pidList
+     * @param $startDateObject
+     * @param $endDateObject
+     * @param $searchword
+     * @param string $locationIds
+     * @param string $organizerIds
+     * @param string $eventType
+     * @return array
+     */
     public function _searchEvents(
         $serviceName,
         $type,
@@ -773,13 +1095,10 @@ class ModelController extends BaseController
         $locationIds = '',
         $organizerIds = '',
         $eventType = '0,1,2,3'
-    ) {
-
-        /* No key provided so return all events */
-        if ($type == '') {
+    ): array {
+        if ($type === '') {
             $serviceChain = '';
             $events = [];
-            $eventsFromService = [];
 
             /* Iterate over all classes providing the cal_model service */
             while (is_object($service = GeneralUtility::makeInstanceService($serviceName, 'event', $serviceChain))) {
@@ -791,10 +1110,10 @@ class ModelController extends BaseController
                         $events = $eventsFromService;
                     } else {
                         foreach ($eventsFromService as $eventdaykey => $eventday) {
-                            if (array_key_exists($eventdaykey, $events) == 1) {
+                            if (array_key_exists($eventdaykey, $events)) {
                                 foreach ($eventday as $eventtimekey => $eventtime) {
                                     if (array_key_exists($eventtimekey, $events [$eventdaykey])) {
-                                        $events [$eventdaykey] [$eventtimekey] = $events [$eventdaykey] [$eventtimekey] + $eventtime;
+                                        $events [$eventdaykey] [$eventtimekey] += $eventtime;
                                     } else {
                                         $events [$eventdaykey] [$eventtimekey] = $eventtime;
                                     }
@@ -803,7 +1122,7 @@ class ModelController extends BaseController
                                 $events [$eventdaykey] = $eventday;
                             }
                         }
-                        $events = $events + $eventsFromService;
+                        $events += $eventsFromService;
                     }
                 }
             }
@@ -823,10 +1142,18 @@ class ModelController extends BaseController
         return $events;
     }
 
-    public function _searchAddress($serviceName, $type, $subtype, $pidList, $searchword)
+    /**
+     * @param $serviceName
+     * @param $type
+     * @param $subtype
+     * @param $pidList
+     * @param $searchword
+     * @return array
+     */
+    public function _searchAddress($serviceName, $type, $subtype, $pidList, $searchword): array
     {
         /* No key provided so return all events */
-        if ($type == '') {
+        if ($type === '') {
             $serviceChain = '';
             $addressFromService = [];
             /* Iterate over all classes providing the cal_model service */
@@ -849,7 +1176,7 @@ class ModelController extends BaseController
      * Returns a specific event with a given serviceKey and UID.
      *
      * @param $serviceName
-     * @param $uid
+     * @param int $uid
      * @param $type
      * @param $subtype
      * @param string $pidList
@@ -873,16 +1200,15 @@ class ModelController extends BaseController
         $disableCalendarSearchString = false,
         $disableCategorySearchString = false,
         $eventType = '0,1,2,3'
-    ) {
-        /* Gets the model for the provided service key */
+    ): EventModel {
         $service = $this->getServiceObjByKey($serviceName, $subtype, $type);
         if (!is_object($service)) {
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The object you are looking for could not be found.',
                 'Please verify your URL parameters: tx_cal_controller[type] and tx_cal_controller[uid].'
             );
         }
-        /* Look up an event with a specific ID inside the model */
+
         $event = $service->find($uid, $pidList, $showHiddenEvents, $showDeletedEvents, $getAllInstances, $disableCalendarSearchString, $disableCategorySearchString, $eventType);
         return $event;
     }
@@ -895,17 +1221,16 @@ class ModelController extends BaseController
      * @param $subtype
      * @return EventModel event object matching the serviceKey and UID.
      */
-    public function create($serviceName, $type, $subtype)
+    public function create($serviceName, $type, $subtype): EventModel
     {
-        /* Gets the model for the provided service key */
         $service = $this->getServiceObjByKey($serviceName, $subtype, $type);
         if (!is_object($service)) {
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The object you are looking for could not be found.',
                 'Please verify your URL parameters: tx_cal_controller[type].'
             );
         }
-        /* Look up an event with a specific ID inside the model */
+
         $event = $service->createEvent(null, false);
         return $event;
     }
@@ -921,11 +1246,9 @@ class ModelController extends BaseController
     public function &getServiceObjByKey($type, $subtype, $key)
     {
         $serviceChain = '';
-        /* Loop over all services providign the specified service type and subtype */
         while (is_object($obj = &GeneralUtility::makeInstanceService($type, $subtype, $serviceChain))) {
             $serviceChain .= ',' . $obj->getServiceKey();
-            /* If the key of the current service matches what we're looking for, return the object */
-            if ($key == $obj->getServiceKey()) {
+            if ($key === $obj->getServiceKey()) {
                 return $obj;
             }
         }
@@ -939,25 +1262,31 @@ class ModelController extends BaseController
      * @param  string    The subtype of the service.
      * @return array     service object.
      */
-    public function getServiceTypes($type, $subtype)
+    public function getServiceTypes($type, $subtype): array
     {
         $serviceChain = '';
         $returnArray = [];
-        /* Loop over all services providign the specified service type and subtype */
         while (is_object($obj = GeneralUtility::makeInstanceService($type, $subtype, $serviceChain))) {
             $serviceChain .= ',' . $obj->getServiceKey();
-            /* If the key of the current service matches what we're looking for, return the object */
             $returnArray [] = $obj->getServiceKey();
         }
         return $returnArray;
     }
 
-    public function findAllObjects($key, $type, $pidList, $functionTobeCalled = '', $paramsToBePassedOn = '')
+    /**
+     * @param $key
+     * @param $type
+     * @param $pidList
+     * @param string $functionTobeCalled
+     * @param string $paramsToBePassedOn
+     * @return array
+     */
+    public function findAllObjects($key, $type, $pidList, $functionTobeCalled = '', $paramsToBePassedOn = ''): array
     {
         /* No key provided so return all X */
         $serviceName = 'cal_' . $key . '_model';
         $objects = [];
-        if ($type == '') {
+        if ($type === '') {
             $serviceChain = '';
             /* Iterate over all classes providing the cal_X_model service */
             while (is_object($service = &GeneralUtility::makeInstanceService($serviceName, $key, $serviceChain))) {
@@ -971,7 +1300,6 @@ class ModelController extends BaseController
                 $serviceChain .= ',' . $service->getServiceKey();
             }
         } else {
-            /* Gets the model for the provided service key */
             $service = &$this->getServiceObjByKey($serviceName, $key, $type);
             /* Look up a objects with a specific ID inside the model */
             if ($functionTobeCalled) {

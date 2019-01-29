@@ -4,6 +4,7 @@ namespace TYPO3\CMS\Cal\View;
 
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
@@ -27,6 +28,8 @@ class NewMonthView extends NewTimeView
 
     /**
      * Constructor.
+     * @param $month
+     * @param $year
      */
     public function __construct($month, $year)
     {
@@ -44,10 +47,10 @@ class NewMonthView extends NewTimeView
      * @param $year
      * @return NewMonthView
      */
-    public static function getMonthView($month, $year)
+    public static function getMonthView($month, $year): NewMonthView
     {
         $controller = &Registry::Registry('basic', 'controller');
-        $cache = $controller->cache->get($month . '_' . $year);
+        $controller->cache->get($month . '_' . $year);
         return new NewMonthView($month, $year);
     }
 
@@ -67,9 +70,9 @@ class NewMonthView extends NewTimeView
         $this->weeks = [];
         $weekNumber = $newDate->getWeekOfYear();
 
-        if ($this->getMonth() == 12 && $weekEnd == 1) {
+        if ($weekEnd === 1 && $this->getMonth() === 12) {
             do {
-                if ($weekNumber == $weekEnd) {
+                if ($weekNumber === $weekEnd) {
                     $this->weeks[($newDate->getYear() + 1) . '_' . $weekNumber] = new NewWeekView(
                         $weekNumber,
                         $newDate->getYear() + 1,
@@ -85,11 +88,11 @@ class NewMonthView extends NewTimeView
                 $newDate->addSeconds(86400 * 7);
                 $weekNumber = $newDate->getWeekOfYear();
                 $weekNumberTmp = $weekNumber;
-                if ($weekNumber != $weekEnd) {
+                if ($weekNumber !== $weekEnd) {
                     $weekNumberTmp = 0;
                 }
-            } while ($weekNumberTmp <= $weekEnd && $newDate->year == $this->getYear());
-        } elseif ($this->getMonth() == 1) {
+            } while ($weekNumberTmp <= $weekEnd && $newDate->year === $this->getYear());
+        } elseif ($this->getMonth() === 1) {
             do {
                 if ($weekNumber > 6) {
                     $this->weeks[$newDate->getYear() . '_' . $weekNumber] = new NewWeekView(
@@ -106,7 +109,7 @@ class NewMonthView extends NewTimeView
                 }
                 $newDate->addSeconds(86400 * 7);
                 $weekNumber = $newDate->getWeekOfYear();
-            } while ($weekNumber <= $weekEnd && $newDate->year == $this->getYear());
+            } while ($weekNumber <= $weekEnd && $newDate->year === $this->getYear());
         } else {
             do {
                 $this->weeks[$this->getYear() . '_' . $weekNumber] = new NewWeekView(
@@ -116,13 +119,13 @@ class NewMonthView extends NewTimeView
                 );
                 $newDate->addSeconds(86400 * 7);
                 $weekNumber = $newDate->getWeekOfYear();
-            } while ($weekNumber <= $weekEnd && $newDate->getYear() == $this->getYear());
+            } while ($weekNumber <= $weekEnd && $newDate->getYear() === $this->getYear());
         }
         $this->maxWeeksInYear = max($this->maxWeeksInYear, $weekNumber);
     }
 
     /**
-     * @param $event
+     * @param EventModel $event
      */
     public function addEvent(&$event)
     {
@@ -130,16 +133,16 @@ class NewMonthView extends NewTimeView
         $eventEndWeek = $event->getEnd()->getWeekOfYear();
         $eventStartYear = $event->getStart()->year;
         $eventEndYear = $event->getEnd()->year;
-        if (($eventStartWeek == 52 || $eventStartWeek == 53) && $event->getStart()->month == 1) {
+        if (($eventStartWeek === 52 || $eventStartWeek === 53) && $event->getStart()->month === 1) {
             $eventStartYear--;
         }
-        if (($eventEndWeek == 52 || $eventEndWeek == 53) && $event->getEnd()->month == 1) {
+        if (($eventEndWeek === 52 || $eventEndWeek === 53) && $event->getEnd()->month === 1) {
             $eventEndYear--;
         }
-        if ($eventStartWeek == 1 && $event->getStart()->month == 12) {
+        if ($eventStartWeek === 1 && $event->getStart()->month === 12) {
             $eventStartYear++;
         }
-        if ($eventEndWeek == 1 && $event->getEnd()->month == 12) {
+        if ($eventEndWeek === 1 && $event->getEnd()->month === 12) {
             $eventEndYear++;
         }
         do {
@@ -151,7 +154,7 @@ class NewMonthView extends NewTimeView
                 $eventStartWeek = 1;
                 $eventStartYear++;
             }
-        } while (!(($eventStartYear == $eventEndYear && $eventStartWeek > $eventEndWeek) || ($eventStartYear > $eventEndYear)));
+        } while (!(($eventStartYear === $eventEndYear && $eventStartWeek > $eventEndWeek) || ($eventStartYear > $eventEndYear)));
     }
 
     /**
@@ -180,7 +183,7 @@ class NewMonthView extends NewTimeView
     public function getWeekdaysMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->setMySubpart('MONTH_WEEKDAYS_SUBPART');
-        if (DATE_CALC_BEGIN_WEEKDAY == 0) {
+        if (DATE_CALC_BEGIN_WEEKDAY === 0) {
             $this->setMySubpart('SUNDAY_MONTH_WEEKDAYS_SUBPART');
         }
         $sims['###WEEKDAYS###'] = $this->render($this->getTemplate());
@@ -188,11 +191,11 @@ class NewMonthView extends NewTimeView
     }
 
     /**
-     * @param $dateObject
+     * @param CalDate $dateObject
      */
     public function setSelected(&$dateObject)
     {
-        if ($dateObject->year == $this->getYear() && $dateObject->month == $this->getMonth()) {
+        if ($dateObject->year === $this->getYear() && $dateObject->month === $this->getMonth()) {
             $this->selected = true;
 
             $week = $this->weeks[$dateObject->year . '_' . $dateObject->getWeekOfYear()];
@@ -203,11 +206,11 @@ class NewMonthView extends NewTimeView
     }
 
     /**
-     * @param $dateObject
+     * @param CalDate $dateObject
      */
     public function setCurrent(&$dateObject)
     {
-        if ($dateObject->year == $this->getYear() && $dateObject->month == $this->getMonth()) {
+        if ($dateObject->year === $this->getYear() && $dateObject->month === $this->getMonth()) {
             $this->current = true;
 
             $week = $this->weeks[$dateObject->year . '_' . $dateObject->getWeekOfYear()];
@@ -236,7 +239,7 @@ class NewMonthView extends NewTimeView
     /**
      * @return bool
      */
-    public function hasEvents()
+    public function hasEvents(): bool
     {
         return !empty($this->getEvents()) || $this->getHasAlldayEvents();
     }

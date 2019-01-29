@@ -15,6 +15,8 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use Doctrine\DBAL\FetchMode;
+use TYPO3\CMS\Cal\Model\Location;
+use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -22,6 +24,7 @@ use TYPO3\CMS\Core\TimeTracker\TimeTracker;
 use TYPO3\CMS\Core\TypoScript\ExtendedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
 /**
@@ -58,8 +61,11 @@ class Api
      * require_once ('class.tx_cal_api.php');
      * $calAPI = new Api($this->cObj, &$conf);
      * $event = $calAPI->findEvent('2','tx_cal_phpicalendar');
+     * @param $cObj
+     * @param $conf
+     * @return Api
      */
-    public function tx_cal_api_with(&$cObj, &$conf)
+    public function tx_cal_api_with(&$cObj, &$conf): Api
     {
         $this->cObj = &$cObj;
         $this->conf = &$conf;
@@ -69,7 +75,6 @@ class Api
 
         $this->conf ['useInternalCaching'] = 1;
         $this->conf ['cachingEngine'] = 'cachingFramework';
-        $this->conf ['writeCachingInfoToDevlog'] = 0;
 
         $GLOBALS ['TSFE']->settingLocale();
 
@@ -118,7 +123,7 @@ class Api
         $this->unsetTSFEOnDestruct = true;
 
         $GLOBALS ['TSFE'] = GeneralUtility::makeInstance(
-            Tsfe::class,
+            TypoScriptFrontendController::class,
             $GLOBALS ['TYPO3_CONF_VARS'],
             $pid,
             '0',
@@ -129,7 +134,7 @@ class Api
             ''
         );
         $GLOBALS ['TSFE']->connectToDB();
-        if ($feUserObj == '') {
+        if ($feUserObj === '') {
             $GLOBALS ['TSFE']->initFEuser();
         } else {
             $GLOBALS ['TSFE']->fe_user = &$feUserObj;
@@ -245,8 +250,9 @@ class Api
      * @param $uid
      * @param $type
      * @param string $pidList
+     * @return Location
      */
-    public function findLocation($uid, $type, $pidList = '')
+    public function findLocation($uid, $type, $pidList = ''): Location
     {
         return $this->modelObj->findLocation($uid, $type, $pidList);
     }
@@ -254,9 +260,9 @@ class Api
     /**
      * @param string $type
      * @param string $pidList
-     * @return mixed
+     * @return array
      */
-    public function findAllLocations($type = '', $pidList = '')
+    public function findAllLocations($type = '', $pidList = ''): array
     {
         return $this->modelObj->findAllLocations($type, $pidList);
     }
@@ -285,8 +291,9 @@ class Api
      * @param $uid
      * @param $type
      * @param string $pidList
+     * @return Organizer
      */
-    public function findOrganizer($uid, $type, $pidList = '')
+    public function findOrganizer($uid, $type, $pidList = ''): Organizer
     {
         return $this->modelObj->findOrganizer($uid, $type, $pidList);
     }
@@ -295,8 +302,9 @@ class Api
      * @param $uid
      * @param $type
      * @param string $pidList
+     * @return array
      */
-    public function findCalendar($uid, $type, $pidList = '')
+    public function findCalendar($uid, $type, $pidList = ''): array
     {
         return $this->modelObj->findCalendar($uid, $type, $pidList);
     }
@@ -466,7 +474,7 @@ class Api
      */
     public function findEventsForIcs($timestamp, $type, $pidList): array
     {
-        return $this->modelObj->findEventsForIcs($timestamp, $type, $pidList);
+        return $this->modelObj->findEventsForIcs($type, $pidList);
     }
 
     /**
@@ -551,10 +559,6 @@ class Api
                     break;
                 }
             }
-
-            // DEBUG ONLY - Show TS object
-            // \TYPO3\CMS\Core\Utility\GeneralUtility::debug($cType, 'CONTENT TYPE');
-            // \TYPO3\CMS\Core\Utility\GeneralUtility::debug($tsObj, 'TS CONFIGURATION');
 
             // Check object and content type
             if ($error) {

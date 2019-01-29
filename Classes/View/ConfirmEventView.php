@@ -14,9 +14,11 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\AttendeeModel;
+use TYPO3\CMS\Cal\Model\CategoryModel;
+use TYPO3\CMS\Cal\Model\LocationModel;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A service which renders a form to confirm the phpicalendar event create/edit.
@@ -28,13 +30,11 @@ class ConfirmEventView extends FeEditingBaseView
     /**
      * Draws a confirm event form.
      *
-     * @param
-     *            object The cObject of the mother-class
-     * @param
-     *            object        The rights object.
+     * @param object The cObject of the mother-class
+     * @param object        The rights object.
      * @return string HTML output.
      */
-    public function drawConfirmEvent()
+    public function drawConfirmEvent(): string
     {
         $this->objectString = 'event';
         $this->isConfirm = true;
@@ -43,7 +43,7 @@ class ConfirmEventView extends FeEditingBaseView
         /* @fixme        Temporarily reverted to using piVars rather than conf */
         // unset($this->controller->piVars['category']);
         $page = Functions::getContent($this->conf['view.']['confirm_event.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no confirm event template file found:</h3>' . $this->conf['view.']['confirm_event.']['template'];
         }
         $this->lastPiVars = $this->controller->piVars;
@@ -53,7 +53,7 @@ class ConfirmEventView extends FeEditingBaseView
 
         $lastViewParams = $this->controller->shortenLastViewAndGetTargetViewParameters();
 
-        if ($lastViewParams['view'] == 'edit_event') {
+        if ($lastViewParams['view'] === 'edit_event') {
             $this->isEditMode = true;
         }
 
@@ -115,7 +115,7 @@ class ConfirmEventView extends FeEditingBaseView
             $calendar = $this->object->getCalendarObject();
             if (is_object($calendar)) {
                 $sims['###CALENDAR_ID###'] = $this->applyStdWrap($calendar->getTitle(), 'calendar_id_stdWrap');
-                $sims['###CALENDAR_ID_VALUE###'] = htmlspecialchars($calendar->getUID());
+                $sims['###CALENDAR_ID_VALUE###'] = htmlspecialchars($calendar->getUid());
             }
         }
     }
@@ -148,10 +148,9 @@ class ConfirmEventView extends FeEditingBaseView
         $categoryArray = $this->object->getCategories();
         if ($this->isAllowed('category')) {
             if (!empty($categoryArray)) {
-                $temp = $this->markerBasedTemplateService->getSubpart($template, '###FORM_CATEGORY###');
-                $catIds = explode(',', $piVarCategory);
                 $ids = [];
                 $names = [];
+                /** @var CategoryModel $category */
                 foreach ($categoryArray as $category) {
                     if (is_object($category)) {
                         $ids[] = $category->getUid();
@@ -178,7 +177,7 @@ class ConfirmEventView extends FeEditingBaseView
         if ($this->isAllowed('allday')) {
             $allday = false;
             $label = $this->controller->pi_getLL('l_false');
-            if ($this->object->isAllDay() == '1') {
+            if ($this->object->isAllDay() === '1') {
                 $allday = 1;
                 $label = $this->controller->pi_getLL('l_true');
             }
@@ -197,7 +196,6 @@ class ConfirmEventView extends FeEditingBaseView
         $sims['###STARTDATE###'] = '';
         if ($this->isAllowed('startdate')) {
             $startDate = $this->object->getStart();
-            $split = $this->conf['dateConfig.']['splitSymbol'];
             $startDateFormatted = $startDate->format(Functions::getFormatStringFromConf($this->conf));
             $dateFormatArray = explode($this->conf['dateConfig.']['splitSymbol'], $startDateFormatted);
             $sims['###STARTDATE###'] = $this->applyStdWrap($startDateFormatted, 'startdate_stdWrap');
@@ -215,7 +213,6 @@ class ConfirmEventView extends FeEditingBaseView
         $sims['###ENDDATE###'] = '';
         if ($this->isAllowed('enddate')) {
             $endDate = $this->object->getEnd();
-            $split = $this->conf['dateConfig.']['splitSymbol'];
             $endDateFormatted = $endDate->format(Functions::getFormatStringFromConf($this->conf));
             $dateFormatArray = explode($this->conf['dateConfig.']['splitSymbol'], $endDateFormatted);
             $sims['###ENDDATE###'] = $this->applyStdWrap($endDateFormatted, 'enddate_stdWrap');
@@ -327,6 +324,7 @@ class ConfirmEventView extends FeEditingBaseView
     {
         $sims['###CAL_LOCATION###'] = '';
         if ($this->isAllowed('cal_location')) {
+            /** @var LocationModel $location */
             if ($location = $this->object->getLocationObject()) {
                 $this->initLocalCObject($location->getValuesAsArray());
                 $this->local_cObj->setCurrentVal($location->getName());
@@ -346,20 +344,6 @@ class ConfirmEventView extends FeEditingBaseView
                 $sims['###CAL_LOCATION###'] = $this->applyStdWrap($value, 'cal_location_stdWrap');
                 $sims['###CAL_LOCATION_VALUE###'] = 0;
             }
-        }
-    }
-
-    /**
-     * @param $template
-     * @param $sims
-     * @param $rems
-     */
-    public function getDescriptionMarker(& $template, & $sims, & $rems)
-    {
-        $sims['###DESCRIPTION###'] = '';
-        if ($this->isAllowed('description')) {
-            $sims['###DESCRIPTION###'] = $this->applyStdWrap($this->object->getDescription(), 'description_stdWrap');
-            $sims['###DESCRIPTION_VALUE###'] = htmlspecialchars($this->object->getDescription());
         }
     }
 
@@ -455,7 +439,6 @@ class ConfirmEventView extends FeEditingBaseView
                 $untilDateFormatted = '';
                 $sims['###UNTIL_VALUE###'] = '';
                 if ($untilDate->getYear() > 0) {
-                    $split = $this->conf['dateConfig.']['splitSymbol'];
                     $untilDateFormatted = $untilDate->format(Functions::getFormatStringFromConf($this->conf));
                     $dateFormatArray = explode($this->conf['dateConfig.']['splitSymbol'], $untilDateFormatted);
                     $sims['###UNTIL_VALUE###'] = htmlspecialchars($dateFormatArray[$this->conf['dateConfig.']['yearPosition']] . $dateFormatArray[$this->conf['dateConfig.']['monthPosition']] . $dateFormatArray[$this->conf['dateConfig.']['dayPosition']]);
@@ -518,13 +501,13 @@ class ConfirmEventView extends FeEditingBaseView
     public function getNotifyMarker(& $template, & $sims, & $rems)
     {
         $sims['###NOTIFY###'] = '';
-        if ($this->isAllowed('notify') && is_array($this->controller->piVars['notify'])) {
+        if (is_array($this->controller->piVars['notify']) && $this->isAllowed('notify')) {
             $notifydisplaylist = [];
             $notifyids = [];
             foreach ($this->controller->piVars['notify'] as $value) {
                 preg_match('/(^[a-z])_([0-9]+)_(.*)/', $value, $idname);
-                if ($idname[1] == 'u' || $idname[1] == 'g') {
-                    $offset = $this->controller->piVars[$idname[1] . '_' . $idname[2] . '_notify_offset'] ? $this->controller->piVars[$idname[1] . '_' . $idname[2] . '_notify_offset'] : $this->conf['view.']['event.']['remind.']['time'];
+                if ($idname[1] === 'u' || $idname[1] === 'g') {
+                    $offset = $this->controller->piVars[$idname[1] . '_' . $idname[2] . '_notify_offset'] ?: $this->conf['view.']['event.']['remind.']['time'];
                     $notifyids[] = $idname[1] . '_' . $idname[2] . '_' . $offset;
                     $notifydisplaylist[] = $idname[3] . ' (' . $offset . ')';
                 }
@@ -542,12 +525,12 @@ class ConfirmEventView extends FeEditingBaseView
     public function getSharedMarker(& $template, & $sims, & $rems)
     {
         $sims['###SHARED###'] = '';
-        if ($this->isAllowed('shared') && is_array($this->controller->piVars['shared'])) {
+        if (is_array($this->controller->piVars['shared']) && $this->isAllowed('shared')) {
             $shareddisplaylist = [];
             $sharedids = [];
             foreach ($this->controller->piVars['shared'] as $value) {
                 preg_match('/(^[a-z])_([0-9]+)_(.*)/', $value, $idname);
-                if ($idname[1] == 'u' || $idname[1] == 'g') {
+                if ($idname[1] === 'u' || $idname[1] === 'g') {
                     $sharedids[] = $idname[1] . '_' . $idname[2];
                     $shareddisplaylist[] = $idname[3];
                 }
@@ -565,12 +548,12 @@ class ConfirmEventView extends FeEditingBaseView
     public function getExceptionMarker(& $template, & $sims, & $rems)
     {
         $sims['###EXCEPTION###'] = '';
-        if ($this->isAllowed('exception') && is_array($this->controller->piVars['exception_ids'])) {
+        if (is_array($this->controller->piVars['exception_ids']) && $this->isAllowed('exception')) {
             $exceptiondisplaylist = [];
             $exceptionids = [];
             foreach ($this->controller->piVars['exception_ids'] as $value) {
                 preg_match('/(^[a-z])_([0-9]+)_(.*)/', $value, $idname);
-                if ($idname[1] == 'u' || $idname[1] == 'g') {
+                if ($idname[1] === 'u' || $idname[1] === 'g') {
                     $exceptionids[] = $idname[1] . '_' . $idname[2];
                     $exceptiondisplaylist[] = $idname[3];
                 }
@@ -588,13 +571,7 @@ class ConfirmEventView extends FeEditingBaseView
     public function getAttendeeMarker(& $template, & $sims, & $rems)
     {
         $sims['###ATTENDEE###'] = '';
-        if ($this->isAllowed('attendee') && $this->object->getEventType() == Model::EVENT_TYPE_MEETING) {
-            $attendee = '';
-            $allowedUsers = GeneralUtility::trimExplode(
-                ',',
-                $this->conf['rights.']['allowedUsers'],
-                1
-            );
+        if ($this->isAllowed('attendee') && $this->object->getEventType() === Model::EVENT_TYPE_MEETING) {
             $globalAttendeeArray = $this->object->getAttendees();
             $attendeeAttendance = [];
             $attendeeDisplayList = [];
@@ -605,6 +582,7 @@ class ConfirmEventView extends FeEditingBaseView
                 'CHAIR' => $this->controller->pi_getLL('l_event_attendee_CHAIR')
             ];
             foreach ($globalAttendeeArray as $serviceKey => $attendeeArray) {
+                /** @var AttendeeModel $attendeeObject */
                 foreach ($attendeeArray as $attendeeObject) {
                     if ($attendeeObject->getFeUserId()) {
                         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -623,7 +601,7 @@ class ConfirmEventView extends FeEditingBaseView
                         $attendeeIds[] = 'email_' . $attendeeObject->getEmail();
                         $attendeeDisplayList[] = $attendeeObject->getEmail() . ' (' . $options[$attendeeObject->getAttendance()] . ')';
                     }
-                    $attendeeAttendance[$attendeeObject->getFeUserId() ? $attendeeObject->getFeUserId() : $attendeeObject->getEmail()] = $attendeeObject->getAttendance();
+                    $attendeeAttendance[$attendeeObject->getFeUserId() ?: $attendeeObject->getEmail()] = $attendeeObject->getAttendance();
                 }
             }
             $sims['###ATTENDEE###'] = $this->applyStdWrap(implode(',', $attendeeDisplayList), 'attendee_stdWrap');
@@ -643,8 +621,7 @@ class ConfirmEventView extends FeEditingBaseView
         $sims['###SENDOUT_INVITATION###'] = '';
 
         if ($this->isAllowed('sendout_invitation')) {
-            $sendoutInvitation = '';
-            if ($this->object->getSendoutInvitation()) {
+            if ($this->object->getSendOutInvitation()) {
                 $value = 1;
                 $label = $this->controller->pi_getLL('l_true');
             } else {

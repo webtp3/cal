@@ -35,7 +35,7 @@ class CalendarService extends BaseService
      * @param $row
      * @return CalendarModel
      */
-    public function createCalendar($row)
+    public function createCalendar($row): CalendarModel
     {
         return new CalendarModel($row, $this->getServiceKey());
     }
@@ -49,7 +49,7 @@ class CalendarService extends BaseService
      *            to search in
      * @return array array ($row)
      */
-    public function find($uid, $pidList)
+    public function find($uid, $pidList): array
     {
         $calendarArray = $this->getCalendarFromTable($pidList, ' AND uid=' . $uid);
         return $calendarArray[0];
@@ -62,7 +62,7 @@ class CalendarService extends BaseService
      *            to search in
      * @return array array of array (array of $rows)
      */
-    public function findAll($pidList)
+    public function findAll($pidList): array
     {
         return $this->getCalendarFromTable(
             $pidList,
@@ -75,11 +75,11 @@ class CalendarService extends BaseService
      * @param string $additionalWhere
      * @return array
      */
-    public function getCalendarFromTable($pidList = '', $additionalWhere = '')
+    public function getCalendarFromTable($pidList, $additionalWhere = ''): array
     {
         $return = [];
         $orderBy = Functions::getOrderBy('tx_cal_calendar');
-        if ($pidList != '') {
+        if ($pidList !== '') {
             $additionalWhere .= ' AND pid IN (' . $pidList . ')';
         }
         $additionalWhere .= $this->getAdditionalWhereForLocalizationAndVersioning('tx_cal_calendar');
@@ -98,8 +98,7 @@ class CalendarService extends BaseService
                         'tx_cal_calendar',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
                 if (!$row['uid']) {
@@ -122,8 +121,9 @@ class CalendarService extends BaseService
     /**
      * @param $uid
      * @return array
+     * @throws \TYPO3\CMS\Core\Exception
      */
-    public function updateCalendar($uid)
+    public function updateCalendar($uid): array
     {
         $insertFields = [
             'tstamp' => time()
@@ -137,13 +137,9 @@ class CalendarService extends BaseService
             $this->checkOnNewOrDeletableFiles('tx_cal_calendar', 'ics_file', $insertFields, $uid);
         }
 
-        // Creating DB records
-        $table = 'tx_cal_calendar';
-        $where = 'uid = ' . $uid;
-
         $service = new ICalendarService();
 
-        if (($insertFields['type'] == 1 && $insertFields['ext_url']) or ($insertFields['type'] == 2 && $insertFields['ics_file'])) {
+        if (((int)$insertFields['type'] === 1 && $insertFields['ext_url']) || ((int)$insertFields['type'] === 2 && $insertFields['ics_file'])) {
             TceMainProcessdatamap::processICS(BackendUtility::getRecord(
                 'tx_cal_calendar',
                 $uid
@@ -160,10 +156,9 @@ class CalendarService extends BaseService
             $rgc->cleanIndexTableOfCalendarUid($uid);
         }
 
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
         if ($this->rightsObj->isAllowedToEditCalendarOwner()) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_calendar_user_group_mm', 'uid_local =' . $uid);
-            if ($this->controller->piVars['owner_ids'] != '') {
+            if ($this->controller->piVars['owner_ids'] !== '') {
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(
@@ -177,7 +172,7 @@ class CalendarService extends BaseService
         }
         if ($this->rightsObj->isAllowedToEditCalendarFreeAndBusyUser()) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_calendar_fnb_user_group_mm', 'uid_local =' . $uid);
-            if ($this->controller->piVars['freeAndBusyUser_ids'] != '') {
+            if ($this->controller->piVars['freeAndBusyUser_ids'] !== '') {
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(
@@ -207,12 +202,12 @@ class CalendarService extends BaseService
             ];
             $table = 'tx_cal_calendar';
             $where = 'uid = ' . $uid;
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
 
             // 'delete' all the events related to the calendar
             $table = 'tx_cal_event';
             $where = 'calendar_id = ' . $uid;
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
         }
         $this->unsetPiVars();
         Functions::clearCache();
@@ -227,7 +222,7 @@ class CalendarService extends BaseService
     public function retrievePostData(&$insertFields)
     {
         $hidden = 0;
-        if ($this->controller->piVars['hidden'] == 'true' && ($this->rightsObj->isAllowedToEditCalendarHidden() || $this->rightsObj->isAllowedToCreateCalendarHidden())) {
+        if ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedToEditCalendarHidden() || $this->rightsObj->isAllowedToCreateCalendarHidden())) {
             $hidden = 1;
         }
         $insertFields['hidden'] = $hidden;
@@ -273,11 +268,11 @@ class CalendarService extends BaseService
      * @param $pid
      * @return array
      */
-    public function saveCalendar($pid)
+    public function saveCalendar($pid): array
     {
         $crdate = time();
         $insertFields = [
-            'pid' => $this->conf['rights.']['create.']['calendar.']['saveCalendarToPid'] ? $this->conf['rights.']['create.']['calendar.']['saveCalendarToPid'] : $pid,
+            'pid' => $this->conf['rights.']['create.']['calendar.']['saveCalendarToPid'] ?: $pid,
             'tstamp' => $crdate,
             'crdate' => $crdate
         ];
@@ -303,9 +298,10 @@ class CalendarService extends BaseService
 
     /**
      * @param $insertFields
-     * @return mixed
+     * @return int
+     * @throws \TYPO3\CMS\Core\Exception
      */
-    public function _saveCalendar(&$insertFields)
+    public function _saveCalendar(&$insertFields): int
     {
         $tempValues = [];
         $tempValues['owner_ids'] = $insertFields['owner_ids'];
@@ -323,7 +319,7 @@ class CalendarService extends BaseService
         }
         $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
 
-        if ($insertFields['type'] == 1 or $insertFields['type'] == 2) {
+        if ((int)$insertFields['type'] === 1 || (int)$insertFields['type'] === 2) {
             $service = new ICalendarService();
             TcemainProcessdatamap::processICS(BackendUtility::getRecord(
                 'tx_cal_calendar',
@@ -337,7 +333,7 @@ class CalendarService extends BaseService
 
         if ($this->rightsObj->isAllowedToCreateCalendarOwner()) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_calendar_user_group_mm', 'uid_local =' . $uid);
-            if ($tempValues['owner_ids'] != '') {
+            if ($tempValues['owner_ids'] !== '') {
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['owner_ids'])), $user, $group);
@@ -347,7 +343,7 @@ class CalendarService extends BaseService
         }
         if ($this->rightsObj->isAllowedToCreateCalendarFreeAndBusyUser()) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_calendar_fnb_user_group_mm', 'uid_local =' . $uid);
-            if ($tempValues['freeAndBusyUser_ids'] != '') {
+            if ($tempValues['freeAndBusyUser_ids'] !== '') {
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(
@@ -394,12 +390,10 @@ class CalendarService extends BaseService
         // Check the results
         if (empty($idArray)) {
             // No calendar ids specified for this user -> show default
-        } elseif ($linkIds != '') {
+        } elseif ($linkIds !== '') {
             // compair the allowed ids with the ids available and retrieve the intersects
             $calendarIds = array_intersect($idArray, explode(',', $linkIds));
-            if (empty($calendarIds)) {
-                // No intersects -> show default
-            } else {
+            if (!empty($calendarIds)) {
                 // create a string for the query
                 $calendarIds = implode(',', $calendarIds);
                 $calendarSearchString = ' AND tx_cal_calendar.uid IN (' . $calendarIds . ')';
@@ -417,29 +411,27 @@ class CalendarService extends BaseService
     }
 
     /**
-     * @param $list
+     * @param string $list
      * @param $pidList
      * @param $includePublic
      * @param bool $includeData
      * @param bool $onlyPublic
      * @return array
      */
-    public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false)
+    public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false): array
     {
+        $userId = 0;
+        $groupIds = '';
         $this->calendarIds = [];
         $collectedIds = [];
 
-        // Logged in? Show public & private calendar
-
-        // calendar ids specified? show these calendar only - if allowed - else show public calendar
-
         $limitationList = '';
-        if ($list != '') { // $this->conf['calendar']
+        if ($list !== '') {
             $limitationList = $list;
         }
 
         // Lets see if the user is logged in
-        if ($this->rightsObj->isLoggedIn() && !$onlyPublic) {
+        if (!$onlyPublic && $this->rightsObj->isLoggedIn()) {
             $userId = $this->rightsObj->getUserId();
             $groupIds = implode(',', $this->rightsObj->getUserGroups());
         }
@@ -447,11 +439,6 @@ class CalendarService extends BaseService
         $ids = [];
         if ($userId === '') { // && !$includePublic
             return $ids;
-        }
-        if ($includeData) {
-            $select = 'tx_cal_calendar.*';
-        } else {
-            $select = 'tx_cal_calendar.uid';
         }
 
         $orderBy = Functions::getOrderBy('tx_cal_calendar');
@@ -476,7 +463,7 @@ class CalendarService extends BaseService
             } else {
                 $where = '0=0 ' . $this->cObj->enableFields('tx_cal_calendar');
             }
-            if ($pidList != '') {
+            if ($pidList !== '') {
                 $where .= ' AND pid IN (' . $pidList . ')';
             }
 
@@ -490,7 +477,7 @@ class CalendarService extends BaseService
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, '', $orderBy);
             if ($result) {
                 while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    if (!in_array($row['uid'], $collectedIds)) {
+                    if (!in_array($row['uid'], $collectedIds, true)) {
                         if ($includeData) {
                             $this->calendarIds[] = $row;
                         } else {
@@ -521,22 +508,22 @@ class CalendarService extends BaseService
                 $table .= ' LEFT JOIN tx_cal_calendar_user_group_mm ON tx_cal_calendar_user_group_mm.uid_local=tx_cal_calendar.uid';
             }
 
-            if ($pidList != '') {
-                $where .= strlen($where) ? ' AND pid IN (' . $pidList . ')' : ' pid IN (' . $pidList . ')';
+            if ($pidList !== '') {
+                $where .= $where !== '' ? ' AND pid IN (' . $pidList . ')' : ' pid IN (' . $pidList . ')';
             }
-            if ($where == '') {
+            if ($where === '') {
                 $where .= ' 0=0 ' . $this->cObj->enableFields('tx_cal_calendar');
             } else {
                 $where .= $this->cObj->enableFields('tx_cal_calendar');
             }
-            if ($limitationList != '') {
+            if ($limitationList !== '') {
                 $where .= ' AND uid IN (' . $limitationList . ')';
             }
             $groupBy = 'tx_cal_calendar.uid';
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupBy, $orderBy);
             if ($result) {
                 while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    if (!in_array($row['uid'], $collectedIds)) {
+                    if (!in_array($row['uid'], $collectedIds, true)) {
                         if ($includeData) {
                             $this->calendarIds[] = $row;
                         } else {
@@ -549,7 +536,7 @@ class CalendarService extends BaseService
             }
         }
 
-        if ($limitationList != '' && !empty($this->calendarIds)) {
+        if ($limitationList !== '' && !empty($this->calendarIds)) {
             $limitationArray = explode(',', $limitationList);
             $this->calendarIds = array_intersect($this->calendarIds, $limitationArray);
         }
@@ -559,12 +546,12 @@ class CalendarService extends BaseService
     /**
      * Call this after you have called getCalendarSearchString or getFreeAndBusyCalendarSearchString
      */
-    public function getCalendarOwner()
+    public function getCalendarOwner(): array
     {
-        if ($this->calendarOwner == null) {
+        if (empty($this->calendarOwner)) {
             $this->calendarOwner = [];
             $table = 'tx_cal_calendar_user_group_mm';
-            if ($this->conf['option'] == 'freeandbusy') {
+            if ($this->conf['option'] === 'freeandbusy') {
                 $table = 'tx_cal_calendar_fnb_user_group_mm';
             }
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, '');
@@ -587,6 +574,7 @@ class CalendarService extends BaseService
     /**
      * @param $uid
      * @param $overlay
+     * @throws \TYPO3\CMS\Core\Exception
      */
     public function createTranslation($uid, $overlay)
     {
@@ -595,16 +583,14 @@ class CalendarService extends BaseService
         $where = $table . '.uid = ' . $uid;
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                unset($row['uid']);
-                $crdate = time();
-                $row['tstamp'] = $crdate;
-                $row['crdate'] = $crdate;
-                $row['l18n_parent'] = $uid;
-                $row['sys_language_uid'] = $overlay;
-                $this->_saveCalendar($row);
-                return;
-            }
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
+            unset($row['uid']);
+            $crdate = time();
+            $row['tstamp'] = $crdate;
+            $row['crdate'] = $crdate;
+            $row['l18n_parent'] = $uid;
+            $row['sys_language_uid'] = $overlay;
+            $this->_saveCalendar($row);
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
     }
@@ -641,8 +627,7 @@ class CalendarService extends BaseService
                             'tx_cal_calendar',
                             $row,
                             $GLOBALS['TSFE']->sys_language_content,
-                            $GLOBALS['TSFE']->sys_language_contentOL,
-                            ''
+                            $GLOBALS['TSFE']->sys_language_contentOL
                         );
                     }
 

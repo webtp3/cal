@@ -18,24 +18,70 @@ use TYPO3\CMS\Cal\Utility\Registry;
  */
 class CalendarModel extends BaseModel
 {
-    public $row = [];
+    /**
+     * @var string
+     */
     public $title = '';
+
+    /**
+     * @var array
+     */
     public $owner = [
         'fe_users' => [],
         'fe_groups' => []
     ];
+
+    /**
+     * @var int
+     */
     public $activateFreeAndBusy = 0;
+
+    /**
+     * @var array
+     */
     public $freeAndBusyUser = [
         'fe_users' => [],
         'fe_groups' => []
     ];
+
+    /**
+     * @var int
+     */
     public $calendarType = 0;
+
+    /**
+     * @var string
+     */
     public $extUrl = '';
+
+    /**
+     * @var string
+     */
     public $icsFile = '';
+
+    /**
+     * @var int
+     */
     public $refresh = 30;
+
+    /**
+     * @var string
+     */
     public $md5 = '';
+
+    /**
+     * @var bool
+     */
     public $isPublic = true;
+
+    /**
+     * @var
+     */
     public $calendarService;
+
+    /**
+     * @var array
+     */
     public $noAutoFetchMethods = [
         'getOwner',
         'getFreeAndBusyUser'
@@ -116,7 +162,7 @@ class CalendarModel extends BaseModel
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -124,7 +170,7 @@ class CalendarModel extends BaseModel
     /**
      * @return int
      */
-    public function isActivateFreeAndBusy()
+    public function isActivateFreeAndBusy(): int
     {
         return $this->activateFreeAndBusy;
     }
@@ -132,7 +178,7 @@ class CalendarModel extends BaseModel
     /**
      * @return int
      */
-    public function getActivateFreeAndBusy()
+    public function getActivateFreeAndBusy(): int
     {
         return $this->activateFreeAndBusy;
     }
@@ -148,7 +194,7 @@ class CalendarModel extends BaseModel
     /**
      * @return int
      */
-    public function getCalendarType()
+    public function getCalendarType(): int
     {
         return $this->calendarType;
     }
@@ -164,7 +210,7 @@ class CalendarModel extends BaseModel
     /**
      * @return string
      */
-    public function getExtUrl()
+    public function getExtUrl(): string
     {
         return $this->extUrl;
     }
@@ -180,7 +226,7 @@ class CalendarModel extends BaseModel
     /**
      * @return string
      */
-    public function getIcsFile()
+    public function getIcsFile(): string
     {
         return $this->icsFile;
     }
@@ -196,7 +242,7 @@ class CalendarModel extends BaseModel
     /**
      * @return int
      */
-    public function getRefresh()
+    public function getRefresh(): int
     {
         return $this->refresh;
     }
@@ -212,7 +258,7 @@ class CalendarModel extends BaseModel
     /**
      * @return string
      */
-    public function getMD5()
+    public function getMD5(): string
     {
         return $this->md5;
     }
@@ -352,7 +398,7 @@ class CalendarModel extends BaseModel
     /**
      * @return bool
      */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->isPublic;
     }
@@ -362,7 +408,7 @@ class CalendarModel extends BaseModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_calendar')) {
@@ -372,7 +418,7 @@ class CalendarModel extends BaseModel
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -395,7 +441,7 @@ class CalendarModel extends BaseModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_calendar')) {
@@ -405,7 +451,7 @@ class CalendarModel extends BaseModel
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -428,13 +474,13 @@ class CalendarModel extends BaseModel
      * @param $groupIdArray
      * @return bool
      */
-    public function isCalendarOwner($userId, $groupIdArray)
+    public function isCalendarOwner($userId, $groupIdArray): bool
     {
-        if (is_array($this->owner['fe_users']) && in_array($userId, $this->owner['fe_users'])) {
+        if (is_array($this->owner['fe_users']) && in_array($userId, $this->owner['fe_users'], true)) {
             return true;
         }
         foreach ($groupIdArray as $id) {
-            if (is_array($this->owner['fe_groups']) && in_array($id, $this->owner['fe_groups'])) {
+            if (is_array($this->owner['fe_groups']) && in_array($id, $this->owner['fe_groups'], true)) {
                 return true;
             }
         }
@@ -448,7 +494,7 @@ class CalendarModel extends BaseModel
      * @param $view
      * @return string
      */
-    public function getEditLink(& $template, & $sims, & $rems, $view)
+    public function getEditLink(& $template, & $sims, & $rems, $view): string
     {
         $editlink = '';
         if ($this->isUserAllowedToEdit()) {
@@ -511,7 +557,7 @@ class CalendarModel extends BaseModel
                     foreach ((array)strip_tags($this->controller->piVars['owner']) as $valueInner) {
                         $idname = [];
                         preg_match('/(^[a-z])_([0-9]+)_(.*)/', $valueInner, $idname);
-                        if ($idname[1] == 'u') {
+                        if ($idname[1] === 'u') {
                             $this->setOwner('fe_users', $idname[2]);
                         } else {
                             $this->setOwner('fe_groups', $idname[2]);
@@ -525,7 +571,7 @@ class CalendarModel extends BaseModel
                 case 'freeAndBusyUser':
                     foreach ((array)strip_tags($this->controller->piVars['freeAndBusyUser']) as $valueInner) {
                         preg_match('/(^[a-z])_([0-9]+)_(.*)/', $valueInner, $idname);
-                        if ($idname[1] == 'u') {
+                        if ($idname[1] === 'u') {
                             $this->setOwner('fe_users', $idname[2]);
                         } else {
                             $this->setOwner('fe_groups', $idname[2]);
@@ -566,7 +612,7 @@ class CalendarModel extends BaseModel
      * Returns a array with fieldname => value pairs, that should be additionally added to the values of the method getValuesAsArray
      * @ return        array
      */
-    public function getAdditionalValuesAsArray()
+    public function getAdditionalValuesAsArray(): array
     {
         $values = parent::getAdditionalValuesAsArray();
         $tables = array_keys($this->owner);

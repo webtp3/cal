@@ -29,9 +29,7 @@ class OrganizerAddress extends Organizer
      * Constructor
      *
      * @param array $row
-     *            array
      * @param string $pidList
-     *            to search in
      */
     public function __construct($row, $pidList)
     {

@@ -31,15 +31,12 @@ class ConfirmLocationOrganizerView extends FeEditingBaseView
     /**
      * Draws a confirm form for a location or an organizer.
      *
-     * @param
-     *            boolean True if a location should be confirmed
-     * @param
-     *            object        The cObject of the mother-class.
-     * @param
-     *            object        The rights object.
+     * @param bool True if a location should be confirmed
+     * @param object        The cObject of the mother-class.
+     * @param object        The rights object.
      * @return string HTML output.
      */
-    public function drawConfirmLocationOrOrganizer($isLocation = true)
+    public function drawConfirmLocationOrOrganizer($isLocation = true): string
     {
         $this->isLocation = $isLocation;
         $this->isConfirm = true;
@@ -50,7 +47,7 @@ class ConfirmLocationOrganizerView extends FeEditingBaseView
         }
 
         $page = Functions::getContent($this->conf['view.']['confirm_location.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no confirm ' . $this->objectString . ' template file found:</h3>' . $this->conf['view.']['confirm_location.']['template'];
         }
 
@@ -63,7 +60,7 @@ class ConfirmLocationOrganizerView extends FeEditingBaseView
 
         $lastViewParams = $this->controller->shortenLastViewAndGetTargetViewParameters();
 
-        if (substr($lastViewParams['view'], 0, 4) == 'edit') {
+        if (strpos($lastViewParams['view'], 'edit') === 0) {
             $this->isEditMode = true;
         }
 
@@ -161,12 +158,12 @@ class ConfirmLocationOrganizerView extends FeEditingBaseView
     public function getSharedMarker(& $template, & $sims, & $rems)
     {
         $sims['###SHARED###'] = '';
-        if ($this->isAllowed('shared') && is_array($this->controller->piVars['shared'])) {
+        if (is_array($this->controller->piVars['shared']) && $this->isAllowed('shared')) {
             $shareddisplaylist = [];
             $sharedids = [];
             foreach ($this->controller->piVars['shared'] as $value) {
                 preg_match('/(^[a-z])_([0-9]+)_(.*)/', $value, $idname);
-                if ($idname[1] == 'u' || $idname[1] == 'g') {
+                if ($idname[1] === 'u' || $idname[1] === 'g') {
                     $sharedids[] = $idname[1] . '_' . $idname[2];
                     $shareddisplaylist[] = $idname[3];
                 }

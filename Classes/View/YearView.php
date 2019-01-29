@@ -29,12 +29,12 @@ class YearView extends MonthView
      * @param $getdate
      * @return string HTML output.
      */
-    public function drawYear(&$master_array, $getdate)
+    public function drawYear(&$master_array, $getdate): string
     {
         $this->_init($master_array);
 
         $page = Functions::getContent($this->conf['view.']['year.']['yearTemplate']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no template file found:</h3>' . $this->conf['view.']['year.']['yearTemplate'] . '<br />Please check your template record and add both cal items at "include static (from extension)"';
         }
         $array = [];

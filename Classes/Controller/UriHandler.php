@@ -62,11 +62,9 @@ class UriHandler
     /**
      * Get the HTML variable
      *
-     * @param string $html :
-     *            HTML text to be handled
      * @return string HTML text in its curren processing status
      */
-    public function getHTML()
+    public function getHTML(): string
     {
         return $this->theParts['html']['content'];
     }
@@ -90,13 +88,13 @@ class UriHandler
      *            file to load
      * @return bool the data was fetched or not
      */
-    public function fetchHTML($file)
+    public function fetchHTML($file): bool
     {
         // Fetches the content of the page
         $this->theParts['html']['content'] = $this->getUrl($file);
         if ($this->theParts['html']['content']) {
             $addr = $this->extParseUrl($file);
-            $path = ($addr['scheme']) ? $addr['scheme'] . '://' . $addr['host'] . (($addr['port']) ? ':' . $addr['port'] : '') . (($addr['filepath']) ? $addr['filepath'] : '/') : $addr['filepath'];
+            $path = $addr['scheme'] ? $addr['scheme'] . '://' . $addr['host'] . ($addr['port'] ? ':' . $addr['port'] : '') . ($addr['filepath'] ?: '/') : $addr['filepath'];
             $this->theParts['html']['path'] = $path;
             return true;
         }
@@ -147,22 +145,24 @@ class UriHandler
         for ($i = 1; $i < $pieces; $i++) {
             $tag = strtolower(strtok(substr($html_code, $len + 1, 10), ' '));
             $len += strlen($tag) + strlen($codepieces[$i]) + 2;
-            $dummy = preg_match('/[^>]*/', $codepieces[$i], $reg);
             $attributes = $this->get_tag_attributes($reg[0]); // Fetches the attributes for the tag
             $imageData = [];
 
             // Finds the src or background attribute
-            $imageData['ref'] = ($attributes['src'] ? $attributes['src'] : $attributes['background']);
+            $imageData['ref'] = ($attributes['src'] ?: $attributes['background']);
             if ($imageData['ref']) {
                 // find out if the value had quotes around it
                 $imageData['quotes'] = (substr(
                         $codepieces[$i],
                         strpos($codepieces[$i], $imageData['ref']) - 1,
                         1
-                    ) == '"') ? '"' : '';
+                    ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
-                if ($imageData['ref'] && !strstr($this->image_fullpath_list, '|' . $imageData['subst_str'] . '|')) {
+                if (false === strpos(
+                    $this->image_fullpath_list,
+                        '|' . $imageData['subst_str'] . '|'
+                )) {
                     $this->image_fullpath_list .= '|' . $imageData['subst_str'] . '|';
                     $imageData['absRef'] = $this->absRef($imageData['ref']);
                     $imageData['tag'] = $tag;
@@ -180,11 +180,10 @@ class UriHandler
         $codepieces = preg_split($attribRegex, $html_code);
         $pieces = count($codepieces);
         for ($i = 1; $i < $pieces; $i++) {
-            $dummy = preg_match('/[^>]*/', $codepieces[$i], $reg);
             // fetches the attributes for the tag
             $attributes = $this->get_tag_attributes($reg[0]);
             $imageData = [];
-            if (strtolower($attributes['rel']) == 'stylesheet' && $attributes['href']) {
+            if ($attributes['href'] && strtolower($attributes['rel']) === 'stylesheet') {
                 // Finds the src or background attribute
                 $imageData['ref'] = $attributes['href'];
                 // Finds out if the value had quotes around it
@@ -192,10 +191,13 @@ class UriHandler
                         $codepieces[$i],
                         strpos($codepieces[$i], $imageData['ref']) - 1,
                         1
-                    ) == '"') ? '"' : '';
+                    ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
-                if ($imageData['ref'] && !strstr($this->image_fullpath_list, '|' . $imageData['subst_str'] . '|')) {
+                if ($imageData['ref'] && false === strpos(
+                    $this->image_fullpath_list,
+                        '|' . $imageData['subst_str'] . '|'
+                )) {
                     $this->image_fullpath_list .= '|' . $imageData['subst_str'] . '|';
                     $imageData['absRef'] = $this->absRef($imageData['ref']);
                     $this->theParts['html']['media'][] = $imageData;
@@ -212,7 +214,7 @@ class UriHandler
             $temp = trim(str_replace('=', '', trim($temp)));
             preg_match($expr, substr($temp, 1, strlen($temp)), $reg);
             $imageData['ref'] = $reg[0];
-            $imageData['quotes'] = substr($temp, 0, 1);
+            $imageData['quotes'] = $temp[0];
             // subst_str is the string to look for, when substituting lateron
             $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
             $theInfo = $this->split_fileref($imageData['ref']);
@@ -221,7 +223,10 @@ class UriHandler
                 case 'gif':
                 case 'jpeg':
                 case 'jpg':
-                    if ($imageData['ref'] && !strstr($this->image_fullpath_list, '|' . $imageData['subst_str'] . '|')) {
+                    if ($imageData['ref'] && false === strpos(
+                        $this->image_fullpath_list,
+                            '|' . $imageData['subst_str'] . '|'
+                    )) {
                         $this->image_fullpath_list .= '|' . $imageData['subst_str'] . '|';
                         $imageData['absRef'] = $this->absRef($imageData['ref']);
                         $this->theParts['html']['media'][] = $imageData;
@@ -249,25 +254,20 @@ class UriHandler
             $tag = strtolower(strtok(substr($html_code, $len + 1, 10), ' '));
             $len += strlen($tag) + strlen($codepieces[$i]) + 2;
 
-            $dummy = preg_match('/[^>]*/', $codepieces[$i], $reg);
             // Fetches the attributes for the tag
-            $attributes = $this->get_tag_attributes($reg[0]);
+            $attributes = $this->get_tag_attributes('');
             $hrefData = [];
-            $hrefData['ref'] = ($attributes['href'] ? $attributes['href'] : $hrefData['ref'] = $attributes['action']);
+            $hrefData['ref'] = ($attributes['href'] ?: $hrefData['ref'] = $attributes['action']);
             if ($hrefData['ref']) {
                 // Finds out if the value had quotes around it
                 $hrefData['quotes'] = (substr(
                         $codepieces[$i],
                         strpos($codepieces[$i], $hrefData['ref']) - 1,
                         1
-                    ) == '"') ? '"' : '';
+                    ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $hrefData['subst_str'] = $hrefData['quotes'] . $hrefData['ref'] . $hrefData['quotes'];
-                if ($hrefData['ref'] && substr(
-                        trim($hrefData['ref']),
-                        0,
-                        1
-                    ) != '#' && !strstr($this->href_fullpath_list, '|' . $hrefData['subst_str'] . '|')) {
+                if (false === strpos($this->href_fullpath_list, '|' . $hrefData['subst_str'] . '|') && strpos(trim($hrefData['ref']), '#') !== 0) {
                     $this->href_fullpath_list .= '|' . $hrefData['subst_str'] . '|';
                     $hrefData['absRef'] = $this->absRef($hrefData['ref']);
                     $hrefData['tag'] = $tag;
@@ -285,7 +285,7 @@ class UriHandler
                 $hrefData['quotes'] = "'";
                 // subst_str is the string to look for, when substituting lateron
                 $hrefData['subst_str'] = $hrefData['quotes'] . $hrefData['ref'] . $hrefData['quotes'];
-                if ($hrefData['ref'] && !strstr($this->href_fullpath_list, '|' . $hrefData['subst_str'] . '|')) {
+                if (false === strpos($this->href_fullpath_list, '|' . $hrefData['subst_str'] . '|')) {
                     $this->href_fullpath_list .= '|' . $hrefData['subst_str'] . '|';
                     $hrefData['absRef'] = $this->absRef($hrefData['ref']);
                     $this->theParts['html']['hrefs'][] = $hrefData;
@@ -299,7 +299,7 @@ class UriHandler
      *
      * @return array array with information about each frame
      */
-    public function extractFramesInfo()
+    public function extractFramesInfo(): array
     {
         $htmlCode = $this->theParts['html']['content'];
         $info = [];
@@ -309,17 +309,16 @@ class UriHandler
             $codepieces = preg_split($attribRegex, $htmlCode, 1000000);
             $pieces = count($codepieces);
             for ($i = 1; $i < $pieces; $i++) {
-                $dummy = preg_match('/[^>]*/', $codepieces[$i], $reg);
                 // Fetches the attributes for the tag
-                $attributes = $this->get_tag_attributes($reg[0]);
+                $attributes = $this->get_tag_attributes('');
                 $frame = [];
                 $frame['src'] = $attributes['src'];
                 $frame['name'] = $attributes['name'];
                 $frame['absRef'] = $this->absRef($frame['src']);
                 $info[] = $frame;
             }
-            return $info;
         }
+        return $info;
     }
 
     /**
@@ -332,10 +331,10 @@ class UriHandler
     {
         if (is_array($this->theParts['html']['media'])) {
             foreach ($this->theParts['html']['media'] as $key => $val) {
-                if ($val['use_jumpurl'] && $this->jumperURL_prefix) {
+                if ($this->jumperURL_prefix && $val['use_jumpurl']) {
                     $subst = $this->jumperURL_prefix . str_replace('%2F', '/', rawurlencode($val['absRef']));
                 } else {
-                    $subst = ($absolute) ? $val['absRef'] : 'cid:part' . $key . '.' . $this->messageid;
+                    $subst = $absolute ? $val['absRef'] : 'cid:part' . $key . '.' . $this->messageid;
                 }
                 $this->theParts['html']['content'] = str_replace(
                     $val['subst_str'],
@@ -359,7 +358,7 @@ class UriHandler
         }
         foreach ($this->theParts['html']['hrefs'] as $key => $val) {
             // Form elements cannot use jumpurl!
-            if ($this->jumperURL_prefix && $val['tag'] != 'form') {
+            if ($this->jumperURL_prefix && $val['tag'] !== 'form') {
                 if ($this->jumperURL_useId) {
                     $substVal = $this->jumperURL_prefix . $key;
                 } else {
@@ -411,7 +410,7 @@ class UriHandler
                         );
                 }
             }
-            $newContent .= $part . ((($key + 1) != count($items)) ? '.src' : '');
+            $newContent .= $part . ((($key + 1) !== count($items)) ? '.src' : '');
         }
         $this->theParts['html']['content'] = $newContent;
     }
@@ -464,7 +463,7 @@ class UriHandler
      *            URL to fetch
      * @return string content of the URL
      */
-    public function getUrl($url)
+    public function getUrl($url): string
     {
         return GeneralUtility::getUrl($url);
     }
@@ -478,7 +477,7 @@ class UriHandler
      *            URL to load
      * @return string
      */
-    public function getStrippedURL($url)
+    public function getStrippedURL($url): string
     {
         $content = '';
         if ($fd = fopen($url, 'rb')) {
@@ -500,7 +499,7 @@ class UriHandler
      *            url
      * @return string the mime type found in the header
      */
-    public function getMimeType($url)
+    public function getMimeType($url): string
     {
         $mimeType = '';
         $headers = trim(GeneralUtility::getUrl($url, 2));
@@ -522,7 +521,7 @@ class UriHandler
      *            to use
      * @return string absolute address
      */
-    public function absRef($ref)
+    public function absRef($ref): string
     {
         $ref = trim($ref);
         $info = parse_url($ref);
@@ -544,7 +543,7 @@ class UriHandler
      *            file to use
      * @return array filename, filebody, fileext
      */
-    public function split_fileref($fileref)
+    public function split_fileref($fileref): array
     {
         $info = [];
         if (preg_match('/(.*\/)(.*)$/', $fileref, $reg)) {
@@ -573,7 +572,7 @@ class UriHandler
      *            to check
      * @return array about the path / URL
      */
-    public function extParseUrl($path)
+    public function extParseUrl($path): array
     {
         $res = parse_url($path);
         preg_match('/(.*\/)([^\/]*)$/', $res['path'], $reg);
@@ -585,11 +584,10 @@ class UriHandler
     /**
      * Creates a regular expression out of a list of tags
      *
-     * @param mixed $tagArray :
-     *            list of tags (either as array or string if it is one tag)
+     * @param $tags
      * @return string regular expression
      */
-    public function tag_regex($tags)
+    public function tag_regex($tags): string
     {
         $tags = (!is_array($tags) ? [
             $tags
@@ -598,7 +596,7 @@ class UriHandler
         $c = count($tags);
         foreach ($tags as $tag) {
             $c--;
-            $regexp .= '<' . $tag . '[[:space:]]' . (($c) ? '|' : '');
+            $regexp .= '<' . $tag . '[[:space:]]' . ($c ? '|' : '');
         }
         return $regexp . '/i';
     }
@@ -613,7 +611,7 @@ class UriHandler
      *            this " OPTION ATTRIB=VALUE>" which means you can omit the tag-name
      * @return array with attributes as keys in lower-case
      */
-    public function get_tag_attributes($tag)
+    public function get_tag_attributes($tag): array
     {
         $attributes = [];
         $tag = ltrim(preg_replace('/^<[^ ]*/', '', trim($tag)));
@@ -626,9 +624,9 @@ class UriHandler
             $attrib = $reg[0];
 
             $tag = ltrim(substr($tag, strlen($attrib), $tagLen));
-            if (substr($tag, 0, 1) == '=') {
+            if (strpos($tag, '=') === 0) {
                 $tag = ltrim(substr($tag, 1, $tagLen));
-                if (substr($tag, 0, 1) == '"') {
+                if (strpos($tag, '"') === 0) {
                     // Quotes around the value
                     $reg = explode('"', substr($tag, 1, $tagLen), 2);
                     $tag = ltrim($reg[1]);
@@ -638,7 +636,7 @@ class UriHandler
                     preg_match('/^([^[:space:]>]*)(.*)/', $tag, $reg);
                     $value = trim($reg[1]);
                     $tag = ltrim($reg[2]);
-                    if (substr($tag, 0, 1) == '>') {
+                    if (strpos($tag, '>') === 0) {
                         $tag = '';
                     }
                 }

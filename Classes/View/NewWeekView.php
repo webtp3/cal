@@ -3,6 +3,7 @@
 namespace TYPO3\CMS\Cal\View;
 
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 
@@ -47,12 +48,15 @@ class NewWeekView extends NewTimeView
 
     /**
      * Constructor.
+     * @param $week
+     * @param $year
+     * @param int $parentMonth
      */
     public function __construct($week, $year, $parentMonth = -1)
     {
         parent::__construct();
         $this->setMySubpart('WEEK_SUBPART');
-        if (DATE_CALC_BEGIN_WEEKDAY == 0) {
+        if (DATE_CALC_BEGIN_WEEKDAY === 0) {
             $this->setMySubpart('SUNDAY_WEEK_SUBPART');
         }
         $this->week = intval($week);
@@ -95,7 +99,7 @@ class NewWeekView extends NewTimeView
     }
 
     /**
-     * @param $event
+     * @param EventModel $event
      * @return mixed|void
      */
     public function addEvent(&$event)
@@ -105,28 +109,20 @@ class NewWeekView extends NewTimeView
         $eventStartFormatted = $eventStart->format('%Y%m%d');
         $eventStartYear = $eventStart->year;
         $eventEndFormatted = $event->getEnd()->format('%Y%m%d');
-        $eventEndYear = $event->getEnd()->year;
         $eventStartWeek = $event->getStart()->getWeekOfYear();
-        $eventEndWeek = $event->getEnd()->getWeekOfYear();
-        if (($eventStartWeek == 52 || $eventStartWeek == 53) && $event->getStart()->month == 1) {
+        if (($eventStartWeek === 52 || $eventStartWeek === 53) && $event->getStart()->month === 1) {
             $eventStartYear--;
         }
-        if (($eventEndWeek == 52 || $eventEndWeek == 53) && $event->getEnd()->month == 1) {
-            $eventEndYear--;
-        }
-        if ($eventStartWeek == 1 && $event->getStart()->month == 12) {
+        if ($eventStartWeek === 1 && $event->getStart()->month === 12) {
             $eventStartYear++;
         }
-        if ($eventEndWeek == 1 && $event->getEnd()->month == 12) {
-            $eventEndYear++;
-        }
-        if ($event->isAllday() || $eventStartFormatted != $eventEndFormatted) {
+        if ($eventStartFormatted !== $eventEndFormatted || $event->isAllDay()) {
             $eventYearEnd = $event->getEnd()->year;
-            if ($event->getEnd()->month == 12 && $event->getEnd()->getWeekOfYear() == 1) {
+            if ($event->getEnd()->month === 12 && $event->getEnd()->getWeekOfYear() === 1) {
                 $eventYearEnd++;
             }
 
-            if (!($eventStartYear == $this->getYear() && $eventStart->getWeekOfYear() == $this->week) && $eventStart->year . sprintf(
+            if (!($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) && $eventStart->year . sprintf(
                     '%02d',
                     $eventStart->getWeekOfYear()
                 ) < $this->getYear() . sprintf(
@@ -140,7 +136,7 @@ class NewWeekView extends NewTimeView
                     $eventStart->addSeconds(86400);
                     $eventStartYear = $eventStart->year;
                     $eventWeek = $eventStart->getWeekOfYear();
-                    if ($eventStart->month == 1 && $eventWeek > 50) {
+                    if ($eventStart->month === 1 && $eventWeek > 50) {
                         $eventStartYear--;
                     }
                 } while ($eventStartYear . sprintf('%02d', $eventWeek) < $this->getYear() . sprintf(
@@ -149,7 +145,7 @@ class NewWeekView extends NewTimeView
                 ));
                 $eventStartFormatted = $eventStart->format('%Y%m%d');
             }
-            if ($eventStartYear == $this->getYear() && $eventStart->getWeekOfYear() == $this->week) {
+            if ($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) {
                 $this->alldays[$eventStartFormatted][] = $event;
                 $this->weekHasEvent = true;
                 $first = true;
@@ -165,7 +161,7 @@ class NewWeekView extends NewTimeView
                     $eventStart->addSeconds(86400);
                     $eventStartYear = $eventStart->year;
                     $eventWeek = $eventStart->getWeekOfYear();
-                    if ($eventStart->month == 1 && $eventWeek > 50) {
+                    if ($eventStart->month === 1 && $eventWeek > 50) {
                         $eventStartYear--;
                     }
                 } while ($eventStart->format('%Y%m%d') <= $eventEndFormatted && $eventStartYear . sprintf(
@@ -175,7 +171,7 @@ class NewWeekView extends NewTimeView
             }
         } else {
             do {
-                if ($eventStartYear == $this->getYear() && $eventStartWeek == $this->week) {
+                if ($eventStartWeek === $this->week || $eventStartYear === $this->getYear()) {
                     $this->dayHasEvent[$eventStart->getDayOfWeek()] = true;
                     if (is_object($this->days[$eventStart->format('%Y%m%d')])) {
                         $this->days[$eventStart->format('%Y%m%d')]->addEvent($event);
@@ -184,7 +180,7 @@ class NewWeekView extends NewTimeView
                 }
                 $eventStart->addSeconds(86400);
                 $eventStartYear = $eventStart->year;
-                if ($eventStart->month == 1 && $eventWeek > 50) {
+                if ($eventStart->month === 1 && $eventWeek > 50) {
                     $eventStartYear--;
                 }
                 $eventStartWeek = $eventStart->getWeekOfYear();
@@ -202,7 +198,7 @@ class NewWeekView extends NewTimeView
     public function getRowspanMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if ($this->rowspan === false) {
-            if ($view == 'month') {
+            if ($view === 'month') {
                 $this->getEventsMarker($template, $sims, $rems, $wrapped, $view);
             } else {
                 $this->getAlldaysMarker($template, $sims, $rems, $wrapped, $view);
@@ -222,9 +218,6 @@ class NewWeekView extends NewTimeView
     {
         if ($this->content === false) {
             $this->content = '';
-
-            $cobj = &Registry::Registry('basic', 'cobj');
-            $conf = &Registry::Registry('basic', 'conf');
 
             // 1. find out the start and length of each event in relation to this week
             // 2. sort by length
@@ -262,9 +255,6 @@ class NewWeekView extends NewTimeView
         if ($this->content === false) {
             $this->content = '';
 
-            $cobj = &Registry::Registry('basic', 'cobj');
-            $conf = &Registry::Registry('basic', 'conf');
-
             // 1. find out the start and length of each event in relation to this week
             // 2. sort by length
             // 3. start with the larges and position it in a yx-matrix with x = 7 and y = size of alldays
@@ -275,8 +265,6 @@ class NewWeekView extends NewTimeView
             $lengthArray = [];
 
             $dayKeys = array_keys($this->days);
-            $controller = &Registry::Registry('basic', 'controller');
-            $currentMonth = $controller->getDateTimeObject->getMonth();
 
             for ($i = 0; $i < 7; $i++) {
                 $timeKeys = array_keys($this->days[$dayKeys[$i]]->getEvents());
@@ -298,7 +286,7 @@ class NewWeekView extends NewTimeView
 
     /**
      * @param $lengthArray
-     * @param $event
+     * @param EventModel $event
      */
     private function fillLengthArray(&$lengthArray, &$event)
     {
@@ -311,8 +299,8 @@ class NewWeekView extends NewTimeView
                 $start = 0;
             } else {
                 $length = intval($event->getEnd()->getDayOfWeek());
-                if ($length == 0) {
-                    if (DATE_CALC_BEGIN_WEEKDAY == 1) {
+                if ($length === 0) {
+                    if (DATE_CALC_BEGIN_WEEKDAY === 1) {
                         $length = 7;
                     } else {
                         $length = 1;
@@ -322,9 +310,9 @@ class NewWeekView extends NewTimeView
             }
         } else {
             $start = intval($event->getStart()->getDayOfWeek());
-            if (DATE_CALC_BEGIN_WEEKDAY == 1) {
+            if (DATE_CALC_BEGIN_WEEKDAY === 1) {
                 $start--;
-                if ($start == -1) {
+                if ($start === -1) {
                     $start = 6;
                 }
             }
@@ -332,9 +320,9 @@ class NewWeekView extends NewTimeView
                 $length = 7 - $start;
             } else {
                 $weekEnd = intval($event->getEnd()->getDayOfWeek());
-                if (DATE_CALC_BEGIN_WEEKDAY == 1) {
+                if (DATE_CALC_BEGIN_WEEKDAY === 1) {
                     $weekEnd--;
-                    if ($weekEnd == -1) {
+                    if ($weekEnd === -1) {
                         $weekEnd = 6;
                     }
                 }
@@ -345,7 +333,7 @@ class NewWeekView extends NewTimeView
     }
 
     /**
-     * @param $lengthArray
+     * @param array $lengthArray
      * @param $view
      */
     private function renderLengthArray(&$lengthArray, $view)
@@ -353,7 +341,6 @@ class NewWeekView extends NewTimeView
         krsort($lengthArray);
 
         $theMatrix = [];
-        $resultMatrix = [];
         $lengthArrayKeys = array_keys($lengthArray);
         $this->rowspan = 1;
 
@@ -365,7 +352,7 @@ class NewWeekView extends NewTimeView
                 $done = false;
                 for ($i = $values[1]; $i < 7 && !$done; $i++) {
                     for ($j = 0; $j < 1000 && !$done; $j++) {
-                        if (!$theMatrix[$i][$j] && $values[0] + $i < 8) {
+                        if ($values[0] + $i < 8 && !$theMatrix[$i][$j]) {
                             // Found an empty start spot
                             $empty = true;
                             for ($k = $i; $k < $values[0] + $i && $empty; $k++) {
@@ -412,13 +399,13 @@ class NewWeekView extends NewTimeView
             $this->content .= '<tr class="alldays ' . $classes . '">';
             for ($i = 0; $i < 7; $i++) {
                 $currentDayClass = ' weekday' . $this->days[$daysKeys[$i]]->weekdayNumber;
-                if ($this->currentDayIndex == $i) {
+                if ($this->currentDayIndex === $i) {
                     $currentDayClass .= ' currentDay';
                 }
-                if ($theMatrix[$i][$j] == false) {
+                if (empty($theMatrix[$i][$j])) {
                     $this->content .= '<td class="' . $classes . $currentDayClass . '">&nbsp;</td>';
                 } elseif (is_object($theMatrix[$i][$j])) {
-                    $this->content .= '<td class="' . $classes . $currentDayClass . '" colspan="' . ($theMatrix[$i][$j]->matrixValue) . '">' . $theMatrix[$i][$j]->renderEventFor('week') . '</td>';
+                    $this->content .= '<td class="' . $classes . $currentDayClass . '" colspan="' . $theMatrix[$i][$j]->matrixValue . '">' . $theMatrix[$i][$j]->renderEventFor('week') . '</td>';
                     $this->days[$daysKeys[$i]]->setHasAlldayEvents(true);
                 }
             }
@@ -444,16 +431,16 @@ class NewWeekView extends NewTimeView
             $this->content .= '<tr class="' . $classes . '">';
             for ($i = 0; $i < 7; $i++) {
                 $currentDayClass = ' weekday' . $this->days[$daysKeys[$i]]->weekdayNumber;
-                if ($this->currentDayIndex == $i) {
+                if ($this->currentDayIndex === $i) {
                     $currentDayClass = ' currentDay';
                 }
-                if ($currentMonth != $this->days[$daysKeys[$i]]->month) {
+                if ($currentMonth !== $this->days[$daysKeys[$i]]->month) {
                     $currentDayClass .= ' monthOff';
                 }
-                if ($theMatrix[$i][$j] == false) {
+                if (empty($theMatrix[$i][$j])) {
                     $this->content .= '<td class="empty ' . $classes . $currentDayClass . '">';
                 } elseif (is_object($theMatrix[$i][$j])) {
-                    $this->content .= '<td class="event ' . $classes . $currentDayClass . '" colspan="' . ($theMatrix[$i][$j]->matrixValue) . '">' . $theMatrix[$i][$j]->renderEventFor('month');
+                    $this->content .= '<td class="event ' . $classes . $currentDayClass . '" colspan="' . $theMatrix[$i][$j]->matrixValue . '">' . $theMatrix[$i][$j]->renderEventFor('month');
                     $this->days[$daysKeys[$i]]->setHasAlldayEvents(true);
                 }
                 $this->content .= '</td>';
@@ -484,7 +471,7 @@ class NewWeekView extends NewTimeView
     /**
      * @return string
      */
-    private function getWeekClasses()
+    private function getWeekClasses(): string
     {
         $classes = '';
         if ($this->current) {
@@ -520,7 +507,7 @@ class NewWeekView extends NewTimeView
         $local_cObj->data['view'] = $weekLinkViewTarget;
         $controller = &Registry::Registry('basic', 'controller');
 
-        if (($rightsObj->isViewEnabled($weekLinkViewTarget) || $conf['view.'][$weekLinkViewTarget . '.'][$weekLinkViewTarget . 'ViewPid']) && $this->weekHasEvent) {
+        if ($this->weekHasEvent && ($rightsObj->isViewEnabled($weekLinkViewTarget) || $conf['view.'][$weekLinkViewTarget . '.'][$weekLinkViewTarget . 'ViewPid'])) {
             $controller->getParametersForTyposcriptLink(
                 $local_cObj->data,
                 [
@@ -727,7 +714,7 @@ class NewWeekView extends NewTimeView
      * @param $weekdayIndex
      * @return string
      */
-    private function getDayClasses($weekdayIndex)
+    private function getDayClasses($weekdayIndex): string
     {
         $conf = &Registry::Registry('basic', 'conf');
         if ($this->initialized === false) {
@@ -739,25 +726,25 @@ class NewWeekView extends NewTimeView
             $this->initialized = true;
         }
         $classes = '';
-        if ($this->dayHasEvent[$weekdayIndex] == 1) {
+        if ($this->dayHasEvent[$weekdayIndex] === 1) {
             $classes .= ' ' . $conf['view.']['month.']['eventDayStyle'];
         }
 
         $localDayIndex = $this->currentDayIndex + DATE_CALC_BEGIN_WEEKDAY;
-        if ($localDayIndex == 7) {
+        if ($localDayIndex === 7) {
             $localDayIndex = 0;
         }
 
-        if ($localDayIndex == $weekdayIndex) {
+        if ($localDayIndex === $weekdayIndex) {
             $classes .= ' ' . $conf['view.']['month.']['monthTodayStyle'];
         }
 
         $localDayIndex = $weekdayIndex - DATE_CALC_BEGIN_WEEKDAY;
-        if ($localDayIndex == -1) {
+        if ($localDayIndex === -1) {
             $localDayIndex = 6;
         }
         $daysKeys = array_keys($this->days);
-        if (intval($this->getParentMonth()) != intval($this->days[$daysKeys[$localDayIndex]]->month)) {
+        if (intval($this->getParentMonth()) !== intval($this->days[$daysKeys[$localDayIndex]]->month)) {
             $classes .= ' ' . $conf['view.']['month.']['monthOffStyle'];
         }
 
@@ -801,12 +788,12 @@ class NewWeekView extends NewTimeView
     }
 
     /**
-     * @param $dateObject
+     * @param CalDate $dateObject
      * @return mixed|void
      */
     public function setSelected(&$dateObject)
     {
-        if ($dateObject->getWeekOfYear() == $this->week && $dateObject->year == $this->getYear()) {
+        if ($dateObject->getWeekOfYear() === $this->week && $dateObject->year === $this->getYear()) {
             $this->selected = true;
 
             $day = $this->days[$dateObject->format('%Y%m%d')];
@@ -817,20 +804,20 @@ class NewWeekView extends NewTimeView
     }
 
     /**
-     * @param $dateObject
+     * @param CalDate $dateObject
      * @return mixed|void
      */
     public function setCurrent(&$dateObject)
     {
-        if ($dateObject->getWeekOfYear() == $this->week && $dateObject->year == $this->getYear()) {
+        if ($dateObject->getWeekOfYear() === $this->week && $dateObject->year === $this->getYear()) {
             $this->current = true;
 
             $day = $this->days[$dateObject->format('%Y%m%d')];
             if (is_object($day)) {
                 $this->currentDayIndex = $dateObject->getDayOfWeek();
-                if (DATE_CALC_BEGIN_WEEKDAY == 1) {
+                if (DATE_CALC_BEGIN_WEEKDAY === 1) {
                     $this->currentDayIndex--;
-                    if ($this->currentDayIndex == -1) {
+                    if ($this->currentDayIndex === -1) {
                         $this->currentDayIndex = 6;
                     }
                 }
@@ -842,7 +829,7 @@ class NewWeekView extends NewTimeView
     /**
      * @return bool
      */
-    public function hasEvents()
+    public function hasEvents(): bool
     {
         return $this->weekHasEvent;
     }

@@ -14,6 +14,10 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalendarModel;
+use TYPO3\CMS\Cal\Model\CategoryModel;
+use TYPO3\CMS\Cal\Model\LocationModel;
+use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -35,10 +39,9 @@ class AdminView extends BaseView
         $this->checkAction();
 
         $page = Functions::getContent($this->conf['view.']['admin.']['adminTemplate']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no adminTemplate file found:</h3>' . $this->conf['view.']['admin.']['adminTemplate'];
         }
-        $return = $page;
         $showCalendarForm = false;
         $showCategoryForm = false;
         $showEventForm = false;
@@ -47,9 +50,6 @@ class AdminView extends BaseView
 
         $this->initLocalCObject($this->getValuesAsArray());
 
-        $feUserUid = $this->rightsObj->getUserId();
-        $feGroupsArray = $this->rightsObj->getUserGroups();
-        $isAdmin = $this->rightsObj->isCalAdmin();
         $createCalendarLink = '';
         if ($this->rightsObj->isAllowedTo('create', 'calendar') && $this->rightsObj->isViewEnabled('create_calendar')) {
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_create_calendar'));
@@ -257,9 +257,10 @@ class AdminView extends BaseView
         // CALENDAR
         $calendarArray = $this->modelObj->findAllCalendar('tx_cal_calendar', $this->conf['pidList']);
         $editCalendarOptions = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
+        /** @var CalendarModel $calendar */
         foreach ($calendarArray['tx_cal_calendar'] as $calendar) {
             if ($calendar->isUserAllowedToEdit() || $calendar->isUserAllowedToDelete()) {
-                $editCalendarOptions .= '<option value="' . $calendar->getUID() . '">' . $calendar->getTitle() . '</option>';
+                $editCalendarOptions .= '<option value="' . $calendar->getUid() . '">' . $calendar->getTitle() . '</option>';
             }
         }
         $params = [
@@ -280,6 +281,7 @@ class AdminView extends BaseView
 
         $categoryArray = $categoryArrays['sys_category'][0][0];
         $editCategoryOptions = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
+        /** @var CategoryModel $category */
         foreach ($categoryArray as $category) {
             if ($category->isUserAllowedToEdit() || $category->isUserAllowedToDelete()) {
                 $editCategoryOptions .= '<option value="' . $category->getUid() . '" >' . $category->getTitle() . '</option>';
@@ -295,21 +297,19 @@ class AdminView extends BaseView
         }
 
         // EVENT
-        /*
-         * $editEventOptions = '<option value="">'.$this->controller->pi_getLL('l_select').'</option>'; $eventArray = $this->modelObj->findAll('cal_event_model','tx_cal_phpicalendar','event', $this->conf['pidList']); unset($eventArray['legend']); foreach($eventArray as $timeArray){ foreach($timeArray as $eventArray){ foreach($eventArray as $event){ $editEventOptions .= '<option value="'.$event->getUid().'" >'.$event->getTitle().'</option>'; } } } $params = array ( 'view' => 'edit_event', 'type' => 'tx_cal_phpicalendar'); foreach($params as $key => $value){ $editEventParams .= '<input type="hidden" value="'.$value.'" name="'.$this->prefixId.'['.$key.']"/>'; } $params = array ( 'view' => 'delete_event', 'type' => 'tx_cal_phpicalendar'); foreach($params as $key => $value){ $deleteEventParams .= '<input type="hidden" value="'.$value.'" name="'.$this->prefixId.'['.$key.']"/>'; }
-         */
 
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        $locationModel = ($confArr['useLocationStructure'] ? $confArr['useLocationStructure'] : 'tx_cal_location');
-        $organizerModel = ($confArr['useOrganizerStructure'] ? $confArr['useOrganizerStructure'] : 'tx_cal_organizer');
+        $locationModel = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
+        $organizerModel = ($confArr['useOrganizerStructure'] ?: 'tx_cal_organizer');
 
         // LOCATION
         $locationArray = $this->modelObj->findAllLocations($locationModel, $this->conf['pidList']);
         $editLocationOptions = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
 
-        foreach ((array)$locationArray as $location) {
+        /** @var LocationModel $location */
+        foreach ($locationArray as $location) {
             if ($location->isUserAllowedToEdit()) {
-                $editLocationOptions .= '<option value="' . $location->getUID() . '" >' . $location->getName() . '</option>';
+                $editLocationOptions .= '<option value="' . $location->getUid() . '" >' . $location->getName() . '</option>';
             }
         }
         $params = [
@@ -324,9 +324,10 @@ class AdminView extends BaseView
         // ORGANIZER
         $organizerArray = $this->modelObj->findAllOrganizer($organizerModel, $this->conf['pidList']);
         $editOrganizerOptions = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
-        foreach ((array)$organizerArray as $organizer) {
+        /** @var Organizer $organizer */
+        foreach ($organizerArray as $organizer) {
             if ($organizer->isUserAllowedToEdit()) {
-                $editOrganizerOptions .= '<option value="' . $organizer->getUID() . '" >' . $organizer->getName() . '</option>';
+                $editOrganizerOptions .= '<option value="' . $organizer->getUid() . '" >' . $organizer->getName() . '</option>';
             }
         }
         $params = [
@@ -403,7 +404,6 @@ class AdminView extends BaseView
     {
         $sims['###CALENDAR_SUBSCRIPTION###'] = '';
         if ($this->rightsObj->isLoggedIn() && $this->rightsObj->isAllowedTo('edit', 'calendarSubscription')) {
-            $editCalendarOptions = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
             $calendarIds = [];
 
             $deselectedCalendarIds = GeneralUtility::trimExplode(
@@ -413,6 +413,7 @@ class AdminView extends BaseView
             );
             foreach ($deselectedCalendarIds as $calendarUid) {
                 $calendarIds[] = $calendarUid;
+                /** @var CalendarModel $calendar */
                 $calendar = $this->modelObj->findCalendar($calendarUid, 'tx_cal_calendar', $this->conf['pidList']);
                 if (is_object($calendar)) {
                     $sims['###CALENDAR_SUBSCRIPTION###'] .= '<input type="checkbox" value="' . $calendar->getUid() . '" name="tx_cal_controller[calendarSubscription][]">' . $calendar->getTitle() . '<br/>';
@@ -420,8 +421,9 @@ class AdminView extends BaseView
             }
 
             $calendarArray = $this->modelObj->findAllCalendar('tx_cal_calendar');
+            /** @var CalendarModel $calendar */
             foreach ($calendarArray['tx_cal_calendar'] as $calendar) {
-                if (!in_array($calendar->getUid(), $calendarIds)) {
+                if (!in_array($calendar->getUid(), $calendarIds, true)) {
                     $calendarIds[] = $calendar->getUid();
                     $sims['###CALENDAR_SUBSCRIPTION###'] .= '<input type="checkbox" value="' . $calendar->getUid() . '" checked="checked" name="tx_cal_controller[calendarSubscription][]">' . $calendar->getTitle() . '<br/>';
                 }
@@ -451,30 +453,32 @@ class AdminView extends BaseView
 
     private function checkAction()
     {
-        switch ($this->controller->piVars['adminAction']) {
-            case 'editCalendarSubscription':
-                $table = 'fe_users';
-                $where = 'uid = ' . $this->rightsObj->getUserId();
-                $ids = is_array($this->controller->piVars['calendarSubscription']) ? $this->controller->piVars['calendarSubscription'] : ($this->controller->piVars['calendarSubscription'] != '' ? GeneralUtility::trimExplode(
+        if ($this->controller->piVars['adminAction'] === 'editCalendarSubscription') {
+            $table = 'fe_users';
+            $where = 'uid = ' . $this->rightsObj->getUserId();
+            if ($this->controller->piVars['calendarSubscription'] !== '') {
+                $ids = is_array($this->controller->piVars['calendarSubscription']) ? $this->controller->piVars['calendarSubscription'] : GeneralUtility::trimExplode(
                     ',',
                     $this->controller->piVars['calendarSubscription'],
                     1
-                ) : []);
-                $allIds = $this->controller->piVars['calendarSubscriptionIds'] ? GeneralUtility::trimExplode(
-                    ',',
-                    $this->controller->piVars['calendarSubscriptionIds'],
-                    1
-                ) : [];
-                $fields = [
-                    'tx_cal_calendar_subscription' => implode(',', array_diff($allIds, $ids))
-                ];
+                );
+            } else {
+                $ids = is_array($this->controller->piVars['calendarSubscription']) ? $this->controller->piVars['calendarSubscription'] : [];
+            }
+            $allIds = $this->controller->piVars['calendarSubscriptionIds'] ? GeneralUtility::trimExplode(
+                ',',
+                $this->controller->piVars['calendarSubscriptionIds'],
+                1
+            ) : [];
+            $fields = [
+                'tx_cal_calendar_subscription' => implode(',', array_diff($allIds, $ids))
+            ];
 
-                $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $fields);
-                $this->conf['calendar'] = $this->conf['view.']['calendar'] = $this->conf['view.']['allowedCalendar'] = $this->conf['category'] = $this->conf['view.']['category'] = $this->conf['view.']['allowedCategory'] = '';
-                $this->controller->checkCalendarAndCategory();
-                unset($this->controller->piVars['calendarSubscription']);
-                Functions::clearCache();
-                break;
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $fields);
+            $this->conf['calendar'] = $this->conf['view.']['calendar'] = $this->conf['view.']['allowedCalendar'] = $this->conf['category'] = $this->conf['view.']['category'] = $this->conf['view.']['allowedCategory'] = '';
+            $this->controller->checkCalendarAndCategory();
+            unset($this->controller->piVars['calendarSubscription']);
+            Functions::clearCache();
         }
     }
 }

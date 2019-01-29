@@ -21,14 +21,11 @@ class RealUrl
      * Main hook function.
      * Generates an entire RealURL configuration.
      *
-     * @param
-     *            array        Main parameters. Typically, 'config' is the
-     *            existing RealURL configuration thas has been
-     *            generated to this point and 'extKey' is unique
-     *            that this hook used when it was registered.
-     * @return
+     * @param $params
+     * @param $parentObj
+     * @return array
      */
-    public function addRealURLConfig(&$params, $parentObj)
+    public function addRealURLConfig(&$params, $parentObj): array
     {
         $config = &$params['config'];
 
@@ -48,7 +45,7 @@ class RealUrl
     /**
      * @return array
      */
-    public function addFilenameSet()
+    public function addFilenameSet(): array
     {
         $calendarRSS = [];
         $calendarRSS['calendarRSS.xml'] = [
@@ -69,7 +66,7 @@ class RealUrl
      *
      * @return array configuration element.
      */
-    public function addPostVarSets()
+    public function addPostVarSets(): array
     {
         $postVarSets = [];
 
@@ -253,7 +250,7 @@ class RealUrl
      *            string        The GET variable.
      * @return array config element.
      */
-    public function addSimple($key)
+    public function addSimple($key): array
     {
         return [
             'GETvar' => $key
@@ -278,18 +275,14 @@ class RealUrl
      * )
      * )
      *
-     * @param
-     *            string        The GET variable.
-     * @param
-     *            string        The name of the table.
-     * @param
-     *            string        The field in the table to be used in the URL.
-     * @param
-     *            string        Previous GET variable that must be present for
-     *            this rule to be evaluated.
+     * @param $key
+     * @param $table
+     * @param string $aliasField
+     * @param bool $condForPrevious
+     * @param string $where
      * @return array config element.
      */
-    public function addTable($key, $table, $aliasField = 'title', $condForPrevious = false, $where = ' AND NOT deleted')
+    public function addTable($key, $table, $aliasField = 'title', $condForPrevious = false, $where = ' AND NOT deleted'): array
     {
         $configArray = [];
 
@@ -334,7 +327,7 @@ class RealUrl
      *            string        noMatch behavior.
      * @return array config element.
      */
-    public function addValueMap($key, $valueMapArray, $noMatch = 'bypass')
+    public function addValueMap($key, $valueMapArray, $noMatch = 'bypass'): array
     {
         $configArray = [];
         $configArray['GETvar'] = $key;
@@ -364,7 +357,7 @@ class RealUrl
      *            All values must be matched.
      * @return array config element.
      */
-    public function addSingle($keyValueArray)
+    public function addSingle($keyValueArray): array
     {
         $configArray = [];
         $configArray['type'] = 'single';

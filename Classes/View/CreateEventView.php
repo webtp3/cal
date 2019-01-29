@@ -14,10 +14,14 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\AttendeeModel;
+use TYPO3\CMS\Cal\Model\CategoryModel;
+use TYPO3\CMS\Cal\Model\ICalendar;
+use TYPO3\CMS\Cal\Model\LocationModel;
+use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Rtehtmlarea\Controller\FrontendRteController;
 
 /**
  * A service which renders a form to create / edit a phpicalendar event.
@@ -48,19 +52,17 @@ class CreateEventView extends FeEditingBaseView
     public $cal_notifyGroupIds = [];
     public $eventType = 'tx_cal_phpicalendar';
     public $confArr = [];
+    protected $dateFormatArray = [];
 
     /**
      * Draws a create event form.
      *
      * @param $getdate int
-     *            date to create the event for. Format: yyyymmdd
      * @param $pidList string
-     *            list of pids.
-     * @param $object object
-     *            phpicalendar object to be updated
+     * @param $object ICalendar
      * @return string HTML output.
      */
-    public function drawCreateEvent($getdate, $pidList, $object = '')
+    public function drawCreateEvent($getdate, $pidList, $object): string
     {
         $this->objectString = 'event';
         if (is_object($object)) {
@@ -95,7 +97,6 @@ class CreateEventView extends FeEditingBaseView
             $this->object->updateWithPIVars($allValues);
         }
 
-        $requiredFieldSims = [];
         $allRequiredFieldsAreFilled = $this->checkRequiredFields($requiredFieldsSims);
 
         $constrainFieldSims = [];
@@ -107,7 +108,7 @@ class CreateEventView extends FeEditingBaseView
             $this->conf['lastview'] = $this->controller->extendLastView();
             $this->conf['view'] = 'confirm_' . $this->objectString;
             $this->controller->piVars = $lastPiVars;
-            if ($this->conf['view.']['dontShowConfirmView'] == 1) {
+            if ((int)$this->conf['view.']['dontShowConfirmView'] === 1) {
                 return $this->controller->saveEvent();
             }
             return $this->controller->confirmEvent();
@@ -120,8 +121,7 @@ class CreateEventView extends FeEditingBaseView
         $this->serviceName = 'cal_event_model';
         $this->table = 'tx_cal_event';
 
-        $page = '';
-        if ($this->conf['view.']['enableAjax'] && $this->controller->piVars['pid']) {
+        if ($this->controller->piVars['pid'] && $this->conf['view.']['enableAjax']) {
             $path = $this->conf['view.']['create_event.']['ajaxTemplate'];
             $page = Functions::getContent($path);
             $this->conf['noWrapInBaseClass'] = 1;
@@ -132,7 +132,7 @@ class CreateEventView extends FeEditingBaseView
             $page = Functions::getContent($path);
         }
 
-        if ($page == '') {
+        if ($page === '') {
             return Functions::createErrorMessage(
                 'No create event template file found at: >' . $path . '<.',
                 'Please make sure the path is correct and that you included the static template for fe-editing.'
@@ -148,7 +148,6 @@ class CreateEventView extends FeEditingBaseView
 
         $this->validation = '';
 
-        $this->dateFormatArray = [];
         $this->dateFormatArray[$this->conf['dateConfig.']['dayPosition']] = 'dd';
         $this->dateFormatArray[$this->conf['dateConfig.']['monthPosition']] = 'mm';
         $this->dateFormatArray[$this->conf['dateConfig.']['yearPosition']] = 'yyyy';
@@ -213,6 +212,7 @@ class CreateEventView extends FeEditingBaseView
      */
     public function getCategoryArrayMarker(& $template, & $sims, & $rems)
     {
+        $serviceKeyArray = [];
         $sims['###CATEGORY_ARRAY###'] = 'new Array(';
         if ($this->isAllowed('category')) {
             $tempCalendarConf = $this->conf['calendar'];
@@ -236,6 +236,7 @@ class CreateEventView extends FeEditingBaseView
                 $serviceKeyArray = [];
                 foreach ($globalCategoryArrays as $serviceKey => $serviceCategoryArrays) {
                     $elements = [];
+                    /** @var CategoryModel $category */
                     foreach ($serviceCategoryArrays[0][0] as $category) {
                         $elements[] = '{"uid":' . $category->getUid() . ',"parentuid":' . intval($category->getParentUid()) . ',"calendaruid":' . intval($category->getCalendarUid()) . ',"title":"' . $category->getTitle() . '","headerstyle":"' . $category->getHeaderStyle() . '","bodystyle":"' . $category->getBodyStyle() . '"}';
                     }
@@ -243,7 +244,7 @@ class CreateEventView extends FeEditingBaseView
                 }
             }
             $this->conf['calendar'] = $tempCalendarConf;
-            if (!$this->conf['category'] == '0') {
+            if (!(int)$this->conf['category'] === '0') {
                 $this->conf['category'] = $tempCategoryConf;
             }
             $sims['###CATEGORY_ARRAY###'] .= implode(',', $serviceKeyArray);
@@ -279,13 +280,13 @@ class CreateEventView extends FeEditingBaseView
             $calendarUID = $this->object->getCalendarUid();
             $categories = $this->object->getCategories();
             $selectedCalendars = $this->object->getCalendarUid() . ',0';
-            if (!$calendarUID && count($categories) == 0) {
+            if (!$calendarUID && count($categories) === 0) {
                 $selectedCategories = '0';
             } else {
                 $ids = [
                     0
                 ];
-                foreach ((array)$categories as $category) {
+                foreach ($categories as $category) {
                     if (is_object($category)) {
                         $ids[] = $category->getUid();
                     }
@@ -320,7 +321,7 @@ class CreateEventView extends FeEditingBaseView
     {
         $sims['###ALLDAY###'] = '';
         if ($this->isAllowed('allday')) {
-            if ($this->object->isAllday()) {
+            if ($this->object->isAllDay()) {
                 $allDayValue = ' checked="checked"';
             } else {
                 $allDayValue = ' ';
@@ -354,7 +355,7 @@ class CreateEventView extends FeEditingBaseView
     {
         $sims['###ENDDATE###'] = '';
         if ($this->isAllowed('enddate')) {
-            if ($this->object->getEnd() == 0) {
+            if ((int)$this->object->getEnd() === 0) {
                 $eventEnd = $this->object->getStart();
             } else {
                 $eventEnd = $this->object->getEnd();
@@ -372,12 +373,12 @@ class CreateEventView extends FeEditingBaseView
      * @param int $stepping
      * @return string
      */
-    public function getTimeSelector($start, $finish, $default, $stepping = 1)
+    public function getTimeSelector($start, $finish, $default, $stepping = 1): string
     {
         $selector = '';
         for ($i = $start; $i < $finish; $i += $stepping) {
             $value = str_pad($i, 2, '0', STR_PAD_LEFT);
-            $selector .= '<option value="' . $value . '"' . ($default == $value ? ' selected="selected"' : '') . '>' . $value . '</option>';
+            $selector .= '<option value="' . $value . '" ' . ($default === $value ? ' selected="selected"' : '') . ' >' . $value . '</option>';
         }
 
         return $selector;
@@ -442,7 +443,6 @@ class CreateEventView extends FeEditingBaseView
     {
         if ($this->isEditMode) {
             // selection uids of available notify/monitor users & -groups
-            $cal_notify_user = '';
             $this->cal_notifyUserIds = [];
             $where = ' AND tx_cal_event.uid=' . $this->object->getUid() . ' AND fe_users.deleted = 0 AND fe_users.disable = 0' . $this->cObj->enableFields('tx_cal_event');
             // TODO add this when groups are allowed: AND tx_cal_fe_user_event_monitor_mm.tablenames="fe_users"
@@ -477,7 +477,7 @@ class CreateEventView extends FeEditingBaseView
                 $limit
             );
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                array_push($this->cal_notifyGroupIds, $row['uid']);
+                $this->cal_notifyGroupIds[] = $row['uid'];
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
@@ -516,7 +516,7 @@ class CreateEventView extends FeEditingBaseView
                 $default = $this->object->getOrganizerId();
             }
             $cal_organizer = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
-            $useOrganizerStructure = ($this->extConf['useOrganizerStructure'] ? $this->extConf['useOrganizerStructure'] : 'tx_cal_organizer');
+            $useOrganizerStructure = ($this->extConf['useOrganizerStructure'] ?: 'tx_cal_organizer');
             $organizers = $this->modelObj->findAllOrganizer($useOrganizerStructure, $this->conf['pidList']);
             $feUserUid = $this->rightsObj->getUserId();
             $feGroupsArray = $this->rightsObj->getUserGroups();
@@ -524,16 +524,20 @@ class CreateEventView extends FeEditingBaseView
                 if (!$this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_organizer.']['default']) {
                     $cal_organizer = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
                 }
+                /** @var Organizer $organizer */
                 foreach ($organizers as $organizer) {
-                    if (in_array($organizer->getUid(), $uidList)) {
-                        if (($this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_organizer.']['onlyOwn']) && !$organizer->isSharedUser(
+                    if (in_array($organizer->getUid(), $uidList, true)) {
+                        if (
+                            !$organizer->isSharedUser(
                                 $feUserUid,
                                 $feGroupsArray
-                            )) {
+                            )
+                            && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_organizer.']['onlyOwn']
+                        ) {
                             continue;
                         }
                         $cal_organizer .= '<option value="' . $organizer->getUid() . '"';
-                        if ($organizer->getUid() == $default) {
+                        if ($organizer->getUid() === $default) {
                             $cal_organizer .= ' selected="selected"';
                         }
                         $this->initLocalCObject($organizer->getValuesAsArray());
@@ -548,15 +552,19 @@ class CreateEventView extends FeEditingBaseView
             }            // if no default values found
             else {
                 // creating options for location by standard fe plugin entry point
-                foreach ((array)$organizers as $organizer) {
-                    if (($this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_organizer.']['onlyOwn']) && !$organizer->isSharedUser(
+                /** @var Organizer $organizer */
+                foreach ($organizers as $organizer) {
+                    if (
+                        !$organizer->isSharedUser(
                             $feUserUid,
                             $feGroupsArray
-                        )) {
+                        )
+                        && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_organizer.']['onlyOwn']
+                    ) {
                         continue;
                     }
                     $cal_organizer .= '<option value="' . $organizer->getUid() . '"';
-                    if ($organizer->getUid() == $default) {
+                    if ($organizer->getUid() === $default) {
                         $cal_organizer .= ' selected="selected"';
                     }
                     $this->initLocalCObject($organizer->getValuesAsArray());
@@ -605,7 +613,7 @@ class CreateEventView extends FeEditingBaseView
             }
             // creating options for location
             $cal_location = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
-            $useLocationStructure = ($this->extConf['useLocationStructure'] ? $this->extConf['useLocationStructure'] : 'tx_cal_location');
+            $useLocationStructure = ($this->extConf['useLocationStructure'] ?: 'tx_cal_location');
             $locations = $this->modelObj->findAllLocations($useLocationStructure, $this->conf['pidList']);
             $feUserUid = $this->rightsObj->getUserId();
             $feGroupsArray = $this->rightsObj->getUserGroups();
@@ -613,16 +621,20 @@ class CreateEventView extends FeEditingBaseView
                 if (!$this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['default']) {
                     $cal_location = '<option value="">' . $this->controller->pi_getLL('l_select') . '</option>';
                 }
+                /** @var LocationModel $location */
                 foreach ($locations as $location) {
-                    if (in_array($location->getUid(), $uidList)) {
-                        if (($this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['onlyOwn']) && !$location->isSharedUser(
-                                $feUserUid,
-                                $feGroupsArray
-                            )) {
+                    if (in_array($location->getUid(), $uidList, true)) {
+                        if (
+                            !$location->isSharedUser(
+                                                        $feUserUid,
+                                                        $feGroupsArray
+                                                    )
+                            && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['onlyOwn']
+                        ) {
                             continue;
                         }
                         $cal_location .= '<option value="' . $location->getUid() . '"';
-                        if ($location->getUid() == $default) {
+                        if ($location->getUid() === $default) {
                             $cal_location .= ' selected="selected"';
                         }
                         $this->initLocalCObject($location->getValuesAsArray());
@@ -637,15 +649,19 @@ class CreateEventView extends FeEditingBaseView
             }            // if no default values found
             else {
                 // creating options for location by standard fe plugin entry point
+                /** @var LocationModel $location */
                 foreach ($locations as $location) {
-                    if ($this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['onlyOwn'] && !$location->isSharedUser(
-                            $feUserUid,
-                            $feGroupsArray
-                        )) {
+                    if (
+                        !$location->isSharedUser(
+                                                $feUserUid,
+                                                $feGroupsArray
+                                            )
+                        && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['onlyOwn']
+                    ) {
                         continue;
                     }
                     $cal_location .= '<option value="' . $location->getUid() . '"';
-                    if ($location->getUid() == $default) {
+                    if ($location->getUid() === $default) {
                         $cal_location .= ' selected="selected"';
                     }
                     $this->initLocalCObject($location->getValuesAsArray());
@@ -680,7 +696,7 @@ class CreateEventView extends FeEditingBaseView
 
             /* Start setting the RTE markers */
             if (ExtensionManagementUtility::isLoaded('tinymce_rte')) {
-                require_once(ExtensionManagementUtility::extPath('tinymce_rte') . 'pi1/class.tx_tinymce_rte_pi1.php'); // alternative RTE
+                require_once ExtensionManagementUtility::extPath('tinymce_rte') . 'pi1/class.tx_tinymce_rte_pi1.php'; // alternative RTE
             }
             if (!$this->RTEObj && ExtensionManagementUtility::isLoaded('rtehtmlarea') && class_exists('\TYPO3\CMS\Rtehtmlarea\Controller\FrontendRteController')) {
                 $this->RTEObj = new FrontendRteController();
@@ -778,13 +794,13 @@ class CreateEventView extends FeEditingBaseView
         if ($this->isAllowed('recurring')) {
             foreach ($frequency_values as $freq) {
                 $frequencyValue = $this->object->getFreq();
-                if ($freq == $frequencyValue) {
+                if ($freq === $frequencyValue) {
                     $selectedFrequency = 'selected="selected"';
                 } else {
                     $selectedFrequency = '';
                 }
 
-                $frequency .= '<option value="' . $freq . '"' . $selectedFrequency . '>' . $this->controller->pi_getLL('l_' . $freq) . '</option>';
+                $frequency .= '<option value="' . $freq . '" ' . $selectedFrequency . ' >' . $this->controller->pi_getLL('l_' . $freq) . '</option>';
             }
             $sims['###FREQUENCY###'] = $this->applyStdWrap($frequency, 'frequency_stdWrap');
         }
@@ -811,7 +827,7 @@ class CreateEventView extends FeEditingBaseView
             $dayName = strtotime('next monday');
             $temp_sims = [];
             foreach ($by_day as $day) {
-                if (in_array($day, $this->object->getByDay())) {
+                if (in_array($day, $this->object->getByDay(), true)) {
                     $temp_sims['###BY_DAY_CHECKED_' . $day . '###'] = 'checked />' . strftime('%a', $dayName);
                 } else {
                     $temp_sims['###BY_DAY_CHECKED_' . $day . '###'] = '/>' . strftime('%a', $dayName);
@@ -861,7 +877,7 @@ class CreateEventView extends FeEditingBaseView
         $sims['###UNTIL###'] = '';
         if ($this->isAllowed('recurring')) {
             $until = $this->object->getUntil();
-            if (is_object($until) && $until->getYear() != 0 && $until->format('%Y%m%d') != '19700101') {
+            if (is_object($until) && $until->getYear() !== 0 && $until->format('%Y%m%d') !== '19700101') {
                 $untilValue = $until->format(Functions::getFormatStringFromConf($this->conf));
                 $sims['###UNTIL###'] = $this->applyStdWrap($untilValue, 'until_stdWrap');
             } else {
@@ -915,13 +931,13 @@ class CreateEventView extends FeEditingBaseView
         if ($this->isAllowed('recurring')) {
             foreach ($rdateType_values as $rdate) {
                 $rdateTypeValue = $this->object->getRdateType();
-                if ($rdate == $rdateTypeValue) {
+                if ($rdate === $rdateTypeValue) {
                     $selectedRdateType = 'selected="selected"';
                 } else {
                     $selectedRdateType = '';
                 }
 
-                $rdateType .= '<option value="' . $rdate . '"' . $selectedRdateType . '>' . $this->controller->pi_getLL('l_' . $rdate) . '</option>';
+                $rdateType .= '<option value="' . $rdate . '" ' . $selectedRdateType . ' >' . $this->controller->pi_getLL('l_' . $rdate) . '</option>';
             }
             $sims['###RDATE_TYPE###'] = $this->applyStdWrap($rdateType, 'rdateType_stdWrap');
         }
@@ -944,7 +960,7 @@ class CreateEventView extends FeEditingBaseView
             foreach ($selectedUsersPlusOffset as $userPlusOffset) {
                 $userOffsetArray = GeneralUtility::trimExplode('|', $userPlusOffset, 1);
                 $selectedUsers[] = $userOffsetArray[0];
-                $userOffsetIndex[$userOffsetArray[0]] = $userOffsetArray[1] == '' ? $this->conf['view.']['event.']['remind.']['time'] : $userOffsetArray[1];
+                $userOffsetIndex[$userOffsetArray[0]] = $userOffsetArray[1] === '' ? $this->conf['view.']['event.']['remind.']['time'] : $userOffsetArray[1];
             }
             if (empty($selectedUsers) && !$this->isEditMode) {
                 $selectedUsers = GeneralUtility::trimExplode(
@@ -966,8 +982,8 @@ class CreateEventView extends FeEditingBaseView
                 $pidWhere . $allowedUsersWhere . $this->cObj->enableFields('fe_users')
             );
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if (in_array($row['uid'], $selectedUsers)) {
-                    $cal_notify_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '" checked="checked" name="tx_cal_controller[notify][]" />' . $row['username'] . '%%%L_REMIND_MINUTES_1%%%<input type="text" value="' . ($userOffsetIndex[$row['uid']] ? $userOffsetIndex[$row['uid']] : $this->conf['view.']['event.']['remind.']['time']) . '"  name="tx_cal_controller[u_' . $row['uid'] . '_notify_offset]" class="reminderOffset"/>%%%L_REMIND_MINUTES_2%%%<br />';
+                if (in_array($row['uid'], $selectedUsers, true)) {
+                    $cal_notify_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '" checked="checked" name="tx_cal_controller[notify][]" />' . $row['username'] . '%%%L_REMIND_MINUTES_1%%%<input type="text" value="' . ($userOffsetIndex[$row['uid']] ?: $this->conf['view.']['event.']['remind.']['time']) . '"  name="tx_cal_controller[u_' . $row['uid'] . '_notify_offset]" class="reminderOffset"/>%%%L_REMIND_MINUTES_2%%%<br />';
                 } else {
                     $cal_notify_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '"  name="tx_cal_controller[notify][]"/>' . $row['username'] . '%%%L_REMIND_MINUTES_1%%%<input type="text" value="' . $this->conf['view.']['event.']['remind.']['time'] . '"  name="tx_cal_controller[u_' . $row['uid'] . '_notify_offset]" class="reminderOffset"/>%%%L_REMIND_MINUTES_2%%%<br />';
                 }
@@ -980,7 +996,7 @@ class CreateEventView extends FeEditingBaseView
             foreach ($selectedGroupsPlusOffset as $groupPlusOffset) {
                 $groupOffsetArray = GeneralUtility::trimExplode('|', $groupPlusOffset, 1);
                 $selectedGroups[] = $groupOffsetArray[0];
-                $groupOffsetIndex[$groupOffsetArray[0]] = $groupOffsetArray[1] == '' ? $this->conf['view.']['event.']['remind.']['time'] : $groupOffsetArray[1];
+                $groupOffsetIndex[$groupOffsetArray[0]] = $groupOffsetArray[1] === '' ? $this->conf['view.']['event.']['remind.']['time'] : $groupOffsetArray[1];
             }
             if (empty($selectedGroups) && !$this->isEditMode) {
                 $selectedGroups = GeneralUtility::trimExplode(
@@ -999,8 +1015,8 @@ class CreateEventView extends FeEditingBaseView
                 $pidWhere . $allowedGroupsWhere . $this->cObj->enableFields('fe_groups')
             );
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if (in_array($row['uid'], $selectedGroups) !== false) {
-                    $cal_notify_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[notify][]" />' . $row['title'] . '%%%L_REMIND_MINUTES_1%%%<input type="text" value="' . ($groupOffsetIndex[$row['uid']] ? $groupOffsetIndex[$row['uid']] : $this->conf['view.']['event.']['remind.']['time']) . '"  name="tx_cal_controller[g_' . $row['uid'] . '_notify_offset]" class="reminderOffset"/>%%%L_REMIND_MINUTES_2%%%<br />';
+                if (in_array($row['uid'], $selectedGroups, true) !== false) {
+                    $cal_notify_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[notify][]" />' . $row['title'] . '%%%L_REMIND_MINUTES_1%%%<input type="text" value="' . ($groupOffsetIndex[$row['uid']] ?: $this->conf['view.']['event.']['remind.']['time']) . '"  name="tx_cal_controller[g_' . $row['uid'] . '_notify_offset]" class="reminderOffset"/>%%%L_REMIND_MINUTES_2%%%<br />';
                 } else {
                     $cal_notify_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '"  name="tx_cal_controller[notify][]"/>' . $row['title'] . '%%%L_REMIND_MINUTES_1%%%<input type="text" value="' . $this->conf['view.']['event.']['remind.']['time'] . '"  name="tx_cal_controller[g_' . $row['uid'] . '_notify_offset]" class="reminderOffset"/>%%%L_REMIND_MINUTES_2%%%<br />';
                 }
@@ -1027,10 +1043,11 @@ class CreateEventView extends FeEditingBaseView
                 'pid in (' . $this->conf['pidList'] . ')' . $this->cObj->enableFields('tx_cal_exception_event')
             );
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if (is_array($this->object->getExceptionSingleIds()) && array_search(
-                        $row['uid'],
-                        $this->object->getExceptionSingleIds()
-                    ) !== false) {
+                if (is_array($this->object->getExceptionSingleIds()) && in_array(
+                    $row['uid'],
+                        $this->object->getExceptionSingleIds(),
+                    true
+                )) {
                     $exception .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[exception_ids][]"/>' . $row['title'] . '<br />';
                 } else {
                     $exception .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['title'] . '" name="tx_cal_controller[exception_ids][]" />' . $row['title'] . '<br />';
@@ -1044,10 +1061,11 @@ class CreateEventView extends FeEditingBaseView
                 'pid in (' . $this->conf['pidList'] . ')' . $this->cObj->enableFields('tx_cal_exception_event_group')
             );
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if (is_array($this->object->getExceptionGroupIds()) && array_search(
-                        $row['uid'],
-                        $this->object->getExceptionGroupIds()
-                    ) !== false) {
+                if (is_array($this->object->getExceptionGroupIds()) && in_array(
+                    $row['uid'],
+                        $this->object->getExceptionGroupIds(),
+                    true
+                )) {
                     $exception .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[exception_ids][]" />' . $row['title'] . '<br />';
                 } else {
                     $exception .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" name="tx_cal_controller[exception_ids][]" />' . $row['title'] . '<br />';
@@ -1120,9 +1138,6 @@ class CreateEventView extends FeEditingBaseView
         }
         $linkParams = [];
         $linkParams['formCheck'] = '1';
-        if (($this->isEditMode && !$this->rightsObj->isAllowedToEditEventCalendar()) || (!$this->isEditMode && $this->rightsObj->isAllowedToCreateEventCalendar())) {
-            // $linkParams['lastview'] = $this->controller->extendLastView();
-        }
         $sims['###ACTION_URL###'] = htmlspecialchars($this->controller->pi_linkTP_keepPIvars_url($linkParams));
 
         $change_calendar_action_url = $this->controller->pi_linkTP_keepPIvars_url();
@@ -1160,7 +1175,7 @@ class CreateEventView extends FeEditingBaseView
                 $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['event_type.']['allowedUids']
             );
             $default = $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['event_type.']['default'];
-            if ($this->object->getEventType() != 0) {
+            if ($this->object->getEventType() !== 0) {
                 $default = $this->object->getEventType();
             }
             // creating options for event type
@@ -1169,7 +1184,7 @@ class CreateEventView extends FeEditingBaseView
                 $eventType = '';
                 foreach ($idList as $eventTypeId) {
                     $eventType .= '<option value="' . $eventTypeId . '"';
-                    if ($eventTypeId == $default) {
+                    if ($eventTypeId === $default) {
                         $eventType .= ' selected="selected"';
                     }
                     $optionValue = $this->controller->pi_getLL('l_event_type_' . $eventTypeId);
@@ -1198,9 +1213,10 @@ class CreateEventView extends FeEditingBaseView
             $attendeeAttendance = [];
             $externalAttendees = [];
             foreach ($globalAttendeeArray as $serviceKey => $attendeeArray) {
+                /** @var AttendeeModel $attendeeObject */
                 foreach ($attendeeArray as $attendeeObject) {
-                    $selectedUsers[] = $attendeeObject->getFeUserId() ? $attendeeObject->getFeUserId() : $attendeeObject->getEmail();
-                    $attendeeAttendance[$attendeeObject->getFeUserId() ? $attendeeObject->getFeUserId() : $attendeeObject->getEmail()] = $attendeeObject->getAttendance();
+                    $selectedUsers[] = $attendeeObject->getFeUserId() ?: $attendeeObject->getEmail();
+                    $attendeeAttendance[$attendeeObject->getFeUserId() ?: $attendeeObject->getEmail()] = $attendeeObject->getAttendance();
                     if (!$attendeeObject->getFeUserId()) {
                         $externalAttendees[] = $attendeeObject->getEmail();
                     }
@@ -1213,6 +1229,7 @@ class CreateEventView extends FeEditingBaseView
                 'fe_users',
                 'pid in (' . $this->conf['pidList'] . ')' . $this->cObj->enableFields('fe_users')
             );
+            $ids = [];
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 $name = $this->getFeUserDisplayName($row);
                 $attendee .= '<span>';
@@ -1238,7 +1255,7 @@ class CreateEventView extends FeEditingBaseView
                             );
                     }
                 }
-                if ($this->conf['view.'][$this->conf['view'] . '.']['freeAndBusyViewPid'] && $row['tx_cal_calendar'] && $this->rightsObj->isLoggedIn()) {
+                if ($row['tx_cal_calendar'] && $this->conf['view.'][$this->conf['view'] . '.']['freeAndBusyViewPid'] && $this->rightsObj->isLoggedIn()) {
                     $groups = $this->rightsObj->getUserGroups();
                     $userId = $this->rightsObj->getUserId();
                     $where = 'uid_local = ' . $row['tx_cal_calendar'] . ' AND ((tablenames = "fe_users" AND uid_foreign = ' . $userId . ') OR (tablenames = "fe_groups" AND uid_foreign in (' . implode(
@@ -1261,7 +1278,7 @@ class CreateEventView extends FeEditingBaseView
                         'pid in (' . $this->conf['pidList'] . ') AND uid =' . $row['tx_cal_calendar'] . $this->cObj->enableFields('tx_cal_calendar')
                     );
                     while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result1)) {
-                        if ($row1['activate_fnb'] == 1) {
+                        if ($row1['activate_fnb'] === 1) {
                             $freeAndBusyIsEnabled = true;
                         }
                     }
@@ -1299,7 +1316,7 @@ class CreateEventView extends FeEditingBaseView
      * @param string $selectedValue
      * @return string
      */
-    public function getAttendeeOptions($attendeeId, $selectedValue = '')
+    public function getAttendeeOptions($attendeeId, $selectedValue = ''): string
     {
         $options = [
             'OPT-PARTICIPANT' => $this->controller->pi_getLL('l_event_attendee_OPT-PARTICIPANT'),
@@ -1310,7 +1327,7 @@ class CreateEventView extends FeEditingBaseView
         foreach ($options as $value => $option) {
             $html .= '<option value="' . $value . '"';
 
-            if ($value == $selectedValue) {
+            if ($value === $selectedValue) {
                 $html .= ' selected="selected"';
             }
             $html .= '>' . $option . '</option>';
@@ -1335,9 +1352,10 @@ class CreateEventView extends FeEditingBaseView
             $attendeeAttendance = [];
             $externalAttendees = [];
             foreach ($globalAttendeeArray as $serviceKey => $attendeeArray) {
+                /** @var AttendeeModel $attendeeObject */
                 foreach ($attendeeArray as $attendeeObject) {
-                    $selectedUsers[] = $attendeeObject->getFeUserId() ? $attendeeObject->getFeUserId() : $attendeeObject->getEmail();
-                    $attendeeAttendance[$attendeeObject->getFeUserId() ? $attendeeObject->getFeUserId() : $attendeeObject->getEmail()] = $attendeeObject->getAttendance();
+                    $selectedUsers[] = $attendeeObject->getFeUserId() ?: $attendeeObject->getEmail();
+                    $attendeeAttendance[$attendeeObject->getFeUserId() ?: $attendeeObject->getEmail()] = $attendeeObject->getAttendance();
                     if (!$attendeeObject->getFeUserId()) {
                         $externalAttendees[] = $attendeeObject->getEmail();
                     }
@@ -1361,12 +1379,8 @@ class CreateEventView extends FeEditingBaseView
         $sims['###SENDOUT_INVITATION###'] = '';
 
         if ($this->isAllowed('sendout_invitation')) {
-            $sendoutInvitation = '';
-            if ($this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.'][$this->objectString . '.']['fields.']['sendout_invitation.']['default'] || $this->controller->piVars['sendout_invitation']) {
-                $sendoutInvitation = ' checked="checked" ';
-            }
             $sims['###SENDOUT_INVITATION###'] = $this->applyStdWrap(
-                $this->object->getSendoutInvitation(),
+                $this->object->getSendOutInvitation(),
                 'sendout_invitation_stdWrap'
             );
         }

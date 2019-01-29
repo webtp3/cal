@@ -34,6 +34,7 @@ class IndexerScheduler extends AbstractTask
 
     /**
      * @return bool
+     * @throws \TYPO3\CMS\Core\Exception
      */
     public function execute()
     {

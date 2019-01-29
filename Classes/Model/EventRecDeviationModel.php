@@ -22,29 +22,34 @@ use TYPO3\CMS\Cal\Utility\Functions;
  */
 class EventRecDeviationModel extends EventModel
 {
+    /**
+     * @var CalDate
+     */
     private $origStartDate;
 
     /**
      * EventRecDeviationModel constructor.
-     * @param $event
+     * @param EventModel $event
      * @param $row
      * @param $start
      * @param $end
      */
     public function __construct($event, $row, $start, $end)
     {
-        Model::__construct($event->serviceKey);
+        parent::__construct($row, true, $event->serviceKey);
         $deviationId = $row['uid'];
-        unset($row['uid']);
-        unset($row['pid']);
-        unset($row['parentid']);
-        unset($row['tstamp']);
-        unset($row['crdate']);
-        unset($row['cruser_id']);
-        unset($row['deleted']);
-        unset($row['hidden']);
-        unset($row['starttime']);
-        unset($row['endtime']);
+        unset(
+            $row['uid'],
+            $row['pid'],
+            $row['parentid'],
+            $row['tstamp'],
+            $row['crdate'],
+            $row['cruser_id'],
+            $row['deleted'],
+            $row['hidden'],
+            $row['starttime'],
+            $row['endtime']
+        );
         // storing allday in a temp var, in case it is set from 1 to 0
         $allday = $row['allday'];
         $row = array_merge($event->row, array_filter($row));
@@ -55,7 +60,7 @@ class EventRecDeviationModel extends EventModel
         $this->setStart($start);
         $this->setEnd($end);
 
-        $this->setAllday($row['allday']);
+        $this->setAllDay($row['allday']);
         $this->origStartDate = new  CalDate($row['orig_start_date']);
         $this->origStartDate->addSeconds($row['orig_start_time']);
 
@@ -74,9 +79,9 @@ class EventRecDeviationModel extends EventModel
     public function getRRuleMarker(&$template, &$sims, &$rems, &$wrapped, $view)
     {
         $eventStart = $this->origStartDate;
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             $sims['###RRULE###'] = 'RECURRENCE-ID;VALUE=DATE:' . $eventStart->format('%Y%m%d');
-        } elseif ($this->conf['view.']['ics.']['timezoneId'] != '') {
+        } elseif ($this->conf['view.']['ics.']['timezoneId'] !== '') {
             $sims['###RRULE###'] = 'RECURRENCE-ID;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('%Y%m%dT%H%M%S');
         } else {
             $offset = Functions::strtotimeOffset($eventStart->getTime());

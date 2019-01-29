@@ -47,7 +47,7 @@ class BackendUtilityReplacementUtility
      * @param string $table
      * @return QueryBuilder
      */
-    protected static function getQueryBuilderForTable($table)
+    protected static function getQueryBuilderForTable($table): QueryBuilder
     {
         return GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
     }

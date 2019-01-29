@@ -22,17 +22,29 @@ use TYPO3\CMS\Cal\Utility\Registry;
  */
 class EventRecModel extends Model
 {
+    /**
+     * @var EventModel
+     */
     public $parentEvent;
+
+    /**
+     * @var CalDate
+     */
     public $start;
+
+    /**
+     * @var CalDate
+     */
     public $end;
-    public $cachedValueArray = [];
-    public $initializingCacheValues = false;
-    public $row;
+
+    /**
+     * @var array
+     */
     public $myMarkerCache = [];
 
     /**
      * EventRecModel constructor.
-     * @param $event
+     * @param EventModel $event
      * @param $start
      * @param $end
      */
@@ -50,7 +62,7 @@ class EventRecModel extends Model
      */
     public function updateWithPiVars(&$piVars)
     {
-        $this->parentEvent->updateWithPiVars($piVars);
+        $this->parentEvent->updateWithPIVars($piVars);
         $this->parentEvent->markerCache = [];
     }
 
@@ -69,7 +81,7 @@ class EventRecModel extends Model
      *
      * @return string location.
      */
-    public function getLocation()
+    public function getLocation(): string
     {
         return $this->parentEvent->getLocation();
     }
@@ -77,7 +89,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function getOrganizer()
+    public function getOrganizer(): string
     {
         return $this->parentEvent->getOrganizer();
     }
@@ -85,7 +97,7 @@ class EventRecModel extends Model
     /**
      * @return int
      */
-    public function getLocationId()
+    public function getLocationId(): int
     {
         return $this->parentEvent->getLocationId();
     }
@@ -93,7 +105,7 @@ class EventRecModel extends Model
     /**
      * @return int
      */
-    public function getOrganizerId()
+    public function getOrganizerId(): int
     {
         return $this->parentEvent->getOrganizerId();
     }
@@ -104,7 +116,7 @@ class EventRecModel extends Model
      *
      * @return string teaser.
      */
-    public function getTeaser()
+    public function getTeaser(): string
     {
         return $this->parentEvent->getTeaser();
     }
@@ -120,9 +132,9 @@ class EventRecModel extends Model
 
     /**
      * @param $view
-     * @return mixed
+     * @return string
      */
-    public function getOrganizerLink($view)
+    public function getOrganizerLink($view): string
     {
         return $this->parentEvent->getOrganizerLink($view);
     }
@@ -130,7 +142,7 @@ class EventRecModel extends Model
     /**
      * Returns the headerstyle name
      */
-    public function getHeaderStyle()
+    public function getHeaderStyle(): string
     {
         return $this->parentEvent->getHeaderStyle();
     }
@@ -138,7 +150,7 @@ class EventRecModel extends Model
     /**
      * Returns the bodystyle name
      */
-    public function getBodyStyle()
+    public function getBodyStyle(): string
     {
         return $this->parentEvent->getBodyStyle();
     }
@@ -148,15 +160,15 @@ class EventRecModel extends Model
      *
      * @return string create user id.
      */
-    public function getCreateUserId()
+    public function getCreateUserId(): string
     {
         return $this->parentEvent->getCreateUserId();
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTimezone()
+    public function getTimezone(): string
     {
         return $this->parentEvent->getTimezone();
     }
@@ -164,7 +176,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventForOrganizer()
+    public function renderEventForOrganizer(): string
     {
         return $this->renderEventFor('ORGANIZER');
     }
@@ -172,7 +184,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventForLocation()
+    public function renderEventForLocation(): string
     {
         return $this->renderEventFor('LOCATION');
     }
@@ -180,7 +192,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventForDay()
+    public function renderEventForDay(): string
     {
         return $this->renderEventFor('DAY');
     }
@@ -188,7 +200,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventForWeek()
+    public function renderEventForWeek(): string
     {
         return $this->renderEventFor('WEEK');
     }
@@ -196,7 +208,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventForAllDay()
+    public function renderEventForAllDay(): string
     {
         return $this->renderEventFor('ALLDAY');
     }
@@ -204,9 +216,9 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventForMonth()
+    public function renderEventForMonth(): string
     {
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             return $this->renderEventFor('MONTH_ALLDAY');
         }
         return $this->renderEventFor('MONTH');
@@ -215,9 +227,9 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventForMiniMonth()
+    public function renderEventForMiniMonth(): string
     {
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             return $this->renderEventFor('MONTH_MINI_ALLDAY');
         }
         return $this->renderEventFor('MONTH_MINI');
@@ -226,7 +238,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventForYear()
+    public function renderEventForYear(): string
     {
         return $this->renderEventFor('year');
     }
@@ -234,7 +246,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEvent()
+    public function renderEvent(): string
     {
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT###');
     }
@@ -243,7 +255,7 @@ class EventRecModel extends Model
      * @param string $subpartSuffix
      * @return string
      */
-    public function renderEventForList($subpartSuffix = 'LIST_ODD')
+    public function renderEventForList($subpartSuffix = 'LIST_ODD'): string
     {
         return $this->renderEventFor($subpartSuffix);
     }
@@ -253,15 +265,15 @@ class EventRecModel extends Model
      * @param string $subpartSuffix
      * @return string
      */
-    public function renderEventFor($viewType, $subpartSuffix = '')
+    public function renderEventFor($viewType, $subpartSuffix = ''): string
     {
-        if ($this->parentEvent->conf['view.']['freeAndBusy.']['enable'] == 1) {
+        if ((int)$this->parentEvent->conf['view.']['freeAndBusy.']['enable'] === 1) {
             $viewType .= '_FNB';
         }
         if (substr(
                 $viewType,
                 -6
-            ) != 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('%Y%m%d') != $this->getEnd()->format('%Y%m%d'))) {
+            ) !== 'ALLDAY' && ($this->isAllDay() || $this->getStart()->format('%Y%m%d') !== $this->getEnd()->format('%Y%m%d'))) {
             $subpartSuffix .= 'ALLDAY';
         }
         $hookObjectsArr = Functions::getHookObjectsArray(
@@ -281,7 +293,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderEventPreview()
+    public function renderEventPreview(): string
     {
         $this->parentEvent->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_PREVIEW###');
@@ -290,7 +302,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function renderTomorrowsEvent()
+    public function renderTomorrowsEvent(): string
     {
         $this->parentEvent->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_TOMORROW###');
@@ -300,13 +312,13 @@ class EventRecModel extends Model
      * @param $subpartMarker
      * @return string
      */
-    public function fillTemplate($subpartMarker)
+    public function fillTemplate($subpartMarker): string
     {
         $templatePath = $this->parentEvent->conf['view.']['event.']['eventModelTemplate'];
 
         $page = Functions::getContent($templatePath);
 
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no event model template file found:</h3>' . $templatePath;
         }
         $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
@@ -325,7 +337,7 @@ class EventRecModel extends Model
             $sims,
             $rems,
             $wrapped,
-            $this->parentEvent->conf['alternateRenderingView'] ? $this->parentEvent->conf['alternateRenderingView'] : ''
+            $this->parentEvent->conf['alternateRenderingView'] ?: ''
         );
         return $this->parentEvent->finish(Functions::substituteMarkerArrayNotCached(
             $page,
@@ -372,7 +384,7 @@ class EventRecModel extends Model
                 $this->parentEvent->conf['view.'][$view . '.']['event.']['startdate.']
             );
             $sims['###STARTDATE_LABEL###'] = $this->controller->pi_getLL('l_event_allday');
-            if ($this->parentEvent->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDateAllday'] == 1) {
+            if ((int)$this->parentEvent->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDateAllday'] === 1) {
                 $sims['###ENDDATE###'] = '';
                 $sims['###ENDDATE_LABEL###'] = '';
             } else {
@@ -384,7 +396,7 @@ class EventRecModel extends Model
                 $sims['###ENDDATE_LABEL###'] = $this->controller->pi_getLL('l_event_enddate');
             }
         } else {
-            if ($this->isAllday()) {
+            if ($this->isAllDay()) {
                 $sims['###STARTTIME_LABEL###'] = '';
                 $sims['###STARTTIME###'] = '';
             } else {
@@ -395,7 +407,7 @@ class EventRecModel extends Model
                     $this->parentEvent->conf['view.'][$view . '.']['event.']['starttime.']
                 );
             }
-            if ($this->isAllday()) {
+            if ($this->isAllDay()) {
                 $sims['###ENDTIME_LABEL###'] = '';
                 $sims['###ENDTIME###'] = '';
             } else {
@@ -412,7 +424,7 @@ class EventRecModel extends Model
                 $this->parentEvent->conf['view.'][$view . '.']['event.']['startdate'],
                 $this->parentEvent->conf['view.'][$view . '.']['event.']['startdate.']
             );
-            if ($this->parentEvent->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDate'] && $eventEnd->format('%Y%m%d') == $eventStart->format('%Y%m%d')) {
+            if ($this->parentEvent->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDate'] && $eventEnd->format('%Y%m%d') === $eventStart->format('%Y%m%d')) {
                 $sims['###STARTDATE_LABEL###'] = $this->controller->pi_getLL('l_date');
                 $sims['###ENDDATE_LABEL###'] = '';
                 $sims['###ENDDATE###'] = '';
@@ -431,7 +443,7 @@ class EventRecModel extends Model
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->parentEvent->getTitle();
     }
@@ -536,7 +548,7 @@ class EventRecModel extends Model
      */
     public function getCategoryLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        return $this->parentEvent->getcategoryLinkMarker($template, $sims, $rems, $wrapped, $view);
+        return $this->parentEvent->getCategoryLinkMarker($template, $sims, $rems, $wrapped, $view);
     }
 
     /**
@@ -574,14 +586,6 @@ class EventRecModel extends Model
     public function getBodystyleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###BODYSTYLE###'] = $this->parentEvent->getBodyStyle();
-    }
-
-    /**
-     * Returns the calendar style name
-     */
-    public function getCalendarStyleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
-    {
-        $this->parentEvent->getCalendarStyle($template, $sims, $rems, $wrapped, $view);
     }
 
     /**
@@ -715,7 +719,7 @@ class EventRecModel extends Model
             //$linkConf['link_useCacheHash'] = 0;
             $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=edit_event&tx_cal_controller[type]=' . $this->parentEvent->getType() . '&tx_cal_controller[uid]=' . $this->parentEvent->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
             $linkConf['link_section'] = 'default';
-            $linkConf['link_parameter'] = $this->parentEvent->conf['view.']['event.']['editEventViewPid'] ? $this->parentEvent->conf['view.']['event.']['editEventViewPid'] : $GLOBALS['TSFE']->id;
+            $linkConf['link_parameter'] = $this->parentEvent->conf['view.']['event.']['editEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
             $this->parentEvent->initLocalCObject($linkConf);
             $this->parentEvent->local_cObj->setCurrentVal($this->parentEvent->conf['view.'][$view . '.']['event.']['editIcon']);
@@ -738,7 +742,7 @@ class EventRecModel extends Model
             //$linkConf['link_useCacheHash'] = 0;
             $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=delete_event&tx_cal_controller[type]=' . $this->parentEvent->getType() . '&tx_cal_controller[uid]=' . $this->parentEvent->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
             $linkConf['link_section'] = 'default';
-            $linkConf['link_parameter'] = $this->parentEvent->conf['view.']['event.']['deleteEventViewPid'] ? $this->parentEvent->conf['view.']['event.']['deleteEventViewPid'] : $GLOBALS['TSFE']->id;
+            $linkConf['link_parameter'] = $this->parentEvent->conf['view.']['event.']['deleteEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
             $this->parentEvent->initLocalCObject($linkConf);
             $this->parentEvent->local_cObj->setCurrentVal($this->parentEvent->conf['view.'][$view . '.']['event.']['deleteIcon']);
@@ -826,7 +830,7 @@ class EventRecModel extends Model
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_event')) {
@@ -837,7 +841,7 @@ class EventRecModel extends Model
         }
         $editOffset = $this->parentEvent->conf['rights.']['edit.']['event.']['timeOffset'] * 60;
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -868,7 +872,7 @@ class EventRecModel extends Model
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_event')) {
@@ -878,7 +882,7 @@ class EventRecModel extends Model
             return true;
         }
         $deleteOffset = $this->parentEvent->conf['rights.']['delete.']['event.']['timeOffset'] * 60;
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -1099,7 +1103,7 @@ class EventRecModel extends Model
     /**
      * @return int
      */
-    public function getUid()
+    public function getUid(): int
     {
         return $this->parentEvent->getUid();
     }
@@ -1107,9 +1111,9 @@ class EventRecModel extends Model
     /**
      * @return int
      */
-    public function isAllday()
+    public function isAllDay(): int
     {
-        return $this->parentEvent->isAllday();
+        return $this->parentEvent->isAllDay();
     }
 
     /**
@@ -1123,31 +1127,31 @@ class EventRecModel extends Model
     /**
      * @return int
      */
-    public function getCalendarUid()
+    public function getCalendarId(): int
     {
-        return $this->parentEvent->getCalendarUid();
+        return $this->parentEvent->getCalendarId();
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->parentEvent->getType();
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getEventType()
+    public function getEventType(): int
     {
         return $this->parentEvent->getEventType();
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getCount()
+    public function getCount(): int
     {
         return $this->parentEvent->getCount();
     }
@@ -1155,7 +1159,7 @@ class EventRecModel extends Model
     /**
      * @return array
      */
-    public function getValuesAsArray()
+    public function getValuesAsArray(): array
     {
         if ($this->initializingCacheValues) {
             return $this->parentEvent->row;
@@ -1170,7 +1174,7 @@ class EventRecModel extends Model
             $mergedValues = array_merge($values, $additionalValues);
 
             // now cache the result to win some ms
-            $this->cachedValueArray = (array)$mergedValues;
+            $this->cachedValueArray = $mergedValues;
             $this->initializingCacheValues = false;
         }
         return $this->cachedValueArray;
@@ -1179,7 +1183,7 @@ class EventRecModel extends Model
     /**
      * @return array
      */
-    public function getAdditionalValuesAsArray()
+    public function getAdditionalValuesAsArray(): array
     {
         $values = parent::getAdditionalValuesAsArray();
         $values['start'] = $this->getStartAsTimestamp();
@@ -1194,15 +1198,15 @@ class EventRecModel extends Model
     /**
      * @return array
      */
-    public function getCategories()
+    public function getCategories(): array
     {
-        return $this->parentEvent->categories;
+        return $this->parentEvent->getCategories();
     }
 
     /**
-     * @return mixed
+     * @return CalDate
      */
-    public function getUntil()
+    public function getUntil(): CalDate
     {
         return $this->parentEvent->getUntil();
     }

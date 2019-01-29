@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -33,17 +34,17 @@ class RssView extends BaseView
      * @param $getdate
      * @return string
      */
-    public function drawRss(&$master_array, $getdate)
+    public function drawRss(&$master_array, $getdate): string
     {
-        // $this->arcExclusive = -1; // Only latest, non archive news
         $this->allowCaching = $this->conf['view.']['rss.']['xmlCaching'];
-        $this->config['limit'] = $this->conf['view.']['rss.']['xmlLimit'] ? $this->conf['view.']['rss.']['xmlLimit'] : 10;
+        $this->config['limit'] = $this->conf['view.']['rss.']['xmlLimit'] ?: 10;
 
         // possible format with piVars
         if ($this->controller->piVars['xmlFormat']) {
             $this->conf['view.']['rss.']['xmlFormat'] = $this->controller->piVars['xmlFormat'];
         }
 
+        $templateName = '';
         switch ($this->conf['view.']['rss.']['xmlFormat']) {
             case 'rss091':
                 $templateName = 'TEMPLATE_RSS091';
@@ -82,8 +83,6 @@ class RssView extends BaseView
         $t['total'] = $this->getNewsSubpart($this->templateCode, $this->spMarker('###' . $templateName . '###'));
         // Reset:
         $subpartArray = [];
-        $wrappedSubpartArray = [];
-        $markerArray = [];
         $count = 0;
 
         foreach ($master_array as $eventDate => $eventTimeArray) {
@@ -134,13 +133,12 @@ class RssView extends BaseView
         $t['total'] = $this->markerBasedTemplateService->substituteSubpart($t['total'], '###HEADER###', $subpartArray['###HEADER###'], 0);
         $t['total'] = $this->markerBasedTemplateService->substituteSubpart($t['total'], '###CONTENT###', $subpartArray['###CONTENT###'], 0);
 
-        $content .= $t['total'];
-        return $content;
+        return $t['total'];
     }
 
     /**
      * @param $eventDate
-     * @param $event
+     * @param EventModel $event
      * @param $template
      * @return mixed
      */
@@ -167,7 +165,7 @@ class RssView extends BaseView
         // date should be ok
         $sims['###CREATE_DATE###'] = date('D, d M Y H:i:s O', $event->row['crdate']);
 
-        if ($this->conf['view.']['rss.']['xmlFormat'] == 'atom03' || $this->conf['view.']['rss.']['xmlFormat'] == 'atom1') {
+        if ($this->conf['view.']['rss.']['xmlFormat'] === 'atom03' || $this->conf['view.']['rss.']['xmlFormat'] === 'atom1') {
             $sims['###CREATE_DATE###'] = $this->getW3cDate($event->row['crdate']);
         }
 
@@ -183,7 +181,7 @@ class RssView extends BaseView
      * @param array $row
      * @return string subpart found, if found.
      */
-    public function getNewsSubpart($myTemplate, $myKey, $row = [])
+    public function getNewsSubpart($myTemplate, $myKey, $row = []): string
     {
         return $this->markerBasedTemplateService->getSubpart($myTemplate, $myKey);
     }
@@ -196,12 +194,12 @@ class RssView extends BaseView
      * @param $marker
      * @return array code for alternating content markers
      */
-    public function getLayouts($templateCode, $alternatingLayouts, $marker)
+    public function getLayouts($templateCode, $alternatingLayouts, $marker): array
     {
         $out = [];
         for ($a = 0; $a < $alternatingLayouts; $a++) {
             $m = '###' . $marker . ($a ? '_' . $a : '') . '###';
-            if (strstr($templateCode, $m)) {
+            if (false !== strpos($templateCode, $m)) {
                 $out[] = $GLOBALS['TSFE']->cObj->getSubpart($templateCode, $m);
             } else {
                 break;
@@ -214,11 +212,10 @@ class RssView extends BaseView
      * returns the subpart name.
      * if 'altMainMarkers.' are given this name is used instead of the default marker-name.
      *
-     * @param string $subpartMarker
-     *            name of the subpart to be substituted
+     * @param string $subpartMarker name of the subpart to be substituted
      * @return string name of the template subpart
      */
-    public function spMarker($subpartMarker)
+    public function spMarker($subpartMarker): string
     {
         $sPBody = substr($subpartMarker, 3, -3);
         $altSPM = '';
@@ -233,7 +230,7 @@ class RssView extends BaseView
             );
         }
 
-        return $altSPM ? $altSPM : $subpartMarker;
+        return $altSPM ?: $subpartMarker;
     }
 
     /**
@@ -242,7 +239,7 @@ class RssView extends BaseView
      * @param $lastBuildTimestamp
      * @return array filled XML header markers
      */
-    public function getXmlHeader($lastBuildTimestamp)
+    public function getXmlHeader($lastBuildTimestamp): array
     {
         $markerArray = [];
 
@@ -250,17 +247,17 @@ class RssView extends BaseView
         $markerArray['###SITE_LINK###'] = $this->config['siteUrl'];
         $markerArray['###SITE_DESCRIPTION###'] = $this->conf['view.']['rss.']['xmlDesc'];
         if (!empty($markerArray['###SITE_DESCRIPTION###'])) {
-            if ($this->conf['view.']['rss.']['xmlFormat'] == 'atom03') {
+            if ($this->conf['view.']['rss.']['xmlFormat'] === 'atom03') {
                 $markerArray['###SITE_DESCRIPTION###'] = '<tagline>' . $markerArray['###SITE_DESCRIPTION###'] . '</tagline>';
-            } elseif ($this->conf['view.']['rss.']['xmlFormat'] == 'atom1') {
+            } elseif ($this->conf['view.']['rss.']['xmlFormat'] === 'atom1') {
                 $markerArray['###SITE_DESCRIPTION###'] = '<subtitle>' . $markerArray['###SITE_DESCRIPTION###'] . '</subtitle>';
             }
         }
 
         $markerArray['###SITE_LANG###'] = $this->conf['view.']['rss.']['xmlLang'];
-        if ($this->conf['view.']['rss.']['xmlFormat'] == 'rss2') {
+        if ($this->conf['view.']['rss.']['xmlFormat'] === 'rss2') {
             $markerArray['###SITE_LANG###'] = '<language>' . $markerArray['###SITE_LANG###'] . '</language>';
-        } elseif ($this->conf['view.']['rss.']['xmlFormat'] == 'atom03') {
+        } elseif ($this->conf['view.']['rss.']['xmlFormat'] === 'atom03') {
             $markerArray['###SITE_LANG###'] = ' xml:lang="' . $markerArray['###SITE_LANG###'] . '"';
         }
         if (empty($this->conf['view.']['rss.']['xmlLang'])) {
@@ -268,9 +265,8 @@ class RssView extends BaseView
         }
 
         $icon = $this->conf['view.']['rss.']['xmlIcon'];
-        if (substr($icon, 0, 4) == 'EXT:') { // extension
+        if (strpos($icon, 'EXT:') === 0) { // extension
             list($extKey, $local) = explode('/', substr($icon, 4), 2);
-            $filename = '';
             if (strcmp(
                     $extKey,
                     ''
@@ -303,7 +299,7 @@ class RssView extends BaseView
             $markerArray['###NEWS_LASTBUILD###'] = '';
         }
 
-        if ($this->conf['view.']['rss.']['xmlFormat'] == 'atom03' || $this->conf['view.']['rss.']['xmlFormat'] == 'atom1') {
+        if ($this->conf['view.']['rss.']['xmlFormat'] === 'atom03' || $this->conf['view.']['rss.']['xmlFormat'] === 'atom1') {
             // TODO: $row ???
             $markerArray['###NEWS_LASTBUILD###'] = $this->getW3cDate($row['maxval']);
         }
@@ -321,7 +317,7 @@ class RssView extends BaseView
         }
 
         if ($this->conf['view.']['rss.']['xmlCopyright']) {
-            if ($this->conf['view.']['rss.']['xmlFormat'] == 'atom1') {
+            if ($this->conf['view.']['rss.']['xmlFormat'] === 'atom1') {
                 $markerArray['###NEWS_COPYRIGHT###'] = '<rights>' . $this->conf['view.']['rss.']['xmlCopyright'] . '</rights>';
             } else {
                 $markerArray['###NEWS_COPYRIGHT###'] = '<copyright>' . $this->conf['view.']['rss.']['xmlCopyright'] . '</copyright>';
@@ -330,7 +326,7 @@ class RssView extends BaseView
             $markerArray['###NEWS_COPYRIGHT###'] = '';
         }
 
-        $charset = ($GLOBALS['TSFE']->metaCharset ? $GLOBALS['TSFE']->metaCharset : 'utf-8');
+        $charset = ($GLOBALS['TSFE']->metaCharset ?: 'utf-8');
         if ($this->conf['view.']['rss.']['xmlDeclaration']) {
             $markerArray['###XML_DECLARATION###'] = trim($this->conf['view.']['rss.']['xmlDeclaration']);
         } else {
@@ -338,7 +334,7 @@ class RssView extends BaseView
         }
 
         // promoting TYPO3 in atom feeds, supress the subversion
-        $version = explode('.', ($GLOBALS['TYPO3_VERSION'] ? $GLOBALS['TYPO3_VERSION'] : $GLOBALS['TYPO_VERSION']));
+        $version = explode('.', ($GLOBALS['TYPO3_VERSION'] ?: $GLOBALS['TYPO_VERSION']));
         unset($version[2]);
         $markerArray['###TYPO3_VERSION###'] = implode($version, '.');
 
@@ -350,11 +346,10 @@ class RssView extends BaseView
      * see: http://www.w3.org/TR/NOTE-datetime (same as ISO 8601)
      * in php5 it would be so easy: date('c', $row['datetime']);
      *
-     * @param
-     *            integer        the datetime value to be converted to w3c format
+     * @param int        the datetime value to be converted to w3c format
      * @return string in w3c format
      */
-    public function getW3cDate($datetime)
+    public function getW3cDate($datetime): string
     {
         // date is only filled with crdate
         $offset = date('Z', $datetime) / 3600;

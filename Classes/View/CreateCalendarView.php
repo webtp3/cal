@@ -23,21 +23,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class CreateCalendarView extends FeEditingBaseView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Draws a create calendar form.
      *
-     * @param
-     *            string        Comma separated list of pids.
-     * @param
-     *            object        A location or organizer object to be updated
+     * @param string Comma separated list of pids.
+     * @param CalendarModel A location or organizer object to be updated
      * @return string HTML output.
      */
-    public function drawCreateCalendar($pidList, $object = '')
+    public function drawCreateCalendar($pidList, $object): string
     {
         $this->objectString = 'calendar';
         if (is_object($object)) {
@@ -47,7 +40,6 @@ class CreateCalendarView extends FeEditingBaseView
             unset($this->controller->piVars['uid']);
         }
 
-        $requiredFieldSims = [];
         $allRequiredFieldsAreFilled = $this->checkRequiredFields($requiredFieldsSims);
 
         $sims = [];
@@ -80,7 +72,7 @@ class CreateCalendarView extends FeEditingBaseView
         $this->table = 'tx_cal_' . $this->objectString;
 
         $page = Functions::getContent($this->conf['view.']['create_calendar.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no create calendar template file found:</h3>' . $this->conf['view.']['create_calendar.']['template'];
         }
 
@@ -133,14 +125,14 @@ class CreateCalendarView extends FeEditingBaseView
             );
             if ($result) {
                 while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    if (!empty($allowedUsers) && array_search($row['uid'], $allowedUsers)) {
-                        if (array_search($row['uid'], $selectedUsers) !== false) {
+                    if (!empty($allowedUsers) && in_array($row['uid'], $allowedUsers, true)) {
+                        if (in_array($row['uid'], $selectedUsers, true)) {
                             $cal_owner_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '" checked="checked" name="tx_cal_controller[owner][]" />' . $row['username'] . '<br />';
                         } else {
                             $cal_owner_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '"  name="tx_cal_controller[owner][]"/>' . $row['username'] . '<br />';
                         }
                     } elseif (empty($allowedUsers)) {
-                        if (array_search($row['uid'], $selectedUsers) !== false) {
+                        if (in_array($row['uid'], $selectedUsers, true)) {
                             $cal_owner_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '" checked="checked" name="tx_cal_controller[owner][]" />' . $row['username'] . '<br />';
                         } else {
                             $cal_owner_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '"  name="tx_cal_controller[owner][]"/>' . $row['username'] . '<br />';
@@ -162,14 +154,14 @@ class CreateCalendarView extends FeEditingBaseView
             );
             if ($result) {
                 while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    if (!empty($allowedGroups) && array_search($row['uid'], $allowedGroups)) {
-                        if (array_search($row['uid'], $selectedGroups) !== false) {
+                    if (!empty($allowedGroups) && in_array($row['uid'], $allowedGroups, true)) {
+                        if (in_array($row['uid'], $selectedGroups, true)) {
                             $cal_owner_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[owner][]" />' . $row['title'] . '<br />';
                         } else {
                             $cal_owner_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '"  name="tx_cal_controller[owner][]"/>' . $row['title'] . '<br />';
                         }
                     } elseif (empty($allowedGroups)) {
-                        if (array_search($row['uid'], $selectedGroups) !== false) {
+                        if (in_array($row['uid'], $selectedGroups, true)) {
                             $cal_owner_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[owner][]" />' . $row['title'] . '<br />';
                         } else {
                             $cal_owner_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '"  name="tx_cal_controller[owner][]"/>' . $row['title'] . '<br />';
@@ -234,14 +226,14 @@ class CreateCalendarView extends FeEditingBaseView
             );
             if ($result) {
                 while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    if (!empty($allowedUsers) && array_search($row['uid'], $allowedUsers)) {
-                        if (array_search($row['uid'], $selectedUsers) !== false) {
+                    if (!empty($allowedUsers) && in_array($row['uid'], $allowedUsers, true)) {
+                        if (in_array($row['uid'], $selectedUsers, true)) {
                             $freeAndBusyUser .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '" checked="checked" name="tx_cal_controller[freeAndBusyUser][]" />' . $row['username'] . '<br />';
                         } else {
                             $freeAndBusyUser .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '"  name="tx_cal_controller[freeAndBusyUser][]"/>' . $row['username'] . '<br />';
                         }
                     } elseif (empty($allowedUsers)) {
-                        if (array_search($row['uid'], $selectedUsers) !== false) {
+                        if (in_array($row['uid'], $selectedUsers, true)) {
                             $freeAndBusyUser .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '" checked="checked" name="tx_cal_controller[freeAndBusyUser][]" />' . $row['username'] . '<br />';
                         } else {
                             $freeAndBusyUser .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '"  name="tx_cal_controller[freeAndBusyUser][]"/>' . $row['username'] . '<br />';
@@ -271,7 +263,7 @@ class CreateCalendarView extends FeEditingBaseView
         if ($this->isAllowed('calendarType')) {
             $calendarType = '';
             foreach ($calendarTypeArray as $index => $title) {
-                if ($this->object->getCalendarType() == $index) {
+                if ($this->object->getCalendarType() === $index) {
                     $calendarType .= '<option value="' . $index . '" selected="selected">' . $title . '</option>';
                 } else {
                     $calendarType .= '<option value="' . $index . '">' . $title . '</option>';

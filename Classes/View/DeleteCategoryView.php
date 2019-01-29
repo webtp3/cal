@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
@@ -21,25 +22,24 @@ use TYPO3\CMS\Cal\Utility\Functions;
  */
 class DeleteCategoryView extends FeEditingBaseView
 {
+    /**
+     * @var CategoryModel
+     */
     public $category;
 
     /**
      * Draws a delete form for a calendar.
      *
-     * @param
-     *            boolean True if a location should be deleted
-     * @param
-     *            object        The object to be deleted
-     * @param
-     *            object        The cObject of the mother-class.
-     * @param
-     *            object        The rights object.
+     * @param bool True if a location should be deleted
+     * @param CategoryModel        The object to be deleted
+     * @param object        The cObject of the mother-class.
+     * @param object        The rights object.
      * @return string HTML output.
      */
-    public function drawDeleteCategory(&$category)
+    public function drawDeleteCategory(&$category): string
     {
         $page = Functions::getContent($this->conf['view.']['delete_category.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>category: no delete category template file found:</h3>' . $this->conf['view.']['delete_category.']['template'];
         }
 
@@ -74,6 +74,7 @@ class DeleteCategoryView extends FeEditingBaseView
      * @param $template
      * @param $sims
      * @param $rems
+     * @param $view
      */
     public function getHiddenMarker(& $template, & $sims, & $rems, $view)
     {
@@ -97,9 +98,10 @@ class DeleteCategoryView extends FeEditingBaseView
     }
 
     /**
-     * @param $template
+     * @param $page
      * @param $sims
      * @param $rems
+     * @param $view
      */
     public function getCalendarMarker(&$page, &$sims, &$rems, $view)
     {

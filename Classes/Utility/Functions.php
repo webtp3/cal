@@ -116,7 +116,7 @@ class Functions
     /**
      * @return string
      */
-    public static function getCharset()
+    public static function getCharset(): string
     {
         return 'utf-8';
     }
@@ -139,7 +139,7 @@ class Functions
     /**
      * @return string
      */
-    public static function getmicrotime()
+    public static function getmicrotime(): string
     {
         list($asec, $sec) = explode(' ', microtime());
         return date('H:m:s', intval($sec)) . ' ' . $asec;
@@ -159,7 +159,7 @@ class Functions
      * @param $conf
      * @return string
      */
-    public static function getFormatStringFromConf($conf)
+    public static function getFormatStringFromConf($conf): string
     {
         $dateFormatArray = [];
         $dateFormatArray[$conf['dateConfig.']['dayPosition']] = '%d';
@@ -174,7 +174,7 @@ class Functions
      * @param $string
      * @return string
      */
-    public static function getYmdFromDateString($conf, $string)
+    public static function getYmdFromDateString($conf, $string): string
     {
         // yyyy.mm.dd or dd.mm.yyyy or mm.dd.yyyy
         $stringArray = explode($conf['dateConfig.']['splitSymbol'], $string);
@@ -189,7 +189,7 @@ class Functions
      * @param $sub
      * @return bool
      */
-    public static function beginsWith($str, $sub)
+    public static function beginsWith($str, $sub): bool
     {
         return substr($str, 0, strlen($sub)) == $sub;
     }
@@ -201,7 +201,7 @@ class Functions
      * @param $sub
      * @return bool
      */
-    public static function endsWith($str, $sub)
+    public static function endsWith($str, $sub): bool
     {
         return substr($str, strlen($str) - strlen($sub)) == $sub;
     }
@@ -259,15 +259,13 @@ class Functions
      * Removes potential XSS code from an input string.
      * Copied from typo3/contrib/RemoveXSS/RemoveXSS.php in TYPO3 trunk.
      *
-     * @param
-     *            string        Input string
-     * @param
-     *            string        replaceString for inserting in keywords (which destroyes the tags)
+     * @param string        Input string
+     * @param string        replaceString for inserting in keywords (which destroyes the tags)
      * @return string string with potential XSS code removed
      *
      * @todo Once TYPO3 4.3 is released and required by cal, remove this method.
      */
-    public static function removeXSS($val, $replaceString = '<x>')
+    public static function removeXSS($val, $replaceString = '<x>'): string
     {
         // don't use empty $replaceString because then no XSS-remove will be done
         if ($replaceString == '') {
@@ -509,19 +507,19 @@ class Functions
             // we can use the non-multibyte safe version
             if (stripos($val2, $ra1word) !== false) {
                 // keep list of potential words that were found
-                if (in_array($ra1word, $ra_protocol)) {
+                if (in_array($ra1word, $ra_protocol, true)) {
                     $ra[] = [
                         $ra1word,
                         'ra_protocol'
                     ];
                 }
-                if (in_array($ra1word, $ra_tag)) {
+                if (in_array($ra1word, $ra_tag, true)) {
                     $ra[] = [
                         $ra1word,
                         'ra_tag'
                     ];
                 }
-                if (in_array($ra1word, $ra_attribute)) {
+                if (in_array($ra1word, $ra_attribute, true)) {
                     $ra[] = [
                         $ra1word,
                         'ra_attribute'
@@ -537,13 +535,13 @@ class Functions
             $found = true;
             while ($found == true) {
                 $val_before = $val;
-                for ($i = 0; $i < count($ra); $i++) {
+                foreach ($ra as $i => $iValue) {
                     $pattern = '';
-                    for ($j = 0; $j < strlen($ra[$i][0]); $j++) {
+                    foreach ($ra[$i][0] as $j => $jValue) {
                         if ($j > 0) {
                             $pattern .= '((&#[xX]0{0,8}([9ab]);)|(&#0{0,8}(9|10|13);)|\s)*';
                         }
-                        $pattern .= $ra[$i][0][$j];
+                        $pattern .= $jValue;
                     }
                     // handle each type a little different (extra conditions to prevent false positives a bit better)
                     switch ($ra[$i][1]) {
@@ -586,7 +584,7 @@ class Functions
      * @param string $modulePath
      * @return array
      */
-    public static function getHookObjectsArray($className, $hookName, $modulePath = 'controller')
+    public static function getHookObjectsArray($className, $hookName, $modulePath = 'controller'): array
     {
         $hookObjectsArr = [];
         if (is_array($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['EXTCONF']['ext/cal/' . $modulePath . '/class.' . $className . '.php'][$hookName])) {
@@ -620,8 +618,7 @@ class Functions
      * Returns a Classname and allows various parameter to be passed to the constructor.
      *
      *
-     * @param
-     *            string        className
+     * @param string        className
      * @return object reference to the object
      *
      * @todo Once TYPO3 4.3 is released and required by cal, remove this method and replace calls to it with GeneralUtility::makeInstance.
@@ -648,7 +645,7 @@ class Functions
      * @param $type
      * @return array
      */
-    public static function getMonthNames($type)
+    public static function getMonthNames($type): array
     {
         $monthNames = [];
         for ($i = 0; $i < 12; $i++) {
@@ -661,7 +658,7 @@ class Functions
      * @param $type
      * @return array
      */
-    public static function getWeekdayNames($type)
+    public static function getWeekdayNames($type): array
     {
         $weekdayNames = [];
         for ($i = 3; $i < 10; $i++) {
@@ -676,7 +673,7 @@ class Functions
      * @param $weekday
      * @return string
      */
-    public static function getDayByWeek($year, $week, $weekday)
+    public static function getDayByWeek($year, $week, $weekday): string
     {
         $date = new CalDate($year . '0101');
         $date->setTZbyID('UTC');
@@ -699,7 +696,7 @@ class Functions
      * @param $note
      * @return string
      */
-    public static function createErrorMessage($error, $note)
+    public static function createErrorMessage($error, $note): string
     {
         return '<div class="error"><h2>Calendar Base Error</h2><p class="message"><strong>Message:</strong> ' . $error . '</p><p class="note"><strong>Note:</strong> ' . $note . '</p></div>';
     }
@@ -730,7 +727,7 @@ class Functions
      *            code thak can potentially have relative links that need to be fixed
      * @return string code with absolute links
      */
-    public static function fixURI($html)
+    public static function fixURI($html): string
     {
         $uriHandler = GeneralUtility::makeInstance(UriHandler::class);
         $uriHandler->setHTML($html);
@@ -751,7 +748,7 @@ class Functions
      * @param array $conf
      * @return array
      */
-    public static function getTsSetupAsPlainArray(&$conf)
+    public static function getTsSetupAsPlainArray(&$conf): array
     {
 
         /** @var TypoScriptService $typoScriptService */
@@ -765,7 +762,7 @@ class Functions
      */
     public static function getContent($path)
     {
-        if (Functions::beginsWith($path, '/')) {
+        if (self::beginsWith($path, '/')) {
             $absPath = $path;
         } else {
             $absPath = $GLOBALS['TSFE']->tmpl->getFileName($path);
@@ -778,7 +775,7 @@ class Functions
      * @param array $eventArray
      * @return string
      */
-    public static function getIcsUid($conf, $eventArray)
+    public static function getIcsUid($conf, $eventArray): string
     {
         return $conf['view.']['ics.']['eventUidPrefix'] . '_' . $eventArray['calendar_id'] . '_' . $eventArray['uid'];
     }

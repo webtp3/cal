@@ -32,19 +32,12 @@ class LocationAddressService extends BaseService
     /**
      * Looks for an location with a given uid on a certain pid-list
      *
-     * @param array $conf
-     *            array
      * @param int $uid
-     *            to search for
      * @param string $pidList
-     *            to search in
-     * @return object tx_cal_organizer_partner object
+     * @return OrganizerPartnerService tx_cal_organizer_partner object
      */
-    public function find($uid, $pidList)
+    public function find($uid, $pidList): OrganizerPartnerService
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $locationArray = $this->getLocationFromTable($pidList, ' AND ' . $this->tableId . '.uid=' . $uid);
         return $locationArray[0];
     }
@@ -53,14 +46,10 @@ class LocationAddressService extends BaseService
      * Looks for an location with a given uid on a certain pid-list
      *
      * @param string $pidList
-     *            to search in
      * @return array tx_cal_location_address object array
      */
-    public function findAll($pidList)
+    public function findAll($pidList): array
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         return $this->getLocationFromTable($pidList);
     }
 
@@ -68,16 +57,11 @@ class LocationAddressService extends BaseService
      * Search for location
      *
      * @param string $pidList
-     *            to search in
      * @param string $searchword
-     *            term
      * @return array containing the location objects
      */
-    public function search($pidList = '', $searchword)
+    public function search($pidList, $searchword): array
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         return $this->getLocationFromTable($pidList, $this->searchWhere($searchword));
     }
 
@@ -85,16 +69,13 @@ class LocationAddressService extends BaseService
      * Generates the sql query and builds location objects out of the result rows
      *
      * @param string $pidList
-     *            to search in
      * @param string $additionalWhere
-     *            where clause
      * @return array containing the location objects
      */
-    public function getLocationFromTable($pidList = '', $additionalWhere = '')
+    public function getLocationFromTable($pidList, $additionalWhere = ''): array
     {
         $locations = [];
-        $orderBy = Functions::getOrderBy($this->tableId);
-        if ($pidList != '') {
+        if ($pidList !== '') {
             $additionalWhere .= ' AND ' . $this->tableId . '.pid IN (' . $pidList . ')';
         }
         $additionalWhere .= $this->getAdditionalWhereForLocalizationAndVersioning($this->tableId);
@@ -134,11 +115,8 @@ class LocationAddressService extends BaseService
      * @param string $sw :
      * @return string
      */
-    public function searchWhere($sw)
+    public function searchWhere($sw): string
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $where = $this->cObj->searchWhere(
             $sw,
             $this->conf['view.']['search.']['searchLocationFieldList'],
@@ -159,11 +137,11 @@ class LocationAddressService extends BaseService
         // TODO: Check if all values are correct
 
         $this->retrievePostData($insertFields);
-        $uid = $this->checkUidForLanguageOverlay($uid, 'tt_address');
+        $uid = self::checkUidForLanguageOverlay($uid, 'tt_address');
         // Creating DB records
         $table = $this->tableId;
         $where = 'uid = ' . $uid;
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
         return $this->find($uid, $this->conf['pidList']);
     }
 
@@ -172,9 +150,6 @@ class LocationAddressService extends BaseService
      */
     public function removeLocation($uid)
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         if ($this->rightsObj->isAllowedToDeleteLocation()) {
             $updateFields = [
                 'tstamp' => time(),
@@ -182,7 +157,7 @@ class LocationAddressService extends BaseService
             ];
             $table = $this->tableId;
             $where = 'uid = ' . $uid;
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
         }
     }
 
@@ -192,7 +167,7 @@ class LocationAddressService extends BaseService
     public function retrievePostData(&$insertFields)
     {
         $hidden = 0;
-        if ($this->controller->piVars['hidden'] == 'true' && ($this->rightsObj->isAllowedToEditLocationHidden() || $this->rightsObj->isAllowedToCreateLocationHidden())) {
+        if ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedToEditLocationHidden() || $this->rightsObj->isAllowedToCreateLocationHidden())) {
             $hidden = 1;
         }
         $insertFields['hidden'] = $hidden;
@@ -202,7 +177,7 @@ class LocationAddressService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedToEditLocationDescription() || $this->rightsObj->isAllowedToCreateLocationDescription()) {
-            $insertFields['description'] = $this->cObj->removeBadHTML($this->controller->piVars['description']);
+            $insertFields['description'] = htmlspecialchars($this->controller->piVars['description']);
         }
 
         if ($this->rightsObj->isAllowedToEditLocationStreet() || $this->rightsObj->isAllowedToCreateLocationStreet()) {
@@ -253,38 +228,38 @@ class LocationAddressService extends BaseService
         // TODO: Check if all values are correct
 
         $hidden = 0;
-        if ($this->controller->piVars['hidden'] == 'true') {
+        if ($this->controller->piVars['hidden'] === 'true') {
             $hidden = 1;
         }
         $insertFields['hidden'] = $hidden;
-        if ($this->controller->piVars['name'] != '') {
+        if ($this->controller->piVars['name'] !== '') {
             $insertFields['name'] = strip_tags($this->controller->piVars['name']);
         }
-        if ($this->controller->piVars['description'] != '') {
-            $insertFields['description'] = $this->cObj->removeBadHTML($this->controller->piVars['description']);
+        if ($this->controller->piVars['description'] !== '') {
+            $insertFields['description'] = htmlspecialchars($this->controller->piVars['description']);
         }
-        if ($this->controller->piVars['street'] != '') {
+        if ($this->controller->piVars['street'] !== '') {
             $insertFields['address'] = strip_tags($this->controller->piVars['street']);
         }
-        if ($this->controller->piVars['zip'] != '') {
+        if ($this->controller->piVars['zip'] !== '') {
             $insertFields['zip'] = strip_tags($this->controller->piVars['zip']);
         }
-        if ($this->controller->piVars['city'] != '') {
+        if ($this->controller->piVars['city'] !== '') {
             $insertFields['city'] = strip_tags($this->controller->piVars['city']);
         }
-        if ($this->controller->piVars['country'] != '') {
+        if ($this->controller->piVars['country'] !== '') {
             $insertFields['country'] = strip_tags($this->controller->piVars['country']);
         }
-        if ($this->controller->piVars['phone'] != '') {
+        if ($this->controller->piVars['phone'] !== '') {
             $insertFields['phone'] = strip_tags($this->controller->piVars['phone']);
         }
-        if ($this->controller->piVars['email'] != '') {
+        if ($this->controller->piVars['email'] !== '') {
             $insertFields['email'] = strip_tags($this->controller->piVars['email']);
         }
-        if ($this->controller->piVars['image'] != '') {
+        if ($this->controller->piVars['image'] !== '') {
             $insertFields['image'] = strip_tags($this->controller->piVars['image']);
         }
-        if ($this->controller->piVars['link'] != '') {
+        if ($this->controller->piVars['link'] !== '') {
             $insertFields['www'] = strip_tags($this->controller->piVars['link']);
         }
 
@@ -315,14 +290,11 @@ class LocationAddressService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedService()
+    public function isAllowedService(): bool
     {
-        $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        $useLocationStructure = ($this->confArr['useLocationStructure'] ? $this->confArr['useLocationStructure'] : 'tx_cal_location');
-        if ($useLocationStructure == $this->keyId) {
-            return true;
-        }
-        return false;
+        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
+        return $useLocationStructure === $this->keyId;
     }
 
     /**
@@ -348,6 +320,5 @@ class LocationAddressService extends BaseService
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
-        return;
     }
 }

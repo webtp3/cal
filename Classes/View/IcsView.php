@@ -15,6 +15,9 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarModel;
+use TYPO3\CMS\Cal\Model\CategoryModel;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\EventRecDeviationModel;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -38,9 +41,7 @@ class IcsView extends BaseView
     {
         $this->_init($master_array);
         $page = Functions::getContent($this->conf['view.']['ics.']['icsListTemplate']);
-        if ($page == '') {
-            // return '<h3>calendar: no icsListTemplate file found:</h3>'.$this->conf['view.']['ics.']['icsListTemplate'];
-            // falling back to default:
+        if ($page === '') {
             $page = '<h3>###L_ICSLISTTITLE###:</h3><br />
 <h4>###CALENDAR_LABEL###</h4>
 <!-- ###CALENDARLINK_LOOP### start -->
@@ -57,7 +58,6 @@ class IcsView extends BaseView
         }
 
         $calendarLinkLoop = $this->markerBasedTemplateService->getSubpart($page, '###CALENDARLINK_LOOP###');
-        $return = '';
         $page = str_replace('###L_ICSLISTTITLE###', $this->controller->pi_getLL('l_icslist_title'), $page);
         $rememberUid = [];
 
@@ -67,13 +67,14 @@ class IcsView extends BaseView
             'calendar',
             'tx_cal_calendar'
         );
-        $calendarIds = $this->calendarService->getIdsFromTable('', $this->conf['pidList'], true, true);
 
         $calendarArray = $this->modelObj->findAllCalendar('tx_cal_calendar', $this->conf['pidList']);
-
+        $calendarReturn = '';
+        /** @var CalendarModel $calendar */
         foreach ($calendarArray['tx_cal_calendar'] as $calendar) {
+            $icslink = '';
             if (is_object($calendar)) {
-                if ($this->conf['view.']['ics.']['showIcsLinks'] == 1) {
+                if ((int)$this->conf['view.']['ics.']['showIcsLinks'] === 1) {
                     $this->initLocalCObject($calendar->getValuesAsArray());
                     $this->local_cObj->setCurrentVal($calendar->getTitle());
                     $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
@@ -92,14 +93,16 @@ class IcsView extends BaseView
         $categoryLinkLoop = $this->markerBasedTemplateService->getSubpart($page, '###CATEGORYLINK_LOOP###');
 
         // by category
+        $categoryReturn = '';
         $categories = $master_array['sys_category'][0][0];
+        /** @var CategoryModel $category */
         foreach ((array)$categories as $category) {
             if (is_object($category)) {
-                if (in_array($category->getUid(), $rememberUid)) {
+                if (in_array($category->getUid(), $rememberUid, true)) {
                     continue;
                 }
                 $icslink = '';
-                if ($this->conf['view.']['ics.']['showIcsLinks'] == 1) {
+                if ((int)$this->conf['view.']['ics.']['showIcsLinks'] === 1) {
                     $this->initLocalCObject($category->getValuesAsArray());
                     $this->local_cObj->setCurrentVal($category->getTitle());
                     $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
@@ -140,11 +143,9 @@ class IcsView extends BaseView
         $this->_init($master_array);
         $this->limitAttendeeToThisEmail = $limitAttendeeToThisEmail;
         $absFile = GeneralUtility::getFileAbsFileName($this->conf['view.']['ics.']['icsTemplate']);
-        $page = GeneralUtility::getURL($absFile);
+        $page = GeneralUtility::getUrl($absFile);
 
-        if ($page == '') {
-            // return '<h3>calendar: no ics template file found:</h3>'.$this->conf['view.']['ics.']['icsTemplate'];
-            // falling back to default:
+        if ($page === '') {
             $page = 'BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//TYPO3/NONSGML Calendar Base (cal) V###CAL_VERSION###//EN
@@ -163,10 +164,14 @@ END:VCALENDAR
         $this->conf['view'] = 'single_ics';
 
         foreach ($this->master_array as $eventDate => $eventTimeArray) {
-            if (is_subclass_of($eventTimeArray, 'TYPO3\CMS\Cal\Model\Model')) {
+            if (is_subclass_of($eventTimeArray, Model::class)) {
                 $ics_events .= $eventTimeArray->renderEventFor('ics');
             } else {
                 foreach ($eventTimeArray as $key => $eventArray) {
+                    /**
+                     * @var int $eventUid
+                     * @var EventModel $event
+                     */
                     foreach ($eventArray as $eventUid => $event) {
                         if (is_object($event)) {
                             $ics_events .= $event->renderEventFor('ics');
@@ -182,7 +187,7 @@ END:VCALENDAR
                                     ));
                                     $start->setHour(substr($deviationRow['start_datetime'], 8, 2));
                                     $start->setMinute(substr($deviationRow['start_datetime'], 10, 2));
-                                    $start->setTZbyId('UTC');
+                                    $start->setTZbyID('UTC');
                                     $end = new  CalDate(substr(
                                         $deviationRow['end_datetime'],
                                         0,
@@ -190,9 +195,8 @@ END:VCALENDAR
                                     ));
                                     $end->setHour(substr($deviationRow['end_datetime'], 8, 2));
                                     $end->setMinute(substr($deviationRow['end_datetime'], 10, 2));
-                                    $end->setTZbyId('UTC');
-                                    unset($deviationRow['start_datetime']);
-                                    unset($deviationRow['end_datetime']);
+                                    $end->setTZbyID('UTC');
+                                    unset($deviationRow['start_datetime'], $deviationRow['end_datetime']);
                                     $new_event = new EventRecDeviationModel(
                                         $event,
                                         $deviationRow,
@@ -213,18 +217,13 @@ END:VCALENDAR
         $rems = [];
         $rems['###EVENT###'] = strip_tags($ics_events);
         $title = '';
-        if (!empty($this->master_array)) {
-            if (is_subclass_of($this->master_array[0], Model::class)) {
-                $title = $this->master_array[0]->getTitle();
-            } else {
-                $title = $this->appendCalendarTitle($title);
-                $title = $this->appendCategoryTitle($title);
-            }
+        if (!empty($this->master_array) && is_subclass_of($this->master_array[0], Model::class)) {
+            $title = $this->master_array[0]->getTitle();
         } else {
             $title = $this->appendCalendarTitle($title);
             $title = $this->appendCategoryTitle($title);
         }
-        if ($title == '') {
+        if ($title === '') {
             $title = $getdate;
         }
         $title .= '.ics';
@@ -260,16 +259,16 @@ END:VCALENDAR
     }
 
     /**
-     * @param $title
+     * @param string $title
      * @return string
      */
-    private function appendCalendarTitle($title)
+    private function appendCalendarTitle($title): string
     {
         if ($this->controller->piVars['calendar']) {
             foreach (explode(',', $this->controller->piVars['calendar']) as $calendarId) {
                 $calendar = $this->modelObj->findCalendar($calendarId, 'tx_cal_calendar', $this->conf['pidList']);
                 if (is_object($calendar)) {
-                    if ($title != '') {
+                    if ($title !== '') {
                         $title .= '_';
                     }
                     $title .= $calendar->getTitle();
@@ -280,16 +279,16 @@ END:VCALENDAR
     }
 
     /**
-     * @param $title
+     * @param string $title
      * @return string
      */
-    private function appendCategoryTitle($title)
+    private function appendCategoryTitle($title): string
     {
         if ($this->controller->piVars['category']) {
             foreach (explode(',', $this->controller->piVars['category']) as $categoryId) {
                 $category = $this->modelObj->findCategory($categoryId, 'sys_category', $this->conf['pidList']);
                 if (is_object($category)) {
-                    if ($title != '') {
+                    if ($title !== '') {
                         $title .= '_';
                     }
                     $title .= $category->getTitle();

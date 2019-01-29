@@ -31,10 +31,9 @@ abstract class NewTimeView
     private $template;
     private $cs_convert;
     private $weekDayLength = 100;
-    private $monthNameLength = 100;
     private $weekDayFormat = '%A';
     protected $current = false;
-    private $selected = false;
+    protected $selected = false;
     private $parentMonth;
 
     /**
@@ -57,7 +56,7 @@ abstract class NewTimeView
      * @param $template
      * @return string
      */
-    public function render(&$template)
+    public function render(&$template): string
     {
         $this->setTemplate($template);
         $rems = [];
@@ -85,34 +84,30 @@ abstract class NewTimeView
     protected function getMarker(& $template, & $sims, & $rems, & $wrapped, $view = '', $base = 'view')
     {
         $conf = &Registry::Registry('basic', 'conf');
-        if ($view == '' && $base == 'view') {
+        if ($view === '' && $base === 'view') {
             $view = !empty($conf['alternateRenderingView']) && is_array($conf[$base . '.'][$conf['alternateRenderingView'] . '.']) ? $conf['alternateRenderingView'] : $conf['view'];
         }
         preg_match_all('!\<\!--[a-zA-Z0-9 ]*###([A-Z0-9_-|]*)\###[a-zA-Z0-9 ]*-->!is', $template, $match);
         $allMarkers = array_unique($match[1]);
 
         foreach ($allMarkers as $marker) {
-            switch ($marker) {
-                default:
-                    if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
-                        $module = GeneralUtility::makeInstanceService(
-                            substr($marker, 8),
-                            'module'
-                        );
-                        if (is_object($module)) {
-                            $rems['###' . $marker . '###'] = $module->start($this);
-                        }
-                    }
-                    $funcFromMarker = 'get' . str_replace(
-                            ' ',
-                            '',
-                            ucwords(str_replace('_', ' ', strtolower($marker)))
-                        ) . 'Marker';
+            if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
+                $module = GeneralUtility::makeInstanceService(
+                    substr($marker, 8),
+                    'module'
+                );
+                if (is_object($module)) {
+                    $rems['###' . $marker . '###'] = $module->start($this);
+                }
+            }
+            $funcFromMarker = 'get' . str_replace(
+                    ' ',
+                    '',
+                    ucwords(str_replace('_', ' ', strtolower($marker)))
+                ) . 'Marker';
 
-                    if (method_exists($this, $funcFromMarker)) {
-                        $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
-                    }
-                    break;
+            if (method_exists($this, $funcFromMarker)) {
+                $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
             }
         }
 
@@ -180,7 +175,7 @@ abstract class NewTimeView
             foreach ($modules as $themodule => $markerArray) {
                 $module = GeneralUtility::makeInstanceService($themodule, 'module');
                 if (is_object($module)) {
-                    if ($markerArray[0] == '') {
+                    if ($markerArray[0] === '') {
                         $sims['###MODULE__' . $themodule . '###'] = $module->start($this); // ld way
                     } else {
                         $moduleMarker = $module->start($this); // get Markerarray from Module
@@ -208,9 +203,10 @@ abstract class NewTimeView
     /**
      * Method for post processing the rendered event
      *
+     * @param string $content
      * @return string $content content/output
      */
-    protected function finish(&$content)
+    protected function finish(&$content): string
     {
         $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_base_model',
@@ -252,7 +248,7 @@ abstract class NewTimeView
             foreach ($allLanguageMarkers as $key => $marker) {
                 $wrapper = $match[1][$key];
                 $label = $controller->pi_getLL('l_' . strtolower($marker));
-                if ($label == '') {
+                if ($label === '') {
                     $label = $controller->pi_getLL('l_event_' . strtolower($marker));
                 }
                 $sims[$wrapper . $marker . '_LABEL' . $wrapper] = $label;
@@ -267,8 +263,7 @@ abstract class NewTimeView
     /**
      * Method to initialise a local content object, that can be used for customized TS rendering with own db values
      *
-     * @param $customData array
-     *            key => value pairs that should be used as fake db-values for TS rendering instead of the values of the current object
+     * @param bool $customData array key => value pairs that should be used as fake db-values for TS rendering instead of the values of the current object
      * @return mixed
      */
     public function getLocalCObject($customData = false)
@@ -383,7 +378,6 @@ abstract class NewTimeView
         if (!is_object($this->cs_convert)) {
             $this->cs_convert = new CharsetConverter();
         }
-        $conf = &Registry::Registry('basic', 'conf');
         return mb_substr(
             strftime($this->getWeekDayFormat(), $timestamp),
             0,
@@ -411,7 +405,7 @@ abstract class NewTimeView
         $remember,
         $class,
         $time
-    ) {
+    ): string {
         $tmp = '';
 
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
@@ -425,7 +419,7 @@ abstract class NewTimeView
             return sprintf($wrap, $remember, $class, '');
         }
         $now = new CalDate();
-        $now->setTZbyId('UTC');
+        $now->setTZbyID('UTC');
         $now->addSeconds($createOffset);
 
         $date = new CalDate();
@@ -433,7 +427,7 @@ abstract class NewTimeView
         $date->setMonth($this->month);
         $date->setYear($this->year);
 
-        if (($date->after($now) || $rightsObj->isAllowedToCreateEventInPast()) && $isAllowedToCreateEvent) {
+        if ($isAllowedToCreateEvent && ($date->after($now) || $rightsObj->isAllowedToCreateEventInPast())) {
             $local_cObj = $this->getLocalCObject();
             $conf['clear_anyway'] = 1;
             if ($conf['view.']['enableAjax']) {
@@ -464,12 +458,10 @@ abstract class NewTimeView
                 }
             } else {
                 $local_cObj->setCurrentVal($conf['view.'][$view . '.']['event.']['addIcon']);
-                // linkConf = Array();
-                //$local_cObj->data['link_useCacheHash'] = 0;
                 $local_cObj->data['link_no_cache'] = 1;
                 $local_cObj->data['link_additionalParams'] = '&tx_cal_controller[gettime]=' . $time . '&tx_cal_controller[getdate]=' . $date->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $controller->extendLastView() . '&tx_cal_controller[view]=create_event';
                 $local_cObj->data['link_section'] = 'default';
-                $local_cObj->data['link_parameter'] = $conf['view.']['event.']['createEventViewPid'] ? $conf['view.']['event.']['createEventViewPid'] : $GLOBALS['TSFE']->id;
+                $local_cObj->data['link_parameter'] = $conf['view.']['event.']['createEventViewPid'] ?: $GLOBALS['TSFE']->id;
                 $tmp .= $local_cObj->cObjGetSingle(
                     $conf['view.'][$view . '.']['event.']['addLink'],
                     $conf['view.'][$view . '.']['event.']['addLink.']
@@ -478,12 +470,10 @@ abstract class NewTimeView
                     $tmp = sprintf($wrap, $remember, $class, $tmp, $date->format('%Y %m %d %H %M %s'));
                 }
             }
+        } elseif ($conf['view.']['enableAjax']) {
+            $tmp = sprintf($wrap, $remember, $class, '');
         } else {
-            if ($conf['view.']['enableAjax']) {
-                $tmp = sprintf($wrap, $remember, $class, '');
-            } else {
-                $tmp = sprintf($wrap, $remember, $class, '');
-            }
+            $tmp = sprintf($wrap, $remember, $class, '');
         }
         return $tmp;
     }
@@ -524,19 +514,13 @@ abstract class NewTimeView
      */
     public function getTimeCellsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $cObj = &Registry::Registry('basic', 'cobj');
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $timesSubpart = $this->markerBasedTemplateService->getSubpart($template, 'TIME_CELLS');
 
         $conf = &Registry::Registry('basic', 'conf');
 
-        $gridLength = $conf['view.']['day.']['gridLength'];
-        if ($gridLength == 0) {
-            $gridLength = 15;
-        }
-
         $gridTime = new CalDate();
-        $gridTime->setTZbyId('UTC');
+        $gridTime->setTZbyID('UTC');
         $gridTime->setMinute(0);
 
         $times = '';
@@ -551,19 +535,17 @@ abstract class NewTimeView
             $dayEnd .= '0';
         }
 
-        if ($conf['view'] == 'day') {
+        if ($conf['view'] === 'day') {
             $d_start = new CalDate($this->getYmd() . $dayStart);
             $d_end = new CalDate($this->getYmd() . $dayEnd);
         }
-        if ($conf['view'] == 'week') {
+        if ($conf['view'] === 'week') {
             $d_start = new CalDate($this->weekStart . $dayStart);
             $d_end = new CalDate($this->weekStart . $dayEnd);
         }
-        $d_start->setTZbyId('UTC');
-        $d_end->setTZbyId('UTC');
+        $d_start->setTZbyID('UTC');
+        $d_end->setTZbyID('UTC');
 
-        $count = 86000;
-        $value = 0;
         $createOffset = 0;
         $isAllowedToCreateEvent = $rightsObj->isAllowedToCreateEvent();
         if ($isAllowedToCreateEvent) {
@@ -608,15 +590,9 @@ abstract class NewTimeView
      */
     public function getHourCellsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $cObj = &Registry::Registry('basic', 'cobj');
         $hoursSubpart = $this->markerBasedTemplateService->getSubpart($template, 'HOUR_CELLS');
 
         $conf = &Registry::Registry('basic', 'conf');
-        $gridLength = $conf['view.']['day.']['gridLength'];
-
-        if ($gridLength == 0) {
-            $gridLength = 15;
-        }
 
         $dayStart = $conf['view.']['day.']['dayStart']; // '0700'; // Start time for day grid
         $dayEnd = $conf['view.']['day.']['dayEnd']; // '2300'; // End time for day grid
@@ -667,8 +643,8 @@ abstract class NewTimeView
             return;
         }
         $than = new CalDate();
-        $than->setTZbyId('UTC');
-        $than->addSeconds($createOffset);
+        $than->setTZbyID('UTC');
+        $than->addSeconds();
 
         $date = new CalDate();
         $date->setDay($this->day);
@@ -681,14 +657,14 @@ abstract class NewTimeView
             $date->setMinute(59);
         }
 
-        if (($date->after($than) || $rightsObj->isAllowedToCreateEventInPast()) && $rightsObj->isAllowedToCreateEvent()) {
+        if ($rightsObj->isAllowedToCreateEvent() && ($date->after($than) || $rightsObj->isAllowedToCreateEventInPast())) {
             $local_cObj = $this->getLocalCObject();
             $timeParams = '';
-            if ($view == 'day' || $view == 'week') {
+            if ($view === 'day' || $view === 'week') {
                 $timeParams = '&tx_cal_controller[gettime]=' . $date->format('%H%M');
-            } elseif ($conf['rights.']['create.']['event.']['fields.']['starttime.']['default'] == 'now') {
+            } elseif ($conf['rights.']['create.']['event.']['fields.']['starttime.']['default'] === 'now') {
                 $now = new CalDate();
-                $than->setTZbyId('UTC');
+                $than->setTZbyID('UTC');
                 $timeParams = '&tx_cal_controller[gettime]=' . $now->format('%H%M');
             }
 
@@ -696,7 +672,7 @@ abstract class NewTimeView
             $local_cObj->data['link_no_cache'] = 1;
             $local_cObj->data['link_additionalParams'] = $timeParams . '&tx_cal_controller[startdate]=' . $date->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $controller->extendLastView() . '&tx_cal_controller[view]=create_event';
             $local_cObj->data['link_section'] = 'default';
-            $local_cObj->data['link_parameter'] = $conf['view.']['event.']['createEventViewPid'] ? $conf['view.']['event.']['createEventViewPid'] : $GLOBALS['TSFE']->id;
+            $local_cObj->data['link_parameter'] = $conf['view.']['event.']['createEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
             $sims['###CREATE_EVENT_LINK###'] .= $local_cObj->cObjGetSingle(
                 $conf['view.'][$view . '.']['event.']['addLink'],
@@ -799,7 +775,7 @@ abstract class NewTimeView
     /**
      * @return int
      */
-    public function getWeekDayLength()
+    public function getWeekDayLength(): int
     {
         return $this->weekDayLength;
     }
@@ -815,7 +791,7 @@ abstract class NewTimeView
     /**
      * @return string
      */
-    public function getWeekDayFormat()
+    public function getWeekDayFormat(): string
     {
         return $this->weekDayFormat;
     }

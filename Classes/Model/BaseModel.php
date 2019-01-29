@@ -14,35 +14,164 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Service\RightsService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * Class BaseModel
  */
 abstract class BaseModel extends AbstractModel
 {
+    /**
+     * @var int
+     */
+    protected $uid = 0;
+
+    /**
+     * @var int
+     */
+    protected $pid = 0;
+
+    /**
+     * @var int
+     */
+    protected $tstamp = 0;
+
+    /**
+     * @var int
+     */
+    protected $crdate = 0;
+
+    /**
+     * @var int
+     */
+    protected $cruser_id = 0;
+
+    /**
+     * @var int
+     */
+    protected $deleted = 0;
+
+    /**
+     * @var int
+     */
+    protected $hidden = 0;
+
+    /**
+     * @var int
+     */
+    protected $starttime = 0;
+
+    /**
+     * @var int
+     */
+    protected $endtime = 0;
+
+    /**
+     * @var string
+     */
     public $prefixId = 'tx_cal_controller';
+
+    /**
+     * @var ContentObjectRenderer
+     */
     public $cObj;
+
+    /**
+     * @var ContentObjectRenderer
+     */
     public $local_cObj;
+
+    /**
+     * @var mixed
+     */
     public $conf;
+
+    /**
+     * @var string
+     */
     public $serviceKey;
+
+    /**
+     * @var
+     */
     public $tempATagParam;
+
+    /**
+     * @var mixed
+     */
     public $controller;
-    public $type;
+
+    /**
+     * @var string
+     */
+    public $type = '';
+
+    /**
+     * @var string
+     */
     public $objectType = '';
+
+    /**
+     * @var bool
+     */
     public $striptags = false;
-    public $hidden = false;
-    public $uid = 0;
-    public $pid = 0;
+
+    /**
+     * @var bool
+     */
+    protected $isPreview = false;
+
+    /**
+     * @var array
+     */
     public $image = [];
+
+    /**
+     * @var array
+     */
     public $attachment = [];
+
+    /**
+     * @var array
+     */
     public $cachedValueArray = [];
+
+    /**
+     * @var bool
+     */
     public $initializingCacheValues = false;
+
+    /**
+     * @var
+     */
     public $templatePath;
+
+    /**
+     * @var array
+     */
+    protected $classMethods = [];
+
+    /**
+     * @var array
+     */
+    protected $classMethodVars = [];
+
+    /**
+     * @var array
+     */
+    protected $row = [];
+
+    /**
+     * @var ObjectStorage
+     */
+    protected $images;
 
     /**
      * @var MarkerBasedTemplateService
@@ -50,10 +179,24 @@ abstract class BaseModel extends AbstractModel
     protected $markerBasedTemplateService;
 
     /**
+     * @var RightsService
+     */
+    protected $rightsObj;
+
+    /**
+     * @var array
+     */
+    public $sharedUsers = [];
+
+    /**
+     * @var array
+     */
+    public $sharedGroups = [];
+
+    /**
      * Constructor.
      *
-     * @param $serviceKey String
-     *            serviceKey for this model
+     * @param string $serviceKey serviceKey for this model
      */
     public function __construct($serviceKey)
     {
@@ -63,6 +206,14 @@ abstract class BaseModel extends AbstractModel
 
         $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
 
+        $this->initObjectStorage();
+    }
+
+    /**
+     *
+     */
+    protected function initObjectStorage()
+    {
         $this->images = new ObjectStorage();
     }
 
@@ -90,7 +241,7 @@ abstract class BaseModel extends AbstractModel
      * This method should be adapted in every model to contain all needed values.
      * In short - every get-method (except the getXYMarker) should be in there.
      */
-    public function getValuesAsArray()
+    public function getValuesAsArray(): array
     {
         // check if this locking variable is set - if so, we're currently within a getValuesAsArray call and <br />
         // thus we would end up in a endless recursion. So skip in that case. This can happen, when a method called by this method
@@ -108,19 +259,9 @@ abstract class BaseModel extends AbstractModel
             $storeKey = get_class($this);
             $cachedValues = $this->controller->cache->get($storeKey);
 
-            if ($cachedValues != '') {
-                if ($this->conf['writeCachingInfoToDevlog'] == 1) {
-                    GeneralUtility::devLog('CACHE HIT (' . __CLASS__ . '::' . __FUNCTION__ . ')', 'cal', -1, []);
-                }
-                $cachedValues = unserialize($cachedValues);
-                $this->classMethodVars = $cachedValues[0];
-                $autoFetchTextFields = $cachedValues[1];
-                $autoFetchTextSplitValue = $cachedValues[2];
+            if ($cachedValues !== '') {
+                list($this->classMethodVars, $autoFetchTextFields, $autoFetchTextSplitValue) = unserialize($cachedValues);
             } else {
-                $noAutoFetchMethods = $this->noAutoFetchMethods;
-                if (count(parent::getNoAutoFetchMethods())) {
-                    $noAutoFetchMethods = array_merge(parent::getNoAutoFetchMethods(), $this->getNoAutoFetchMethods());
-                }
                 $cObj = &Registry::Registry('basic', 'cobj');
                 $autoFetchTextFields = explode(',', strtolower($this->conf['autoFetchTextFields']));
                 $autoFetchTextSplitValue = $cObj->stdWrap(
@@ -130,21 +271,21 @@ abstract class BaseModel extends AbstractModel
 
                 // new way - get everything dynamically
                 if (empty($this->classMethodVars)) {
-                    // get all methods of this class and search for apropriate get-methods
+                    // get all methods of this class and search for appropriate get-methods
                     $classMethods = get_class_methods($this);
-                    if (count($classMethods)) {
+                    if (!empty($classMethods)) {
                         $this->classMethods = [];
                         foreach ($classMethods as $methodName) {
                             // check if the methods name is get method, not a getMarker method and not this method itself (a loop wouldn't be that nice)
-                            if (substr($methodName, 0, 3) == 'get' && substr(
-                                    $methodName,
-                                    strlen($methodName) - 6
-                                ) != 'Marker' && $methodName != 'getValuesAsArray' && $methodName != 'getCustomValuesAsArray' && !in_array(
-                                    $methodName,
-                                    $this->noAutoFetchMethods
-                                )) {
+                            if (
+                                $methodName !== 'getValuesAsArray'
+                                && $methodName !== 'getCustomValuesAsArray'
+                                && strpos($methodName, 'get') === 0
+                                && !in_array($methodName, $this->noAutoFetchMethods, true)
+                                && substr($methodName, strlen($methodName) - 6) !== 'Marker'
+                            ) {
                                 $varName = substr($methodName, 3);
-                                // as final check that the method name seems to be propper, check if there is also a setter for it
+                                // as final check that the method name seems to be proper, check if there is also a setter for it
                                 if (method_exists($this, 'set' . $varName)) {
                                     $this->classMethodVars[] = $varName;
                                 }
@@ -152,9 +293,6 @@ abstract class BaseModel extends AbstractModel
                         }
                         unset($varName);
                     }
-                }
-                if ($this->conf['writeCachingInfoToDevlog'] == 1) {
-                    GeneralUtility::devLog('CACHE MISS (' . __CLASS__ . '::' . __FUNCTION__ . ')', 'cal', 2, []);
                 }
                 $this->controller->cache->set($storeKey, serialize([
                     $this->classMethodVars,
@@ -164,25 +302,26 @@ abstract class BaseModel extends AbstractModel
             }
 
             // prepare the basic value array
-            $valueArray = [];
             $valueArray = $this->row;
 
             // process the get methods and fill the valueArray dynamically
             if (!empty($this->classMethodVars)) {
                 foreach ($this->classMethodVars as $varName) {
                     $methodName = 'get' . $varName;
-                    $methodValue = $this->$methodName();
-                    // convert any probable array to a comma list, except it contains objects
-                    if (is_array($methodValue) && !is_object($methodValue[0])) {
-                        if (in_array(strtolower($varName), $autoFetchTextFields)) {
-                            $methodValue = implode($autoFetchTextSplitValue, $methodValue);
-                        } else {
-                            $methodValue = implode(',', $methodValue);
+                    if (method_exists($this, $methodName)) {
+                        $methodValue = $this->$methodName();
+                        // convert any probable array to a comma list, except it contains objects
+                        if (is_array($methodValue) && !is_object($methodValue[0])) {
+                            if (in_array(strtolower($varName), $autoFetchTextFields, true)) {
+                                $methodValue = implode($autoFetchTextSplitValue, $methodValue);
+                            } else {
+                                $methodValue = implode(',', $methodValue);
+                            }
                         }
-                    }
-                    // now fill the array, except the methods return value is a object, which can't be used in TS
-                    if (!is_object($methodValue)) {
-                        $valueArray[strtolower($varName)] = $methodValue;
+                        // now fill the array, except the methods return value is a object, which can't be used in TS
+                        if (!is_object($methodValue)) {
+                            $valueArray[strtolower($varName)] = $methodValue;
+                        }
                     }
                 }
             }
@@ -204,7 +343,7 @@ abstract class BaseModel extends AbstractModel
             }
 
             // now cache the result to win some ms
-            $this->cachedValueArray = (array)$mergedValues;
+            $this->cachedValueArray = $mergedValues;
             $this->initializingCacheValues = false;
         }
         return $this->cachedValueArray;
@@ -215,7 +354,7 @@ abstract class BaseModel extends AbstractModel
      * This method is ment to be overwritten from inside a model, whereas the method getValuesAsArray should stay untouched from inside a model.
      * @ return        array
      */
-    public function getAdditionalValuesAsArray()
+    public function getAdditionalValuesAsArray(): array
     {
         return [];
     }
@@ -235,7 +374,7 @@ abstract class BaseModel extends AbstractModel
     /**
      * Returns the image blob
      */
-    public function getImage()
+    public function getImage(): array
     {
         return $this->image;
     }
@@ -245,7 +384,7 @@ abstract class BaseModel extends AbstractModel
      */
     public function getImages()
     {
-        $fileRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+        $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
         return $fileRepository->findByRelation('tx_cal_' . $this->getObjectType(), 'image', $this->getUid());
     }
 
@@ -265,10 +404,10 @@ abstract class BaseModel extends AbstractModel
      * @param $image
      * @return bool
      */
-    public function removeImage($image)
+    public function removeImage($image): bool
     {
-        for ($i = 0; $i < count($this->image); $i++) {
-            if ($this->image[$i] == $image) {
+        foreach ($this->image as $i => $iValue) {
+            if ($iValue === $image) {
                 array_splice($this->image, $i);
                 return true;
             }
@@ -279,7 +418,7 @@ abstract class BaseModel extends AbstractModel
     /**
      * Returns the attachment url
      */
-    public function getAttachment()
+    public function getAttachment(): array
     {
         return $this->attachment;
     }
@@ -289,7 +428,7 @@ abstract class BaseModel extends AbstractModel
      */
     public function getAttachments()
     {
-        $fileRepository = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\FileRepository');
+        $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
         return $fileRepository->findByRelation('tx_cal_' . $this->getObjectType(), 'attachment', $this->getUid());
     }
 
@@ -319,11 +458,11 @@ abstract class BaseModel extends AbstractModel
      * @param $url String
      * @return bool
      */
-    public function removeAttachmentURL($url)
+    public function removeAttachmentURL($url): bool
     {
-        for ($i = 0; $i < count($this->attachment); $i++) {
-            if ($this->attachment == $url) {
-                array_splice($this->attachment, $i);
+        foreach ($this->attachment as $a => $aValue) {
+            if ($aValue === $url) {
+                array_splice($this->image, $a);
                 return true;
             }
         }
@@ -335,27 +474,21 @@ abstract class BaseModel extends AbstractModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
-    {
-        return false;
-    }
+    abstract public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool;
 
     /**
      * @param string $feUserUid
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
-    {
-        return false;
-    }
+    abstract public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool;
 
     /**
      * Returns the type value
      *
-     * @return int type.
+     * @return string type.
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -364,8 +497,7 @@ abstract class BaseModel extends AbstractModel
      * Sets the type attribute.
      * This should be the service type
      *
-     * @param $type String
-     *            type
+     * @param string $type
      */
     public function setType($type)
     {
@@ -375,13 +507,13 @@ abstract class BaseModel extends AbstractModel
     /**
      * @return string
      */
-    public function getObjectType()
+    public function getObjectType(): string
     {
         return $this->objectType;
     }
 
     /**
-     * @param $type
+     * @param string $type
      */
     public function setObjectType($type)
     {
@@ -391,17 +523,17 @@ abstract class BaseModel extends AbstractModel
     /**
      * @return int
      */
-    public function getUid()
+    public function getUid(): int
     {
         return $this->uid;
     }
 
     /**
-     * @param $t
+     * @param int $uid
      */
-    public function setUid($t)
+    public function setUid($uid)
     {
-        $this->uid = $t;
+        $this->uid = $uid;
     }
 
     /**
@@ -415,7 +547,7 @@ abstract class BaseModel extends AbstractModel
     /**
      * @return int
      */
-    public function getPid()
+    public function getPid(): int
     {
         return $this->pid;
     }
@@ -425,7 +557,7 @@ abstract class BaseModel extends AbstractModel
      *
      * @return int == true, 0 == false.
      */
-    public function getHidden()
+    public function getHidden(): int
     {
         return $this->hidden;
     }
@@ -435,7 +567,7 @@ abstract class BaseModel extends AbstractModel
      *
      * @return int == true, 0 == false.
      */
-    public function isHidden()
+    public function isHidden(): int
     {
         return $this->hidden;
     }
@@ -443,54 +575,11 @@ abstract class BaseModel extends AbstractModel
     /**
      * Sets the hidden value.
      *
-     * @param $hidden Integer
-     *            == true, 0 == false.
+     * @param $hidden int == true, 0 == false.
      */
     public function setHidden($hidden)
     {
         $this->hidden = $hidden;
-    }
-
-    /**
-     * @param $template
-     * @param $sims
-     * @param $rems
-     * @param $wrapped
-     * @param $view
-     */
-    public function getDescriptionMarker(& $template, & $sims, & $rems, & $wrapped, $view)
-    {
-        if (($view == 'ics') || ($view == 'single_ics')) {
-            $description = preg_replace('/,/', '\,', preg_replace(
-                '/' . chr(10) . '|' . chr(13) . '/',
-                '\r\n',
-                html_entity_decode(preg_replace('/&nbsp;/', ' ', strip_tags($this->getDescription())))
-            ));
-        } else {
-            $description = $this->getDescription();
-        }
-
-        $this->initLocalCObject();
-        $this->local_cObj->setCurrentVal($description);
-        $this->local_cObj->data['bodytext'] = $description;
-        if ($this->striptags) {
-            $sims['###DESCRIPTION_STRIPTAGS###'] = strip_tags($this->local_cObj->cObjGetSingle(
-                $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['description'],
-                $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['description.']
-            ));
-        } else {
-            if ($this->isPreview) {
-                $sims['###DESCRIPTION###'] = $this->local_cObj->cObjGetSingle(
-                    $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['preview'],
-                    $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['preview.']
-                );
-            } else {
-                $sims['###DESCRIPTION###'] = $this->local_cObj->cObjGetSingle(
-                    $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['description'],
-                    $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['description.']
-                );
-            }
-        }
     }
 
     /**
@@ -527,7 +616,7 @@ abstract class BaseModel extends AbstractModel
      */
     public function getMarker(& $template, & $sims, & $rems, & $wrapped, $view = '', $base = 'view')
     {
-        if ($view == '' && $base == 'view') {
+        if ($view === '' && $base === 'view') {
             $view = !empty($this->conf['alternateRenderingView']) && is_array($this->conf[$base . '.'][$this->conf['alternateRenderingView'] . '.']) ? $this->conf['alternateRenderingView'] : $this->conf['view'];
         }
         $match = [];
@@ -535,23 +624,19 @@ abstract class BaseModel extends AbstractModel
         $allMarkers = array_unique($match[1]);
 
         foreach ($allMarkers as $marker) {
-            switch ($marker) {
-                default:
-                    if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
-                        $module = GeneralUtility::makeInstanceService(substr($marker, 8), 'module');
-                        if (is_object($module)) {
-                            $rems['###' . $marker . '###'] = $module->start($this);
-                        }
-                    }
-                    $funcFromMarker = 'get' . str_replace(
-                            ' ',
-                            '',
-                            ucwords(str_replace('_', ' ', strtolower($marker)))
-                        ) . 'Marker';
-                    if (method_exists($this, $funcFromMarker)) {
-                        $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
-                    }
-                    break;
+            if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
+                $module = GeneralUtility::makeInstanceService(substr($marker, 8), 'module');
+                if (is_object($module)) {
+                    $rems['###' . $marker . '###'] = $module->start($this);
+                }
+            }
+            $funcFromMarker = 'get' . str_replace(
+                    ' ',
+                    '',
+                    ucwords(str_replace('_', ' ', strtolower($marker)))
+                ) . 'Marker';
+            if (method_exists($this, $funcFromMarker)) {
+                $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
             }
         }
 
@@ -575,7 +660,7 @@ abstract class BaseModel extends AbstractModel
                      * if(preg_match('/.*_LABEL/',$marker)){ $sims['###'.$marker.'###'] = $controller->pi_getLL('l_'.$this->getObjectType().'_'.strtolower(substr($marker,0,strlen($marker)-6))); continue; }
                      */
                     if (preg_match('/.*_LABEL$/', $marker) || preg_match('/^L_.*/', $marker)) {
-                        continue;
+                        break;
                     }
                     $funcFromMarker = 'get' . str_replace(
                             ' ',
@@ -604,7 +689,7 @@ abstract class BaseModel extends AbstractModel
                             unset($tmp);
                         }
                         // if $current is still empty and we have a db-field matching the markers name, use this one
-                        if ($current == '' && $this->row[strtolower($marker)] != '') {
+                        if ($current === '' && $this->row[strtolower($marker)] !== '') {
                             $current = $this->row[strtolower($marker)];
                         }
 
@@ -628,28 +713,28 @@ abstract class BaseModel extends AbstractModel
         // also work with old way of MODULE__-Marker
 
         if (is_array($modules)) { // MODULE-MARKER FOUND
-            foreach ($modules as $themodule => $markerArray) {
-                $module = GeneralUtility::makeInstanceService($themodule, 'module');
+            foreach ($modules as $theModule => $markerArray) {
+                $module = GeneralUtility::makeInstanceService($theModule, 'module');
                 if (is_object($module)) {
-                    if ($markerArray[0] == '') {
-                        $sims['###MODULE__' . $themodule . '###'] = $module->start($this); // ld way
+                    if ($markerArray[0] === '') {
+                        $sims['###MODULE__' . $theModule . '###'] = $module->start($this); // ld way
                     } else {
                         $moduleMarker = $module->start($this, true); // get Markerarray from Module
                         if (is_array($moduleMarker)) {
                             foreach ($markerArray as $key => $requestedKey) {
                                 if (array_key_exists('###' . $requestedKey . '###', $moduleMarker)) {
                                     $val = $moduleMarker['###' . $requestedKey . '###'];
-                                    if ($this->conf[$base . '.'][$view . '.'][$this->getObjectType() . '.']['module__' . strtolower($themodule) . '___' . strtolower($requestedKey)]) {
+                                    if ($this->conf[$base . '.'][$view . '.'][$this->getObjectType() . '.']['module__' . strtolower($theModule) . '___' . strtolower($requestedKey)]) {
                                         $this->local_cObj->setCurrentVal($val);
-                                        $sims['###MODULE__' . $themodule . '___' . strtoupper($requestedKey) . '###'] = $this->local_cObj->cObjGetSingle(
-                                            $this->conf[$base . '.'][$view . '.'][$this->getObjectType() . '.']['module__' . strtolower($themodule) . '___' . strtolower($requestedKey)],
-                                            $this->conf[$base . '.'][$view . '.'][$this->getObjectType() . '.']['module__' . strtolower($themodule) . '___' . strtolower($requestedKey) . '.']
+                                        $sims['###MODULE__' . $theModule . '___' . strtoupper($requestedKey) . '###'] = $this->local_cObj->cObjGetSingle(
+                                            $this->conf[$base . '.'][$view . '.'][$this->getObjectType() . '.']['module__' . strtolower($theModule) . '___' . strtolower($requestedKey)],
+                                            $this->conf[$base . '.'][$view . '.'][$this->getObjectType() . '.']['module__' . strtolower($theModule) . '___' . strtolower($requestedKey) . '.']
                                         );
                                     } else {
-                                        $sims['###MODULE__' . $themodule . '___' . strtoupper($requestedKey) . '###'] = $val;
+                                        $sims['###MODULE__' . $theModule . '___' . strtoupper($requestedKey) . '###'] = $val;
                                     }
                                 } else {
-                                    $sims['###MODULE__' . $themodule . '___' . strtoupper($requestedKey) . '###'] = 'Could not find the marker "' . $requestedKey . '" in the module ' . $themodule . ' template.';
+                                    $sims['###MODULE__' . $theModule . '___' . strtoupper($requestedKey) . '###'] = 'Could not find the marker "' . $requestedKey . '" in the module ' . $theModule . ' template.';
                                 }
                             }
                         }
@@ -675,9 +760,9 @@ abstract class BaseModel extends AbstractModel
      * Method for post processing the rendered event
      *
      * @param $content
-     * @return processed content/output
+     * @return string
      */
-    public function finish(&$content)
+    public function finish($content): string
     {
         $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_base_model',
@@ -718,7 +803,7 @@ abstract class BaseModel extends AbstractModel
             foreach ($allLanguageMarkers as $key => $marker) {
                 $wrapper = $match[1][$key];
                 $label = $this->controller->pi_getLL('l_' . strtolower($this->getObjectType() . '_' . $marker));
-                if ($label == '') {
+                if ($label === '') {
                     $label = $this->controller->pi_getLL('l_event_' . strtolower($marker));
                 }
                 $sims[$wrapper . $marker . '_LABEL' . $wrapper] = $label;
@@ -728,17 +813,6 @@ abstract class BaseModel extends AbstractModel
             }
         }
         return $content;
-    }
-
-    /**
-     * Abstract method to be implemented by each class extending.
-     *
-     * @param $object
-     * @return int => less, equals, greater
-     */
-    public function compareTo($object)
-    {
-        return -1;
     }
 
     /**
@@ -769,13 +843,13 @@ abstract class BaseModel extends AbstractModel
      * @param $groupIdArray
      * @return bool
      */
-    public function isSharedUser($userId, $groupIdArray)
+    public function isSharedUser($userId, $groupIdArray): bool
     {
-        if (is_array($this->getSharedUsers()) && in_array($userId, $this->getSharedUsers())) {
+        if (is_array($this->getSharedUsers()) && in_array($userId, $this->getSharedUsers(), true)) {
             return true;
         }
         foreach ($groupIdArray as $id) {
-            if (is_array($this->getSharedGroups()) && in_array($id, $this->getSharedGroups())) {
+            if (is_array($this->getSharedGroups()) && in_array($id, $this->getSharedGroups(), true)) {
                 return true;
             }
         }
@@ -784,40 +858,14 @@ abstract class BaseModel extends AbstractModel
     }
 
     /**
-     * @return int
-     */
-    public function getIsAllowedToEdit()
-    {
-        return $this->isUserAllowedToEdit() ? 1 : 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function getIsAllowedToDelete()
-    {
-        return $this->isUserAllowedToDelete() ? 1 : 0;
-    }
-
-    public function setIsAllowedToEdit()
-    {
-        // Dummy function to get the value filled automatically of the getIsAllowedToEdit function
-    }
-
-    public function setIsAllowedToDelete()
-    {
-        // Dummy function to get the value filled automatically of the getIsAllowedToDelete function
-    }
-
-    /**
      * @param $subpartMarker
-     * @return string|processed
+     * @return string
      */
-    public function fillTemplate($subpartMarker)
+    public function fillTemplate($subpartMarker): string
     {
         $page = Functions::getContent($this->templatePath);
 
-        if ($page == '') {
+        if ($page === '') {
             return Functions::createErrorMessage(
                 'No ' . $this->objectType . ' template file found at: >' . $this->templatePath . '<.',
                 'Please make sure the path is correct and that you included the static template and double-check the path using the Typoscript Object Browser.'
@@ -849,5 +897,149 @@ abstract class BaseModel extends AbstractModel
             $rems,
             $wrapped
         ));
+    }
+
+    /**
+     * @return int
+     */
+    public function getTstamp(): int
+    {
+        return $this->tstamp;
+    }
+
+    /**
+     * @param int $tstamp
+     */
+    public function setTstamp(int $tstamp)
+    {
+        $this->tstamp = $tstamp;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCrdate(): int
+    {
+        return $this->crdate;
+    }
+
+    /**
+     * @param int $crdate
+     */
+    public function setCrdate(int $crdate)
+    {
+        $this->crdate = $crdate;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCruserId(): int
+    {
+        return $this->cruser_id;
+    }
+
+    /**
+     * @param int $cruser_id
+     */
+    public function setCruserId(int $cruser_id)
+    {
+        $this->cruser_id = $cruser_id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * @param bool $deleted
+     */
+    public function setDeleted(bool $deleted)
+    {
+        $this->deleted = $deleted;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStarttime(): int
+    {
+        return $this->starttime;
+    }
+
+    /**
+     * @param int $starttime
+     */
+    public function setStarttime(int $starttime)
+    {
+        $this->starttime = $starttime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEndtime(): int
+    {
+        return $this->endtime;
+    }
+
+    /**
+     * @param int $endtime
+     */
+    public function setEndtime(int $endtime)
+    {
+        $this->endtime = $endtime;
+    }
+
+    /**
+     * @param $id
+     */
+    public function addSharedUser($id)
+    {
+        $this->sharedUsers[] = $id;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSharedUsers(): array
+    {
+        return $this->sharedUsers;
+    }
+
+    /**
+     * @param $userIds
+     */
+    public function setSharedUsers($userIds)
+    {
+        $this->sharedUsers = $userIds;
+    }
+
+    /**
+     * @param $id
+     */
+    public function addSharedGroup($id)
+    {
+        $this->sharedGroups[] = $id;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSharedGroups(): array
+    {
+        return $this->sharedGroups;
+    }
+
+    /**
+     * @param $groupIds
+     */
+    public function setSharedGroups($groupIds)
+    {
+        $this->sharedGroups = $groupIds;
     }
 }

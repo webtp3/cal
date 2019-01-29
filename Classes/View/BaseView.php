@@ -17,14 +17,20 @@ namespace TYPO3\CMS\Cal\View;
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarModel;
+use TYPO3\CMS\Cal\Model\CategoryModel;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
+use TYPO3\CMS\Cal\Model\TodoModel;
 use TYPO3\CMS\Cal\Service\BaseService;
+use TYPO3\CMS\Cal\Service\CalendarService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * Class BaseView
@@ -36,7 +42,19 @@ class BaseView extends BaseService
     public $viewarray;
     public $eventArray;
     public $legend = '';
-    public $local_cObj; // reference to a locally created cObject whos data is allowed to be altered and is used to render TS objects
+    protected $pointerName = '';
+
+    protected $cachedValueArray = [];
+
+    /**
+     * @var CharsetConverter
+     */
+    protected $cs_convert;
+
+    /**
+     * @var ContentObjectRenderer
+     */
+    public $local_cObj;
 
     /**
      * @var MarkerBasedTemplateService
@@ -55,7 +73,6 @@ class BaseView extends BaseService
      */
     public function _init(&$master_array)
     {
-        //store cs_convert-object
         $this->cs_convert = new CharsetConverter();
         $this->master_array = &$master_array;
         $this->initLocalCObject();
@@ -95,7 +112,7 @@ class BaseView extends BaseService
     public function getTomorrowsEventsMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###TOMORROWS_EVENTS###'] = '';
-        if ($this->conf['view.']['other.']['showTomorrowEvents'] == 1) {
+        if ((int)$this->conf['view.']['other.']['showTomorrowEvents'] === 1) {
             $rems['###TOMORROWS_EVENTS###'] = $this->tomorrows_events($this->markerBasedTemplateService->getSubpart(
                 $page,
                 '###TOMORROWS_EVENTS###'
@@ -113,7 +130,7 @@ class BaseView extends BaseService
     {
         $rems['###TODO###'] = '';
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        if ($this->rightsObj->isViewEnabled('todo') && $confArr['todoSubtype'] == 'todo') {
+        if ($confArr['todoSubtype'] === 'todo' && $this->rightsObj->isViewEnabled('todo')) {
             $dateObject = new CalDate($this->conf['getdate']);
             $pidList = $this->conf['pidList'];
             $todos = [];
@@ -150,6 +167,10 @@ class BaseView extends BaseService
                         $todoContent .= $todoTimeArray->renderEventFor($this->conf['view']);
                     } else {
                         foreach ($todoTimeArray as $key => $todoArray) {
+                            /**
+                             * @var int $todoUid
+                             * @var TodoModel $todo
+                             */
                             foreach ($todoArray as $todoUid => $todo) {
                                 if (is_object($todo)) {
                                     $todoContent .= $todo->renderEventFor($this->conf['view']);
@@ -178,7 +199,7 @@ class BaseView extends BaseService
     public function getUserLoginMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###USER_LOGIN###'] = '';
-        if ($this->conf['view.']['other.']['showLogin'] == 1) {
+        if ((int)$this->conf['view.']['other.']['showLogin'] === 1) {
             $local_sims = [];
             $local_rems = [];
             $parameter = ['view' => $this->conf['view'], $this->pointerName => null];
@@ -219,7 +240,7 @@ class BaseView extends BaseService
     public function getIcsLinkMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###ICS_LINK###'] = '';
-        if ($this->conf['view.']['ics.']['showIcsLinks'] == 1) {
+        if ((int)$this->conf['view.']['ics.']['showIcsLinks'] === 1) {
             $this->initLocalCObject();
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_calendar_icslink'));
             $this->local_cObj->data['link_wrap'] = str_replace(
@@ -249,7 +270,7 @@ class BaseView extends BaseService
     public function getSearchMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###SEARCH###'] = '';
-        if ($this->conf['view.']['other.']['showSearch'] == 1) {
+        if ((int)$this->conf['view.']['other.']['showSearch'] === 1) {
             $local_sims = [];
             $page = $this->replace_files($page, ['search_box' => $this->conf['view.']['other.']['searchBoxTemplate']]);
             $local_sims['###GETDATE###'] = $this->conf['getdate'];
@@ -286,14 +307,12 @@ class BaseView extends BaseService
     public function getJumpsMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###JUMPS###'] = '';
-        if ($this->conf['view.']['other.']['showJumps'] == 1) {
+        if ((int)$this->conf['view.']['other.']['showJumps'] === 1) {
             preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $this->conf['getdate'], $day_array2);
-            $this_day = $day_array2[3];
-            $this_month = $day_array2[2];
             $this_year = $day_array2[1];
             $temp_sims = [];
             $temp_sims['###LIST_JUMPS###'] = $this->list_jumps();
-            $temp_sims['###LIST_ICALS###'] = ''; //display_ical_list(availableCalendars($username, $password, $ALL_CALENDARS_COMBINED));
+            $temp_sims['###LIST_ICALS###'] = '';
             $temp_sims['###LIST_YEARS###'] = $this->list_years(
                 $this_year,
                 $this->conf['view.']['other.']['dateFormatYearJump']
@@ -319,7 +338,7 @@ class BaseView extends BaseService
      * @param string $s string to escape
      * @return string escaped string to use in JS variable contents
      */
-    public function escapeForJS($s)
+    public function escapeForJS($s): string
     {
         // escape all single & double quotes and backslashes
         return preg_replace('/(["\'\\\\])/', '\\\\$1', $s);
@@ -333,6 +352,7 @@ class BaseView extends BaseService
      */
     public function getCalendarSelectorMarker(&$page, &$sims, &$rems, &$wrapped)
     {
+        $calendarOptions = '';
         $rems['###CALENDAR_SELECTOR###'] = '';
         if ($this->conf['view.']['other.']['showCalendarSelection']) {
             $temp_sims = [];
@@ -348,7 +368,7 @@ class BaseView extends BaseService
             if (is_array($calendarArray)) {
                 $calendarOptions .= '<option value="0">' . $this->controller->pi_getLL('l_all_cal_comb_lang') . '</option>';
                 foreach ($calendarArray as $calendar) {
-                    if (in_array($calendar->row['uid'], $selectedCalendars)) {
+                    if (in_array($calendar->row['uid'], $selectedCalendars, true)) {
                         $calendarOptions .= '<option value="' . $calendar->row['uid'] . '" selected="selected">' . $calendar->getTitle() . '</option>';
                     } else {
                         $calendarOptions .= '<option value="' . $calendar->row['uid'] . '">' . $calendar->getTitle() . '</option>';
@@ -386,7 +406,7 @@ class BaseView extends BaseService
         // checking for a allowed view with '$this->rightsObj->isViewEnabled($viewParams['view'])' for a chash-validated backlink piVar seems a bit odd.
         // So I removed this check in order to ease website admins life to not have to care about allowedViews only to get backlinks working :)
         // Hope this doesn't break anything or opens up XSS leaks. Feel free to put it back in if in doubt.
-        if ($this->conf['view'] != $viewParams['view']) {
+        if ($this->conf['view'] !== $viewParams['view']) {
             $this->initLocalCObject();
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_back'));
             $this->local_cObj->data['view'] = $viewParams['view'];
@@ -432,22 +452,22 @@ class BaseView extends BaseService
         // set alternate rendering view, so that the rendering of the attached listView can be customized
         $tempAlternateRenderingView = $tx_cal_listview->conf['alternateRenderingView'];
         $renderingView = $this->conf['view.'][$this->conf['view'] . '.']['useListEventRenderSettingsView'];
-        $tx_cal_listview->conf['alternateRenderingView'] = $renderingView ? $renderingView : 'list';
+        $tx_cal_listview->conf['alternateRenderingView'] = $renderingView ?: 'list';
         $listSubpart = $this->markerBasedTemplateService->getSubpart($page, '###LIST###');
 
-        if ($this->conf['view'] == 'month' && $this->conf['view.']['month.']['showListInMonthView']) {
+        if ($this->conf['view'] === 'month' && $this->conf['view.']['month.']['showListInMonthView']) {
             $starttime = Calendar::calculateStartMonthTime($starttime);
             $endtime = Calendar::calculateEndMonthTime($starttime);
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listSubpart, $starttime, $endtime);
-        } elseif ($this->conf['view'] == 'day') {
+        } elseif ($this->conf['view'] === 'day') {
             $starttime = Calendar::calculateStartDayTime($starttime);
             $endtime = Calendar::calculateEndDayTime($starttime);
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listSubpart, $starttime, $endtime);
-        } elseif ($this->conf['view'] == 'week') {
+        } elseif ($this->conf['view'] === 'week') {
             $starttime = Calendar::calculateStartWeekTime($starttime);
             $endtime = Calendar::calculateEndWeekTime($starttime);
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listSubpart, $starttime, $endtime);
-        } elseif ($this->conf['view'] == 'year') {
+        } elseif ($this->conf['view'] === 'year') {
             $starttime = Calendar::calculateStartYearTime($starttime);
             $endtime = Calendar::calculateEndYearTime($starttime);
             $rems['###LIST###'] = $tx_cal_listview->drawList($this->master_array, $listSubpart, $starttime, $endtime);
@@ -496,7 +516,7 @@ class BaseView extends BaseService
             $now = new CalDate();
             $now->setTZbyID('UTC');
 
-            if ($this->conf['getdate'] != $now->format('%Y%m%d')) {
+            if ($this->conf['getdate'] !== $now->format('%Y%m%d')) {
                 $cal_time_obj = new CalDate($this->conf['getdate'] . '000000');
                 $cal_time_obj->setTZbyID('UTC');
             } else {
@@ -521,7 +541,7 @@ class BaseView extends BaseService
     /**
      * @param $view
      * @param $wrap
-     * @param $cal_time_obj
+     * @param CalDate $cal_time_obj
      * @param $createOffset
      * @param $isAllowedToCreateEvent
      * @param $remember
@@ -538,7 +558,7 @@ class BaseView extends BaseService
         $remember,
         $class,
         $time
-    ) {
+    ): string {
         $tmp = '';
         if (!$this->rightsObj->isViewEnabled('create_event')) {
             if ($this->conf['view.']['enableAjax']) {
@@ -553,7 +573,7 @@ class BaseView extends BaseService
             $now->setHour(23);
             $now->setMinute(59);
         }
-        if (($cal_time_obj->after($now) || $this->rightsObj->isAllowedToCreateEventInPast()) && $isAllowedToCreateEvent) {
+        if ($isAllowedToCreateEvent && ($cal_time_obj->after($now) || $this->rightsObj->isAllowedToCreateEventInPast())) {
             $this->initLocalCObject();
             if ($this->conf['view.']['enableAjax']) {
                 $this->local_cObj->setCurrentVal($this->conf['view.'][$view . '.']['event.']['addIcon']);
@@ -585,12 +605,10 @@ class BaseView extends BaseService
                 }
             } else {
                 $this->local_cObj->setCurrentVal($this->conf['view.'][$view . '.']['event.']['addIcon']);
-                //$linkConf = Array();
-                //$this->local_cObj->data['link_useCacheHash'] = 0;
                 $this->local_cObj->data['link_no_cache'] = 1;
                 $this->local_cObj->data['link_additionalParams'] = '&tx_cal_controller[gettime]=' . $time . '&tx_cal_controller[getdate]=' . $cal_time_obj->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView() . '&tx_cal_controller[view]=create_event';
                 $this->local_cObj->data['link_section'] = 'default';
-                $this->local_cObj->data['link_parameter'] = $this->conf['view.']['event.']['createEventViewPid'] ? $this->conf['view.']['event.']['createEventViewPid'] : $GLOBALS['TSFE']->id;
+                $this->local_cObj->data['link_parameter'] = $this->conf['view.']['event.']['createEventViewPid'] ?: $GLOBALS['TSFE']->id;
                 $tmp .= $this->local_cObj->cObjGetSingle(
                     $this->conf['view.'][$view . '.']['event.']['addLink'],
                     $this->conf['view.'][$view . '.']['event.']['addLink.']
@@ -599,12 +617,10 @@ class BaseView extends BaseService
                     $tmp = sprintf($wrap, $remember, $class, $tmp, $cal_time_obj->format('%Y %m %d %H %M %s'));
                 }
             }
+        } elseif ($this->conf['view.']['enableAjax']) {
+            $tmp = sprintf($wrap, $remember, $class, '');
         } else {
-            if ($this->conf['view.']['enableAjax']) {
-                $tmp = sprintf($wrap, $remember, $class, '');
-            } else {
-                $tmp = sprintf($wrap, $remember, $class, '');
-            }
+            $tmp = sprintf($wrap, $remember, $class, '');
         }
         return $tmp;
     }
@@ -721,11 +737,12 @@ class BaseView extends BaseService
         $calendarIds = [];
         foreach ($deselectedCalendarIds as $calendarUid) {
             $calendarIds[] = $calendarUid;
+            /** @var Calendar $calendar */
             $calendar = $this->modelObj->findCalendar($calendarUid, 'tx_cal_calendar', $this->conf['pidList']);
             $ajaxString .= 'var tmpCal' . $calendar->getUid() . ' = new Array();';
             $calendarValues = $calendar->getValuesAsArray();
             foreach ($calendarValues as $key => $value) {
-                if ($key != 'l18n_diffsource') {
+                if ($key !== 'l18n_diffsource') {
                     $ajaxString .= 'tmpCal' . $calendar->getUid() . '[\'' . $key . '\']=' . '\'' . $value . '\';';
                 }
             }
@@ -737,9 +754,9 @@ class BaseView extends BaseService
         foreach ($calendarArray['tx_cal_calendar'] as $calendar) {
             $ajaxString .= 'var tmpCal' . $calendar->getUid() . ' = new Array();';
             $calendarValues = $calendar->getValuesAsArray();
-            if (!in_array($calendar->getUid(), $calendarIds)) {
+            if (!in_array($calendar->getUid(), $calendarIds, true)) {
                 foreach ($calendarValues as $key => $value) {
-                    if ($key != 'l18n_diffsource') {
+                    if ($key !== 'l18n_diffsource') {
                         $ajaxString .= 'tmpCal' . $calendar->getUid() . '[\'' . $key . '\']=' . '\'' . $value . '\';';
                     }
                 }
@@ -823,30 +840,26 @@ class BaseView extends BaseService
      */
     public function getMarker(& $template, & $sims, & $rems, & $wrapped, $view = '')
     {
-        if ($view == '') {
+        if ($view === '') {
             $view = $this->conf['view'];
         }
         preg_match_all('!\<\!--[a-zA-Z0-9 ]*###([A-Z0-9_-|]*)\###[a-zA-Z0-9 ]*-->!is', $template, $match);
         $allMarkers = array_unique($match[1]);
 
         foreach ($allMarkers as $marker) {
-            switch ($marker) {
-                default:
-                    if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
-                        $module = GeneralUtility:: makeInstanceService(substr($marker, 8), 'module');
-                        if (is_object($module)) {
-                            $rems['###' . $marker . '###'] = $module->start($this);
-                        }
-                    }
-                    $funcFromMarker = 'get' . str_replace(
-                            ' ',
-                            '',
-                            ucwords(str_replace('_', ' ', strtolower($marker)))
-                        ) . 'Marker';
-                    if (method_exists($this, $funcFromMarker)) {
-                        $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
-                    }
-                    break;
+            if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
+                $module = GeneralUtility:: makeInstanceService(substr($marker, 8), 'module');
+                if (is_object($module)) {
+                    $rems['###' . $marker . '###'] = $module->start($this);
+                }
+            }
+            $funcFromMarker = 'get' . str_replace(
+                    ' ',
+                    '',
+                    ucwords(str_replace('_', ' ', strtolower($marker)))
+                ) . 'Marker';
+            if (method_exists($this, $funcFromMarker)) {
+                $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
             }
         }
 
@@ -856,55 +869,39 @@ class BaseView extends BaseService
         $allSingleMarkers = array_diff($allSingleMarkers, $allMarkers);
 
         foreach ($allSingleMarkers as $marker) {
-            switch ($marker) {
-                case 'IMG_PATH':
-                    //do nothing. we replace it at the end
-                    break;
-                default:
-                    /* not needed here anymore. Label markers do now get processed in the main controller
-                    if(preg_match('/.*_LABEL/',$marker)){
-                        $sims['###'.$marker.'###'] = $this->controller->pi_getLL('l_'.strtolower(substr($marker,0,strlen($marker)-6)));
-                        continue;
+            if ($marker !== 'IMG_PATH') {
+                if (preg_match('/.*_LABEL$/', $marker) || preg_match('/^L_.*/', $marker)) {
+                    continue;
+                }
+                $funcFromMarker = 'get' . str_replace(
+                        ' ',
+                        '',
+                        ucwords(str_replace('_', ' ', strtolower($marker)))
+                    ) . 'Marker';
+                if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
+                    $module = GeneralUtility:: makeInstanceService(substr($marker, 8), 'module');
+                    if (is_object($module)) {
+                        $sims['###' . $marker . '###'] = $module->start($this);
                     }
-                    if(preg_match('/L_.* /',$marker)){
-                        #$sims['###'.$marker.'###'] = $this->controller->pi_getLL(strtolower($marker));
-                        continue;
+                } elseif (method_exists($this, $funcFromMarker)) {
+                    $this->$funcFromMarker($template, $sims, $rems, $view);
+                } elseif (preg_match('/MODULE__([A-Z0-9_-|])*/', $marker)) {
+                    $tmp = explode('___', substr($marker, 8));
+                    $modules[$tmp[0]][] = $tmp[1];
+                } elseif ($this->conf['view.'][$view . '.'][strtolower($marker)]) {
+                    $this->initLocalCObject();
+                    $current = '';
+                    if ($this->row[strtolower($marker)] !== '') {
+                        $current = $this->row[strtolower($marker)];
                     }
-                    */
-                    // if marker is a label - skip it
-                    if (preg_match('/.*_LABEL$/', $marker) || preg_match('/^L_.*/', $marker)) {
-                        continue;
-                    }
-                    $funcFromMarker = 'get' . str_replace(
-                            ' ',
-                            '',
-                            ucwords(str_replace('_', ' ', strtolower($marker)))
-                        ) . 'Marker';
-                    if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
-                        $module = GeneralUtility:: makeInstanceService(substr($marker, 8), 'module');
-                        if (is_object($module)) {
-                            $sims['###' . $marker . '###'] = $module->start($this);
-                        }
-                    } elseif (method_exists($this, $funcFromMarker)) {
-                        $this->$funcFromMarker($template, $sims, $rems, $view);
-                    } elseif (preg_match('/MODULE__([A-Z0-9_-|])*/', $marker)) {
-                        $tmp = explode('___', substr($marker, 8));
-                        $modules[$tmp[0]][] = $tmp[1];
-                    } elseif ($this->conf['view.'][$view . '.'][strtolower($marker)]) {
-                        $this->initLocalCObject();
-                        $current = '';
-                        if ($this->row[strtolower($marker)] != '') {
-                            $current = $this->row[strtolower($marker)];
-                        }
-                        $this->local_cObj->setCurrentVal($current);
-                        $sims['###' . $marker . '###'] = $this->local_cObj->cObjGetSingle(
-                            $this->conf['view.'][$view . '.'][strtolower($marker)],
-                            $this->conf['view.'][$view . '.'][strtolower($marker) . '.']
-                        );
-                    } else {
-                        $sims['###' . $marker . '###'] = '';
-                    }
-                    break;
+                    $this->local_cObj->setCurrentVal($current);
+                    $sims['###' . $marker . '###'] = $this->local_cObj->cObjGetSingle(
+                        $this->conf['view.'][$view . '.'][strtolower($marker)],
+                        $this->conf['view.'][$view . '.'][strtolower($marker) . '.']
+                    );
+                } else {
+                    $sims['###' . $marker . '###'] = '';
+                }
             }
         }
 
@@ -914,11 +911,11 @@ class BaseView extends BaseService
         //this allows to spread the Module-Markers over complete template instead of one time
         //also work with old way of MODULE__-Marker
 
-        if (is_array($modules)) {  //MODULE-MARKER FOUND
+        if (isset($modules)) {  //MODULE-MARKER FOUND
             foreach ($modules as $themodule => $markerArray) {
                 $module = GeneralUtility:: makeInstanceService($themodule, 'module');
                 if (is_object($module)) {
-                    if ($markerArray[0] == '') {
+                    if ($markerArray[0] === '') {
                         $sims['###MODULE__' . $themodule . '###'] = $module->start($this); //old way
                     } else {
                         $moduleMarker = $module->start($this); // get Markerarray from Module
@@ -973,7 +970,7 @@ class BaseView extends BaseService
      * @param $page
      * @return string
      */
-    public function replaceViewMarker($page)
+    public function replaceViewMarker($page): string
     {
         $next_day = new CalDate();
         $next_day->copy($this->controller->getDateTimeObject);
@@ -1035,10 +1032,10 @@ class BaseView extends BaseService
 
         $this->initLocalCObject();
 
-        $dayViewPid = $this->conf['view.']['day.']['dayViewPid'] ? $this->conf['view.']['day.']['dayViewPid'] : false;
-        $weekViewPid = $this->conf['view.']['week.']['weekViewPid'] ? $this->conf['view.']['week.']['weekViewPid'] : false;
-        $monthViewPid = $this->conf['view.']['month.']['monthViewPid'] ? $this->conf['view.']['month.']['monthViewPid'] : false;
-        $yearViewPid = $this->conf['view.']['year.']['yearViewPid'] ? $this->conf['view.']['year.']['yearViewPid'] : false;
+        $dayViewPid = $this->conf['view.']['day.']['dayViewPid'] ?: false;
+        $weekViewPid = $this->conf['view.']['week.']['weekViewPid'] ?: false;
+        $monthViewPid = $this->conf['view.']['month.']['monthViewPid'] ?: false;
+        $yearViewPid = $this->conf['view.']['year.']['yearViewPid'] ?: false;
 
         // next day
         $nextdaylinktext = $this->markerBasedTemplateService->getSubpart($page, '###NEXT_DAYLINKTEXT###');
@@ -1199,10 +1196,10 @@ class BaseView extends BaseService
             $i = 0;
             foreach ($match[1] as $key => $val) {
                 $offset = $match[2][$i] . $match[3][$i];
-                if ($match[1][$i] == 'SMALL') {
+                if ($match[1][$i] === 'SMALL') {
                     $template_file = Functions::getContent($this->conf['view.']['month.']['monthSmallTemplate']);
                     $type = 'small';
-                } elseif ($match[1][$i] == 'MEDIUM') {
+                } elseif ($match[1][$i] === 'MEDIUM') {
                     $template_file = Functions::getContent($this->conf['view.']['month.']['monthMediumTemplate']);
                     $type = 'medium';
                 } else {
@@ -1235,7 +1232,7 @@ class BaseView extends BaseService
 
                 // This opens up another template and parses it as well.
                 $data = $GLOBALS['TSFE']->tmpl->getFileName($data);
-                $data = (file_exists($data)) ? Functions::getContent($data) : $data;
+                $data = file_exists($data) ? Functions::getContent($data) : $data;
                 // This removes any unfilled tags
                 if (!$data) {
                     $page = preg_replace(
@@ -1266,9 +1263,9 @@ class BaseView extends BaseService
         $viewMarker = '###' . strtoupper($view) . 'VIEWLINK###';
         $viewTarget = $this->conf['view.'][strtolower($view) . 'LinkTarget'];
         $rems[$viewMarker] = '';
-        if ($this->rightsObj->isViewEnabled($viewTarget) || $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']) {
+        if ($this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid'] || $this->rightsObj->isViewEnabled($viewTarget)) {
             $this->initLocalCObject();
-            if ($viewTarget == $this->conf['view']) {
+            if ($viewTarget === $this->conf['view']) {
                 $this->local_cObj->data['link_ATagParams'] = 'class="current"';
             }
             $this->local_cObj->setCurrentVal($this->markerBasedTemplateService->getSubpart(
@@ -1276,9 +1273,9 @@ class BaseView extends BaseService
                 '###' . strtoupper($view) . 'VIEWLINKTEXT###'
             ));
             $this->local_cObj->data['view'] = $viewTarget;
-            if ($viewTarget == 'week' && DATE_CALC_BEGIN_WEEKDAY == 0) {
+            if ($viewTarget === 'week' && DATE_CALC_BEGIN_WEEKDAY === 0) {
                 $date = new CalDate($this->conf['getdate']);
-                if ($date->format('%w') == 0) {
+                if ((int)$date->format('%w') === 0) {
                     $date->addSeconds(86400);
                 }
                 $this->controller->getParametersForTyposcriptLink(
@@ -1362,7 +1359,7 @@ class BaseView extends BaseService
     /**
      * @return string
      */
-    public function list_jumps()
+    public function list_jumps(): string
     {
         $day_array2 = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $getdate, $day_array2);
@@ -1384,7 +1381,7 @@ class BaseView extends BaseService
      * @param $view
      * @return string
      */
-    public function createJumpEntry($view)
+    public function createJumpEntry($view): string
     {
         $viewTarget = $this->conf['view.'][strtolower($view) . 'LinkTarget'];
         if (!empty($this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid'])) {
@@ -1437,7 +1434,7 @@ class BaseView extends BaseService
      * @param $conf
      * @return string
      */
-    public function getMonthMenu($conf)
+    public function getMonthMenu($conf): string
     {
         // gmdate is ok.
         if ($conf['monthStart.']['thisMonth']) {
@@ -1449,17 +1446,16 @@ class BaseView extends BaseService
             $month_time->setMonth($this->local_cObj->cObjGetSingle($conf['monthStart'], $conf['monthStart.']));
             $this->initLocalCObject();
             $month_time->setYear($this->local_cObj->cObjGetSingle($conf['yearStart'], $conf['yearStart.']));
-            $month = $conf['monthStart'];
-            $year = $conf['yearStart'];
         }
 
+        $return = '';
         for ($i = 0; $i < $conf['count']; $i++) {
             $monthdate = $month_time->format('%Y%m%d');
             $select_month = $month_time->format($conf['format']);
 
             $this->initLocalCObject();
             $this->local_cObj->setCurrentVal($select_month);
-            if ($this->rightsObj->isViewEnabled('month') || $this->conf['view.']['month.']['monthViewPid']) {
+            if ($this->conf['view.']['month.']['monthViewPid'] || $this->rightsObj->isViewEnabled('month')) {
                 $this->controller->getParametersForTyposcriptLink(
                     $this->local_cObj->data,
                     ['getdate' => $monthdate, 'view' => 'month', $this->pointerName => null],
@@ -1497,16 +1493,15 @@ class BaseView extends BaseService
             $year_time = Calendar::calculateStartYearTime();
             $this->initLocalCObject();
             $year_time->setYear($this->local_cObj->cObjGetSingle($conf['yearStart'], $conf['yearStart.']));
-            $year = $conf['yearStart'];
         }
-
+        $return = '';
         for ($i = 0; $i < $conf['count']; $i++) {
             $yeardate = $year_time->format('%Y%m%d');
             $select_year = $year_time->format($conf['format']);
 
             $this->initLocalCObject();
             $this->local_cObj->setCurrentVal($select_year);
-            if ($this->rightsObj->isViewEnabled('year') || $this->conf['view.']['year.']['yearViewPid']) {
+            if ($this->conf['view.']['year.']['yearViewPid'] || $this->rightsObj->isViewEnabled('year')) {
                 $this->controller->getParametersForTyposcriptLink(
                     $this->local_cObj->data,
                     ['getdate' => $yeardate, 'view' => 'year', $this->pointerName => null],
@@ -1533,7 +1528,7 @@ class BaseView extends BaseService
      * @param bool $renderAsForm
      * @return string
      */
-    public function getCategorySelectionTree($treeConf, $categoryArray, $renderAsForm = false)
+    public function getCategorySelectionTree($treeConf, $categoryArray, $renderAsForm = false): string
     {
         $treeHtml = '';
         foreach ($categoryArray as $categoryServiceKey => $categoryServiceResult) {
@@ -1542,6 +1537,7 @@ class BaseView extends BaseService
                 $categoryArrayByCalendarUid = $modelCategoryArray[2];
 
                 $parentCategoryArray = [];
+                /** @var CalendarModel $category */
                 foreach ($categoryArrayByUid as $category) {
                     $parentCategoryArray[$category->getParentUid()][] = $category;
                 }
@@ -1551,7 +1547,7 @@ class BaseView extends BaseService
                     $calendarTitle = $calendarParams[1];
                     $calendarUid = $calendarParams[0];
                     if ($calendarParams[2]) {
-                        $calendarType = $calendarParams[2];
+                        /** @var CalendarService $calendarService */
                         $calendarService = &$this->modelObj->getServiceObjByKey(
                             'cal_calendar_model',
                             'calendar',
@@ -1561,9 +1557,9 @@ class BaseView extends BaseService
                         $calendarTitle = $calendar->getTitle();//.$calendar->getEditLink();
                     }
 
-                    if (intval($treeConf['calendar']) == $treeConf['calendar']) {
+                    if (intval($treeConf['calendar']) === $treeConf['calendar']) {
                         $ids = explode(',', $treeConf['calendar']);
-                        if (!in_array($calendarUid, $ids)) {
+                        if (!in_array($calendarUid, $ids, true)) {
                             continue;
                         }
                     } else {
@@ -1575,8 +1571,9 @@ class BaseView extends BaseService
                         $treeHtml .= $this->cObj->stdWrap($treeConf['emptyElement'], $treeConf['emptyElement.']);
                     } else {
                         foreach ($calendarCategoryArray as $rootCategoryId) {
+                            /** @var CategoryModel $rootCategory */
                             $rootCategory = $categoryArrayByUid[$rootCategoryId];
-                            if ($rootCategory->getParentUid() == 0 || !$categoryArrayByUid[$rootCategory->getParentUid()]) {
+                            if ($rootCategory->getParentUid() === 0 || !$categoryArrayByUid[$rootCategory->getParentUid()]) {
                                 $treeHtml .= $this->cObj->stdWrap($this->addSubCategory(
                                     $treeConf,
                                     $parentCategoryArray,
@@ -1600,7 +1597,7 @@ class BaseView extends BaseService
     /**
      * @param $treeConf
      * @param $parentCategoryArray
-     * @param $parentCategory
+     * @param CategoryModel $parentCategory
      * @param $level
      * @param $renderAsForm
      * @return mixed|string
@@ -1611,22 +1608,23 @@ class BaseView extends BaseService
         $treeHtml = '';
         if ($renderAsForm) {
             $selectedCategories = [];
-            if ($treeConf['category'] != '') {
+            if ($treeConf['category'] !== '') {
                 $selectedCategories = explode(',', $treeConf['category']);
             }
             if ($treeConf['selector.']) {
                 $treeHtml .= $this->cObj->stdWrap(
                     ((in_array(
-                            $parentCategory->getUid(),
-                            $selectedCategories
-                        ) || empty($selectedCategories)) ? ' checked="checked"' : ''),
+                        $parentCategory->getUid(),
+                        $selectedCategories,
+                            true
+                    ) || empty($selectedCategories)) ? ' checked="checked"' : ''),
                     $treeConf['selector.']
                 );
             } else {
                 $catValues = $parentCategory->getValuesAsArray();
                 $allowedCategoryArray = GeneralUtility::trimExplode(',', $this->conf['view.']['category'], 1);
                 $notSelectedCategories = array_diff($allowedCategoryArray, $selectedCategories);
-                if (in_array($parentCategory->getUid(), $selectedCategories) && !empty($notSelectedCategories)) {
+                if (!empty($notSelectedCategories) && in_array($parentCategory->getUid(), $selectedCategories, true)) {
                     $catValues['cur'] = 1;
                 }
                 $this->initLocalCObject($catValues);
@@ -1708,9 +1706,9 @@ class BaseView extends BaseService
      * @param $dateFormat_month
      * @return string
      */
-    public function list_months($this_year, $dateFormat_month)
+    public function list_months($this_year, $dateFormat_month): string
     {
-        if ($this->conf['view.']['other.']['listMonth_referenceToday'] == 1) {
+        if ((int)$this->conf['view.']['other.']['listMonth_referenceToday'] === 1) {
             $this_year = strftime('%Y');
         }
 
@@ -1722,10 +1720,9 @@ class BaseView extends BaseService
         if ($this->conf['view.']['other.']['listMonth_onlyShowCurrentYear']) {
             $month = 1;
             $monthSize = 12;
-            $monthOffset = $monthSize - $this_month;
         } else {
             $monthSize = intval($this->conf['view.']['other.']['listMonth_totalMonthCount']);
-            $monthSize = $monthSize ? $monthSize : 12; // ensure valid data
+            $monthSize = $monthSize ?: 12; // ensure valid data
 
             $monthOffset = intval($this->conf['view.']['other.']['listMonth_previousMonthCount']);
             $monthOffset = ($monthOffset < $monthSize) ? $monthOffset : intval($monthSize / 2);
@@ -1741,6 +1738,8 @@ class BaseView extends BaseService
         $month_time->setDay(1);
         $month_time->setMonth($month);
         $month_time->setYear($this_year);
+
+        $return = '';
 
         for ($i = 0; $i < $monthSize; $i++) {
             $monthdate = $month_time->format('%Y%m%d');
@@ -1767,7 +1766,7 @@ class BaseView extends BaseService
             }
             $link = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $link;
 
-            if ($month_month == $this_month) {
+            if ($month_month === $this_month) {
                 $tmp = $this->cObj->stdWrap($link, $this->conf['view.']['other.']['listMonthSelected_stdWrap.']);
                 $return .= str_replace('###MONTH###', $select_month, $tmp);
             } else {
@@ -1785,25 +1784,22 @@ class BaseView extends BaseService
      * @param $dateFormat
      * @return string
      */
-    public function list_years($this_year, $dateFormat)
+    public function list_years($this_year, $dateFormat): string
     {
         $viewTarget = $this->conf['view.']['yearLinkTarget'];
         $day_array2 = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $this->conf['getdate'], $day_array2);
-        $this_day = $day_array2[3];
-        $this_month = $day_array2[2];
-        $this_year = $day_array2[1];
-        $unix_time = gmmktime(0, 0, 0, $this_month, $this_day, $this_year);
+        list($this_year, $this_month, $this_day) = $day_array2;
 
         $yearSize = intval($this->conf['view.']['other.']['listYear_totalYearCount']);
-        $yearSize = $yearSize ? $yearSize : 3; // ensure valid data
+        $yearSize = $yearSize ?: 3; // ensure valid data
 
         $yearOffset = intval($this->conf['view.']['other.']['listYear_previousYearCount']);
         $yearOffset = ($yearOffset < $yearSize) ? $yearOffset : intval($yearSize / 2);
 
         $currentYear = $this_year - $yearOffset;
 
-        $getdate_year = strftime($dateFormat, $unix_time);
+        $return = '';
 
         for ($i = 0; $i < $yearSize; $i++) {
             $date = $currentYear . $this_month . $this_day;
@@ -1828,7 +1824,7 @@ class BaseView extends BaseService
                 ], $this->conf['cache'], $this->conf['clear_anyway']);
             }
             $link = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $link;
-            if ($currentYear == $this_year) {
+            if ($currentYear === $this_year) {
                 $tmp = $this->cObj->stdWrap($link, $this->conf['view.']['other.']['listYearSelected_stdWrap.']);
             } else {
                 $tmp = $this->cObj->stdWrap($link, $this->conf['view.']['other.']['listYear_stdWrap.']);
@@ -1846,7 +1842,7 @@ class BaseView extends BaseService
      * @param $dateFormat_week_jump
      * @return string
      */
-    public function list_weeks($this_year, $dateFormat_week_jump)
+    public function list_weeks($this_year, $dateFormat_week_jump): string
     {
         $viewTarget = $this->conf['view.']['weekLinkTarget'];
 
@@ -1857,7 +1853,7 @@ class BaseView extends BaseService
             $start_week_time->setTZbyID('UTC');
         } else {
             $weekSize = intval($this->conf['view.']['other.']['listWeek_totalWeekCount']);
-            $weekSize = $weekSize ? $weekSize : 10; // ensure valid data
+            $weekSize = $weekSize ?: 10; // ensure valid data
 
             $weekOffset = intval($this->conf['view.']['other.']['listWeek_previousWeekCount']);
             $weekOffset = ($weekOffset < $weekSize) ? $weekOffset : intval($weekSize / 2);
@@ -1870,6 +1866,9 @@ class BaseView extends BaseService
         $start_week_time = Calendar::calculateStartWeekTime($start_week_time);
         $end_week_time = Calendar::calculateEndWeekTime($start_week_time);
         $formattedGetdate = intval($this->conf['getdate']);
+
+        $return = '';
+
         for ($i = 0; $i < $weekSize; $i++) {
             $weekdate = $start_week_time->format('%Y%m%d');
             $select_week1 = $start_week_time->format($dateFormat_week_jump);
@@ -1933,6 +1932,10 @@ class BaseView extends BaseService
             $replace_ad = '';
             $replace_e = '';
             foreach ($this->master_array[$next_day] as $cal_time => $event_times) {
+                /**
+                 * @var int $uid
+                 * @var EventModel $event
+                 */
                 foreach ($event_times as $uid => $event) {
                     $wrapped['###EVENT_LINK###'] = explode(
                         '|',
@@ -1945,7 +1948,7 @@ class BaseView extends BaseService
                     );
                     $return = $wrapped['###EVENT_LINK###'][0] . $event->renderTomorrowsEvent() . $wrapped['###EVENT_LINK###'][1];
                     $eventStart = $event->getStart();
-                    if ($eventStart->getHour() == 0 && $eventStart->getMinute() == 0) {
+                    if ($eventStart->getHour() === 0 && $eventStart->getMinute() === 0) {
                         $replace_ad .= $return;
                     } else {
                         $replace_e .= $return;
@@ -1966,7 +1969,7 @@ class BaseView extends BaseService
      * @param $eventFreq
      * @return string
      */
-    public function getFreq($eventFreq)
+    public function getFreq($eventFreq): string
     {
         $freq_type = '';
         switch ($eventFreq) {
@@ -2000,7 +2003,7 @@ class BaseView extends BaseService
      * @param $type
      * @return string
      */
-    public function _draw_month_new($offset = '+0', $type)
+    public function _draw_month_new($offset, $type): string
     {
         if (preg_match('![+|-][0-9]{1,2}!is', $offset)) { // new one
             $monthDate = new CalDate();
@@ -2057,16 +2060,16 @@ class BaseView extends BaseService
 
     /**
      * Draws the month view
-     * @param        $page    string        The page template
-     * @param        $offset    integer        The month offset. Default = +0
-     * @param        $type    integer        The date of the event
+     * @param string       $page    string        The page template
+     * @param string $offset integer        The month offset. Default = +0
+     * @param  int      $type    integer        The date of the event
      * @return        string        The HTML output.
      */
-    public function _draw_month($page, $offset = '+0', $type)
+    public function _draw_month($page, $offset, $type): string
     {
         $viewTarget = $this->conf['view.']['monthLinkTarget'];
         $monthTemplate = $this->markerBasedTemplateService->getSubpart($page, '###MONTH_TEMPLATE###');
-        if ($monthTemplate != '') {
+        if ($monthTemplate !== '') {
             $loop_wd = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###LOOPWEEKDAY###');
             $t_month = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###SWITCHMONTHDAY###');
             $startweek = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###LOOPMONTHWEEKS_DAYS###');
@@ -2074,11 +2077,6 @@ class BaseView extends BaseService
             $weeknum = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###LOOPWEEK_NUMS###');
             $corner = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###CORNER###');
 
-            /* 11.12.2008 Franz:
-            * why is there a limitation that only MEDIUM calendar sheets can have absolute offsets and vice versa?
-            * I'm commenting this out and make it more flexible.
-            */
-            //if ($type != 'medium') {  // old one
             if (preg_match('![+|-][0-9]{1,2}!is', $offset)) { // new one
                 $fake_getdate_time = new CalDate();
                 $fake_getdate_time->copy($this->controller->getDateTimeObject);
@@ -2096,7 +2094,6 @@ class BaseView extends BaseService
             }
 
             $minical_month = $fake_getdate_time->getMonth();
-            $minical_year = $fake_getdate_time->getYear();
             $today = new CalDate();
 
             $month_title = $fake_getdate_time->format($this->conf['view.'][$viewTarget . '.']['dateFormatMonth']);
@@ -2130,6 +2127,7 @@ class BaseView extends BaseService
                             $arrayOfEvents = &$dateArray[$timeKey];
                             $eventKeys = array_keys($arrayOfEvents);
                             foreach ($eventKeys as $eventKey) {
+                                /** @var EventModel $event */
                                 $event = &$arrayOfEvents[$eventKey];
                                 $eventReferenceKey = $dateKey . '_' . $event->getType() . '_' . $event->getUid() . '_' . $event->getStart()->format('%Y%m%d%H%M%S');
                                 $this->eventArray[$eventReferenceKey] = &$event;
@@ -2137,7 +2135,7 @@ class BaseView extends BaseService
                                 $starttime->copy($event->getStart());
                                 $endtime = new CalDate();
                                 $endtime->copy($event->getEnd());
-                                if ($timeKey == '-1') {
+                                if ($timeKey === '-1') {
                                     $endtime->addSeconds(1); // needed to let allday events show up
                                 }
                                 $j = new CalDate();
@@ -2162,6 +2160,8 @@ class BaseView extends BaseService
 
             $dateOfWeek = Calc::beginOfWeek(15, $fake_getdate_time->getMonth(), $fake_getdate_time->getYear());
             $start_day = new CalDate($dateOfWeek . '000000');
+
+            $weekday_loop = '';
 
             // backwardscompatibility with old templates
             if (!empty($corner)) {
@@ -2195,7 +2195,7 @@ class BaseView extends BaseService
                     '###WEEKDAY###' => $weekday,
                     '###WEEKDAY_LONG###' => $weekdayLong,
                     '###ADDITIONAL_CLASSES###' => ' ' . $additionalClasses,
-                    '###CLASSES###' => (!empty($additionalClasses) ? ' class="' . $additionalClasses . '" ' : ''),
+                    '###CLASSES###' => !empty($additionalClasses) ? ' class="' . $additionalClasses . '" ' : '',
                 ];
                 $weekday_loop .= strtr($loop_wd, $markerArray);
             }
@@ -2219,6 +2219,8 @@ class BaseView extends BaseService
 
             $formattedWeekStartTime = $startWeekTime->format('%Y%m%d');
             $formattedWeekEndTime = $endWeekTime->format('%Y%m%d');
+            $middle = '';
+
             do {
                 $daylink = new CalDate();
                 $daylink->copy($start_day);
@@ -2232,17 +2234,17 @@ class BaseView extends BaseService
                     $isSelectedWeek = true;
                 }
 
-                if ($start_day->format('%Y%U') == $today->format('%Y%U')) {
+                if ($start_day->format('%Y%U') === $today->format('%Y%U')) {
                     $isCurrentWeek = true;
                 }
 
-                if ($i == 0 && !empty($weeknum)) {
+                if ($i === 0 && !empty($weeknum)) {
                     $start_day->addSeconds(86400);
                     $num = $numPlain = $start_day->getWeekOfYear();
                     $hasEvent = false;
                     $start_day->subtractSeconds(86400);
                     for ($j = 0; $j < 7; $j++) {
-                        if (is_array($this->viewarray[$start_day->format('%Y%m%d')]) || $isAllowedToCreateEvent) {
+                        if ($isAllowedToCreateEvent || is_array($this->viewarray[$start_day->format('%Y%m%d')])) {
                             $hasEvent = true;
                             break;
                         }
@@ -2250,7 +2252,7 @@ class BaseView extends BaseService
                     }
                     $start_day->copy($daylink);
                     $weekLinkViewTarget = $this->conf['view.']['weekLinkTarget'];
-                    if (($this->rightsObj->isViewEnabled($weekLinkViewTarget) || $this->conf['view.'][$weekLinkViewTarget . '.'][$weekLinkViewTarget . 'ViewPid']) && $hasEvent) {
+                    if ($hasEvent && ($this->rightsObj->isViewEnabled($weekLinkViewTarget) || $this->conf['view.'][$weekLinkViewTarget . '.'][$weekLinkViewTarget . 'ViewPid'])) {
                         $this->initLocalCObject();
                         $this->local_cObj->setCurrentVal($num);
                         $this->local_cObj->data['view'] = $weekLinkViewTarget;
@@ -2280,8 +2282,8 @@ class BaseView extends BaseService
 
                     $weekClasses = trim(implode(' ', $className));
                     $markerArray = [
-                        '###ADDITIONAL_CLASSES###' => ($weekClasses ? ' ' . $weekClasses : ''),
-                        '###CLASSES###' => ($weekClasses ? ' class="' . $weekClasses . '" ' : ''),
+                        '###ADDITIONAL_CLASSES###' => $weekClasses ? ' ' . $weekClasses : '',
+                        '###CLASSES###' => $weekClasses ? ' class="' . $weekClasses . '" ' : '',
                         '###WEEKNUM###' => $num,
                         '###WEEKNUM_PLAIN###' => $numPlain,
                     ];
@@ -2338,22 +2340,22 @@ class BaseView extends BaseService
                 }
                 $style[] = $this->conf['view.']['month.']['month' . ucfirst($type) . 'Style'];
 
-                if ($check_month != $minical_month) {
+                if ($check_month !== $minical_month) {
                     $style[] = $this->conf['view.']['month.']['monthOffStyle'];
                 }
-                if ($start_day->format('%w') == 0 || $start_day->format('%w') == 6) {
+                if ($start_day->format('%w') === '0' || $start_day->format('%w') === '6') {
                     $style[] = $this->conf['view.']['month.']['monthDayWeekendStyle'];
                 }
                 if ($isSelectedWeek) {
                     $style[] = $this->conf['view.']['month.']['monthDaySelectedWeekStyle'];
                 }
-                if ($formatedGetdate == $this->conf['getdate']) {
+                if ($formatedGetdate === $this->conf['getdate']) {
                     $style[] = $this->conf['view.']['month.']['monthSelectedStyle'];
                 }
                 if ($isCurrentWeek) {
                     $style[] = $this->conf['view.']['month.']['monthDayCurrentWeekStyle'];
                 }
-                if ($formatedGetdate == $today->format('%Y%m%d')) {
+                if ($formatedGetdate === $today->format('%Y%m%d')) {
                     $style[] = $this->conf['view.']['month.']['monthTodayStyle'];
                 }
                 if ($this->conf['view.']['month.']['monthDayOfWeekStyle']) {
@@ -2362,7 +2364,7 @@ class BaseView extends BaseService
 
                 //clean up empty styles (code beautify)
                 foreach ($style as $key => $classname) {
-                    if ($classname == '') {
+                    if ($classname === '') {
                         unset($style[$key]);
                     }
                 }
@@ -2380,8 +2382,8 @@ class BaseView extends BaseService
                 $classesDay = implode(' ', $style);
                 $markerArray = [
                     '###STYLE###' => $classesDay,
-                    '###ADDITIONAL_CLASSES###' => ($classesDay ? ' ' . $classesDay : ''),
-                    '###CLASSES###' => ($classesDay ? ' class="' . $classesDay . '" ' : ''),
+                    '###ADDITIONAL_CLASSES###' => $classesDay ? ' ' . $classesDay : '',
+                    '###CLASSES###' => $classesDay ? ' class="' . $classesDay . '" ' : '',
                     '###DAY_ID###' => $formatedGetdate,
                 ];
 
@@ -2392,11 +2394,11 @@ class BaseView extends BaseService
                 if ($this->viewarray[$formatedGetdate] && preg_match('!\###EVENT\###!is', $t_month)) {
                     foreach ($this->viewarray[$formatedGetdate] as $cal_time => $event_times) {
                         foreach ($event_times as $uid => $eventId) {
-                            if ($type == 'large') {
+                            if ($type === 'large') {
                                 $switch['###EVENT###'] .= $this->eventArray[$eventId]->renderEventForMonth();
-                            } elseif ($type == 'medium') {
+                            } elseif ($type === 'medium') {
                                 $switch['###EVENT###'] .= $this->eventArray[$eventId]->renderEventForYear();
-                            } elseif ($type == 'small') {
+                            } elseif ($type === 'small') {
                                 $switch['###EVENT###'] .= $this->eventArray[$eventId]->renderEventForMiniMonth();
                             }
                         }
@@ -2436,15 +2438,15 @@ class BaseView extends BaseService
                 );
 
                 $start_day->addSeconds(86400); // 60 * 60 *24 -> strtotime('+1 day', $start_day);
-                if ($i == 7) {
+                if ($i === 7) {
                     $i = 0;
                     $middle .= $endweek;
                     $checkagain = $start_day->getMonth();
-                    if ($checkagain != $minical_month) {
+                    if ($checkagain !== $minical_month) {
                         $whole_month = false;
                     }
                 }
-            } while ($whole_month == true);
+            } while ($whole_month);
 
             $rems['###LOOPWEEKDAY###'] = $weekday_loop;
             $rems['###LOOPMONTHWEEKS###'] = $middle;
@@ -2457,7 +2459,6 @@ class BaseView extends BaseService
                 $rems,
                 []
             );
-            $monthTemplate .= $ajaxEvents;
             $page = Functions::substituteMarkerArrayNotCached(
                 $page,
                 [],
@@ -2467,7 +2468,7 @@ class BaseView extends BaseService
         }
 
         $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST###');
-        if ($listTemplate != '') {
+        if ($listTemplate !== '') {
             $tx_cal_listview = &GeneralUtility::makeInstanceService('cal_view', 'list', 'list');
             $starttime = gmmktime(0, 0, 0, $this_month, 1, $this_year);
             $endtime = gmmktime(0, 0, 0, $this_month + 1, 1, $this_year);
@@ -2476,7 +2477,7 @@ class BaseView extends BaseService
 
         $return = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
 
-        if ($this->rightsObj->isViewEnabled($viewTarget) || $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']) {
+        if ($this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid'] || $this->rightsObj->isViewEnabled($viewTarget)) {
             $this->initLocalCObject();
             $this->local_cObj->setCurrentVal($month_title);
             $this->local_cObj->data['view'] = $viewTarget;
@@ -2518,6 +2519,7 @@ class BaseView extends BaseService
         if (is_array($eventDateArray)) {
             foreach ($eventDateArray as $eventTimeArray) {
                 foreach ($eventTimeArray as $eventArray) {
+                    /** @var EventModel  $event */
                     foreach ($eventArray as $event) {
                         $foundEvents[] = $event->getLinkToEvent(
                             $event->getTitle(),
@@ -2555,11 +2557,11 @@ class BaseView extends BaseService
      */
     public function getCalendarNavMarker(&$page, &$sims, &$rems, $view)
     {
-        if ($this->conf['view.']['month.']['navigation'] == 0) {
+        if ((int)$this->conf['view.']['month.']['navigation'] === 0) {
             $page = str_replace('###CALENDAR_NAV###', '', $page);
         } else {
             $template = Functions::getContent($this->conf['view.']['month.']['horizontalSidebarTemplate']);
-            if ($template == '') {
+            if ($template === '') {
                 $template = '<h3>calendar: no calendar_nav template file found:</h3>' . $this->conf['view.']['month.']['horizontalSidebarTemplate'];
             }
             $page = str_replace('###CALENDAR_NAV###', $template, $page);
@@ -2568,7 +2570,7 @@ class BaseView extends BaseService
 
     /**
      * Method to initialise a local content object, that can be used for customized TS rendering with own db values
-     * @param    $customData    array    Array with key => value pairs that should be used as fake db-values for TS rendering instead of the values of the current object
+     * @param bool $customData
      */
     public function initLocalCObject($customData = false)
     {
@@ -2586,7 +2588,7 @@ class BaseView extends BaseService
      * Method to return all values from current view, that might be interresting for rendering TS objects
      * @return    array    Array with key => value pairs that might be interresting
      */
-    public function getValuesAsArray()
+    public function getValuesAsArray(): array
     {
         if (!is_array($this->cachedValueArray) || (is_array($this->cachedValueArray) && !count($this->cachedValueArray))) {
             // for now, just return the data of the parent cObject
@@ -2610,7 +2612,7 @@ class BaseView extends BaseService
      * @param null $object
      * @return string
      */
-    public function renderWithFluid($object = null)
+    public function renderWithFluid($object = null): string
     {
         $templateFile = GeneralUtility::getFileAbsFileName($this->conf['view.'][$this->conf['view'] . '.'][$this->conf['view'] . 'TemplateFluid']);
         /** @var $view StandaloneView */
@@ -2628,7 +2630,7 @@ class BaseView extends BaseService
     /**
      * @return int
      */
-    public function getCount()
+    public function getCount(): int
     {
         $count = 0;
         if (count($this->master_array)) {
@@ -2653,7 +2655,7 @@ class BaseView extends BaseService
                                     unset($this->master_array[$cal_time][$event_times][$a_keys]);
                                     continue;
                                 }
-                                if ($this->conf['view.'][$this->conf['view'] . '.']['hideStartedEvents'] == 1 && $event->getStart()->before($this->starttime)) {
+                                if ((int)$this->conf['view.'][$this->conf['view'] . '.']['hideStartedEvents'] === 1 && $event->getStart()->before($this->starttime)) {
                                     unset($this->master_array[$cal_time][$event_times][$a_keys]);
                                     continue;
                                 }

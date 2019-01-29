@@ -30,6 +30,16 @@ use TYPO3\CMS\Scheduler\Scheduler;
  */
 class TceMainProcesscmdmap
 {
+    /**
+     * @param string $command
+     * @param string $table
+     * @param $id
+     * @param $value
+     * @param $tce
+     * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     * @throws \TYPO3\CMS\Core\Exception
+     */
     public function processCmdmap_postProcess(&$command, &$table, &$id, &$value, &$tce)
     {
         /** @var ConnectionPool $connectionPool */
@@ -49,12 +59,12 @@ class TceMainProcesscmdmap
                             $pageIDForPlugin = $this->getPageIDForPlugin($row ['pid']);
 
                             $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
-                            if ($page ['doktype'] != 254) {
+                            if ($page ['doktype'] !== 254) {
                                 $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                                 $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
                                 $notificationService = Functions::getNotificationService();
-                                if ($command == 'delete') {
+                                if ($command === 'delete') {
                                     /* If the deleted event is temporary, reset the MD5 of the parent calendar */
                                     if ($row ['isTemp']) {
                                         $calendar_id = $row ['calendar_id'];
@@ -85,11 +95,11 @@ class TceMainProcesscmdmap
             case 'tx_cal_calendar':
                 /* If a calendar has been deleted, we might need to clean up. */
 
-                if ($command == 'delete') {
+                if ($command === 'delete') {
                     /* Using getRecordRaw rather than getRecord since the record has already been deleted. */
                     $calendarRow = BackendUtility::getRecord('tx_cal_calendar', $id, '*', '', false);
                     /* If the calendar is an External URL or ICS file, then we need to clean up */
-                    if (($calendarRow ['type'] == 1) or ($calendarRow ['type'] == 2)) {
+                    if (($calendarRow ['type'] === 1) || ($calendarRow ['type'] === 2)) {
                         $service = new ICalendarService();
                         $service->deleteTemporaryEvents($id);
                         $service->deleteTemporaryCategories($id);
@@ -98,7 +108,7 @@ class TceMainProcesscmdmap
                     }
                 }
 
-                if ($command == 'copy') {
+                if ($command === 'copy') {
                     $newCalendarIds = $tce->copyMappingArray ['tx_cal_calendar'];
 
                     // check if source of copy has a scheduler task attached
@@ -115,7 +125,7 @@ class TceMainProcesscmdmap
 
             case 'tx_cal_exception_event_group':
             case 'tx_cal_exception_event':
-                if ($command == 'delete') {
+                if ($command === 'delete') {
                     $query = $connectionPool->getConnectionForTable($table);
                     $result = $query->select(['*'], $table, ['uid' => $id]);
                     if ($result) {
@@ -127,7 +137,7 @@ class TceMainProcesscmdmap
                                 $pageIDForPlugin = $this->getPageIDForPlugin($row ['pid']);
 
                                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
-                                if ($page ['doktype'] != 254) {
+                                if ($page ['doktype'] !== 254) {
                                     $tx_cal_api = new Api();
                                     $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
@@ -141,7 +151,7 @@ class TceMainProcesscmdmap
                 }
                 break;
                 case 'tx_cal_event_deviation':
-                    if ($command == 'delete') {
+                    if ($command === 'delete') {
                         $query = $connectionPool->getQueryBuilderForTable('tx_cal_event_deviation');
                         $result = $query->select(['tx_cal_event.uid', 'tx_cal_event.pid'])->from('tx_cal_event', 'E')
                             ->join('E', 'tx_cal_index', 'I', 'I.event_uid = E.uid')
@@ -156,6 +166,15 @@ class TceMainProcesscmdmap
         }
     }
 
+    /**
+     * @param string $command
+     * @param string $table
+     * @param $id
+     * @param $value
+     * @param $tce
+     * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     */
     public function processCmdmap_preProcess(&$command, &$table, &$id, &$value, &$tce)
     {
         /** @var ConnectionPool $connectionPool */
@@ -163,7 +182,7 @@ class TceMainProcesscmdmap
 
         switch ($table) {
             case 'tx_cal_event':
-                if ($command == 'delete') {
+                if ($command === 'delete') {
                     $query = $connectionPool->getConnectionForTable('tx_cal_event');
                     $result = $query->select(['*'], 'tx_cal_event', ['uid' => $id]);
 
@@ -181,7 +200,7 @@ class TceMainProcesscmdmap
                                 }
 
                                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
-                                if ($page ['doktype'] != 254) {
+                                if ($page ['doktype'] !== 254) {
                                     $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                                     $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
@@ -204,7 +223,7 @@ class TceMainProcesscmdmap
                 }
                 break;
             case 'tx_cal_fe_user_event_monitor_mm':
-                if ($command == 'delete') {
+                if ($command === 'delete') {
                     $relationRecord = BackendUtility::getRecord('tx_cal_fe_user_event_monitor_mm', $id);
                     // We have to delete the gabriel events BEFORE the tx_cal_events and
                     // its related tx_cal_fe_user_event_monitor_mm records are gone
@@ -220,6 +239,11 @@ class TceMainProcesscmdmap
         }
     }
 
+    /**
+     * @param int $eventUid
+     * @param int $pid
+     * @throws \TYPO3\CMS\Core\Exception
+     */
     public function reindexEvent($eventUid, $pid)
     {
         /* If we're in a workspace, don't notify anyone about the event */
@@ -228,10 +252,7 @@ class TceMainProcesscmdmap
             $pageIDForPlugin = $this->getPageIDForPlugin($pid);
 
             $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
-            if ($page ['doktype'] != 254) {
-                $tx_cal_api = new Api();
-                $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
-
+            if ($page ['doktype'] !== 254) {
                 /** @var RecurrenceGenerator $rgc */
                 $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
                 $rgc->generateIndexForUid($eventUid, 'tx_cal_event');
@@ -239,11 +260,15 @@ class TceMainProcesscmdmap
         }
     }
 
-    public function getPageIDForPlugin($pid)
+    /**
+     * @param int $pid
+     * @return int
+     */
+    public function getPageIDForPlugin($pid): int
     {
         $pageTSConf = BackendUtility::getPagesTSconfig($pid);
         if ($pageTSConf ['options.'] ['tx_cal_controller.'] ['pageIDForPlugin']) {
-            return $pageTSConf ['options.'] ['tx_cal_controller.'] ['pageIDForPlugin'];
+            return (int)$pageTSConf ['options.'] ['tx_cal_controller.'] ['pageIDForPlugin'];
         }
         return $pid;
     }

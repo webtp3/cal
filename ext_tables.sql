@@ -11,6 +11,7 @@ CREATE TABLE tx_cal_event (
 	hidden tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	starttime int(11) DEFAULT '0' NOT NULL,
 	endtime int(11) DEFAULT '0' NOT NULL,
+
 	start_date int(11) DEFAULT '0' NOT NULL,
 	end_date int(11) DEFAULT '0' NOT NULL,
 	start_time int(11) unsigned DEFAULT '0' NOT NULL,

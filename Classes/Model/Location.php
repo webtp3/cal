@@ -29,9 +29,7 @@ class Location extends LocationModel
      * Constructor
      *
      * @param array $row
-     *            array
      * @param string $pidList
-     *            to search in
      */
     public function __construct($row, $pidList)
     {
@@ -45,7 +43,7 @@ class Location extends LocationModel
     /**
      * @return string
      */
-    public function renderLocation()
+    public function renderLocation(): string
     {
         return $this->fillTemplate('###TEMPLATE_LOCATION_LOCATION###');
     }
@@ -53,7 +51,7 @@ class Location extends LocationModel
     /**
      * @return string
      */
-    public function renderOrganizer()
+    public function renderOrganizer(): string
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_ORGANIZER###');
     }
@@ -63,7 +61,7 @@ class Location extends LocationModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_location')) {
@@ -73,7 +71,7 @@ class Location extends LocationModel
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -95,7 +93,7 @@ class Location extends LocationModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_location')) {
@@ -105,7 +103,7 @@ class Location extends LocationModel
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -127,9 +125,9 @@ class Location extends LocationModel
      * @param $rems
      * @param $wrapped
      * @param $view
-     * @return string|void
+     * @return string
      */
-    public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
+    public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view): string
     {
         $editlink = '';
         if ($this->isUserAllowedToEdit()) {
@@ -180,7 +178,7 @@ class Location extends LocationModel
      * @param string $subpartSuffix
      * @return string
      */
-    public function renderLocationFor($viewType, $subpartSuffix = '')
+    public function renderLocationFor($viewType, $subpartSuffix = ''): string
     {
         return $this->fillTemplate('###TEMPLATE_LOCATION_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }
@@ -190,7 +188,7 @@ class Location extends LocationModel
      * @param string $subpartSuffix
      * @return string
      */
-    public function renderOrganizerFor($viewType, $subpartSuffix = '')
+    public function renderOrganizerFor($viewType, $subpartSuffix = ''): string
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }

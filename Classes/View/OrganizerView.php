@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
@@ -25,25 +26,20 @@ class OrganizerView extends BaseView
     /**
      * Draws a organizer.
      *
-     * @param
-     *            object        The organizer to be drawn.
+     * @param Organizer $organizer        The organizer to be drawn.
      * @param array $relatedEvents
      * @return string HTML output.
      */
-    public function drawOrganizer($organizer, $relatedEvents = [])
+    public function drawOrganizer($organizer, $relatedEvents = []): string
     {
         $this->_init($relatedEvents);
-
-        $lastview = $this->controller->extendLastView();
-        $uid = $this->conf['uid'];
-        $type = $this->conf['type'];
         $page = Functions::getContent($this->conf['view.']['organizer.']['organizerTemplate']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no organizer template file found:</h3>' . $this->conf['view.']['organizer.']['organizerTemplate'];
         }
         if (is_object($organizer)) {
             $rems['###ORGANIZER###'] = $organizer->renderOrganizer();
-            if ($this->conf['view.']['event.']['substitutePageTitle'] == 1) {
+            if ((int)$this->conf['view.']['event.']['substitutePageTitle'] === 1) {
                 $GLOBALS['TSFE']->page['title'] = $organizer->getName();
                 $GLOBALS['TSFE']->indexedDocTitle = $organizer->getName();
             }

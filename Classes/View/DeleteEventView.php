@@ -14,6 +14,8 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Model\LocationModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
@@ -21,25 +23,24 @@ use TYPO3\CMS\Cal\Utility\Functions;
  */
 class DeleteEventView extends FeEditingBaseView
 {
+    /**
+     * @var EventModel
+     */
     public $event;
 
     /**
      * Draws a delete event form.
      *
-     * @param
-     *            object        The event to be deleted
-     * @param
-     *            object The cObject of the mother-class
-     * @param
-     *            object        The rights object.
+     * @param EventModel        The event to be deleted
+     * @param object The cObject of the mother-class
+     * @param object        The rights object.
      * @return string HTML output.
      */
-    public function drawDeleteEvent(&$event, $pidList)
+    public function drawDeleteEvent(&$event, $pidList): string
     {
-        $modelObj = $this->modelObj;
         unset($this->controller->piVars['category']);
         $page = Functions::getContent($this->conf['view.']['delete_event.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no confirm event template file found:</h3>' . $this->conf['view.']['delete_event.']['template'];
         }
 
@@ -134,7 +135,7 @@ class DeleteEventView extends FeEditingBaseView
     public function getAlldayMarker(& $template, & $sims, & $rems)
     {
         $label = $this->controller->pi_getLL('l_false');
-        if ($this->object->isAllDay() == '1') {
+        if ($this->object->isAllDay() === '1') {
             $label = $this->controller->pi_getLL('l_true');
         }
         $sims['###ALLDAY###'] = $this->cObj->stdWrap(
@@ -272,6 +273,7 @@ class DeleteEventView extends FeEditingBaseView
     public function getCalLocationMarker(& $template, & $sims, & $rems)
     {
         $sims['###CAL_LOCATION###'] = '';
+        /** @var LocationModel $location */
         if ($location = $this->object->getLocationObject()) {
             $sims['###CAL_LOCATION###'] = $this->cObj->stdWrap(
                 $location->getName(),
@@ -332,7 +334,7 @@ class DeleteEventView extends FeEditingBaseView
         $dayName = strtotime('next monday');
         $temp_sims = [];
         foreach ($this->object->getByDay() as $day) {
-            if (in_array($day, $by_day)) {
+            if (in_array($day, $by_day, true)) {
                 $temp_sims[] = strftime('%a', $dayName);
             }
             $dayName += 86400;
@@ -461,7 +463,7 @@ class DeleteEventView extends FeEditingBaseView
         $GLOBALS['TYPO3_DB']->sql_free_result($result);
         if (!empty($cal_notify_user)) {
             $sims['###NOTIFY###'] = $this->cObj->stdWrap(
-                implode(',', (array)$cal_notify_user),
+                implode(',', $cal_notify_user),
                 $this->conf['view.'][$this->conf['view'] . '.']['notify_stdWrap.']
             );
         }

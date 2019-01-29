@@ -25,19 +25,17 @@ class ConfirmCategoryView extends FeEditingBaseView
     /**
      * Draws a create category form.
      *
-     * @param
-     *            string        Comma separated list of pids.
-     * @param
-     *            object        A location or organizer object to be updated
+     * @param string        Comma separated list of pids.
+     * @param object        A location or organizer object to be updated
      * @return string HTML output.
      */
-    public function drawConfirmCategory()
+    public function drawConfirmCategory(): string
     {
         $this->objectString = 'category';
         $this->isConfirm = true;
         unset($this->controller->piVars['formCheck']);
         $page = Functions::getContent($this->conf['view.']['confirm_category.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>category: no create category template file found:</h3>' . $this->conf['view.']['confirm_category.']['template'];
         }
 
@@ -47,7 +45,7 @@ class ConfirmCategoryView extends FeEditingBaseView
 
         $lastViewParams = $this->controller->shortenLastViewAndGetTargetViewParameters();
 
-        if ($lastViewParams['view'] == 'edit_category') {
+        if ($lastViewParams['view'] === 'edit_category') {
             $this->isEditMode = true;
         }
 
@@ -87,11 +85,9 @@ class ConfirmCategoryView extends FeEditingBaseView
     {
         $sims['###CALENDAR_ID###'] = '';
         $sims['###CALENDAR_ID_VALUE###'] = '';
-        if ($this->isAllowed('calendar_id')) {
-            if ($calendar = $this->object->getCalendarObject()) {
-                $sims['###CALENDAR_ID###'] = $this->applyStdWrap($calendar->getTitle(), 'calendar_id_stdWrap');
-                $sims['###CALENDAR_ID_VALUE###'] = htmlspecialchars($calendar->getUID());
-            }
+        if ($this->isAllowed('calendar_id') && $calendar = $this->object->getCalendarObject()) {
+            $sims['###CALENDAR_ID###'] = $this->applyStdWrap($calendar->getTitle(), 'calendar_id_stdWrap');
+            $sims['###CALENDAR_ID_VALUE###'] = htmlspecialchars($calendar->getUid());
         }
     }
 

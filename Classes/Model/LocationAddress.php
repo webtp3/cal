@@ -28,10 +28,8 @@ class LocationAddress extends Location
     /**
      * Constructor
      *
-     * @param int $uid
-     *            to search for
+     * @param $row
      * @param string $pidList
-     *            to search in
      */
     public function __construct($row, $pidList)
     {
@@ -42,6 +40,9 @@ class LocationAddress extends Location
         $this->templatePath = $this->conf['view.']['location.']['locationModelTemplate4Address'];
     }
 
+    /**
+     * @param $row
+     */
     public function createLocation($row)
     {
         $this->row = $row;

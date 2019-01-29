@@ -15,8 +15,8 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
-use TYPO3\CMS\Core\Utility\DebugUtility;
 
 /**
  * A concrete view for the calendar.
@@ -29,7 +29,15 @@ class ListView extends BaseView
     public $reverse = false;
     public $errorMessage = '';
     public $suggestMessage = '';
+
+    /**
+     * @var CalDate
+     */
     public $starttime;
+
+    /**
+     * @var CalDate
+     */
     public $endtime;
     public $objectsInList = [];
     public $count;
@@ -43,14 +51,14 @@ class ListView extends BaseView
      */
     public function initTemplate(&$page)
     {
-        if ($page == '') {
+        if ($page === '') {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             if ($confArr['useTeaser']) {
                 $page = Functions::getContent($this->conf['view.']['list.']['listWithTeaserTemplate']);
             } else {
                 $page = Functions::getContent($this->conf['view.']['list.']['listTemplate']);
             }
-            if ($page == '') {
+            if ($page === '') {
                 $this->error = true;
                 if ($confArr['useTeaser']) {
                     $this->errorMessage = 'No list template file found for "view.list.listWithTeaserTemplate" at >' . $this->conf['view.']['list.']['listWithTeaserTemplate'] . '<';
@@ -65,18 +73,19 @@ class ListView extends BaseView
 
     /**
      * @param $page
+     * @return string
      */
-    public function getListSubpart($page)
+    public function getListSubpart($page): string
     {
         $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST_TEMPLATE###');
-        if ($listTemplate == '') {
+        if ($listTemplate === '') {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             if ($confArr['useTeaser']) {
                 $page = Functions::getContent($this->conf['view.']['list.']['listWithTeaserTemplate']);
             } else {
                 $page = Functions::getContent($this->conf['view.']['list.']['listTemplate']);
             }
-            if ($page == '') {
+            if ($page === '') {
                 $this->error = true;
                 if ($confArr['useTeaser']) {
                     $this->errorMessage = 'No list template file found for "view.list.listWithTeaserTemplate" at >' . $this->conf['view.']['list.']['listWithTeaserTemplate'] . '<';
@@ -84,10 +93,10 @@ class ListView extends BaseView
                     $this->errorMessage = 'No list template file found for "view.list.listTemplate" at >' . $this->conf['view.']['list.']['listTemplate'] . '<';
                 }
                 $this->suggestMessage = 'Please make sure the path is correct and that you included the static template and double-check the path using the Typoscript Object Browser.';
-                return null;
+                return '';
             }
             $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST_TEMPLATE###');
-            if ($listTemplate == '') {
+            if ($listTemplate === '') {
                 $this->error = true;
                 if ($confArr['useTeaser']) {
                     $this->errorMessage = 'No list template file found for "view.list.listWithTeaserTemplate" at >' . $this->conf['view.']['list.']['listWithTeaserTemplate'] . '<';
@@ -95,7 +104,7 @@ class ListView extends BaseView
                     $this->errorMessage = 'No ###LIST_TEMPLATE### subpart found in "view.list.listTemplate" at >' . $this->conf['view.']['list.']['listTemplate'] . '<';
                 }
                 $this->suggestMessage = 'Please include a ###LIST_TEMPLATE### subpart.';
-                return null;
+                return '';
             }
         }
         return $listTemplate;
@@ -107,8 +116,14 @@ class ListView extends BaseView
      * @param $rems
      * @return string
      */
-    public function processObjects(&$master_array, &$sims, &$rems)
+    public function processObjects(&$master_array, &$sims, &$rems): string
     {
+        $middle = '';
+        $monthItemCounter = 0;
+        $weekItemCounter = 0;
+        $dayItemCounter = 0;
+        $yearItemCounter = 0;
+
         /* Subtract strtotimeOffset because we're going from GMT back to local time */
         if ($this->reverse) {
             $GLOBALS['TSFE']->register['cal_list_starttime'] = $this->endtime->getTime();
@@ -141,6 +156,7 @@ class ListView extends BaseView
 
             $this->walkThroughMasterArray($master_array, $this->reverse, $firstEventDate);
 
+            /** @var CalDate $firstEventDate */
             if ($firstEventDate) {
                 $GLOBALS['TSFE']->register['cal_list_firstevent'] = $firstEventDate->getTime();
             }
@@ -155,7 +171,7 @@ class ListView extends BaseView
             }
 
             // start rendering the events
-            if (count($this->objectsInList) && $this->count > 0) {
+            if ($this->count > 0 && count($this->objectsInList)) {
                 $times = array_keys($this->objectsInList);
 
                 // preset vars
@@ -189,7 +205,7 @@ class ListView extends BaseView
                     $alternatingLayouts = [];
                     $layout_keys = array_keys($alternatingLayoutConfig);
                     foreach ($layout_keys as $key) {
-                        if (substr($key, strlen($key) - 1) != '.') {
+                        if (substr($key, strlen($key) - 1) !== '.') {
                             $suffix = $this->cObj->stdWrap(
                                 $alternatingLayoutConfig[$key],
                                 $alternatingLayoutConfig[$key . '.']
@@ -263,6 +279,7 @@ class ListView extends BaseView
                     }
 
                     foreach ($e_keys as $e_key) {
+                        /** @var EventModel $event */
                         $event = &$this->objectsInList[$cal_time][$e_key];
 
                         if ($firstTime) {
@@ -471,8 +488,7 @@ class ListView extends BaseView
 
                         $layoutNum = $alternationCount % count($alternatingLayouts);
                         $layoutSuffix = $alternatingLayouts[$layoutNum];
-                        $eventText = '';
-                        if ($this->conf['view'] == 'location' || $this->conf['view'] == 'organizer' || $this->conf['view'] == 'event') {
+                        if ($this->conf['view'] === 'location' || $this->conf['view'] === 'organizer' || $this->conf['view'] === 'event') {
                             $eventText = $event->renderEventForList(strtoupper($this->conf['view']) . '_' . $layoutSuffix);
                         } else {
                             $eventText = $event->renderEventForList($layoutSuffix);
@@ -508,8 +524,8 @@ class ListView extends BaseView
                                     $rememberUid = [];
 
                                     foreach ($categoryArray as $categoryObject) {
-                                        if (!in_array($categoryObject->getUid(), $rememberUid)) {
-                                            if (in_array($categoryObject->getUid(), $ids)) {
+                                        if (!in_array($categoryObject->getUid(), $rememberUid, true)) {
+                                            if (in_array($categoryObject->getUid(), $ids, true)) {
                                                 $categoryGroupArray[$categoryObject->getUid()] .= $eventText;
                                             }
                                             $rememberUid[] = $categoryObject->getUid();
@@ -519,7 +535,7 @@ class ListView extends BaseView
                             } elseif ($this->conf['view.']['list.']['enableCalendarWrapper']) {
                                 $id = $event->getCalendarUid();
                                 foreach ($calendarArray as $calendarObject) {
-                                    if ($calendarObject->getUid() == $id) {
+                                    if ($calendarObject->getUid() === $id) {
                                         $calendarGroupArray[$calendarObject->getTitle()] .= $eventText;
                                     }
                                 }
@@ -564,7 +580,7 @@ class ListView extends BaseView
                         $keys = array_keys($categoryGroupArray);
                         sort($keys);
                         foreach ($keys as $categoryId) {
-                            if ($categoryId == $this->conf['view.']['list.']['noCategoryWrapper.']['uid']) {
+                            if ($categoryId === (int)$this->conf['view.']['list.']['noCategoryWrapper.']['uid']) {
                                 $this->initLocalCObject();
                                 $middle .= $this->local_cObj->cObjGetSingle(
                                     $this->conf['view.']['list.']['noCategoryWrapper'],
@@ -594,18 +610,19 @@ class ListView extends BaseView
     }
 
     /**
-     * @param $event
+     * @param EventModel $event
      * @param $cal_time
      * @param $firstEventDate
      * @return bool
      */
-    public function processObject(&$event, &$cal_time, &$firstEventDate)
+    public function processObject(&$event, &$cal_time, &$firstEventDate): bool
     {
+        $finished = false;
         $eventStart = $event->getStart();
         $eventEnd = $event->getEnd();
 
         if ($eventEnd->before($this->starttime) || $eventStart->after($this->endtime)) {
-            return;
+            return false;
         }
 
         /* If we haven't saved an event date already, save this one */
@@ -616,12 +633,6 @@ class ListView extends BaseView
             } else {
                 $firstEventDate->copy($eventStart);
             }
-        }
-        /* Always save the current event date as the last one and let it fall through */
-        if ($this->reverse) {
-            $lastEventDate = $eventStart;
-        } else {
-            $lastEventDate = $eventEnd;
         }
 
         $year = $eventStart->getYear();
@@ -666,7 +677,7 @@ class ListView extends BaseView
 
             if ($this->count < $this->recordsPerPage * $this->offset || $this->count > $this->recordsPerPage * $this->offset + $this->recordsPerPage - 1) {
                 $this->count++;
-                if ($this->count == intval($this->conf['view.']['list.']['maxEvents'])) {
+                if ($this->count === intval($this->conf['view.']['list.']['maxEvents'])) {
                     $finished = true;
                 }
                 return $finished;
@@ -687,34 +698,34 @@ class ListView extends BaseView
         }
 
         if ($this->conf['view.']['list.']['showLongEventsInEachWrapper']) {
-            if ($this->conf['view.']['list.']['enableDayWrapper'] && $eventStart->format('%Y%m%d') != $eventEnd->format('%Y%m%d')) {
+            if ($this->conf['view.']['list.']['enableDayWrapper'] && $eventStart->format('%Y%m%d') !== $eventEnd->format('%Y%m%d')) {
                 $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y%m%d') != $eventEnd->format('%Y%m%d')) {
+                while ($tempEventStart->format('%Y%m%d') !== $eventEnd->format('%Y%m%d')) {
                     $tempEventStart->addSeconds(60 * 60 * 24);
                     $this->objectsInList[$tempEventStart->format('%Y%m%d')][] = &$event;
                 }
             }
-            if ($this->conf['view.']['list.']['enableWeekWrapper'] && $eventStart->format('%Y%U') != $eventEnd->format('%Y%U')) {
+            if ($this->conf['view.']['list.']['enableWeekWrapper'] && $eventStart->format('%Y%U') !== $eventEnd->format('%Y%U')) {
                 $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y%U') != $eventEnd->format('%Y%U')) {
+                while ($tempEventStart->format('%Y%U') !== $eventEnd->format('%Y%U')) {
                     $tempEventStart->addSeconds(60 * 60 * 24 * 7);
                     $this->objectsInList[$tempEventStart->format('%Y%m%d')][] = &$event;
                 }
             }
-            if ($this->conf['view.']['list.']['enableMonthWrapper'] && $eventStart->format('%Y%m') != $eventEnd->format('%Y%m')) {
+            if ($this->conf['view.']['list.']['enableMonthWrapper'] && $eventStart->format('%Y%m') !== $eventEnd->format('%Y%m')) {
                 $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y%m') != $eventEnd->format('%Y%m')) {
+                while ($tempEventStart->format('%Y%m') !== $eventEnd->format('%Y%m')) {
                     $tempEventStart->setMonth($tempEventStart->getMonth() + 1);
                     $this->objectsInList[$tempEventStart->format('%Y%m01')][] = &$event;
                 }
             }
-            if ($this->conf['view.']['list.']['enableYearWrapper'] && $eventStart->format('%Y') != $eventEnd->format('%Y')) {
+            if ($this->conf['view.']['list.']['enableYearWrapper'] && $eventStart->format('%Y') !== $eventEnd->format('%Y')) {
                 $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y') != $eventEnd->format('%Y')) {
+                while ($tempEventStart->format('%Y') !== $eventEnd->format('%Y')) {
                     $tempEventStart->setYear($tempEventStart->getYear() + 1);
                     $this->objectsInList[$tempEventStart->format('%Y0101')][] = &$event;
                 }
@@ -722,7 +733,7 @@ class ListView extends BaseView
         }
 
         $this->count++;
-        if ($this->count == intval($this->conf['view.']['list.']['maxEvents'])) {
+        if ($this->count === intval($this->conf['view.']['list.']['maxEvents'])) {
             $finished = true;
         }
         return $finished;
@@ -751,8 +762,6 @@ class ListView extends BaseView
             // create a reference
             $event_times = &$master_array[$cal_time];
             if (is_array($event_times)) {
-                $day_array2 = [];
-
                 $event_times_keys = array_keys($event_times);
                 if ($reverse) {
                     $event_times_keys = array_reverse($event_times_keys);
@@ -781,7 +790,7 @@ class ListView extends BaseView
                             if (!is_object($event)) {
                                 continue;
                             }
-                            if ($this->conf['view.']['list.']['hideStartedEvents'] == 1 && $event->getStart()->before($this->starttime)) {
+                            if ((int)$this->conf['view.']['list.']['hideStartedEvents'] === 1 && $event->getStart()->before($this->starttime)) {
                                 continue;
                             }
 
@@ -800,13 +809,13 @@ class ListView extends BaseView
      * @param $endtime
      * @return mixed
      */
-    public function drawList(&$master_array, $page = '', $starttime, $endtime)
+    public function drawList(&$master_array, $page, $starttime, $endtime)
     {
         $this->starttime = $starttime;
         $this->endtime = $endtime;
         $this->objectsInList = [];
 
-        if ($this->conf['activateFluid'] == 1) {
+        if ((int)$this->conf['activateFluid'] === 1) {
             $this->_init($master_array);
             return $this->renderWithFluid();
         }
@@ -826,13 +835,10 @@ class ListView extends BaseView
         }
 
         // ordering of the events
-        switch (strtolower($this->conf['view.']['list.']['order'])) {
-            default:
-                $this->reverse = false;
-                break;
-            case 'desc':
-                $this->reverse = true;
-                break;
+        if (strtolower($this->conf['view.']['list.']['order']) === 'desc') {
+            $this->reverse = true;
+        } else {
+            $this->reverse = false;
         }
 
         $rems = [];
@@ -917,6 +923,7 @@ class ListView extends BaseView
     public function getPageBrowser($template)
     {
         $pb = '';
+        $spacer = '';
 
         // render PageBrowser
         if ($this->conf['view.']['list.']['pageBrowser.']['usePageBrowser']) {
@@ -933,13 +940,13 @@ class ListView extends BaseView
                         $hookObj->renderPageBrowser($this, $pb, $this->count, $this->recordsPerPage, $template);
                     }
                 }
-                if ($pb != '') {
+                if ($pb !== '') {
                     return $pb;
                 }
             }
 
             // use the piPageBrowser
-            if ($this->conf['view.']['list.']['pageBrowser.']['useType'] == 'piPageBrowser') {
+            if ($this->conf['view.']['list.']['pageBrowser.']['useType'] === 'piPageBrowser') {
                 $browserConfig = &$this->conf['view.']['list.']['pageBrowser.']['piPageBrowser.'];
                 $this->controller->internal['res_count'] = $this->count;
                 $this->controller->internal['results_at_a_time'] = $this->recordsPerPage;
@@ -1007,7 +1014,7 @@ class ListView extends BaseView
                 $browserConfig = $this->conf['view.']['list.']['pageBrowser.']['default.'];
                 $this->offset = intval($this->controller->piVars[$this->pointerName]);
 
-                $pagesTotal = intval($this->recordsPerPage) == 0 ? 1 : ceil($this->count / $this->recordsPerPage);
+                $pagesTotal = intval($this->recordsPerPage) === 0 ? 1 : ceil($this->count / $this->recordsPerPage);
                 $nextPage = $this->offset + 1;
                 $previousPage = $this->offset - 1;
                 $pagesCount = intval($this->conf['view.']['list.']['pageBrowser.']['pagesCount']) - 1;
@@ -1056,7 +1063,7 @@ class ListView extends BaseView
 
                 $pbMarker['###PREVIOUS###'] = '';
                 if ($previousPage >= 0) {
-                    $previousPage = $previousPage == 0 ? null : $previousPage;
+                    $previousPage = $previousPage === 0 ? null : $previousPage;
                     $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
                         $this->pointerName => $previousPage
                     ], $this->conf['cache']);
@@ -1067,24 +1074,22 @@ class ListView extends BaseView
                 }
 
                 for ($i = $min; $i <= $max; $i++) {
-                    if ($this->offset + 1 == $i) {
+                    if ($this->offset + 1 === $i) {
                         $pbMarker['###PAGES###'] .= $this->cObj->stdWrap($i, $browserConfig['actPage_stdWrap.']);
-                    } else {
-                        if ($i == 1 || $i == $max || ($i > 1 && $i >= $pstart && $i <= $pend && $i < $max)) {
-                            $this->local_cObj->setCurrentVal($i);
-                            $pageNum = ($i - 1);
-                            $pageNum = $pageNum == 0 ? null : $pageNum;
-                            $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
-                                $this->pointerName => $pageNum
-                            ], $this->conf['cache']);
-                            $pbMarker['###PAGES###'] .= $this->local_cObj->cObjGetSingle(
-                                $browserConfig['pageLink'],
-                                $browserConfig['pageLink.']
-                            );
-                        } elseif (($i == 2 && $i < $pstart) || ($i == $pend + 1 && $i < $max)) {
-                            unset($this->local_cObj->data['link_parameter']);
-                            $pbMarker['###PAGES###'] .= $spacer;
-                        }
+                    } elseif ($i === 1 || $i === $max || ($i > 1 && $i >= $pstart && $i <= $pend && $i < $max)) {
+                        $this->local_cObj->setCurrentVal($i);
+                        $pageNum = ($i - 1);
+                        $pageNum = $pageNum === 0 ? null : $pageNum;
+                        $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
+                            $this->pointerName => $pageNum
+                        ], $this->conf['cache']);
+                        $pbMarker['###PAGES###'] .= $this->local_cObj->cObjGetSingle(
+                            $browserConfig['pageLink'],
+                            $browserConfig['pageLink.']
+                        );
+                    } elseif (($i === 2 && $i < $pstart) || ($i === $pend + 1 && $i < $max)) {
+                        unset($this->local_cObj->data['link_parameter']);
+                        $pbMarker['###PAGES###'] .= $spacer;
                     }
                 }
                 $pb = Functions::substituteMarkerArrayNotCached($template, $pbMarker, [], []);
@@ -1100,15 +1105,8 @@ class ListView extends BaseView
      * @param bool $debug
      * @return bool
      */
-    public function hasPeriodChanged($old, $new, $reverse = false, $debug = false)
+    public function hasPeriodChanged($old, $new, $reverse = false, $debug = false): bool
     {
-        if ($debug) {
-            DebugUtility::debug([
-                $old,
-                $new,
-                $reverse
-            ]);
-        }
         if ($reverse) {
             return intval($new) < intval($old);
         }

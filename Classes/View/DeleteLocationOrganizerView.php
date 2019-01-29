@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\LocationModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
@@ -27,20 +28,16 @@ class DeleteLocationOrganizerView extends FeEditingBaseView
     /**
      * Draws a delete form for a location or an organizer.
      *
-     * @param
-     *            boolean True if a location should be deleted
-     * @param
-     *            object        The object to be deleted
-     * @param
-     *            object        The cObject of the mother-class.
-     * @param
-     *            object        The rights object.
+     * @param bool True if a location should be deleted
+     * @param LocationModel        The object to be deleted
+     * @param object        The cObject of the mother-class.
+     * @param object        The rights object.
      * @return string HTML output.
      */
-    public function drawDeleteLocationOrOrganizer($isLocation = true, &$object)
+    public function drawDeleteLocationOrOrganizer($isLocation, &$object): string
     {
         $page = Functions::getContent($this->conf['view.']['delete_location.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>category: no delete location template file found:</h3>' . $this->conf['view.']['delete_location.']['template'];
         }
 

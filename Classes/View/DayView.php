@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\View;
  */
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Functions;
 
@@ -25,9 +26,14 @@ use TYPO3\CMS\Cal\Utility\Functions;
  */
 class DayView extends BaseView
 {
+    /**
+     * @param $master_array
+     * @param $getdate
+     * @return mixed
+     */
     public function newDrawDay(&$master_array, $getdate)
     {
-        if (!isset($getdate) || $getdate == '') {
+        if (!isset($getdate) || $getdate === '') {
             $getdate = new  CalDate();
         } else {
             $getdate = new  CalDate($getdate);
@@ -38,10 +44,10 @@ class DayView extends BaseView
         $dayModel->setCurrent($today);
         $dayModel->setSelected($getdate);
 
-        $dayModel->weekDayFormat = $this->conf['view.']['day.']['dateFormatDay'];
+        $dayModel->setWeekDayFormat($this->conf['view.']['day.']['dateFormatDay']);
         $weekdayLength = intval($this->conf['view.']['day.']['weekdayLength']);
         if ($weekdayLength > 0) {
-            $dayModel->weekDayLength = $weekdayLength;
+            $dayModel->setWeekDayFormat($weekdayLength);
         }
 
         $masterArrayKeys = array_keys($master_array);
@@ -67,13 +73,11 @@ class DayView extends BaseView
     /**
      * Draws the day view
      *
-     * @param $master_array array
-     *            to be drawn.
-     * @param $getdate integer
-     *            of the event
+     * @param $master_array array to be drawn.
+     * @param $getdate integer of the event
      * @return string HTML output.
      */
-    public function drawDay(&$master_array, $getdate)
+    public function drawDay(&$master_array, $getdate): string
     {
         $this->_init($master_array);
         if ($this->conf['useNewTemplatesAndRendering']) {
@@ -81,12 +85,12 @@ class DayView extends BaseView
         }
 
         $page = Functions::getContent($this->conf['view.']['day.']['dayTemplate']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>day: no template file found:</h3>' . $this->conf['view.']['day.']['dayTemplate'] . "<br />Please check your template record and add both cal items at 'include static (from extension)'";
         }
 
         $dayTemplate = $this->markerBasedTemplateService->getSubpart($page, '###DAY_TEMPLATE###');
-        if ($dayTemplate == '') {
+        if ($dayTemplate === '') {
             $rems = [];
             return $this->finish($page, $rems);
         }
@@ -95,16 +99,15 @@ class DayView extends BaseView
         $dayEnd = $this->conf['view.']['day.']['dayEnd']; // '2300'; // End time for day grid
         $gridLength = $this->conf['view.']['day.']['gridLength']; // '15'; // Grid distance in minutes for day view, multiples of 15 preferred
 
-        if (!isset($getdate) || $getdate == '') {
+        if (!isset($getdate) || $getdate === '') {
             $getdate_obj = new  CalDate();
             $getdate = $getdate_obj->format('%Y%m%d');
         }
 
         $day_array2 = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $getdate, $day_array2);
-        $this_day = $day_array2[3];
-        $this_month = $day_array2[2];
-        $this_year = $day_array2[1];
+
+        list($this_year, $this_month, $this_day) = $day_array2;
 
         $unix_time = new  CalDate($getdate . '000000');
 
@@ -125,11 +128,9 @@ class DayView extends BaseView
         $next_month_obj = new  CalDate();
         $next_month_obj->copy($unix_time);
         $next_month_obj->addSeconds(604800);
-        $next_month = $next_month_obj->format('%Y%m%d');
         $prev_month_obj = new  CalDate();
         $prev_month_obj->copy($unix_time);
         $prev_month_obj->subtractSeconds(604801);
-        $prev_month = $prev_month_obj->format('%Y%m%d');
 
         $dateOfWeek = Calc::beginOfWeek($this_day, $this_month, $this_year);
         $week_start_day = new  CalDate($dateOfWeek . '000000');
@@ -143,7 +144,7 @@ class DayView extends BaseView
 
         // Nasty fix to work with TS strftime
         $start_day_time = new  CalDate($getdate . '000000');
-        $start_day_time->setTZbyId('UTC');
+        $start_day_time->setTZbyID('UTC');
         $end_day_time = Calendar::calculateEndDayTime($start_day_time);
 
         $GLOBALS['TSFE']->register['cal_day_starttime'] = $start_day_time->getTime();
@@ -156,7 +157,7 @@ class DayView extends BaseView
         );
 
         $dayTemplate = Functions::getContent($this->conf['view.']['day.']['dayTemplate']);
-        if ($dayTemplate == '') {
+        if ($dayTemplate === '') {
             return '<h3>calendar: no template file found:</h3>' . $this->conf['view.']['day.']['dayTemplate'] . '<br />Please check your template record and add both cal items at "include static (from extension)"';
         }
 
@@ -175,22 +176,17 @@ class DayView extends BaseView
         // Replaces the daysofweek
         $loop_dof = $this->markerBasedTemplateService->getSubpart($dayTemplate, '###DAYSOFWEEK###');
 
-        // Build the body
-        $dayborder = 0;
-
-        $out = '';
         $fillTime = sprintf('%04d', $dayStart);
         $day_array = [];
 
         while ($fillTime < $dayEnd) {
-            array_push($day_array, $fillTime);
+            $day_array[] = $fillTime;
             $dTime = [];
             preg_match('/([0-9]{2})([0-9]{2})/', $fillTime, $dTime);
-            $fill_h = $dTime[1];
-            $fill_min = $dTime[2];
+            list($fill_h, $fill_min) = $dTime;
             $fill_min = sprintf('%02d', $fill_min + $gridLength);
-            if ($fill_min == 60) {
-                $fill_h = sprintf('%02d', ($fill_h + 1));
+            if ((int)$fill_min === 60) {
+                $fill_h = sprintf('%02d', $fill_h + 1);
                 $fill_min = '00';
             }
             $fillTime = $fill_h . $fill_min;
@@ -216,18 +212,19 @@ class DayView extends BaseView
                 preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $ovlKey, $dDate);
 
                 $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . $dTimeStart[2] . ':00');
-                $d_start->setTZbyId('UTC');
+                $d_start->setTZbyID('UTC');
                 $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . $dTimeEnd[2] . ':00');
-                $d_end->setTZbyId('UTC');
+                $d_end->setTZbyID('UTC');
 
                 foreach ($ovlValue as $ovl_time_key => $ovl_time_Value) {
+                    /** @var EventModel $event */
                     foreach ($ovl_time_Value as $event) {
                         $eventStart = $event->getStart();
                         $eventArray[$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')] = $event;
                         $starttime = new  CalDate();
                         $endtime = new  CalDate();
                         $j = new  CalDate();
-                        if ($ovl_time_key == '-1') {
+                        if ($ovl_time_key === '-1') {
                             $starttime->copy($event->getStart());
                             $endtime->copy($event->getEnd());
                             $endtime->addSeconds(1);
@@ -244,12 +241,12 @@ class DayView extends BaseView
 
                             $entries = 1;
                             $old_day = new  CalDate($ovlKey . '000000');
-                            $old_day->setTZbyId('UTC');
+                            $old_day->setTZbyID('UTC');
                             $endOfDay->copy($d_end);
                             $startOfDay->copy($d_start);
 
                             // $d_start -= $gridLength * 60;
-                            for ($k = 0; $k < count($view_array[($ovlKey)]); $k++) {
+                            foreach ($view_array[$starttime->format('%Y%m%d')][$starttime->format('%H%M')] as $k => $kValue) {
                                 if (empty($view_array[$starttime->format('%Y%m%d')][$starttime->format('%H%M')][$k])) {
                                     break;
                                 }
@@ -267,7 +264,7 @@ class DayView extends BaseView
                                     $startOfDay->addSeconds(60 * 60 * 24);
                                     $j->copy($startOfDay);
                                     $entries = 0;
-                                    for ($k = 0; $k < count($view_array[$startOfDay->format('%Y%m%d')]); $k++) {
+                                    foreach ($view_array[$d_start->format('%Y%m%d')][$startOfDay->format('%H%M')] as $k => $kValue) {
                                         if (empty($view_array[$d_start->format('%Y%m%d')][$startOfDay->format('%H%M')][$k])) {
                                             break;
                                         }
@@ -285,7 +282,7 @@ class DayView extends BaseView
             }
         }
 
-        if ($this->conf['view.']['day.']['dynamic'] == 1) {
+        if ((int)$this->conf['view.']['day.']['dynamic'] === 1) {
             $dayStart = '2359';
             $dayEnd = '0000';
             if (is_array($view_array[$getdate])) {
@@ -311,23 +308,21 @@ class DayView extends BaseView
             $max = [];
             foreach ($view_array[$getdate] as $array_time => $time_val) {
                 $c = count($view_array[$getdate][$array_time]);
-                array_push($max, $c);
+                $max[] = $c;
             }
             $nbrGridCols[$getdate] = max($max);
         } else {
             $nbrGridCols[$getdate] = 1;
         }
-
+        $weekday_loop = '';
         $isAllowedToCreateEvent = $this->rightsObj->isAllowedToCreateEvent();
         $start_day = $week_start_day;
         for ($i = 0; $i < 7; $i++) {
-            $day_num = $start_day->format('%w');
-
             $daylink = $start_day->format('%Y%m%d');
 
             $weekday = $start_day->format($this->conf['view.']['day.']['dateFormatDay']);
 
-            if ($daylink == $getdate) {
+            if ((int)$daylink === $getdate) {
                 $row1 = 'rowToday';
                 $row2 = 'rowOn';
                 $row3 = 'rowToday';
@@ -337,7 +332,7 @@ class DayView extends BaseView
                 $row3 = 'rowOff';
             }
             $dayLinkViewTarget = $this->conf['view.']['dayLinkTarget'];
-            if (($this->rightsObj->isViewEnabled($dayLinkViewTarget) || $this->conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid']) && ($view_array[$daylink] || $isAllowedToCreateEvent)) {
+            if (($view_array[$daylink] || $isAllowedToCreateEvent) && ($this->rightsObj->isViewEnabled($dayLinkViewTarget) || $this->conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid'])) {
                 $this->initLocalCObject();
                 $this->local_cObj->setCurrentVal($weekday);
                 $this->local_cObj->data['view'] = $dayLinkViewTarget;
@@ -383,7 +378,6 @@ class DayView extends BaseView
         // Replaces the allday events
         $replace = '';
         if (is_array($view_array[$getdate]['-1'])) {
-            $loop_ad = $this->markerBasedTemplateService->getSubpart($dayTemplate, '###LOOPALLDAY###');
             foreach ($view_array[$getdate]['-1'] as $uid => $allday) {
                 $replace .= $eventArray[$allday]->renderEventForAllDay();
             }
@@ -391,7 +385,7 @@ class DayView extends BaseView
         $sims['###ALLDAY###'] = $replace;
 
         $view_array = $view_array[$getdate];
-        $nbrGridCols = $nbrGridCols[$getdate] ? $nbrGridCols[$getdate] : 1;
+        $nbrGridCols = $nbrGridCols[$getdate] ?: 1;
         $t_array = [];
         $pos_array = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $getdate, $dDate);
@@ -404,16 +398,16 @@ class DayView extends BaseView
                 '%02d',
                 $dTimeStart[2]
             ) . ':00');
-        $d_start->setTZbyId('UTC');
+        $d_start->setTZbyID('UTC');
         $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
                 '%02d',
                 $dTimeEnd[2]
             ) . ':00');
-        $d_end->setTZbyId('UTC');
+        $d_end->setTZbyID('UTC');
 
         $i = new  CalDate();
         $i->copy($d_start);
-        $i->setTZbyId('UTC');
+        $i->setTZbyID('UTC');
         while ($i->before($d_end)) {
             $i_formatted = $i->format('%H%M');
             if (is_array($view_array[$i_formatted]) && count($view_array[$i_formatted]) > 0) {
@@ -425,7 +419,7 @@ class DayView extends BaseView
                         $pos_array
                     )) {
                         $eventEnd = $event->getEnd();
-                        $nd = $eventEnd->subtractSeconds((($eventEnd->getMinute() % $gridLength) * 60));
+                        $nd = $eventEnd->subtractSeconds(($eventEnd->getMinute() % $gridLength) * 60);
                         if ($i_formatted >= $nd) {
                             $t_array[$i_formatted][$pos_array[$event->getType() . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')]] = [
                                 'ended' => $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')
@@ -436,8 +430,8 @@ class DayView extends BaseView
                             ];
                         }
                     } else {
-                        for ($j = 0; $j < $nbrGridCols; $j++) {
-                            if (count($t_array[$i_formatted][$j]) == 0 || !isset($t_array[$i_formatted][$j])) {
+                        foreach ($t_array[$i_formatted] as $j => $jValue) {
+                            if (!isset($t_array[$i_formatted][$j]) || count($jValue) === 0) {
                                 $pos_array[$event->getType() . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')] = $j;
                                 $t_array[$i_formatted][$j] = [
                                     'begin' => $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')
@@ -455,19 +449,19 @@ class DayView extends BaseView
         }
 
         $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
-
+        $daydisplay = '';
         $cal_time_obj = new  CalDate($getdate . '000000');
-        $cal_time_obj->setTZbyId('UTC');
+        $cal_time_obj->setTZbyID('UTC');
         foreach ($t_array as $cal_time => $val) {
             preg_match('/([0-9]{2})([0-9]{2})/', $cal_time, $dTimeStart);
             $cal_time_obj->setHour($dTimeStart[1]);
             $cal_time_obj->setMinute($dTimeStart[2]);
 
             $key = $cal_time_obj->format($this->conf['view.']['day.']['timeFormatDay']);
-            if (intval($dTimeStart[2]) == 0) {
+            if (intval($dTimeStart[2]) === 0) {
                 $daydisplay .= sprintf(
                     $this->conf['view.']['day.']['dayTimeCell'],
-                    (60 / $gridLength),
+                    60 / $gridLength,
                     $key,
                     $gridLength
                 );
@@ -475,14 +469,14 @@ class DayView extends BaseView
                 $size_tmp = 60 - (int)substr($cal_time, 2, 2);
                 $daydisplay .= sprintf(
                     $this->conf['view.']['day.']['dayTimeCell'],
-                    ($size_tmp / $gridLength),
+                    $size_tmp / $gridLength,
                     $key,
                     $gridLength
                 );
             } else {
                 $daydisplay .= sprintf($this->conf['view.']['day.']['dayTimeCell2'], $gridLength);
             }
-            if ($dayborder == 0) {
+            if ($dayborder === 0) {
                 $class = ' ' . $this->conf['view.']['day.']['classDayborder'];
                 $dayborder++;
             } else {
@@ -490,44 +484,31 @@ class DayView extends BaseView
                 $dayborder = 0;
             }
 
-            if ($val != '' && count($val) > 0) {
-                for ($i = 0; $i < count($val); $i++) {
+            if ($val !== '' && count($val) > 0) {
+                foreach ($val as $i => $iValue) {
                     if (!empty($val[$i])) {
-                        $keys = array_keys($val[$i]);
-                        switch ($keys[0]) {
-                            case 'begin':
-                                $event = &$eventArray[$val[$i][$keys[0]]];
-                                $dayEndTime = new  CalDate();
-                                $dayEndTime->copy($event->getEnd());
-                                $dayStartTime = new  CalDate();
-                                $dayStartTime->copy($event->getStart());
+                        $keys = array_keys($iValue);
+                        if ($keys[0] === 'begin') {
+                            $event = &$eventArray[$val[$i][$keys[0]]];
+                            $dayEndTime = new  CalDate();
+                            $dayEndTime->copy($event->getEnd());
+                            $dayStartTime = new  CalDate();
+                            $dayStartTime->copy($event->getStart());
 
-                                $rest = $dayStartTime->getMinute() % ($gridLength);
-                                $plus = 0;
-                                if ($rest > 0) {
-                                    $plus = 1;
-                                }
-                                if ($dayEndTime->after($d_end)) {
-                                    $dayEndTime = $d_end;
-                                }
-                                if ($dayStartTime->before($d_start)) {
-                                    $dayStartTime = $d_start;
-                                }
-                                $colSpan = $rowspan_array[$getdate][$val[$i][$keys[0]]];
+                            $colSpan = $rowspan_array[$getdate][$val[$i][$keys[0]]];
 
-                                $daydisplay .= sprintf($this->conf['view.']['day.']['dayEventPre'], $colSpan);
-                                $daydisplay .= $event->renderEventForDay();
-                                $daydisplay .= $this->conf['view.']['day.']['dayEventPost'];
-                                // End event drawing
-                                break;
+                            $daydisplay .= sprintf($this->conf['view.']['day.']['dayEventPre'], $colSpan);
+                            $daydisplay .= $event->renderEventForDay();
+                            $daydisplay .= $this->conf['view.']['day.']['dayEventPost'];
+                            // End event drawing
                         }
                     }
                 }
                 if (count($val) < $nbrGridCols) {
                     $remember = 0;
                     // Render cells with events
-                    for ($l = 0; $l < $nbrGridCols; $l++) {
-                        if (!$val[$l]) {
+                    foreach ($val as $lValue) {
+                        if (!$lValue) {
                             $remember++;
                         } elseif ($remember > 0) {
                             $daydisplay .= $this->getCreateEventLink(
@@ -555,7 +536,6 @@ class DayView extends BaseView
                             $class,
                             $cal_time
                         );
-                        $remember = 0;
                     }
                 }
             } else {

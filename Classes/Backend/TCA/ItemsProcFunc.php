@@ -21,6 +21,9 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\QueryGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * Class ItemsProcFunc
+ */
 class ItemsProcFunc
 {
 
@@ -33,7 +36,7 @@ class ItemsProcFunc
      * @todo Localize translation names. Probably not too critical since
      *       they're mostly English anyway but its easy to do.
      */
-    public function getDayTimes($config)
+    public function getDayTimes($config): array
     {
         $interval = 60 * 30;
         $dayLength = 60 * 60 * 24;
@@ -64,7 +67,7 @@ class ItemsProcFunc
      * @param  array    The current config array.
      * @return array
      */
-    public function getUsersAndGroups($config)
+    public function getUsersAndGroups($config): array
     {
         /* Add frontend groups */
 
@@ -76,7 +79,7 @@ class ItemsProcFunc
         $builder = $connectionPool->getQueryBuilderForTable($table);
 
         $res = $builder->select('*')->from($table)->orderBy('title')->execute();
-        while (($row = $res->fetch(FetchMode::ASSOCIATIVE))) {
+        while ($row = $res->fetch(FetchMode::ASSOCIATIVE)) {
             $label = BackendUtility::getRecordTitle($table, $row);
             $value = -1 * intval($row ['uid']);
             $config ['items'] [] = [
@@ -97,7 +100,7 @@ class ItemsProcFunc
         $builder = $connectionPool->getQueryBuilderForTable($table);
 
         $res = $builder->select('*')->from($table)->orderBy('name')->execute();
-        while (($row = $res->fetch(FetchMode::ASSOCIATIVE))) {
+        while ($row = $res->fetch(FetchMode::ASSOCIATIVE)) {
             $label = BackendUtility::getRecordTitle($table, $row);
             $value = $row ['uid'];
             $config ['items'] [] = [
@@ -143,11 +146,12 @@ class ItemsProcFunc
      * A SQL resource is returned.
      * exec_SELECTquery($select_fields,$from_table,$where_clause,$groupBy='',$orderBy='',$limit='')
      *
-     * @param  string       Name of the table.
-     * @param  string       Custom WHERE clause.
-     * @param  string       GROUP BY options.
-     * @param  string       ORDER BY options.
-     * @param  string        LIMIT options.
+     * @param $table
+     * @param string $where
+     * @param string $groupBy
+     * @param string $orderBy
+     * @param string $limit
+     * @param string $pid
      * @return object resource.
      */
     public static function getSQLResource($table, $where = '', $groupBy = '', $orderBy = '', $limit = '', $pid = '')
@@ -168,7 +172,7 @@ class ItemsProcFunc
         $builder = $connectionPool->getQueryBuilderForTable($table);
 
         /* If we're grabbing calendar or category records, check access control settings */
-        if ($table == 'tx_cal_calendar' or $table == 'tx_cal_category') {
+        if ($table === 'tx_cal_calendar' || $table === 'tx_cal_category') {
 
             /* If we have a non-admin backend user, check access control settings */
             if (is_object($GLOBALS ['BE_USER']) && !$GLOBALS ['BE_USER']->user ['admin']) {
@@ -220,7 +224,7 @@ class ItemsProcFunc
                 $pidlist = '';
                 foreach ($mounts as $idx => $uid) {
                     $list = $qG->getTreeList($uid, 99, 0, $GLOBALS ['BE_USER']->getPagePermsClause(1));
-                    $pidlist .= ($pidlist == '' ? '' : ',') . $list;
+                    $pidlist .= ($pidlist === '' ? '' : ',') . $list;
                 }
                 $cache [$GLOBALS ['BE_USER']->user ['uid']] ['pidlist'] = $pidlist;
                 $GLOBALS ['BE_USER']->setAndSaveSessionData('cal_itemsProcFunc', $cache);

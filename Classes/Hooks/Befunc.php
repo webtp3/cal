@@ -37,16 +37,16 @@ class Befunc
      * @param $conf
      * @return string
      */
-    public function postprocessvalue(&$conf)
+    public function postprocessvalue(&$conf): string
     {
         if ($conf['colConf']['tx_cal_event']) {
             $value = new CalDate($conf['value'] . '000000');
-            if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] == '1') {
+            if ((int)$GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] === '1') {
                 $conf['value'] = $value->format('%d.%m.%Y');
             } else {
                 $conf['value'] = $value->format('%d-%m-%Y');
             }
         }
-        return $conf['value'];
+        return $conf['value'] ?? '';
     }
 }

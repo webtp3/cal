@@ -46,9 +46,8 @@ class ReminderView extends NotificationView
             case 'fe_groups':
                 $subType = 'getGroupsFE';
                 $groups = [];
-                $serviceObj = null;
                 $serviceObj = GeneralUtility::makeInstanceService('auth', $subType);
-                if ($serviceObj == null) {
+                if ($serviceObj === null) {
                     return;
                 }
 
@@ -83,7 +82,7 @@ class ReminderView extends NotificationView
      */
     public function process(&$event, $email, $userId)
     {
-        if ($email != '' && GeneralUtility::validEmail($email)) {
+        if ($email !== '' && GeneralUtility::validEmail($email)) {
             $template = $this->conf['view.']['event.']['remind.'][$userId . '.']['template'];
             if (!$template) {
                 $template = $this->conf['view.']['event.']['remind.']['all.']['template'];
@@ -96,7 +95,9 @@ class ReminderView extends NotificationView
         }
     }
 
-    /* @todo    Figure out where this should live */
+    /* @todo    Figure out where this should live
+     * @param int $calEventUID
+     */
     public function scheduleReminder($calEventUID)
     {
 
@@ -105,7 +106,6 @@ class ReminderView extends NotificationView
 
         // get the related monitoring records
         $taskId = null;
-        $offset = 0;
 
         $select = '*';
         $table = 'tx_cal_fe_user_event_monitor_mm';
@@ -181,7 +181,6 @@ class ReminderView extends NotificationView
                         $this->deleteReminder($calEventUID);
                     }
                 } else {
-                    // taskId == 0 -> schedule task
                     $this->createSchedulerTask($scheduler, $date, $calEventUID, $timestamp, $offset, $row['uid']);
                 }
             }
@@ -190,7 +189,7 @@ class ReminderView extends NotificationView
 
     /**
      * @param $scheduler
-     * @param $date
+     * @param CalDate $date
      * @param $calEventUID
      * @param $timestamp
      * @param $offset
@@ -240,7 +239,9 @@ class ReminderView extends NotificationView
         }
     }
 
-    /* @todo    Figure out where this should live */
+    /* @todo    Figure out where this should live
+     * @param int $eventUid
+     */
     public function deleteReminder($eventUid)
     {
         if (ExtensionManagementUtility::isLoaded('scheduler')) {
@@ -255,7 +256,6 @@ class ReminderView extends NotificationView
                 }
             }
         } elseif (ExtensionManagementUtility::isLoaded('gabriel')) {
-            $monitoringUID = 'tx_cal_fe_user_event_monitor_mm:' . $eventUid;
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_gabriel', ' crid="' . $eventUid . '"');
         }
     }

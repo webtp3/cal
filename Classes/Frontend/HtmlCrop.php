@@ -34,17 +34,17 @@ class HtmlCrop
      * @param $conf
      * @return string
      */
-    public function html_substr2PHP4($content, $conf)
+    public function html_substr2PHP4($content, $conf): string
     {
 
         // The approximate length you want the concatenated text to be
-        $minimum_length = $conf['minLength'] ? $conf['minLength'] : 200;
+        $minimum_length = $conf['minLength'] ?: 200;
         // The variation in how long the text can be
         // in this example text length will be between 200-10=190 characters
         // and the character where the last tag ends
         // $length_offset = $conf['lengthOffset'] ? $conf['lengthOffset'] : 10;
 
-        $replaceString = $conf['replaceString'] ? $conf['replaceString'] : '...';
+        $replaceString = $conf['replaceString'] ?: '...';
         // Reset tag counter & quote checker
         $doc = domxml_xmltree('<body>' . $content . '</body>');
         $body = $doc->get_elements_by_tagname('body');
@@ -60,7 +60,7 @@ class HtmlCrop
      * @param string $replaceString
      * @return string
      */
-    public function getContentAsStringPHP4($node, &$length, $maxLength = 200, $replaceString = '...')
+    public function getContentAsStringPHP4($node, &$length, $maxLength = 200, $replaceString = '...'): string
     {
         $st = '';
         if ($length >= $maxLength) {
@@ -111,13 +111,13 @@ class HtmlCrop
     {
 
         // The approximate length you want the concatenated text to be
-        $minimum_length = $conf['minLength'] ? $conf['minLength'] : 200;
+        $minimum_length = $conf['minLength'] ?: 200;
         // The variation in how long the text can be
         // in this example text length will be between 200-10=190 characters
         // and the character where the last tag ends
         // $length_offset = $conf['lengthOffset'] ? $conf['lengthOffset'] : 10;
 
-        $replaceString = $conf['replaceString'] ? $conf['replaceString'] : '...';
+        $replaceString = $conf['replaceString'] ?: '...';
         // Reset tag counter & quote checker
 
         $doc = new DOMDocument('1.0', 'utf-8');
@@ -137,7 +137,7 @@ class HtmlCrop
      * @param string $replaceString
      * @return string
      */
-    public function getContentAsStringPHP5($node, &$length, $maxLength = 200, $replaceString = '...')
+    public function getContentAsStringPHP5($node, &$length, $maxLength = 200, $replaceString = '...'): string
     {
         $st = '';
         if ($length >= $maxLength) {

@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\Service;
  */
 use RuntimeException;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Model\TodoModel;
@@ -39,7 +40,7 @@ class TodoService extends EventService
      * @param string $additionalWhere
      * @return array array of events represented by the model.
      */
-    public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '4', $additionalWhere = '')
+    public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '4', $additionalWhere = ''): array
     {
         return parent::findAllWithin($start_date, $end_date, $pidList, '4', $additionalWhere);
     }
@@ -51,7 +52,7 @@ class TodoService extends EventService
      * @param string $eventType
      * @return array array of todos represented by the model.
      */
-    public function findAll($pidList, $eventType = '4')
+    public function findAll($pidList, $eventType = '4'): array
     {
         return parent::findAll($pidList, '4');
     }
@@ -61,7 +62,7 @@ class TodoService extends EventService
      * @param $isException
      * @return EventModel|TodoModel
      */
-    public function createEvent($row, $isException)
+    public function createEvent($row, $isException): EventModel
     {
         return new TodoModel($row, $this->getServiceKey());
     }
@@ -77,7 +78,7 @@ class TodoService extends EventService
      * @param bool $disableCalendarSearchString
      * @param bool $disableCategorySearchString
      * @param string $eventType
-     * @return object todo represented by the model.
+     * @return EventModel
      */
     public function find(
         $uid,
@@ -88,7 +89,7 @@ class TodoService extends EventService
         $disableCalendarSearchString = false,
         $disableCategorySearchString = false,
         $eventType = '4'
-    ) {
+    ): EventModel {
         return parent::find(
             $uid,
             $pidList,
@@ -106,7 +107,7 @@ class TodoService extends EventService
      * @param bool $disableCategorySearchString
      * @return array
      */
-    public function findCurrentTodos($disableCalendarSearchString = false, $disableCategorySearchString = false)
+    public function findCurrentTodos($disableCalendarSearchString = false, $disableCategorySearchString = false): array
     {
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->starttime = new CalDate($confArr['recurrenceStart']);
@@ -127,7 +128,7 @@ class TodoService extends EventService
             $calendarSearchString = $calendarService->getCalendarSearchString(
                 $this->conf['pidList'],
                 true,
-                $this->conf['calendar'] ? $this->conf['calendar'] : ''
+                $this->conf['calendar'] ?: ''
             );
         }
 
@@ -149,9 +150,10 @@ class TodoService extends EventService
 
     /**
      * @param $pid
-     * @return object
+     * @return EventModel
+     * @throws \TYPO3\CMS\Core\Exception
      */
-    public function saveEvent($pid)
+    public function saveEvent($pid): EventModel
     {
         $object = $this->modelObj->createEvent('tx_cal_todo');
         $object->updateWithPIVars($this->controller->piVars);
@@ -200,7 +202,7 @@ class TodoService extends EventService
         $insertFields['uid'] = $uid;
         $insertFields['category'] = $this->controller->piVars['category_ids'];
         self::_notify($insertFields);
-        if ($object->getSendoutInvitation()) {
+        if ($object->getSendOutInvitation()) {
             $object->setUid($uid);
             $this->_invite($object);
         }
@@ -224,9 +226,9 @@ class TodoService extends EventService
     /**
      * @param $eventData
      * @param $object
-     * @return mixed
+     * @return int
      */
-    public function _saveEvent(&$eventData, $object)
+    public function _saveEvent(&$eventData, $object): int
     {
         $tempValues = [];
         $tempValues['notify_ids'] = $eventData['notify_ids'];
@@ -257,7 +259,7 @@ class TodoService extends EventService
 
         // creating relation records
         if ($this->rightsObj->isAllowedTo('create', 'todo', 'notify')) {
-            if ($tempValues['notify_ids'] != '') {
+            if ($tempValues['notify_ids'] !== '') {
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
@@ -304,7 +306,7 @@ class TodoService extends EventService
                 $uid,
                 'fe_groups'
             );
-        } elseif ($this->rightsObj->isLoggedIn() && $this->conf['rights.']['create.']['todo.']['addFeUserToNotify']) {
+        } elseif ($this->conf['rights.']['create.']['todo.']['addFeUserToNotify'] && $this->rightsObj->isLoggedIn()) {
             self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
                 $this->rightsObj->getUserId()
             ], $uid, 'fe_users');
@@ -394,9 +396,10 @@ class TodoService extends EventService
 
     /**
      * @param $uid
-     * @return object
+     * @return EventModel
+     * @throws \TYPO3\CMS\Core\Exception
      */
-    public function updateEvent($uid)
+    public function updateEvent($uid): EventModel
     {
         $insertFields = [
             'tstamp' => time()
@@ -431,7 +434,7 @@ class TodoService extends EventService
         $this->_updateEvent($uid, $insertFields, $event);
 
         self::_notifyOfChanges($event_old, $insertFields);
-        if ($event->getSendoutInvitation()) {
+        if ($event->getSendOutInvitation()) {
             $this->_invite($event);
         }
         $this->unsetPiVars();
@@ -487,10 +490,9 @@ class TodoService extends EventService
             $this->checkOnNewOrDeletableFiles('tx_cal_event', 'attachment', $eventData);
         }
 
-        $where = ' AND tx_cal_event.uid=' . $uid . ' AND tx_cal_fe_user_category_mm.tablenames="fe_users" ' . $this->cObj->enableFields('tx_cal_event');
-
         if ($this->rightsObj->isAllowedTo('edit', 'todo', 'category')) {
             $categoryIds = [];
+            /** @var CategoryModel $category */
             foreach ($object->getCategories() as $category) {
                 if (is_object($category)) {
                     $categoryIds[] = $category->getUid();
@@ -502,12 +504,12 @@ class TodoService extends EventService
             self::insertIdsIntoTableWithMMRelation($table, $categoryIds, $uid, '');
         }
 
-        if ($this->rightsObj->isAllowedTo('edit', 'todo', 'notify') && !is_null($tempValues['notify_ids'])) {
+        if ($tempValues['notify_ids'] !== null && $this->rightsObj->isAllowedTo('edit', 'todo', 'notify')) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery(
                 'tx_cal_fe_user_event_monitor_mm',
                 'uid_local =' . $uid . ' AND tablenames in ("fe_users","fe_groups")'
             );
-            if ($tempValues['notify_ids'] != '') {
+            if ($tempValues['notify_ids'] !== '') {
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
@@ -663,16 +665,20 @@ class TodoService extends EventService
 
     /**
      * @param $insertFields
-     * @param $object
+     * @param EventModel $object
      */
     public function filterDataToBeSaved(&$insertFields, &$object)
     {
         $hidden = 0;
-        if (isset($this->conf['rights.']['create.']['todo.']['fields.']['hidden.']['default']) && !$this->rightsObj->isAllowedTo(
+        if (
+            !$this->rightsObj->isAllowedTo(
                 'edit',
                 'todo',
                 'hidden'
-            ) && !$this->rightsObj->isAllowedTo('create', 'todo', 'hidden')) {
+            )
+            && !$this->rightsObj->isAllowedTo('create', 'todo', 'hidden')
+            && isset($this->conf['rights.']['create.']['todo.']['fields.']['hidden.']['default'])
+        ) {
             $hidden = $this->conf['rights.']['create.']['todo.']['fields.']['hidden.']['default'];
         } elseif ($object->isHidden() && $this->rightsObj->isAllowedTo('create', 'todo', 'hidden')) {
             $hidden = 1;
@@ -680,12 +686,12 @@ class TodoService extends EventService
         $insertFields['hidden'] = $hidden;
         $insertFields['type'] = $object->getEventType();
 
-        $insertFields['allday'] = $object->isAllday() ? '1' : '0';
+        $insertFields['allday'] = $object->isAllDay() ? '1' : '0';
         if (!$this->rightsObj->isAllowedTo('create', 'todo', 'allday')) {
             $insertFields['allday'] = $this->conf['rights.']['create.']['todo.']['fields.']['allday.']['default'];
         }
         if ($this->rightsObj->isAllowedTo('create', 'todo', 'calendar')) {
-            if ($object->getCalendarUid() != '') {
+            if ($object->getCalendarUid() !== '') {
                 $insertFields['calendar_id'] = $object->getCalendarUid();
             } elseif ($this->conf['rights.']['create.']['todo.']['fields.']['calendar.']['default']) {
                 $insertFields['calendar_id'] = $this->conf['rights.']['create.']['todo.']['fields.']['calendar_id.']['default'];
@@ -730,7 +736,7 @@ class TodoService extends EventService
         if ($this->rightsObj->isAllowedTo('create', 'todo', 'cal_location')) {
             $insertFields['location_id'] = $object->getLocationId();
         }
-        if ($object->getDescription() != '' && $this->rightsObj->isAllowedTo('create', 'todo', 'description')) {
+        if ($object->getDescription() !== '' && $this->rightsObj->isAllowedTo('create', 'todo', 'description')) {
             $insertFields['description'] = $object->getDescription();
         }
         if ($this->rightsObj->isAllowedTo('create', 'todo', 'recurring')) {
@@ -775,16 +781,20 @@ class TodoService extends EventService
 
     /**
      * @param $insertFields
-     * @param $object
+     * @param EventModel $object
      */
     public function filterDataToBeUpdated(&$insertFields, &$object)
     {
         $hidden = 0;
-        if (isset($this->conf['rights.']['edit.']['todo.']['fields.']['hidden.']['default']) && !$this->rightsObj->isAllowedTo(
-                'edit',
-                'todo',
-                'hidden'
-            ) && !$this->rightsObj->isAllowedTo('create', 'todo', 'hidden')) {
+        if (
+            !$this->rightsObj->isAllowedTo(
+                        'edit',
+                        'todo',
+                        'hidden'
+                    )
+            && !$this->rightsObj->isAllowedTo('create', 'todo', 'hidden')
+            && isset($this->conf['rights.']['edit.']['todo.']['fields.']['hidden.']['default'])
+        ) {
             $hidden = $this->conf['rights.']['edit.']['todo.']['fields.']['hidden.']['default'];
         } elseif ($object->isHidden() && $this->rightsObj->isAllowedToEditEventHidden()) {
             $hidden = 1;
@@ -795,13 +805,13 @@ class TodoService extends EventService
             $insertFields['type'] = $object->getEventType();
         }
 
-        $insertFields['allday'] = $object->isAllday() ? '1' : '0';
+        $insertFields['allday'] = $object->isAllDay() ? '1' : '0';
         if (!$this->rightsObj->isAllowedTo('edit', 'todo', 'allday')) {
             $insertFields['allday'] = $this->conf['rights.']['edit.']['todo.']['fields.']['allday.']['default'];
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'todo', 'calendar')) {
-            if ($object->getCalendarUid() != '') {
+            if ($object->getCalendarUid() !== '') {
                 $insertFields['calendar_id'] = $object->getCalendarUid();
             } elseif ($this->conf['rights.']['edit.']['todo.']['fields.']['calendar.']['default']) {
                 $insertFields['calendar_id'] = $this->conf['rights.']['edit.']['todo.']['fields.']['calendar_id.']['default'];
@@ -846,7 +856,7 @@ class TodoService extends EventService
         if ($this->rightsObj->isAllowedTo('edit', 'todo', 'cal_location')) {
             $insertFields['location_id'] = $object->getLocationId();
         }
-        if ($object->getDescription() != '' && $this->rightsObj->isAllowedTo('edit', 'todo', 'description')) {
+        if ($object->getDescription() !== '' && $this->rightsObj->isAllowedTo('edit', 'todo', 'description')) {
             $insertFields['description'] = $object->getDescription();
         }
         if ($this->rightsObj->isAllowedTo('edit', 'todo', 'recurring')) {
@@ -900,14 +910,14 @@ class TodoService extends EventService
      * @return array
      */
     public function search(
-        $pidList = '',
+        $pidList,
         $start_date,
         $end_date,
         $searchword,
         $locationIds = '',
         $organizerIds = '',
         $eventType = '0,1,2,3'
-    ) {
+    ): array {
         return parent::search($pidList, $start_date, $end_date, $searchword, $locationIds, $organizerIds, '4');
     }
 
@@ -916,11 +926,11 @@ class TodoService extends EventService
      * @param array $ex_event_dates
      * @return array
      */
-    public function getRecurringEventsFromIndex($event, $ex_event_dates = [])
+    public function getRecurringEventsFromIndex($event, $ex_event_dates = []): array
     {
         $master_array = [];
         $startDate = $event->getStart();
-        $master_array[$startDate->format('%Y%m%d')][$event->isAllday() ? '-1' : ($startDate->format('%H%M'))][$event->getUid()] = &$event;
+        $master_array[$startDate->format('%Y%m%d')][$event->isAllDay() ? '-1' : $startDate->format('%H%M')][$event->getUid()] = &$event;
         $select = '*';
         $table = 'tx_cal_index';
         $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('%Y%m%d%H%M%S') . ' AND start_datetime <= ' . $this->endtime->format('%Y%m%d%H%M%S');
@@ -930,7 +940,7 @@ class TodoService extends EventService
                 $nextOccuranceTime = new CalDate($row['start_datetime']);
                 $nextOccuranceEndTime = new CalDate($row['end_datetime']);
                 $new_event = new TodoRecModel($event, $nextOccuranceTime, $nextOccuranceEndTime);
-                if ($new_event->isAllday()) {
+                if ($new_event->isAllDay()) {
                     $master_array[$nextOccuranceTime->format('%Y%m%d')]['-1'][$event->getUid()] = $new_event;
                 } else {
                     $master_array[$nextOccuranceTime->format('%Y%m%d')][$nextOccuranceTime->format('%H%M')][$event->getUid()] = $new_event;
@@ -943,7 +953,7 @@ class TodoService extends EventService
 
     public function unsetPiVars()
     {
-        parent::unsetPivars();
+        parent::unsetPiVars();
         unset($this->controller->piVars['priority'], $this->controller->piVars['completed'], $this->controller->piVars['status']);
     }
 }

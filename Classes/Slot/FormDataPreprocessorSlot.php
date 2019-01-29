@@ -48,7 +48,7 @@ class FormDataPreprocessorSlot
         }
 
         foreach ($recordData->regTableItems_data as $key => $value) {
-            $table = substr($key, 0, -(strlen($key) - strripos($key, '_')));
+            $table = substr($key, 0, -(strlen($key) - strrpos($key, '_')));
 
             $mainFields = new TceFormsGetmainfields();
             $mainFields->getMainFields_preProcess($table, $value, null);

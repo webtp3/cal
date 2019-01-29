@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
@@ -21,25 +22,24 @@ use TYPO3\CMS\Cal\Utility\Functions;
  */
 class DeleteCalendarView extends FeEditingBaseView
 {
+    /**
+     * @var CalendarModel
+     */
     public $calendar;
 
     /**
      * Draws a delete form for a calendar.
      *
-     * @param
-     *            boolean True if a location should be deleted
-     * @param
-     *            object        The object to be deleted
-     * @param
-     *            object        The cObject of the mother-class.
-     * @param
-     *            object        The rights object.
+     * @param bool True if a location should be deleted
+     * @param CalendarModel        The object to be deleted
+     * @param object        The cObject of the mother-class.
+     * @param object        The rights object.
      * @return string HTML output.
      */
-    public function drawDeleteCalendar(&$calendar)
+    public function drawDeleteCalendar(&$calendar): string
     {
         $page = Functions::getContent($this->conf['view.']['delete_calendar.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no confirm calendar template file found:</h3>' . $this->conf['view.']['delete_calendar.']['template'];
         }
 
@@ -101,7 +101,7 @@ class DeleteCalendarView extends FeEditingBaseView
     public function getExtUrlMarker(& $template, & $sims, & $rems)
     {
         $sims['###EXTURL###'] = '';
-        if ($this->object->getCalendarType() == 1) {
+        if ($this->object->getCalendarType() === 1) {
             $sims['###EXTURL###'] = $this->applyStdWrap(
                 $this->object->getExtUrl(),
                 $this->conf['view.'][$this->conf['view'] . '.']['exturl_stdWrap.']
@@ -130,7 +130,7 @@ class DeleteCalendarView extends FeEditingBaseView
     public function getIcsFileMarker(& $template, & $sims, & $rems)
     {
         $sims['###ICSFILE###'] = '';
-        if ($this->object->getCalendarType() == 2) {
+        if ($this->object->getCalendarType() === 2) {
             $sims['###ICSFILE###'] = $this->applyStdWrap($this->object->getIcsFile(), 'icsfile_stdWrap');
         }
     }

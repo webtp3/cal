@@ -3,6 +3,7 @@
 namespace TYPO3\CMS\Cal\View;
 
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
@@ -57,7 +58,7 @@ class NewDayView extends NewTimeView
     }
 
     /**
-     * @param $event
+     * @param EventModel $event
      */
     public function addEvent(&$event)
     {
@@ -96,8 +97,6 @@ class NewDayView extends NewTimeView
      */
     public function getEventsColumnMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $content = '';
-
         $conf = &Registry::Registry('basic', 'conf');
         $dayStart = $conf['view.']['day.']['dayStart']; // '0700'; // Start time for day grid
         $dayEnd = $conf['view.']['day.']['dayEnd']; // '2300'; // End time for day grid
@@ -109,14 +108,14 @@ class NewDayView extends NewTimeView
         while (strlen($dayEnd) < 6) {
             $dayEnd .= '0';
         }
-        if ($gridLength == 0) {
+        if ((int)$gridLength === 0) {
             $gridLength = 15;
         }
 
         $d_start = new CalDate($this->getYmd() . $dayStart);
-        $d_start->setTZbyId('UTC');
+        $d_start->setTZbyID('UTC');
         $d_end = new CalDate($this->getYmd() . $dayEnd);
-        $d_end->setTZbyId('UTC');
+        $d_end->setTZbyID('UTC');
 
         // splitting the events into H:M, to find out if events run in parallel
         $i = new CalDate();
@@ -131,13 +130,13 @@ class NewDayView extends NewTimeView
         foreach ($timeKeys as $timeKey) {
             $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
-                if (!$this->events[$timeKey][$eventKey]->isAllday() && ($this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d') == $this->events[$timeKey][$eventKey]->getEnd()->format('%Y%m%d'))) {
+                if (!$this->events[$timeKey][$eventKey]->isAllday() && ($this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d') === $this->events[$timeKey][$eventKey]->getEnd()->format('%Y%m%d'))) {
                     $eventMappingKey = $this->events[$timeKey][$eventKey]->getType() . '_' . $this->events[$timeKey][$eventKey]->getUid() . '_' . $this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d%H%M%S');
                     $eventArray[$eventMappingKey] = &$this->events[$timeKey][$eventKey];
 
                     $i->copy($this->events[$timeKey][$eventKey]->getStart());
                     $time = $i->getTime();
-                    $time = $time - ($time % ($gridLength * 60));
+                    $time -= ($time % ($gridLength * 60));
                     $i = new CalDate($time);
                     if ($i->before($d_start)) {
                         $i->copy($d_start);
@@ -167,7 +166,7 @@ class NewDayView extends NewTimeView
             $max = [];
             foreach ($viewArray[$this->getYmd()] as $array_time => $time_val) {
                 $c = count($viewArray[$this->getYmd()][$array_time]);
-                array_push($max, $c);
+                $max[] = $c;
             }
             $nbrGridCols = max($max);
         } else {
@@ -189,7 +188,7 @@ class NewDayView extends NewTimeView
                     $eventMappingKey = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M%S');
                     if (array_key_exists($eventMappingKey, $pos_array)) {
                         $eventEnd = $event->getEnd();
-                        $eventEnd->subtractSeconds((($eventEnd->getMinute() % $gridLength) * 60));
+                        $eventEnd->subtractSeconds(($eventEnd->getMinute() % $gridLength) * 60);
                         if ($i_formatted >= $eventEnd->format('%H%M')) {
                             $t_array[$i_formatted][$pos_array[$eventMappingKey]] = [
                                 'ended' => $eventMappingKey
@@ -237,64 +236,66 @@ class NewDayView extends NewTimeView
      * @param $positionArray
      * @return string
      */
-    private function renderEventsColumn(&$eventArray, &$d_start, &$d_end, &$view_array, &$t_array, &$positionArray)
-    {
+    private function renderEventsColumn(
+        &$eventArray,
+        &$d_start,
+        &$d_end,
+        &$view_array,
+        &$t_array,
+        &$positionArray
+    ): string {
+        $daydisplay = '';
         $conf = &Registry::Registry('basic', 'conf');
-        $gridLength = $conf['day.']['gridLength'];
 
         $cal_time_obj = new CalDate($this->getYmd() . '000000');
-        $cal_time_obj->setTZbyId('UTC');
-        $eventCounter = 0;
+        $cal_time_obj->setTZbyID('UTC');
         foreach ($t_array as $cal_time => $val) {
             preg_match('/([0-9]{2})([0-9]{2})/', $cal_time, $dTimeStart);
             $cal_time_obj->setHour($dTimeStart[1]);
             $cal_time_obj->setMinute($dTimeStart[2]);
-            $key = $cal_time_obj->format($conf['view.'][$conf['view'] . '.']['timeFormatDay']);
 
-            if ($val != '' && count($val) > 0) {
-                for ($i = 0; $i < count($val); $i++) {
+            if ($val !== '' && count($val) > 0) {
+                for ($i = 0, $iMax = count($val); $i < $iMax; $i++) {
                     if (!empty($val[$i])) {
                         $keys = array_keys($val[$i]);
-                        switch ($keys[0]) {
-                            case 'begin':
-                                $event = &$eventArray[$val[$i][$keys[0]]];
-                                $eventContent = $event->renderEventFor($conf['view']);
-                                $colSpan = $positionArray[$val[$i][$keys[0]]];
-                                // left
-                                // 1 = 0
-                                // 2 = 50
-                                // 3 = 33.333
-                                // 4 = 25
+                        if ($keys[0] === 'begin') {
+                            $event = &$eventArray[$val[$i][$keys[0]]];
+                            $eventContent = $event->renderEventFor($conf['view']);
+                            $colSpan = $positionArray[$val[$i][$keys[0]]];
+                            // left
+                            // 1 = 0
+                            // 2 = 50
+                            // 3 = 33.333
+                            // 4 = 25
 
-                                $left = 0;
-                                if ($colSpan > 1) {
-                                    $left = 100 / $colSpan * $i;
-                                }
+                            $left = 0;
+                            if ($colSpan > 1) {
+                                $left = 100 / $colSpan * $i;
+                            }
 
-                                // width
-                                // 1 = 100
-                                // 2 = 85,50
-                                // 3 = 56.666, 56.666, 33.333
-                                // 4 = 42.5, 42.5, 42.5, 25
-                                // 5 = 34,34,34,34,20
+                            // width
+                            // 1 = 100
+                            // 2 = 85,50
+                            // 3 = 56.666, 56.666, 33.333
+                            // 4 = 42.5, 42.5, 42.5, 25
+                            // 5 = 34,34,34,34,20
 
-                                $width = 100;
-                                if ($colSpan > 1) {
-                                    $width = 135 / $colSpan;
-                                }
+                            $width = 100;
+                            if ($colSpan > 1) {
+                                $width = 135 / $colSpan;
+                            }
 
-                                // TODO: move this into a hook
-                                $eventContent = str_replace([
-                                    '***LEFT***',
-                                    '***WIDTH***'
-                                ], [
-                                    $left,
-                                    $width
-                                ], $eventContent);
+                            // TODO: move this into a hook
+                            $eventContent = str_replace([
+                                '***LEFT***',
+                                '***WIDTH***'
+                            ], [
+                                $left,
+                                $width
+                            ], $eventContent);
 
-                                $daydisplay .= $eventContent;
-                                // End event drawing
-                                break;
+                            $daydisplay .= $eventContent;
+                            // End event drawing
                         }
                     }
                 }
@@ -322,7 +323,7 @@ class NewDayView extends NewTimeView
         if (!empty($this->events) || $this->hasAlldayEvents) {
             $classes .= ' withEventDay';
         }
-        if (intval($this->getParentMonth()) != intval($this->getMonth())) {
+        if (intval($this->getParentMonth()) !== intval($this->getMonth())) {
             $classes .= ' monthOff';
         }
 
@@ -338,7 +339,7 @@ class NewDayView extends NewTimeView
      */
     public function getDayTitleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims['###DAY_TITLE###'] = $this->getWeekdayString($this->time, $view);
+        $sims['###DAY_TITLE###'] = $this->getWeekdayString($this->time);
     }
 
     /**
@@ -372,7 +373,7 @@ class NewDayView extends NewTimeView
         $local_cObj->data['link_timestamp'] = $value;
         $controller = &Registry::Registry('basic', 'controller');
 
-        if (($rightsObj->isViewEnabled($dayLinkViewTarget) || $conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid']) && (!empty($this->events) || $hasEvent || $this->hasAlldayEvents || $isAllowedToCreateEvent)) {
+        if (($hasEvent || !empty($this->events) || $this->hasAlldayEvents || $isAllowedToCreateEvent) && ($rightsObj->isViewEnabled($dayLinkViewTarget) || $conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid'])) {
             $controller->getParametersForTyposcriptLink(
                 $local_cObj->data,
                 [
@@ -405,12 +406,12 @@ class NewDayView extends NewTimeView
         foreach ($timeKeys as $timeKey) {
             $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
-                if ($this->events[$timeKey][$eventKey]->isAllday() || ($this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d') != $this->events[$timeKey][$eventKey]->getEnd()->format('%Y%m%d'))) {
+                if ($this->events[$timeKey][$eventKey]->isAllday() || ($this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d') !== $this->events[$timeKey][$eventKey]->getEnd()->format('%Y%m%d'))) {
                     $content .= $this->events[$timeKey][$eventKey]->renderEventFor($view);
                 }
             }
         }
-        if ($content == '' && ($view == 'week' || $view == 'day')) {
+        if ($content === '' && ($view === 'week' || $view === 'day')) {
             $content = '<td class="st-c st-s">&nbsp;</td>';
         }
         $sims['###ALLDAY###'] = $content;
@@ -421,7 +422,7 @@ class NewDayView extends NewTimeView
      */
     public function setCurrent(&$dateObject)
     {
-        if ($this->getDay() == $dateObject->day && $this->getMonth() == $dateObject->month && $this->getYear() == $dateObject->year) {
+        if ($this->getDay() === $dateObject->day && $this->getMonth() === $dateObject->month && $this->getYear() === $dateObject->year) {
             $this->current = true;
         }
     }
@@ -431,7 +432,7 @@ class NewDayView extends NewTimeView
      */
     public function setSelected(&$dateObject)
     {
-        if ($this->getDay() == $dateObject->day && $this->getMonth() == $dateObject->month && $this->getYear() == $dateObject->year) {
+        if ($this->getDay() === $dateObject->day && $this->getMonth() === $dateObject->month && $this->getYear() === $dateObject->year) {
             $this->selected = true;
         }
     }
@@ -439,7 +440,7 @@ class NewDayView extends NewTimeView
     /**
      * @return int
      */
-    public function getTime()
+    public function getTime(): int
     {
         return $this->time;
     }
@@ -463,7 +464,7 @@ class NewDayView extends NewTimeView
     /**
      * @return array
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         return $this->events;
     }
@@ -479,7 +480,7 @@ class NewDayView extends NewTimeView
     /**
      * @return bool
      */
-    public function getHasAlldayEvents()
+    public function getHasAlldayEvents(): bool
     {
         return $this->hasAlldayEvents;
     }
@@ -495,7 +496,7 @@ class NewDayView extends NewTimeView
     /**
      * @return bool
      */
-    public function hasEvents()
+    public function hasEvents(): bool
     {
         return !empty($this->getEvents()) || $this->getHasAlldayEvents();
     }

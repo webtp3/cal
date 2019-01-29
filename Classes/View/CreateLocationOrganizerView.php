@@ -30,15 +30,12 @@ class CreateLocationOrganizerView extends FeEditingBaseView
     /**
      * Draws a create location or organizer form.
      *
-     * @param
-     *            boolean        True if a location should be confirmed
-     * @param
-     *            string        Comma separated list of pids.
-     * @param
-     *            object        A location or organizer object to be updated
+     * @param            bool        True if a location should be confirmed
+     * @param            string        Comma separated list of pids.
+     * @param            object        A location or organizer object to be updated
      * @return string HTML output.
      */
-    public function drawCreateLocationOrOrganizer($isLocation = true, $pidList, $object = '')
+    public function drawCreateLocationOrOrganizer($isLocation, $pidList, $object): string
     {
         $this->isLocation = $isLocation;
         if ($isLocation) {
@@ -52,7 +49,6 @@ class CreateLocationOrganizerView extends FeEditingBaseView
             $this->conf['view'] = 'create_' . $this->objectString;
             unset($this->controller->piVars['uid']);
         }
-        $requiredFieldSims = [];
         $allRequiredFieldsAreFilled = $this->checkRequiredFields($requiredFieldsSims);
 
         if ($allRequiredFieldsAreFilled) {
@@ -70,7 +66,7 @@ class CreateLocationOrganizerView extends FeEditingBaseView
         $this->table = 'tx_cal_' . $this->objectString;
 
         $page = Functions::getContent($this->conf['view.']['create_location.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no create location template file found:</h3>' . $this->conf['view.']['create_location.']['template'];
         }
 

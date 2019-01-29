@@ -28,7 +28,7 @@ class DateEval
      *       converting periods and slashes into dashes and taking US date
      *       format into account.
      */
-    public function returnFieldJS()
+    public function returnFieldJS(): string
     {
         return '
 			//Convert the date to a timstamp using standard TYPO3 methods

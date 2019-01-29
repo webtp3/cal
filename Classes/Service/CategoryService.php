@@ -29,7 +29,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CategoryService extends BaseService
 {
     public $categoryArrayByEventUid = [];
-    public $categoryArrayByCalendarUid = null;
+    public $categoryArrayByCalendarUid;
     public $categoryArrayByUid = [];
     public $allCateogryIdsByParentId;
     public $categoryArrayCached = [];

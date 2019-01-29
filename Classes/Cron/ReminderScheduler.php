@@ -34,6 +34,17 @@ class ReminderScheduler extends AbstractTask
     /** @var ConnectionPool */
     public $connectionPool;
 
+    /**
+     * This is the main method that is called when a task is executed
+     * It MUST be implemented by all classes inheriting from this one
+     * Note that there is no error handling, errors and failures are expected
+     * to be handled and logged by the client implementations.
+     * Should return TRUE on successful execution, FALSE on error.
+     *
+     * @return bool Returns TRUE on successful execution, FALSE on error
+     * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     */
     public function execute()
     {
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
@@ -57,10 +68,29 @@ class ReminderScheduler extends AbstractTask
         // ******************
         // Constants defined
         // ******************
-        $path = (php_sapi_name() == 'cgi' || php_sapi_name() == 'isapi' || php_sapi_name() == 'cgi-fcgi') &&
-            ($_SERVER ['ORIG_PATH_TRANSLATED'] ? $_SERVER ['ORIG_PATH_TRANSLATED'] : $_SERVER ['PATH_TRANSLATED']) ?
-                ($_SERVER ['ORIG_PATH_TRANSLATED'] ? $_SERVER ['ORIG_PATH_TRANSLATED'] : $_SERVER ['PATH_TRANSLATED']) :
-                ($_SERVER ['ORIG_SCRIPT_FILENAME'] ? $_SERVER ['ORIG_SCRIPT_FILENAME'] : $_SERVER ['SCRIPT_FILENAME']);
+        if ($_SERVER ['ORIG_SCRIPT_FILENAME']) {
+            if ($_SERVER ['ORIG_PATH_TRANSLATED']) {
+                $path = (PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi') &&
+                ($_SERVER ['ORIG_PATH_TRANSLATED'] ?: $_SERVER ['PATH_TRANSLATED']) ?
+                    $_SERVER ['ORIG_PATH_TRANSLATED'] :
+                    $_SERVER ['ORIG_SCRIPT_FILENAME'];
+            } else {
+                $path = (PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi') &&
+                ($_SERVER ['ORIG_PATH_TRANSLATED'] ?: $_SERVER ['PATH_TRANSLATED']) ?
+                    $_SERVER ['PATH_TRANSLATED'] :
+                    $_SERVER ['ORIG_SCRIPT_FILENAME'];
+            }
+        } elseif ($_SERVER ['ORIG_PATH_TRANSLATED']) {
+            $path = (PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi') &&
+            ($_SERVER ['ORIG_PATH_TRANSLATED'] ?: $_SERVER ['PATH_TRANSLATED']) ?
+                $_SERVER ['ORIG_PATH_TRANSLATED'] :
+                $_SERVER ['SCRIPT_FILENAME'];
+        } else {
+            $path = (PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi') &&
+            ($_SERVER ['ORIG_PATH_TRANSLATED'] ?: $_SERVER ['PATH_TRANSLATED']) ?
+                $_SERVER ['PATH_TRANSLATED'] :
+                $_SERVER ['SCRIPT_FILENAME'];
+        }
 
         define('PATH_thisScript', str_replace('//', '/', str_replace('\\', '/', $path)));
 
@@ -81,7 +111,7 @@ class ReminderScheduler extends AbstractTask
             define('PATH_tslib', $configured_tslib_path);
         }
 
-        if (PATH_tslib == '') {
+        if (PATH_tslib === '') {
             die('Cannot find tslib/. Please set path by defining $configured_tslib_path in ' . basename(PATH_thisScript) . '.');
         }
 
@@ -97,7 +127,7 @@ class ReminderScheduler extends AbstractTask
 
         $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
-        if ($page ['doktype'] != 254) {
+        if ($page ['doktype'] !== 254) {
             /** @var Api $calAPI */
             $calAPI = GeneralUtility::makeInstance(Api::class);
             $calAPI = &$calAPI->tx_cal_api_without($pageIDForPlugin);
@@ -117,7 +147,7 @@ class ReminderScheduler extends AbstractTask
     /**
      * @return int
      */
-    public function getUID()
+    public function getUID(): int
     {
         return $this->uid;
     }

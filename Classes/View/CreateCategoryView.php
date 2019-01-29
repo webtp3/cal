@@ -26,13 +26,11 @@ class CreateCategoryView extends FeEditingBaseView
     /**
      * Draws a create category form.
      *
-     * @param
-     *            string        Comma separated list of pids.
-     * @param
-     *            object        A location or organizer object to be updated
+     * @param string        Comma separated list of pids.
+     * @param CategoryModel $category A location or organizer object to be updated
      * @return string HTML output.
      */
-    public function drawCreateCategory($pidList, $category = '')
+    public function drawCreateCategory($pidList, $category): string
     {
         $this->objectString = 'category';
 
@@ -50,7 +48,6 @@ class CreateCategoryView extends FeEditingBaseView
             unset($this->controller->piVars['uid']);
         }
 
-        $requiredFieldSims = [];
         $allRequiredFieldsAreFilled = $this->checkRequiredFields($requiredFieldsSims);
 
         if ($allRequiredFieldsAreFilled) {
@@ -65,7 +62,7 @@ class CreateCategoryView extends FeEditingBaseView
         $this->table = 'tx_cal_' . $this->objectString;
 
         $page = Functions::getContent($this->conf['view.']['create_category.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>category: no create category template file found:</h3>' . $this->conf['view.']['create_category.']['template'];
         }
         if (is_object($object) && !$object->isUserAllowedToEdit()) {
@@ -141,7 +138,7 @@ class CreateCategoryView extends FeEditingBaseView
             /* If there are allowed styles, draw the selector */
             if (count($allowedStyles) > 0) {
                 foreach ($allowedStyles as $style) {
-                    if ($style == $selectedStyle) {
+                    if ($style === $selectedStyle) {
                         $headerStyle .= '<option value="' . $style . '" selected="selected" class="' . $style . '">' . $style . '</option>';
                     } else {
                         $headerStyle .= '<option value="' . $style . '" class="' . $style . '">' . $style . '</option>';
@@ -174,7 +171,7 @@ class CreateCategoryView extends FeEditingBaseView
             /* If there are allowed styles, draw the selector */
             if (count($allowedStyles) > 0) {
                 foreach ($allowedStyles as $style) {
-                    if ($style == $selectedStyle) {
+                    if ($style === $selectedStyle) {
                         $bodyStyle .= '<option value="' . $style . '" selected="selected" class="' . $style . '">' . $style . '</option>';
                     } else {
                         $bodyStyle .= '<option value="' . $style . '" class="' . $style . '">' . $style . '</option>';
@@ -207,9 +204,8 @@ class CreateCategoryView extends FeEditingBaseView
             } elseif ($this->conf['calendar_id']) {
                 $this->conf['calendar'] = $this->conf['calendar_id'];
             }
-            $ids = [];
             $this->conf['category'] = $this->object->getParentUID();
-            if ($this->conf['category'] == '0') {
+            if ((int)$this->conf['category'] === '0') {
                 $this->conf['category'] = '-1';
             }
             $this->conf['view.']['edit_category.']['tree.']['calendar'] = $this->conf['calendar'];
@@ -228,7 +224,7 @@ class CreateCategoryView extends FeEditingBaseView
             ), 'parent_category_stdWrap');
 
             $this->conf['calendar'] = $tempCalendarConf;
-            if ($this->conf['category'] == 'a') {
+            if ($this->conf['category'] === 'a') {
                 $this->conf['category'] = $tempCategoryConf;
             }
         }

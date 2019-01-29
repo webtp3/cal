@@ -2,11 +2,6 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
-use RuntimeException;
-use TYPO3\CMS\Cal\Model\OrganizerPartner;
-use TYPO3\CMS\Cal\Utility\Functions;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -27,5 +22,5 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
  */
 class OrganizerPartnerService extends BaseService
 {
-// Only needed to avoid exceptions from some Service generation
+    // Only needed to avoid exceptions from some Service generation
 }

@@ -47,11 +47,11 @@ class LogoffPostProcessing
      */
     public function clearSessionApiAfterLogoff($_params, &$pObj)
     {
-        if (GeneralUtility::_GP('logintype') === 'logout' && $_COOKIE['fe_typo_user']) {
+        if ($_COOKIE['fe_typo_user'] && GeneralUtility::_GP('logintype') === 'logout') {
             session_id($_COOKIE['fe_typo_user']);
             session_start();
 
-            if (!$_SESSION['cal_api_logoff'] == 1) {
+            if ((int)$_SESSION['cal_api_logoff'] !== 1) {
                 if (is_array($_SESSION)) {
                     $sessionEntries = array_keys($_SESSION);
                     foreach ($sessionEntries as $key) {

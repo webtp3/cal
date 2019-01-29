@@ -2,7 +2,6 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
-use RuntimeException;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
 
 /**
@@ -33,7 +32,7 @@ class AttendeeService extends BaseService
      *            to search for
      * @param string $pidList
      *            to search in
-     * @return array array ($row)
+     * @return AttendeeModel|bool
      */
     public function find($uid, $pidList)
     {
@@ -54,7 +53,7 @@ class AttendeeService extends BaseService
         if ($foundAttendees[0]) {
             return $foundAttendees[0];
         }
-        return 'none';
+        return false;
     }
 
     /**
@@ -64,7 +63,7 @@ class AttendeeService extends BaseService
      *            to search in
      * @return array array of array (array of $rows)
      */
-    public function findAll($pidList)
+    public function findAll($pidList): array
     {
         $foundAttendees = [];
         $select = '*';
@@ -85,7 +84,7 @@ class AttendeeService extends BaseService
 
     /**
      * @param $uid
-     * @return array
+     * @return AttendeeModel|bool
      */
     public function updateAttendee($uid)
     {
@@ -106,13 +105,11 @@ class AttendeeService extends BaseService
      */
     public function _updateAttendee($uid, &$insertFields)
     {
-
-        // Updating DB records
-        $table = 'tx_cal_attendee';
-        $where = 'uid = ' . $uid;
-
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
-
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+            'tx_cal_attendee',
+            'uid = ' . $uid,
+            $insertFields
+        );
         $this->unsetPiVars();
     }
 
@@ -122,15 +119,14 @@ class AttendeeService extends BaseService
     public function removeAttendee($uid)
     {
         if ($this->rightsObj->isAllowedToDeleteCategory()) {
-            // 'delete' the attendee object
-            $updateFields = [
-                'tstamp' => time(),
-                'deleted' => 1
-            ];
-            $table = 'tx_cal_attendee';
-            $where = 'uid = ' . $uid;
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
-
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+                'tx_cal_attendee',
+                'uid = ' . $uid,
+                [
+                    'tstamp' => time(),
+                    'deleted' => 1
+                ]
+            );
             $this->unsetPiVars();
         }
     }
@@ -141,7 +137,7 @@ class AttendeeService extends BaseService
     public function retrievePostData(&$insertFields)
     {
         $hidden = 0;
-        if ($this->controller->piVars['hidden'] == 'true' && ($this->rightsObj->isAllowedTo(
+        if ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedTo(
                     'edit',
                     'attendee',
                     'hidden'
@@ -185,13 +181,13 @@ class AttendeeService extends BaseService
 
     /**
      * @param $pid
-     * @return array
+     * @return AttendeeModel|bool
      */
     public function saveAttendee($pid)
     {
         $crdate = time();
         $insertFields = [
-            'pid' => $this->conf['rights.']['create.']['attendee.']['saveAttendeeToPid'] ? $this->conf['rights.']['create.']['attendee.']['saveAttendeeToPid'] : $pid,
+            'pid' => $this->conf['rights.']['create.']['attendee.']['saveAttendeeToPid'] ?: $pid,
             'tstamp' => $crdate,
             'crdate' => $crdate
         ];
@@ -211,23 +207,15 @@ class AttendeeService extends BaseService
      */
     public function _saveAttendee(&$insertFields)
     {
-        $table = 'tx_cal_attendee';
-        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
-        if (false === $result) {
-            throw new RuntimeException(
-                'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
-                1431458138
-            );
-        }
-        $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
-        return $uid;
+        $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_cal_attendee', $insertFields);
+        return $GLOBALS['TYPO3_DB']->sql_insert_id();
     }
 
     /**
      * @param $eventUid
      * @return string
      */
-    public function getAttendeeEventSearchString($eventUid)
+    public function getAttendeeEventSearchString($eventUid): string
     {
         return ' AND tx_cal_attendee.event_id = ' . $eventUid;
     }
@@ -236,7 +224,7 @@ class AttendeeService extends BaseService
      * @param $row
      * @return AttendeeModel
      */
-    public function createAttendee($row)
+    public function createAttendee($row): AttendeeModel
     {
         $attendee = new AttendeeModel($row, $this->getServiceKey());
         return $attendee;
@@ -246,7 +234,7 @@ class AttendeeService extends BaseService
      * @param $eventUid
      * @return array
      */
-    public function findEventAttendees($eventUid)
+    public function findEventAttendees($eventUid): array
     {
         $foundAttendees = [];
         // selecting attendees NOT attached to a fe_user

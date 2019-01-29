@@ -15,8 +15,8 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use RuntimeException;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
@@ -29,7 +29,7 @@ class SubscriptionManagerView extends BaseView
      *
      * @return string output of the subscription manager.
      */
-    public function drawSubscriptionManager()
+    public function drawSubscriptionManager(): string
     {
         $rems = [];
         $sims = [];
@@ -42,7 +42,7 @@ class SubscriptionManagerView extends BaseView
 
         /* Get the subscription manager template */
         $page = Functions::getContent($this->conf['view.']['event.']['subscriptionManagerTemplate']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no event template file found:</h3>' . $this->conf['view.']['event.']['subscriptionManagerTemplate'];
         }
 
@@ -63,14 +63,7 @@ class SubscriptionManagerView extends BaseView
             );
 
             if (is_object($event)) {
-                unset($this->controller->piVars['monitor']);
-                unset($this->controller->piVars['email']);
-                unset($this->controller->piVars['sid']);
-                $local_rems = [];
-                $local_sims = [];
-                $local_wrapped = [];
-
-                $status = $this->markerBasedTemplateService->getSubpart($page, '###STATUS###');
+                unset($this->controller->piVars['monitor'], $this->controller->piVars['email'], $this->controller->piVars['sid']);
                 switch ($this->conf['monitor']) {
                     case 'stop': /* Unsubscribe a user */
                         if ($this->unsubscribe($email, $event, $subscriptionHash)) {
@@ -89,7 +82,6 @@ class SubscriptionManagerView extends BaseView
                         break;
                     case 'start': /* Subscribe a user */
                         if ($this->subscribe($email, $event, $subscriptionHash)) {
-                            $status = $this->markerBasedTemplateService->getSubpart($page, '###STATUS_START###');
                             $sims['###STATUS###'] = sprintf(
                                 $this->controller->pi_getLL('l_monitor_event_subscribe_successful'),
                                 $event->getTitle()
@@ -104,68 +96,62 @@ class SubscriptionManagerView extends BaseView
                         break;
                 }
             } else {
-                $noeventmessage = $this->conf['monitor'] == 'stop' ? 'l_monitor_event_unsubscribe_noevent' : 'l_monitor_event_subscribe_noevent';
+                $noeventmessage = $this->conf['monitor'] === 'stop' ? 'l_monitor_event_unsubscribe_noevent' : 'l_monitor_event_subscribe_noevent';
                 $sims['###STATUS###'] = sprintf($this->controller->pi_getLL($noeventmessage));
             }
-        } else {
-            /* If there's a logged in user, show the subscription container */
-            if ($this->conf['subscribeFeUser'] && $this->rightsObj->isLoggedIn()) {
+        } elseif ($this->conf['subscribeFeUser'] && $this->rightsObj->isLoggedIn()) {
+            $select = '*';
+            $table = 'tx_cal_fe_user_event_monitor_mm, tx_cal_event';
+            $where = 'tx_cal_event.uid = tx_cal_fe_user_event_monitor_mm.uid_local AND tx_cal_fe_user_event_monitor_mm.uid_foreign IN (' . $this->rightsObj->getUserId() . ')';
+            $where .= ' AND tx_cal_event.deleted = 0 AND tx_cal_event.hidden = 0';
+            $where .= ' AND tx_cal_event.pid IN (' . $this->conf['pidList'] . ')';
+
+            /* Save to temporary variables */
+            $remUid = $this->conf['uid'];
+            $remType = $this->conf['type'];
+
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
+            $eventList = [];
+            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                $local_rems = [];
+                $local_sims = [];
+                $local_wrapped = [];
                 $subscriptionContainer = $this->markerBasedTemplateService->getSubpart($page, '###SUBSCRIPTION_CONTAINER###');
-                $return = '';
-
-                $select = '*';
-                $table = 'tx_cal_fe_user_event_monitor_mm, tx_cal_event';
-                $where = 'tx_cal_event.uid = tx_cal_fe_user_event_monitor_mm.uid_local AND tx_cal_fe_user_event_monitor_mm.uid_foreign IN (' . $this->rightsObj->getUserId() . ')';
-                $where .= ' AND tx_cal_event.deleted = 0 AND tx_cal_event.hidden = 0';
-                $where .= ' AND tx_cal_event.pid IN (' . $this->conf['pidList'] . ')';
-
-                /* Save to temporary variables */
-                $remUid = $this->conf['uid'];
-                $remType = $this->conf['type'];
-
-                $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-                $eventList = [];
-                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    $local_rems = [];
-                    $local_sims = [];
-                    $local_wrapped = [];
-                    $subscriptionContainer = $this->markerBasedTemplateService->getSubpart($page, '###SUBSCRIPTION_CONTAINER###');
-                    $event = $this->modelObj->findEvent(
-                        $row['uid'],
-                        'tx_cal_phpicalendar',
-                        $this->conf['pidList'],
-                        true,
-                        true,
-                        false,
-                        true,
-                        false
-                    );
-                    $this->conf['uid'] = $row['uid'];
-                    $this->conf['type'] = $event->getType();
-                    $event->getMarker($subscriptionContainer, $local_sims, $local_rems, $local_wrapped);
-                    $eventList[] = '<li>' . Functions::substituteMarkerArrayNotCached(
-                            $subscriptionContainer,
-                            $local_sims,
-                            $local_rems,
-                            $local_wrapped
-                        ) . '</li>';
-                }
-                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-
-                /* Restore from temporary variables */
-                $this->conf['uid'] = $remUid;
-                $this->conf['type'] = $remType;
-
-                if (empty($eventList)) {
-                    $return = 'No events found.';
-                } else {
-                    $return = '<ul>' . implode(chr(10), $eventList) . '</ul>';
-                }
-
-                $rems['###SUBSCRIPTION_CONTAINER###'] = $return;
-            } else { /* Otherwise, request login or captcha validation */
-                $sims['###STATUS###'] = 'You must be logged in to manage your event notifications.';
+                $event = $this->modelObj->findEvent(
+                    $row['uid'],
+                    'tx_cal_phpicalendar',
+                    $this->conf['pidList'],
+                    true,
+                    true,
+                    false,
+                    true,
+                    false
+                );
+                $this->conf['uid'] = $row['uid'];
+                $this->conf['type'] = $event->getType();
+                $event->getMarker($subscriptionContainer, $local_sims, $local_rems, $local_wrapped);
+                $eventList[] = '<li>' . Functions::substituteMarkerArrayNotCached(
+                        $subscriptionContainer,
+                        $local_sims,
+                        $local_rems,
+                        $local_wrapped
+                    ) . '</li>';
             }
+            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+
+            /* Restore from temporary variables */
+            $this->conf['uid'] = $remUid;
+            $this->conf['type'] = $remType;
+
+            if (empty($eventList)) {
+                $return = 'No events found.';
+            } else {
+                $return = '<ul>' . implode(chr(10), $eventList) . '</ul>';
+            }
+
+            $rems['###SUBSCRIPTION_CONTAINER###'] = $return;
+        } else { /* Otherwise, request login or captcha validation */
+            $sims['###STATUS###'] = 'You must be logged in to manage your event notifications.';
         }
         $page = Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
         $rems = [];
@@ -178,19 +164,16 @@ class SubscriptionManagerView extends BaseView
      * Check both the fe_users table and the
      * tx_cal_unknown_users table.
      *
-     * @param
-     *            string        Email address to unsubscribe.
-     * @param
-     *            object        Event that email should be unsubscribed from.
-     * @param
-     *            string        Unique hash of email and event.
+     * @param string        Email address to unsubscribe.
+     * @param EventModel $event        Event that email should be unsubscribed from.
+     * @param string        Unique hash of email and event.
      * @return bool whether unsubscribe was successful.
      * @todo Should we always try to unsubscribe both fe users and unknown
      *       users or just try one and stop if successful?
      */
-    public function unsubscribe($email, $event, $subscriptionHash)
+    public function unsubscribe($email, $event, $subscriptionHash): bool
     {
-        $eventUID = $event->getUID();
+        $eventUID = $event->getUid();
         return $this->unsubscribeByTable(
                 'fe_users',
                 $email,
@@ -208,17 +191,13 @@ class SubscriptionManagerView extends BaseView
      * Attempts to unsubscribe an email address within a particular table from
      * a particular event if the subscription hash matches.
      *
-     * @param
-     *            string        Table to look up email address in.
-     * @param
-     *            string        Email address to unsubscribe.
-     * @param
-     *            object        Event that email should be unsubscribed from.
-     * @param
-     *            string        Unique hash of email and event.
+     * @param string        Table to look up email address in.
+     * @param string        Email address to unsubscribe.
+     * @param object        Event that email should be unsubscribed from.
+     * @param string        Unique hash of email and event.
      * @return bool whether unsubscribe was successful.
      */
-    public function unsubscribeByTable($table, $email, $eventUID, $subscriptionHash)
+    public function unsubscribeByTable($table, $email, $eventUID, $subscriptionHash): bool
     {
         $sqlSelect = 'tx_cal_event.uid, ' . $table . '.crdate, ' . $table . '.email';
         $sqlTable = 'tx_cal_fe_user_event_monitor_mm, tx_cal_event, ' . $table;
@@ -229,7 +208,7 @@ class SubscriptionManagerView extends BaseView
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($sqlSelect, $sqlTable, $sqlWhere);
         while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
             $md5 = md5($row['uid'] . $row['email'] . $row['crdate']);
-            if ($md5 == $subscriptionHash) {
+            if ($md5 === $subscriptionHash) {
                 $unsubscribeUids[] = $row['uid'];
             }
         }
@@ -255,24 +234,21 @@ class SubscriptionManagerView extends BaseView
      * Attempts to subscribe an email address to a particular event if the
      * subscription hash matches.
      *
-     * @param
-     *            string        Email address to subscribe.
-     * @param
-     *            object        Event that email should be subscribed to.
-     * @param
-     *            string        Unique Hash of email and event.
+     * @param string        Email address to subscribe.
+     * @param EventModel $event        Event that email should be subscribed to.
+     * @param string        Unique Hash of email and event.
      * @return bool whether subscribe was successful.
      * @todo Should we always try to subscribe as a frontend user first?
      */
-    public function subscribe($email, $event, $subscriptionHash)
+    public function subscribe($email, $event, $subscriptionHash): bool
     {
-        $md5 = md5($event->getUid() . $email . $event->getCreationDate());
-        $eventUID = $event->getUID();
-        $eventPID = $event->getPID();
+        $md5 = md5($event->getUid() . $email . $event->getCrdate());
+        $eventUID = $event->getUid();
+        $eventPID = $event->getPid();
 
         $offset = $this->conf['view.']['event.']['remind.']['time'];
         /* If the subscription hash matches, subscribe */
-        if ($md5 == $subscriptionHash) {
+        if ($md5 === $subscriptionHash) {
             $user_uid = $this->getFrontendUserUid($email);
             $user_table = 'fe_users';
             /* If we didn't find a matching frontend user, try unknown users */
@@ -292,11 +268,8 @@ class SubscriptionManagerView extends BaseView
                 $eventPID
             );
 
-            $pageTSConf = BackendUtility::getPagesTSconfig($eventPID);
-            $offset = is_numeric($pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time']) ? $pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time'] * 60 : 0;
-            $date = new  CalDate($insertFields['start_date'] . '000000');
+            $date = new  CalDate();
             $date->setTZbyID('UTC');
-            $reminderTimestamp = $date->getTime() + $insertFields['start_time'] - $offset;
             $reminderService = &Functions::getReminderService();
             $reminderService->scheduleReminder($eventUID);
 
@@ -308,28 +281,24 @@ class SubscriptionManagerView extends BaseView
     /**
      * Inserts an intermediate row for a many-to-many table.
      *
-     * @param
-     *            string        Name of the MM table.
-     * @param
-     *            integer        Value for the uid_local field.
-     * @param
-     *            integer        Value for the uid_foreign field.
-     * @param
-     *            string        Name of the table for uid_foreign.
-     * @param
-     *            integer        Sort order.
+     * @param $mmTable
+     * @param $uid_local
+     * @param $uid_foreign
+     * @param $table
+     * @param $sorting
+     * @param int $offset
+     * @param int $eventPid
      * @return int whether a new row was inserted.
      */
-    public function insertMMRow($mmTable, $uid_local, $uid_foreign, $table, $sorting, $offset = 0, $eventPid = 0)
+    public function insertMMRow($mmTable, $uid_local, $uid_foreign, $table, $sorting, $offset = 0, $eventPid = 0): int
     {
         $already_exists = false;
 
         /* Check if row already exists */
         $where = 'uid_local =' . $uid_local . ' AND uid_foreign = ' . $uid_foreign . ' AND tablenames="' . $table . '"';
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid_local', $mmTable, $where);
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+        if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
             $already_exists = true;
-            break;
         }
         $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
@@ -363,21 +332,19 @@ class SubscriptionManagerView extends BaseView
      * @param $email
      * @return int
      */
-    public function getUnknownUserUid($email)
+    public function getUnknownUserUid($email): int
     {
         $already_exists = false;
         $user_uid = 0;
-        $crdate = 0;
 
         $table = 'tx_cal_unknown_users';
         $select = 'uid,crdate';
         $where = 'email = "' . $email . '"';
 
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+        if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
             $already_exists = true;
             $user_uid = $row['uid'];
-            break;
         }
         $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
@@ -406,7 +373,7 @@ class SubscriptionManagerView extends BaseView
      * @param $email
      * @return bool
      */
-    public function getFrontendUserUid($email)
+    public function getFrontendUserUid($email): bool
     {
         $user_uid = false;
 
@@ -415,9 +382,8 @@ class SubscriptionManagerView extends BaseView
         $where = 'email = "' . $email . '"';
 
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+        if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
             $user_uid = $row['uid'];
-            break;
         }
         $GLOBALS['TYPO3_DB']->sql_free_result($result);
 

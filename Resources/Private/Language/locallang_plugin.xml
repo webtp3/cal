@@ -15,14 +15,6 @@
                 processing intensive information (archive period count,
                 category count, categories) in an internal cache.
             </label>
-
-            <label index="extmng.writeCachingInfoToDevlog">Debug caching info: Which information about
-                internal caching should be written to devlog
-                (extension "devlog" required)."disabled": don't write any information about
-                caching to devlog. "cache misses": log only cache misses.
-                "all": log cache misses and cache hits to devlog.
-            </label>
-
             <label index="extmng.cachingMode">Caching Mode: Determines the cache entries
                 lifetime and when the internal cache from cal will be cleared.
                 "normal": (default) the cache entries will get the same lifetime as

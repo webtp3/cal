@@ -31,7 +31,7 @@ class Calendar
      * @param bool $txt
      * @return string
      */
-    public static function two2threeCharDays($day, $txt = true)
+    public static function two2threeCharDays($day, $txt = true): string
     {
         switch ($day) {
             case 'SU':
@@ -49,6 +49,7 @@ class Calendar
             case 'SA':
                 return $txt ? 'sat' : '6';
         }
+        return '';
     }
 
     /**
@@ -88,7 +89,7 @@ class Calendar
      * @param string $dateObject
      * @return CalDate
      */
-    public static function calculateStartDayTime($dateObject = '')
+    public static function calculateStartDayTime($dateObject = ''): CalDate
     {
         $timeObj = new CalDate();
         $timeObj->setTZbyID('UTC');
@@ -105,7 +106,7 @@ class Calendar
      * @param string $dateObject
      * @return CalDate
      */
-    public static function calculateEndDayTime($dateObject = '')
+    public static function calculateEndDayTime($dateObject = ''): CalDate
     {
         $timeObj = new CalDate();
         $timeObj->setTZbyID('UTC');
@@ -122,7 +123,7 @@ class Calendar
      * @param string $dateObject
      * @return CalDate
      */
-    public static function calculateStartWeekTime($dateObject = '')
+    public static function calculateStartWeekTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartDayTime($dateObject);
         $timeObj = new CalDate(Calc::beginOfWeek(
@@ -138,7 +139,7 @@ class Calendar
      * @param string $dateObject
      * @return CalDate
      */
-    public static function calculateEndWeekTime($dateObject = '')
+    public static function calculateEndWeekTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartWeekTime($dateObject);
         $timeObj->addSeconds(604799);
@@ -149,7 +150,7 @@ class Calendar
      * @param string $dateObject
      * @return CalDate
      */
-    public static function calculateStartMonthTime($dateObject = '')
+    public static function calculateStartMonthTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartDayTime($dateObject);
         $timeObj->setDay(1);
@@ -160,7 +161,7 @@ class Calendar
      * @param string $dateObject
      * @return CalDate
      */
-    public static function calculateEndMonthTime($dateObject = '')
+    public static function calculateEndMonthTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartDayTime($dateObject);
         $timeObj = new CalDate(Calc::endOfNextMonth(
@@ -178,7 +179,7 @@ class Calendar
      * @param string $dateObject
      * @return CalDate
      */
-    public static function calculateStartYearTime($dateObject = '')
+    public static function calculateStartYearTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartMonthTime($dateObject);
         $timeObj->setMonth(1);
@@ -189,7 +190,7 @@ class Calendar
      * @param string $dateObject
      * @return CalDate
      */
-    public static function calculateEndYearTime($dateObject = '')
+    public static function calculateEndYearTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartYearTime($dateObject);
         $timeObj->setYear($timeObj->getYear() + 1);
@@ -201,12 +202,13 @@ class Calendar
      * @param $time
      * @return string
      */
-    public static function getHourFromTime($time)
+    public static function getHourFromTime($time): string
     {
+        $retVal = '';
         $time = str_replace(':', '', $time);
 
         if ($time) {
-            $retVal = substr($time, 0, strlen($time) - 2);
+            $retVal = substr($time, 0, -2);
         }
         return $retVal;
     }
@@ -215,8 +217,9 @@ class Calendar
      * @param $time
      * @return string
      */
-    public static function getMinutesFromTime($time)
+    public static function getMinutesFromTime($time): string
     {
+        $retVal = '';
         $time = str_replace(':', '', $time);
         if ($time) {
             $retVal = substr($time, -2);
@@ -225,7 +228,7 @@ class Calendar
     }
 
     /**
-     * @param number $timestamp
+     * @param int $timestamp
      * @return number
      */
     public static function getTimeFromTimestamp($timestamp = 0)

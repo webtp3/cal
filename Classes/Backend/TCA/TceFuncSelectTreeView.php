@@ -47,10 +47,14 @@ class TceFuncSelectTreeView extends AbstractTreeView
      * @param $bank int
      * @return string wrapped title
      */
-    public function wrapTitle($title, $v, $bank = 0)
+    public function wrapTitle($title, $v, $bank = 0): string
     {
         if ($v ['uid'] > 0) {
-            if (in_array($v ['uid'], $this->MOUNTS) || in_array($v ['uid'], $this->TCEforms_nonSelectableItemsArray)) {
+            if (in_array($v ['uid'], $this->MOUNTS, true) || in_array(
+                $v ['uid'],
+                    $this->TCEforms_nonSelectableItemsArray,
+                true
+            )) {
                 return '<a href="#" title="' . $v ['title'] . '"><span style="color:#999;cursor:default;">' . $title . '</span></a>';
             }
             $aOnClick = 'setFormValueFromBrowseWin(\'' . $this->TCEforms_itemFormElName . '\',' . $v ['uid'] . ',\'' . addslashes($title) . '\'); return false;';
@@ -66,9 +70,9 @@ class TceFuncSelectTreeView extends AbstractTreeView
      * @param  array		Item row.
      * @return string tag.
      */
-    public function getIcon($row)
+    public function getIcon($row): string
     {
-        if (in_array($row ['uid'], $this->MOUNTS)) {
+        if (in_array($row ['uid'], $this->MOUNTS, true)) {
             $this->table = 'tx_cal_calendar';
         }
         $return = parent::getIcon($row);
@@ -82,7 +86,7 @@ class TceFuncSelectTreeView extends AbstractTreeView
      * @param  array		Record for root.
      * @return string image tag.
      */
-    public function getRootIcon($rec)
+    public function getRootIcon($rec): string
     {
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         return $iconFactory->getIcon('cal-pagetree-root', Icon::SIZE_SMALL)->render();

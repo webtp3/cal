@@ -36,22 +36,23 @@ class TodoRecModel extends EventRecModel
     /**
      * @return string
      */
-    public function renderEvent()
+    public function renderEvent(): string
     {
         return $this->fillTemplate('###TEMPLATE_TODO###');
     }
 
     /**
      * @param $viewType
+     * @param string $subpartSuffix
      * @return string
      */
-    public function renderEventFor($viewType, $subpartSuffix = '')
+    public function renderEventFor($viewType, $subpartSuffix = ''): string
     {
-        if ($this->parentEvent->conf['view.']['freeAndBusy.']['enable'] == 1) {
+        if ((int)$this->parentEvent->conf['view.']['freeAndBusy.']['enable'] === 1) {
             $viewType .= '_FNB';
         }
         // Need to check if _ALLDAY is already in viewType since handling changed from classic to new standard rendering
-        if (($this->isAllday()) && (strpos($viewType, '_ALLDAY') < 1)) {
+        if ($this->isAllDay() && (strpos($viewType, '_ALLDAY') < 1)) {
             $viewType .= '_ALLDAY';
         }
         return $this->fillTemplate('###TEMPLATE_TODO_' . strtoupper($viewType) . '###');
@@ -60,7 +61,7 @@ class TodoRecModel extends EventRecModel
     /**
      * @return string
      */
-    public function renderEventPreview()
+    public function renderEventPreview(): string
     {
         $this->parentEvent->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_TODO_PREVIEW###');
@@ -69,7 +70,7 @@ class TodoRecModel extends EventRecModel
     /**
      * @return string
      */
-    public function renderTomorrowsEvent()
+    public function renderTomorrowsEvent(): string
     {
         $this->parentEvent->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_TODO_TOMORROW###');
@@ -79,13 +80,13 @@ class TodoRecModel extends EventRecModel
      * @param $subpartMarker
      * @return string
      */
-    public function fillTemplate($subpartMarker)
+    public function fillTemplate($subpartMarker): string
     {
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        $modelTemplate = $confArr['todoSubtype'] == 'event' ? 'todoInlineModelTemplate' : 'todoSeparateModelTemplate';
+        $modelTemplate = $confArr['todoSubtype'] === 'event' ? 'todoInlineModelTemplate' : 'todoSeparateModelTemplate';
 
         $page = Functions::getContent($this->parentEvent->conf['view.']['todo.'][$modelTemplate]);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no todo model template file found:</h3>' . $this->parentEvent->conf['view.']['todo.'][$modelTemplate];
         }
         $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);

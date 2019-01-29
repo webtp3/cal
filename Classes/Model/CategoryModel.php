@@ -2,6 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Cal\Controller\ModelController;
+use TYPO3\CMS\Cal\Service\SysCategoryService;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -19,17 +21,60 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class CategoryModel extends BaseModel
 {
-    public $row = [];
+    /**
+     * @var int
+     */
     public $parentUid = 0;
+
+    /**
+     * @var int
+     */
     public $calendarUid = 0;
+
+    /**
+     * @var string
+     */
     public $title = '';
+
+    /**
+     * @var string
+     */
     public $headerStyle = '';
+
+    /**
+     * @var string
+     */
     public $bodyStyle = '';
+
+    /**
+     * @var bool
+     */
     public $sharedUserAllowed = false;
+
+    /**
+     * @var SysCategoryService
+     */
     public $categoryService;
+
+    /**
+     * @var int
+     */
     public $singlePid = 0;
+
+    /**
+     * @var array
+     */
     public $notificationEmails = [];
+
+    /**
+     * @var string
+     */
     public $icon = '';
+
+    /**
+     * @var CalendarModel
+     */
+    private $calendarObject;
 
     /**
      * Constructor.
@@ -38,7 +83,6 @@ class CategoryModel extends BaseModel
      */
     public function __construct($row, $serviceKey)
     {
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->setType('sys_category');
         $this->setObjectType('category');
         parent::__construct($serviceKey);
@@ -85,7 +129,7 @@ class CategoryModel extends BaseModel
     /**
      * @return int
      */
-    public function getParentUid()
+    public function getParentUid(): int
     {
         return $this->parentUid;
     }
@@ -101,7 +145,7 @@ class CategoryModel extends BaseModel
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -117,7 +161,7 @@ class CategoryModel extends BaseModel
     /**
      * @return string
      */
-    public function getHeaderStyle()
+    public function getHeaderStyle(): string
     {
         return $this->headerStyle;
     }
@@ -133,7 +177,7 @@ class CategoryModel extends BaseModel
     /**
      * @return string
      */
-    public function getBodyStyle()
+    public function getBodyStyle(): string
     {
         return $this->bodyStyle;
     }
@@ -149,7 +193,7 @@ class CategoryModel extends BaseModel
     /**
      * @return bool
      */
-    public function isSharedUserAllowed()
+    public function isSharedUserAllowed(): bool
     {
         return $this->sharedUserAllowed;
     }
@@ -165,7 +209,7 @@ class CategoryModel extends BaseModel
     /**
      * @return int
      */
-    public function getCalendarUid()
+    public function getCalendarUid(): int
     {
         return $this->calendarUid;
     }
@@ -195,7 +239,7 @@ class CategoryModel extends BaseModel
     /**
      * @return int
      */
-    public function getSinglePid()
+    public function getSinglePid(): int
     {
         return $this->singlePid;
     }
@@ -211,7 +255,7 @@ class CategoryModel extends BaseModel
     /**
      * @return array
      */
-    public function getNotificationEmails()
+    public function getNotificationEmails(): array
     {
         return $this->notificationEmails;
     }
@@ -229,7 +273,7 @@ class CategoryModel extends BaseModel
     /**
      * @return string
      */
-    public function getIcon()
+    public function getIcon(): string
     {
         return $this->icon;
     }
@@ -247,7 +291,7 @@ class CategoryModel extends BaseModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightsController');
         if (!$rightsObj->isViewEnabled('edit_category')) {
@@ -257,7 +301,7 @@ class CategoryModel extends BaseModel
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -267,7 +311,9 @@ class CategoryModel extends BaseModel
         $isCategoryOwner = false;
         $isAllowedToEditPublicCategory = false;
         if ($this->getCalendarUid()) {
+            /** @var ModelController $modelObj */
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
+            /** @var CalendarModel $calendar */
             $calendar = $modelObj->findCalendar($this->getCalendarUid(), 'tx_cal_calendar', $this->conf['pidList']);
             $isCategoryOwner = $calendar->isCalendarOwner($feUserUid, $feGroupsArray);
             if ($calendar->isPublic()) {
@@ -282,7 +328,7 @@ class CategoryModel extends BaseModel
         if ($isAllowedToEditOwnCategoryOnly) {
             return $isCategoryOwner;
         }
-        return $isAllowedToEditCategory && ($isCategoryOwner || ($this->getCalendarUid() == 0 && $isAllowedToEditGeneralCategory) || $isAllowedToEditPublicCategory);
+        return $isAllowedToEditCategory && ($isCategoryOwner || ($this->getCalendarUid() === 0 && $isAllowedToEditGeneralCategory) || $isAllowedToEditPublicCategory);
     }
 
     /**
@@ -290,7 +336,7 @@ class CategoryModel extends BaseModel
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightsController');
         if (!$rightsObj->isViewEnabled('delete_category')) {
@@ -300,7 +346,7 @@ class CategoryModel extends BaseModel
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -309,7 +355,9 @@ class CategoryModel extends BaseModel
         $isCategoryOwner = false;
         $isAllowedToDeletePublicCategory = false;
         if ($this->getCalendarUid()) {
+            /** @var ModelController $modelObj */
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
+            /** @var CalendarModel $calendar */
             $calendar = $modelObj->findCalendar($this->getCalendarUid(), 'tx_cal_calendar', $this->conf['pidList']);
             $isCategoryOwner = $calendar->isCalendarOwner($feUserUid, $feGroupsArray);
             if ($calendar->isPublic()) {
@@ -324,7 +372,7 @@ class CategoryModel extends BaseModel
         if ($isAllowedToDeleteOwnCategoryOnly) {
             return $isCategoryOwner;
         }
-        return $isAllowedToDeleteCategory && ($isCategoryOwner || ($this->getCalendarUid() == 0 && $isAllowedToDeleteGeneralCategory) || $isAllowedToDeletePublicCategory);
+        return $isAllowedToDeleteCategory && ($isCategoryOwner || ($this->getCalendarUid() === 0 && $isAllowedToDeleteGeneralCategory) || $isAllowedToDeletePublicCategory);
     }
 
     /**
@@ -347,7 +395,7 @@ class CategoryModel extends BaseModel
      * @param $view
      * @return string
      */
-    public function getEditLink(& $template, & $sims, & $rems, $view)
+    public function getEditLink(& $template, & $sims, & $rems, $view): string
     {
         $editlink = '';
         if ($this->isUserAllowedToEdit()) {
@@ -398,8 +446,6 @@ class CategoryModel extends BaseModel
      */
     public function updateWithPIVars(&$piVars)
     {
-        $modelObj = &Registry::Registry('basic', 'modelController');
-
         foreach ($piVars as $key => $value) {
             switch ($key) {
                 case 'uid':
@@ -423,7 +469,7 @@ class CategoryModel extends BaseModel
                     unset($piVars['headerstyle']);
                     break;
                 case 'bodystyle':
-                    $this->setBodystyle(strip_tags($piVars['bodystyle']));
+                    $this->setBodyStyle(strip_tags($piVars['bodystyle']));
                     unset($piVars['bodystyle']);
                     break;
                 case 'parent_category':

@@ -15,8 +15,8 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use RuntimeException;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Controller;
+use TYPO3\CMS\Cal\Service\RightsService;
 use TYPO3\CMS\Cal\Service\SysCategoryService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -29,16 +29,49 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class EventModel extends Model
 {
+    /**
+     * @var LocationModel
+     */
     public $location;
-    public $isException;
-    public $createUserId;
-    public $isPreview = false;
+
+    /**
+     * @var bool
+     */
+    public $isException = false;
+
+    /**
+     * @var int
+     */
+    public $createUserId = 0;
+
+    /**
+     * @var bool
+     */
     public $isTomorrow = false;
-    public $teaser;
+
+    /**
+     * @var string
+     */
+    public $teaser = '';
+
+    /**
+     * @var string
+     */
     public $limitAttendeeToThisEmail = '';
+
+    /**
+     * @var string
+     */
     public $timezone = 'UTC';
-    public $cachedValueArray = [];
+
+    /**
+     * @var bool
+     */
     public $sendOutInvitation = false;
+
+    /**
+     * @var array
+     */
     public $markerCache = [];
 
     /**
@@ -65,19 +98,17 @@ class EventModel extends Model
      */
     public function updateWithPIVars(&$piVars)
     {
-        $modelObj = &Registry::Registry('basic', 'modelController');
-        $cObj = &$this->controller->cObj;
         $startDateIsSet = false;
         $endDateIsSet = false;
 
         $customFieldArray = [];
-        if ($this->conf['view'] == 'create_event' || $this->conf['view'] == 'edit_event') {
+        if ($this->conf['view'] === 'create_event' || $this->conf['view'] === 'edit_event') {
             $customFieldArray = GeneralUtility::trimExplode(
                 ',',
-                $this->conf['rights.'][$this->conf['view'] == 'create_event' ? 'create.' : 'edit.']['event.']['additionalFields'],
+                $this->conf['rights.'][$this->conf['view'] === 'create_event' ? 'create.' : 'edit.']['event.']['additionalFields'],
                 1
             );
-        } elseif ($this->conf['view'] == 'confirm_event') {
+        } elseif ($this->conf['view'] === 'confirm_event') {
             if ($this->row['uid'] > 0) {
                 $customFieldArray = GeneralUtility::trimExplode(
                     ',',
@@ -93,8 +124,8 @@ class EventModel extends Model
             }
         }
 
-        if ($piVars['formCheck'] == '1') {
-            $this->setAllday(false);
+        if ($piVars['formCheck'] === '1') {
+            $this->setAllDay(false);
         }
 
         foreach ($piVars as $key => $value) {
@@ -104,14 +135,13 @@ class EventModel extends Model
                     unset($piVars['hidden']);
                     break;
                 case 'calendar_id':
-                    $this->setCalendarUid(intval($piVars['calendar_id']));
+                    $this->setCalendarId(intval($piVars['calendar_id']));
                     unset($piVars['calendar_id']);
                     break;
                 case 'category':
                 case 'category_ids':
                     $this->setCategories([]);
                     $categories = [];
-                    $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
                     $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
                     $categoryService->getCategoryArray($this->conf['pidList'], $categories);
                     $piVarsCaregoryArray = explode(
@@ -127,10 +157,10 @@ class EventModel extends Model
                     break;
                 case 'allday_checkbox':
                 case 'allday':
-                    if (intval($piVars[$key]) == 1) {
-                        $this->setAllday(true);
-                    } elseif (strlen($piVars[$key]) > 0) {
-                        $this->setAllday(false);
+                    if ((int)$piVars[$key] === 1) {
+                        $this->setAllDay(true);
+                    } elseif ($piVars[$key] !== '') {
+                        $this->setAllDay(false);
                     }
                     break;
                 case 'start_date':
@@ -148,9 +178,9 @@ class EventModel extends Model
                     if (!$startDateIsSet) {
                         $start = new CalDate(Functions::getYmdFromDateString(
                                 $this->conf,
-                                strip_tags($piVars['startdate'] ? $piVars['startdate'] : $piVars['getdate'])
+                                strip_tags($piVars['startdate'] ?: $piVars['getdate'])
                             ) . '000000');
-                        if (strlen($piVars['starttime']) == 4) {
+                        if (strlen($piVars['starttime']) === 4) {
                             $tempArray = [];
                             preg_match('/([0-9]{2})([0-9]{2})/', $piVars['starttime'], $tempArray);
                             $start->setHour(intval($tempArray[1]));
@@ -181,9 +211,9 @@ class EventModel extends Model
                     if (!$endDateIsSet) {
                         $end = new CalDate(Functions::getYmdFromDateString(
                                 $this->conf,
-                                strip_tags($piVars['enddate'] ? $piVars['enddate'] : $piVars['getdate'])
+                                strip_tags($piVars['enddate'] ?: $piVars['getdate'])
                             ) . '000000');
-                        if (strlen($piVars['endtime']) == 4) {
+                        if (strlen($piVars['endtime']) === 4) {
                             $tempArray = [];
                             preg_match('/([0-9]{2})([0-9]{2})/', $piVars['endtime'], $tempArray);
                             $end->setHour(intval($tempArray[1]));
@@ -220,11 +250,11 @@ class EventModel extends Model
                     unset($piVars['title']);
                     break;
                 case 'description':
-                    $this->setDescription($cObj->removeBadHTML($piVars['description'], []));
+                    $this->setDescription(htmlspecialchars($piVars['description']));
                     unset($piVars['description'], $piVars['_TRANSFORM_description']);
                     break;
                 case 'teaser':
-                    $this->setTeaser($cObj->removeBadHTML($piVars['teaser'], []));
+                    $this->setTeaser(htmlspecialchars($piVars['teaser']));
                     unset($piVars['teaser']);
                     break;
                 case 'image':
@@ -250,7 +280,7 @@ class EventModel extends Model
                         'month',
                         'year'
                     ];
-                    $this->setFreq(in_array($piVars['frequency_id'], $valueArray) ? $piVars['frequency_id'] : 'none');
+                    $this->setFreq(in_array($piVars['frequency_id'], $valueArray, true) ? $piVars['frequency_id'] : 'none');
                     unset($piVars['frequency_id']);
                     break;
                 case 'by_day':
@@ -262,7 +292,7 @@ class EventModel extends Model
                     unset($piVars['by_day']);
                     break;
                 case 'by_monthday':
-                    $this->setByMonthday(strtolower(strip_tags($piVars['by_monthday'])));
+                    $this->setByMonthDay(strtolower(strip_tags($piVars['by_monthday'])));
                     unset($piVars['by_monthday']);
                     break;
                 case 'by_month':
@@ -270,7 +300,7 @@ class EventModel extends Model
                     unset($piVars['by_month']);
                     break;
                 case 'until':
-                    if ($piVars['until'] != 0) {
+                    if ((int)$piVars['until'] !== 0) {
                         $until = new CalDate(Functions::getYmdFromDateString(
                                 $this->conf,
                                 strip_tags($piVars['until'])
@@ -303,9 +333,9 @@ class EventModel extends Model
                     $this->setExceptionGroupIds([]);
                     foreach (GeneralUtility::trimExplode(',', $piVars['exception_ids'], 1) as $valueInner) {
                         preg_match('/(^[a-z])_([0-9]+)/', $valueInner, $idname);
-                        if ($idname[1] == 'u') {
+                        if ($idname[1] === 'u') {
                             $this->addExceptionSingleId($idname[2]);
-                        } elseif ($idname[1] == 'g') {
+                        } elseif ($idname[1] === 'g') {
                             $this->addExceptionGroupId($idname[2]);
                         }
                     }
@@ -320,9 +350,9 @@ class EventModel extends Model
                     }
                     foreach ($values as $entry) {
                         preg_match('/(^[a-z])_([0-9]+)/', $entry, $idname);
-                        if ($idname[1] == 'u') {
+                        if ($idname[1] === 'u') {
                             $this->addSharedUser($idname[2]);
-                        } elseif ($idname[1] == 'g') {
+                        } elseif ($idname[1] === 'g') {
                             $this->addSharedGroup($idname[2]);
                         }
                     }
@@ -332,6 +362,7 @@ class EventModel extends Model
                     unset($piVars['event_type']);
                     break;
                 case 'attendee':
+                    $serviceKey = '';
                     $attendeeIndex = [];
                     $attendeeServices = $this->getAttendees();
                     $emptyAttendeeArray = [];
@@ -340,13 +371,11 @@ class EventModel extends Model
                     foreach ($attendeeServiceKeys as $serviceKey) {
                         $attendeeKeys = array_keys($attendeeServices[$serviceKey]);
                         foreach ($attendeeKeys as $attendeeKey) {
-                            $attendeeIndex[$serviceKey . '_' . ($attendeeServices[$serviceKey][$attendeeKey]->getFeUserId() ? $attendeeServices[$serviceKey][$attendeeKey]->getFeUserId() : $attendeeServices[$serviceKey][$attendeeKey]->getEmail())] = &$attendeeServices[$serviceKey][$attendeeKey];
+                            /** @var AttendeeModel $attendee */
+                            $attendee = $attendeeServices[$serviceKey][$attendeeKey];
+                            $attendeeIndex[$serviceKey . '_' . ($attendee->getFeUserId() ?: $attendee->getEmail())] = &$attendee;
                         }
                     }
-                    $servKey = 'tx_cal_attendee';
-                    $newAttendeeArray = [
-                        $servKey => []
-                    ];
 
                     $values = $piVars[$key];
                     if (!is_array($piVars[$key])) {
@@ -372,10 +401,10 @@ class EventModel extends Model
                         } else {
                             $initRow = [];
                             $attendee = new AttendeeModel($initRow, 'cal_attendee_model');
-                            if ($idname[1] == 'u') {
+                            if ($idname[1] === 'u') {
                                 $attendee->setFeUserId($idname[2]);
                                 $attendee->setAttendance($attendance[$entry]);
-                            } elseif ($idname[1] == 'email') {
+                            } elseif ($idname[1] === 'email') {
                                 $attendee->setEmail($idname[2]);
                                 $attendee->setAttendance('OPT-PARTICIPANT');
                             }
@@ -398,17 +427,17 @@ class EventModel extends Model
                     unset($piVars['attendee'], $piVars['attendance']);
                     break;
                 case 'sendout_invitation':
-                    $this->setSendOutInvitation($piVars['sendout_invitation'] == 1);
+                    $this->setSendOutInvitation((int)$piVars['sendout_invitation'] === 1);
                     unset($piVars['sendout_invitation']);
                     break;
                 default:
-                    if (in_array($key, $customFieldArray)) {
+                    if (in_array($key, $customFieldArray, true)) {
                         $this->row[$key] = $value;
                     }
             }
         }
 
-        if ($this->getEventType() != Model::EVENT_TYPE_MEETING) {
+        if ($this->getEventType() !== Model::EVENT_TYPE_MEETING) {
             $newAttendeeArray = [];
             $this->setAttendees($newAttendeeArray);
         }
@@ -456,19 +485,19 @@ class EventModel extends Model
         $this->setType($this->serviceKey);
         $this->setUid($row['uid']);
         $this->setPid($row['pid']);
-        $this->setCreationDate($row['crdate']);
+        $this->setCrdate($row['crdate']);
         $this->setCreateUserId($row['cruser_id']);
         $this->setHidden($row['hidden']);
         $this->setTstamp($row['tstamp']);
 
-        $this->setCalendarUid($row['calendar_id']);
+        $this->setCalendarId($row['calendar_id']);
 
         $this->setTimezone($row['timezone']);
 
         if ($row['allday']) {
             $row['start_time'] = 0;
             $row['end_time'] = 0;
-        } elseif ($row['start_time'] == 0 && $row['end_time'] == 0) {
+        } elseif ($row['start_time'] === 0 && $row['end_time'] === 0) {
             $row['allday'] = 1;
         }
         $tempDate = new CalDate($row['start_date'] . '000000');
@@ -480,17 +509,17 @@ class EventModel extends Model
         $tempDate->addSeconds($row['end_time']);
         $this->setEnd($tempDate);
 
-        $this->setAllday($row['allday']);
+        $this->setAllDay($row['allday']);
         $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
-        if (!$this->isAllday() && $eventStart->equals($this->getEnd()) || $eventStart->after($this->getEnd())) {
+        if ($eventStart->after($this->getEnd()) || !$this->isAllDay() && $eventStart->equals($this->getEnd())) {
             $tempDate = new CalDate($row['start_date']);
             $tempDate->setTZbyID('UTC');
             $tempDate->addSeconds($row['start_time'] + $this->conf['view.']['event.']['event.']['defaultEventLength']);
             $this->setEnd($tempDate);
         }
 
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             $eventEnd->addSeconds(86399);
             $this->setEnd($eventEnd);
         }
@@ -500,7 +529,7 @@ class EventModel extends Model
 
         $this->setFreq($row['freq']);
         $this->setByDay($row['byday']);
-        $this->setByMonthday($row['bymonthday']);
+        $this->setByMonthDay($row['bymonthday']);
         $this->setByMonth($row['bymonth']);
 
         $tempDate = new CalDate($row['until'] . '000000');
@@ -521,7 +550,7 @@ class EventModel extends Model
         /* new */
         $this->setEventType($row['type']);
 
-        if ($row['type'] == 3) { // meeting
+        if ($row['type'] === 3) { // meeting
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $this->setAttendees($modelObj->findEventAttendees($this->getUid()));
         }
@@ -552,11 +581,11 @@ class EventModel extends Model
                 $this->addExceptionGroupId($id);
             }
         }
-        if ($row['calendar_headerstyle'] != '') {
+        if ($row['calendar_headerstyle'] !== '') {
             $this->setHeaderStyle($row['calendar_headerstyle']);
         }
 
-        if ($row['calendar_bodystyle'] != '') {
+        if ($row['calendar_bodystyle'] !== '') {
             $this->setBodyStyle($row['calendar_bodystyle']);
         }
 
@@ -573,8 +602,8 @@ class EventModel extends Model
 
             $this->setOrganizerId($row['organizer_id']);
             $this->setOrganizer($row['organizer']);
-            $this->setOrganizerPage($row['organizer_pid']);
-            $this->setOrganizerLinkUrl($row['organizer_link']);
+            $this->setOrganizerPid($row['organizer_pid']);
+            $this->setOrganizerLink($row['organizer_link']);
         }
 
         $this->sharedUsers = [];
@@ -585,9 +614,9 @@ class EventModel extends Model
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
             while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['tablenames'] == 'fe_users') {
+                if ($row1['tablenames'] === 'fe_users') {
                     $this->addSharedUser($row1['uid_foreign']);
-                } elseif ($row1['tablenames'] == 'fe_groups') {
+                } elseif ($row1['tablenames'] === 'fe_groups') {
                     $this->addSharedGroup($row1['uid_foreign']);
                 }
             }
@@ -602,9 +631,9 @@ class EventModel extends Model
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
             while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['tablenames'] == 'fe_users') {
+                if ($row1['tablenames'] === 'fe_users') {
                     $this->addNotifyUser($row1['uid_foreign'] . '|' . $row1['offset']);
-                } elseif ($row1['tablenames'] == 'fe_groups') {
+                } elseif ($row1['tablenames'] === 'fe_groups') {
                     $this->addNotifyGroup($row1['uid_foreign'] . '|' . $row1['offset']);
                 }
             }
@@ -613,11 +642,12 @@ class EventModel extends Model
     }
 
     /**
-     * @return mixed
+     * @return EventModel
      */
-    public function cloneEvent()
+    public function cloneEvent(): EventModel
     {
         $thisClass = get_class($this);
+        /** @var EventModel $event */
         $event = new $thisClass($this->getValuesAsArray(), $this->isException, $this->getType());
         $event->markerCache = $this->markerCache;
         $event->setIsClone(true);
@@ -629,33 +659,29 @@ class EventModel extends Model
      *
      * @return string teaser.
      */
-    public function getTeaser()
+    public function getTeaser(): string
     {
         return $this->teaser;
     }
 
     /**
      * Sets the teaser of the event.
-     *
-     * @param
-     *            string        The location.
+     * @param string $teaser
      */
     public function setTeaser($teaser)
     {
-        $this->teaser = $teaser;
+        $this->teaser = $teaser ?? '';
     }
 
     /**
      * @param $view
      * @return string
      */
-    public function getLocationLink($view)
+    public function getLocationLink($view): string
     {
         $locationLink = '';
-        /*
-         * 26.01.2009 the URL link is handled now by the getLocationMarker method, just like the page link /* if($this->getLocationLinkUrl()!='' && $this->getLocation()){ $tempArray = $this->getValuesAsArray(); $tempArray['link'] = $this->getLocationLinkUrl(); $this->initLocalCObject($tempArray); unset($tempArray); $this->local_cObj->setCurrentVal($this->getLocation()); $locationLink = $this->local_cObj->cObjGetSingle($this->conf['view.'][$view.'.']['event.']['location'],$this->conf['view.'][$view.'.']['event.']['location.']); } else
-         */
         if ($this->getLocationId() > 0) {
+            /** @var LocationModel $location */
             $location = $this->getLocationObject();
 
             if (is_object($location)) {
@@ -669,7 +695,7 @@ class EventModel extends Model
                 } else {
                     /* If location view is allowed, link to it */
                     $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-                    if ($rightsObj->isViewEnabled($this->conf['view.']['locationLinkTarget']) || $this->conf['view.']['location.']['locationViewPid']) {
+                    if ($this->conf['view.']['location.']['locationViewPid'] || $rightsObj->isViewEnabled($this->conf['view.']['locationLinkTarget'])) {
                         $location->getLinkToLocation('|');
                         $this->local_cObj->data['link_parameter'] = $this->controller->cObj->lastTypoLinkUrl;
                     } else {
@@ -682,7 +708,6 @@ class EventModel extends Model
                     $this->conf['view.'][$view . '.']['event.']['location.']
                 );
             } else {
-                GeneralUtility::devLog('getLocationLink: no location object found', 'cal', 1);
                 $locationLink = '';
             }
         }
@@ -693,12 +718,9 @@ class EventModel extends Model
      * @param $view
      * @return string
      */
-    public function getOrganizerLink($view)
+    public function getOrganizerLink($view = ''): string
     {
         $organizerLink = '';
-        /*
-         * 26.01.2009 the URL link is handled now by the getOrganizerMarker method, just like the page link /* if($this->getOrganizerLinkUrl()!='' && $this->getOrganizer()){ $tempArray = $this->getValuesAsArray(); $tempArray['link'] = $this->getOrganizerLinkUrl(); $this->initLocalCObject($tempArray); unset($tempArray); $this->local_cObj->setCurrentVal($this->getOrganizer()); $organizerLink = $this->local_cObj->cObjGetSingle($this->conf['view.'][$view.'.']['event.']['organizer'],$this->conf['view.'][$view.'.']['event.']['organizer.']); } else
-         */
         if ($this->getOrganizerId() > 0) {
             $organizer = $this->getOrganizerObject();
 
@@ -709,12 +731,12 @@ class EventModel extends Model
                 $this->local_cObj->setCurrentVal($organizer->getName());
 
                 /* If a specific organizer page is defined, link to it */
-                if ($this->getOrganizerPage() > 0) {
-                    $this->local_cObj->data['link_parameter'] = $this->getOrganizerPage();
+                if ($this->getOrganizerPid() > 0) {
+                    $this->local_cObj->data['link_parameter'] = $this->getOrganizerPid();
                 } else {
                     /* If organizer view is allowed, link to it */
                     $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-                    if ($rightsObj->isViewEnabled($this->conf['view.']['organizerLinkTarget']) || $this->conf['view.']['organizer.']['organizerViewPid']) {
+                    if ($this->conf['view.']['organizer.']['organizerViewPid'] || $rightsObj->isViewEnabled($this->conf['view.']['organizerLinkTarget'])) {
                         $organizer->getLinkToOrganizer('|');
                         $this->local_cObj->data['link_parameter'] = $this->controller->cObj->lastTypoLinkUrl;
                     } else {
@@ -727,7 +749,6 @@ class EventModel extends Model
                     $this->conf['view.'][$view . '.']['event.']['organizer.']
                 );
             } else {
-                GeneralUtility::devLog('getOrganizerLink: no organizer object found', 'cal', 1);
                 $organizerLink = '';
             }
         }
@@ -737,19 +758,22 @@ class EventModel extends Model
     /**
      * Returns the headerstyle name
      */
-    public function getHeaderStyle()
+    public function getHeaderStyle(): string
     {
+        /** @var RightsService $rightsObj */
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-        if ($this->row['isFreeAndBusyEvent'] == 1) {
+        if ($this->row['isFreeAndBusyEvent'] === 1) {
             return $this->conf['view.']['freeAndBusy.']['headerStyle'];
         }
-        if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['differentStyleIfOwnEvent'] && $rightsObj->getUserId() == $this->getCreateUserId()) {
+        if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['differentStyleIfOwnEvent'] && $rightsObj->getUserId() === $this->getCreateUserId()) {
             return $this->conf['view.']['event.']['event.']['headerStyleOfOwnEvent'];
         }
-        if (count($this->categories) && is_object($this->categories[0])) {
-            if ($this->categories[0]->getHeaderStyle() != '') {
-                return $this->categories[0]->getHeaderStyle();
-            }
+        if (
+            count($this->categories)
+            && is_object($this->categories[0])
+            && $this->categories[0]->getHeaderStyle() !== ''
+        ) {
+            return $this->categories[0]->getHeaderStyle();
         }
         return $this->headerstyle;
     }
@@ -757,19 +781,22 @@ class EventModel extends Model
     /**
      * Returns the bodystyle name
      */
-    public function getBodyStyle()
+    public function getBodyStyle(): string
     {
+        /** @var RightsService $rightsObj */
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-        if ($this->row['isFreeAndBusyEvent'] == 1) {
+        if ($this->row['isFreeAndBusyEvent'] === 1) {
             return $this->conf['view.']['freeAndBusy.']['bodyStyle'];
         }
-        if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['differentStyleIfOwnEvent'] && $rightsObj->getUserId() == $this->getCreateUserId()) {
+        if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['differentStyleIfOwnEvent'] && $rightsObj->getUserId() === $this->getCreateUserId()) {
             return $this->conf['view.']['event.']['event.']['bodyStyleOfOwnEvent'];
         }
-        if (count($this->categories) && is_object($this->categories[0])) {
-            if ($this->categories[0]->getBodyStyle() != '') {
-                return $this->categories[0]->getBodyStyle();
-            }
+        if (
+            count($this->categories)
+            && is_object($this->categories[0])
+            && $this->categories[0]->getBodyStyle() !== ''
+        ) {
+            return $this->categories[0]->getBodyStyle();
         }
 
         return $this->bodystyle;
@@ -778,9 +805,9 @@ class EventModel extends Model
     /**
      * Gets the createUserId of the event.
      *
-     * @return string create user id.
+     * @return int create user id.
      */
-    public function getCreateUserId()
+    public function getCreateUserId(): int
     {
         return $this->createUserId;
     }
@@ -788,8 +815,7 @@ class EventModel extends Model
     /**
      * Sets the createUserId of the event.
      *
-     * @param
-     *            string        The create user id.
+     * @param string
      */
     public function setCreateUserId($createUserId)
     {
@@ -799,7 +825,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForOrganizer()
+    public function renderEventForOrganizer(): string
     {
         return $this->renderEventFor('ORGANIZER');
     }
@@ -807,7 +833,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForLocation()
+    public function renderEventForLocation(): string
     {
         return $this->renderEventFor('LOCATION');
     }
@@ -815,7 +841,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForDay()
+    public function renderEventForDay(): string
     {
         return $this->renderEventFor('DAY');
     }
@@ -823,7 +849,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForWeek()
+    public function renderEventForWeek(): string
     {
         return $this->renderEventFor('WEEK');
     }
@@ -831,7 +857,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForAllDay()
+    public function renderEventForAllDay(): string
     {
         return $this->renderEventFor('ALLDAY');
     }
@@ -839,9 +865,9 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForMonth()
+    public function renderEventForMonth(): string
     {
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             return $this->renderEventFor('MONTH_ALLDAY');
         }
         return $this->renderEventFor('MONTH');
@@ -850,9 +876,9 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForMiniMonth()
+    public function renderEventForMiniMonth(): string
     {
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             return $this->renderEventFor('MONTH_MINI_ALLDAY');
         }
         return $this->renderEventFor('MONTH_MINI');
@@ -861,9 +887,9 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForMediumMonth()
+    public function renderEventForMediumMonth(): string
     {
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             return $this->renderEventFor('MONTH_MEDIUM_ALLDAY');
         }
         return $this->renderEventFor('MONTH_MEDIUM');
@@ -872,7 +898,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventForYear()
+    public function renderEventForYear(): string
     {
         return $this->renderEventFor('year');
     }
@@ -880,7 +906,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEvent()
+    public function renderEvent(): string
     {
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT###');
     }
@@ -889,7 +915,7 @@ class EventModel extends Model
      * @param string $subpartSuffix
      * @return string
      */
-    public function renderEventForList($subpartSuffix = 'LIST_ODD')
+    public function renderEventForList($subpartSuffix = 'LIST_ODD'): string
     {
         return $this->renderEventFor($subpartSuffix);
     }
@@ -899,15 +925,15 @@ class EventModel extends Model
      * @param string $subpartSuffix
      * @return string
      */
-    public function renderEventFor($viewType, $subpartSuffix = '')
+    public function renderEventFor($viewType, $subpartSuffix = ''): string
     {
-        if ($this->row['isFreeAndBusyEvent'] == 1) {
+        if ($this->row['isFreeAndBusyEvent'] === 1) {
             $viewType .= '_FNB';
         }
         if (substr(
                 $viewType,
                 -6
-            ) != 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('%Y%m%d') != $this->getEnd()->format('%Y%m%d'))) {
+            ) !== 'ALLDAY' && ($this->isAllDay() || $this->getStart()->format('%Y%m%d') !== $this->getEnd()->format('%Y%m%d'))) {
             $subpartSuffix .= 'ALLDAY';
         }
         $hookObjectsArr = Functions::getHookObjectsArray(
@@ -929,13 +955,13 @@ class EventModel extends Model
      * @param $subpartMarker
      * @return string
      */
-    public function fillTemplate($subpartMarker)
+    public function fillTemplate($subpartMarker): string
     {
         $templatePath = $this->conf['view.']['event.']['eventModelTemplate'];
 
         $page = Functions::getContent($templatePath);
 
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no event model template file found:</h3>' . $templatePath;
         }
         $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
@@ -961,7 +987,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderEventPreview()
+    public function renderEventPreview(): string
     {
         $this->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_PREVIEW###');
@@ -970,7 +996,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function renderTomorrowsEvent()
+    public function renderTomorrowsEvent(): string
     {
         $this->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_PHPICALENDAR_EVENT_TOMORROW###');
@@ -989,7 +1015,6 @@ class EventModel extends Model
         $type = $this->conf['type'];
         $monitoring = $this->conf['monitor'];
         $getdate = $this->conf['getdate'];
-        $captchaStr = 0;
         $rems['###SUBSCRIPTION###'] = '';
         $sims['###NOTLOGGEDIN_NOMONITORING_HEADING###'] = '';
         $sims['###NOTLOGGEDIN_NOMONITORING_SUBMIT###'] = '';
@@ -999,8 +1024,8 @@ class EventModel extends Model
         $sims_temp['L_CAPTCHA_STOP_SUCCESS'] = '';
 
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-        if (($this->conf['allowSubscribe'] == 1 || ($this->conf['subscribeFeUser'] == 1 && $rightsObj->isLoggedIn())) && $uid) {
-            if ($monitoring != null && $monitoring != '') {
+        if ($uid && ((int)$this->conf['allowSubscribe'] === 1 || ((int)$this->conf['subscribeFeUser'] === 1 && $rightsObj->isLoggedIn()))) {
+            if (!empty($monitoring)) {
                 $user_uid = $rightsObj->getUserId();
                 switch ($monitoring) {
                     case 'start':
@@ -1023,15 +1048,12 @@ class EventModel extends Model
                                     );
                                 }
 
-                                $pageTSConf = BackendUtility::getPagesTSconfig($this->conf['rights.']['create.']['event.']['saveEventToPid']);
-                                $offset = is_numeric($pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time']) ? $pageTSConf['options.']['tx_cal_controller.']['view.']['event.']['remind.']['time'] * 60 : 0;
-                                $date = new CalDate($insertFields['start_date'] . '000000');
+                                $date = new CalDate();
                                 $date->setTZbyID('UTC');
-                                $reminderTimestamp = $date->getTime() + $insertFields['start_time'] - $offset;
                                 $reminderService = &Functions::getReminderService();
                                 $reminderService->scheduleReminder($uid);
                             } else {
-                                if ($this->conf['subscribeWithCaptcha'] == 1 && ExtensionManagementUtility::isLoaded('captcha')) {
+                                if ((int)$this->conf['subscribeWithCaptcha'] === 1 && ExtensionManagementUtility::isLoaded('captcha')) {
                                     session_start();
                                     $captchaStr = $_SESSION['tx_captcha_string'];
                                     $_SESSION['tx_captcha_string'] = '';
@@ -1039,7 +1061,7 @@ class EventModel extends Model
                                     $captchaStr = -1;
                                 }
 
-                                if (($captchaStr && $this->controller->piVars['captcha'] === $captchaStr) || ($this->conf['subscribeWithCaptcha'] == 0)) {
+                                if (($captchaStr && $this->controller->piVars['captcha'] === $captchaStr) || ((int)$this->conf['subscribeWithCaptcha'] === 0)) {
                                     // send confirm email!!
                                     $email = $this->controller->piVars['email'];
 
@@ -1093,7 +1115,7 @@ class EventModel extends Model
                                                 'tx_cal_controller[monitor]' => 'start',
                                                 'tx_cal_controller[email]' => $email,
                                                 'tx_cal_controller[uid]' => $this->getUid(),
-                                                'tx_cal_controller[sid]' => md5($this->getUid() . $email . $this->getCreationDate())
+                                                'tx_cal_controller[sid]' => md5($this->getUid() . $email . $this->getCrdate())
                                             ]
                                         );
 
@@ -1153,7 +1175,7 @@ class EventModel extends Model
                                 $where = 'uid_foreign = ' . $user_uid . ' AND uid_local = ' . $uid . ' AND tablenames = "fe_users"';
                                 $GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
                             } else {
-                                if ($this->conf['subscribeWithCaptcha'] == 1 && ExtensionManagementUtility::isLoaded('captcha')) {
+                                if ((int)$this->conf['subscribeWithCaptcha'] === 1 && ExtensionManagementUtility::isLoaded('captcha')) {
                                     session_start();
                                     $captchaStr = $_SESSION['tx_captcha_string'];
                                     $_SESSION['tx_captcha_string'] = '';
@@ -1161,7 +1183,7 @@ class EventModel extends Model
                                     $captchaStr = -1;
                                 }
 
-                                if (($captchaStr && $this->controller->piVars['captcha'] === $captchaStr) || ($this->conf['subscribeWithCaptcha'] == 0)) {
+                                if (($captchaStr && $this->controller->piVars['captcha'] === $captchaStr) || ((int)$this->conf['subscribeWithCaptcha'] === 0)) {
                                     $email = $this->controller->piVars['email'];
                                     $table = 'tx_cal_unknown_users';
                                     $select = 'crdate';
@@ -1169,10 +1191,8 @@ class EventModel extends Model
                                     $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
                                     $crdate = 0;
                                     if ($result) {
-                                        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                                            $crdate = $row['crdate'];
-                                            break;
-                                        }
+                                        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
+                                        $crdate = $row['crdate'];
                                         $GLOBALS['TYPO3_DB']->sql_free_result($result);
                                     }
 
@@ -1325,7 +1345,7 @@ class EventModel extends Model
             } else { /* Not a logged in user */
 
                 /* If a CAPTCHA is required to subscribe, add a couple extra markers */
-                if ($this->conf['subscribeWithCaptcha'] == 1 && ExtensionManagementUtility::isLoaded('captcha')) {
+                if ((int)$this->conf['subscribeWithCaptcha'] === 1 && ExtensionManagementUtility::isLoaded('captcha')) {
                     $sims_temp['CAPTCHA_SRC'] = '<img src="' . ExtensionManagementUtility::siteRelPath('captcha') . 'captcha/captcha.php' . '" alt="" />';
                     $sims_temp['L_CAPTCHA_TEXT'] = $this->controller->pi_getLL('l_captcha_text');
                     $sims_temp['CAPTCHA_TEXT'] = '<input type="text" size=10 name="tx_cal_controller[captcha]" value="">';
@@ -1398,7 +1418,7 @@ class EventModel extends Model
             );
 
             $sims['###STARTDATE_LABEL###'] = $this->controller->pi_getLL('l_event_allday');
-            if ($this->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDateAllday'] == 1) {
+            if ((int)$this->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDateAllday'] === 1) {
                 $sims['###ENDDATE###'] = '';
                 $sims['###ENDDATE_LABEL###'] = '';
             } else {
@@ -1410,7 +1430,7 @@ class EventModel extends Model
                 $sims['###ENDDATE_LABEL###'] = $this->controller->pi_getLL('l_event_enddate');
             }
         } else {
-            if ($this->isAllday()) {
+            if ($this->isAllDay()) {
                 $sims['###STARTTIME_LABEL###'] = '';
                 $sims['###STARTTIME###'] = '';
             } else {
@@ -1421,7 +1441,7 @@ class EventModel extends Model
                     $this->conf['view.'][$view . '.']['event.']['starttime.']
                 );
             }
-            if ($this->isAllday()) {
+            if ($this->isAllDay()) {
                 $sims['###ENDTIME_LABEL###'] = '';
                 $sims['###ENDTIME###'] = '';
             } else {
@@ -1438,7 +1458,7 @@ class EventModel extends Model
                 $this->conf['view.'][$view . '.']['event.']['startdate'],
                 $this->conf['view.'][$view . '.']['event.']['startdate.']
             );
-            if ($this->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDate'] && $eventEnd->format('%Y%m%d') == $eventStart->format('%Y%m%d')) {
+            if ($this->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDate'] && $eventEnd->format('%Y%m%d') === $eventStart->format('%Y%m%d')) {
                 $sims['###STARTDATE_LABEL###'] = $this->controller->pi_getLL('l_date');
                 $sims['###ENDDATE_LABEL###'] = '';
                 $sims['###ENDDATE###'] = '';
@@ -1465,15 +1485,18 @@ class EventModel extends Model
     {
         $this->initLocalCObject();
         $this->local_cObj->setCurrentVal($this->getTitle());
-        if ($this->isTomorrow && !in_array($view, [
-                'create_event',
-                'edit_event'
-            ]) && $this->conf['view.']['other.']['tomorrowsEvents']) {
+        if (
+            $this->isTomorrow
+            && isset($this->conf['view.']['other.']['tomorrowsEvents'])
+            && !in_array($view, [
+                        'create_event',
+                        'edit_event'
+                    ])) {
             $sims['###TITLE###'] = $this->local_cObj->cObjGetSingle(
                 $this->conf['view.']['other.']['tomorrowsEvents'],
                 $this->conf['view.']['other.']['tomorrowsEvents.']
             );
-        } elseif ($this->isAllday() && $this->conf['view.'][$view . '.']['event.']['alldayTitle']) {
+        } elseif ($this->conf['view.'][$view . '.']['event.']['alldayTitle'] && $this->isAllDay()) {
             $sims['###TITLE###'] = $this->local_cObj->cObjGetSingle(
                 $this->conf['view.'][$view . '.']['event.']['alldayTitle'],
                 $this->conf['view.'][$view . '.']['event.']['alldayTitle.']
@@ -1513,10 +1536,10 @@ class EventModel extends Model
             $sims['###ORGANIZER###'] = $this->getOrganizerLink($view);
         } else {
             $this->initLocalCObject($this->getValuesAsArray());
-            if ($this->getOrganizerPage() > 0) {
-                $this->local_cObj->data['link_parameter'] = $this->getOrganizerPage();
+            if ($this->getOrganizerPid() > 0) {
+                $this->local_cObj->data['link_parameter'] = $this->getOrganizerPid();
             } else {
-                $this->local_cObj->data['link_parameter'] = $this->getOrganizerLinkUrl();
+                $this->local_cObj->data['link_parameter'] = $this->getOrganizerLink();
             }
             $this->local_cObj->setCurrentVal($this->getOrganizer());
             $sims['###ORGANIZER###'] = $this->local_cObj->cObjGetSingle(
@@ -1524,7 +1547,7 @@ class EventModel extends Model
                 $this->conf['view.'][$view . '.']['event.']['organizer.']
             );
         }
-        if ($view == 'ics' || $view == 'ics_single') {
+        if ($view === 'ics' || $view === 'ics_single') {
             $sims['###ORGANIZER###'] = Functions::replaceLineFeed($sims['###ORGANIZER###']);
         }
     }
@@ -1553,7 +1576,7 @@ class EventModel extends Model
                 $this->conf['view.'][$view . '.']['event.']['location.']
             );
         }
-        if ($view == 'ics' || $view == 'ics_single') {
+        if ($view === 'ics' || $view === 'ics_single') {
             $sims['###LOCATION###'] = Functions::replaceLineFeed($sims['###LOCATION###']);
         }
     }
@@ -1589,8 +1612,8 @@ class EventModel extends Model
      */
     public function getIcsLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        if ($this->conf['view.']['ics.']['showIcsLinks'] == 1) {
-            $this->initLocalCObject($tempArray);
+        if ((int)$this->conf['view.']['ics.']['showIcsLinks'] === 1) {
+            $this->initLocalCObject();
             $uid = $this->getUid();
             if ($this->row['l18n_parent'] > 0) {
                 $uid = $this->row['l18n_parent'];
@@ -1668,19 +1691,6 @@ class EventModel extends Model
     public function getBodystyleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###BODYSTYLE###'] = $this->getBodyStyle();
-    }
-
-    /**
-     * Returns the calendar style name
-     */
-    public function getCalendarStyleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
-    {
-        $this->initLocalCObject();
-        $this->local_cObj->setCurrentVal($this->getCalendarUid());
-        $sims['###CALENDARSTYLE###'] = $this->local_cObj->cObjGetSingle(
-            $this->conf['view.'][$view . '.']['event.']['calendarStyle'],
-            $this->conf['view.'][$view . '.']['event.']['calendarStyle.']
-        );
     }
 
     /**
@@ -1825,7 +1835,7 @@ class EventModel extends Model
             //$linkConf['link_useCacheHash'] = 0;
             $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=edit_event&tx_cal_controller[type]=' . $this->getType() . '&tx_cal_controller[uid]=' . $this->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
             $linkConf['link_section'] = 'default';
-            $linkConf['link_parameter'] = $this->conf['view.']['event.']['editEventViewPid'] ? $this->conf['view.']['event.']['editEventViewPid'] : $GLOBALS['TSFE']->id;
+            $linkConf['link_parameter'] = $this->conf['view.']['event.']['editEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
             $this->initLocalCObject($linkConf);
             $this->local_cObj->setCurrentVal($this->conf['view.'][$view . '.']['event.']['editIcon']);
@@ -1845,10 +1855,9 @@ class EventModel extends Model
                 $linkConf['link_ATagParams'] = ' onclick="' . $temp . '"';
             }
             $linkConf['link_no_cache'] = 0;
-            //$linkConf['link_useCacheHash'] = 0;
             $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=delete_event&tx_cal_controller[type]=' . $this->getType() . '&tx_cal_controller[uid]=' . $this->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
             $linkConf['link_section'] = 'default';
-            $linkConf['link_parameter'] = $this->conf['view.']['event.']['deleteEventViewPid'] ? $this->conf['view.']['event.']['deleteEventViewPid'] : $GLOBALS['TSFE']->id;
+            $linkConf['link_parameter'] = $this->conf['view.']['event.']['deleteEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
             $this->initLocalCObject($linkConf);
             $this->local_cObj->setCurrentVal($this->conf['view.'][$view . '.']['event.']['deleteIcon']);
@@ -1869,14 +1878,14 @@ class EventModel extends Model
     public function getMoreLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###MORE_LINK###'] = '';
-        if ($this->conf['view.']['event.']['isPreview'] && $this->conf['preview']) {
+        if ($this->conf['preview'] && $this->conf['view.']['event.']['isPreview']) {
             $this->initLocalCObject();
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_more'));
 
             $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
                 'page_id' => $GLOBALS['TSFE']->id,
                 'preview' => null,
-                'view' => event,
+                'view' => 'event',
                 'uid' => $this->getUid(),
                 'type' => $this->getType()
             ], $this->conf['cache'], $this->conf['clear_anyway'], $this->conf['view.']['event.']['eventViewPid']);
@@ -1961,18 +1970,56 @@ class EventModel extends Model
     {
         $event_status = strtolower($this->getStatus());
         $confirmed = '';
-        if ($event_status != '') {
+        if ($event_status !== '') {
             $confirmed = sprintf($this->conf['view.'][$view . '.']['event.']['todoIcon'], $event_status);
-        } elseif (is_array($this->getCalRecu()) && count($this->getCalRecu()) > 0) {
-            $confirmed = $this->conf['view.'][$view . '.']['event.']['recurringIcon'];
         }
         $sims['###ICON###'] = $confirmed;
     }
 
     /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
+    public function getDescriptionMarker(& $template, & $sims, & $rems, & $wrapped, $view)
+    {
+        if (($view === 'ics') || ($view === 'single_ics')) {
+            $description = preg_replace('/,/', '\,', preg_replace(
+                '/' . chr(10) . '|' . chr(13) . '/',
+                '\r\n',
+                html_entity_decode(preg_replace('/&nbsp;/', ' ', strip_tags($this->getDescription())))
+            ));
+        } else {
+            $description = $this->getDescription();
+        }
+
+        $this->initLocalCObject();
+        $this->local_cObj->setCurrentVal($description);
+        $this->local_cObj->data['bodytext'] = $description;
+        if ($this->striptags) {
+            $sims['###DESCRIPTION_STRIPTAGS###'] = strip_tags($this->local_cObj->cObjGetSingle(
+                $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['description'],
+                $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['description.']
+            ));
+        } elseif ($this->isPreview) {
+            $sims['###DESCRIPTION###'] = $this->local_cObj->cObjGetSingle(
+                $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['preview'],
+                $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['preview.']
+            );
+        } else {
+            $sims['###DESCRIPTION###'] = $this->local_cObj->cObjGetSingle(
+                $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['description'],
+                $this->conf['view.'][$view . '.'][$this->getObjectType() . '.']['description.']
+            );
+        }
+    }
+
+    /**
      * @return array
      */
-    public function getAdditionalValuesAsArray()
+    public function getAdditionalValuesAsArray(): array
     {
         $values = parent::getAdditionalValuesAsArray();
         $values['event_owner'] = $this->getEventOwner();
@@ -1993,7 +2040,7 @@ class EventModel extends Model
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
 
@@ -2006,7 +2053,7 @@ class EventModel extends Model
         }
         $editOffset = $this->conf['rights.']['edit.']['event.']['timeOffset'] * 60;
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -2038,8 +2085,9 @@ class EventModel extends Model
      * @param array $feGroupsArray
      * @return bool
      */
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
+    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
+        /** @var RightsService $rightsObj */
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_event')) {
             return false;
@@ -2047,8 +2095,7 @@ class EventModel extends Model
         if ($rightsObj->isCalAdmin()) {
             return true;
         }
-        $deleteOffset = $this->conf['rights.']['delete.']['event.']['timeOffset'] * 60;
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -2061,7 +2108,7 @@ class EventModel extends Model
         } else {
             $temp = new CalDate();
             $temp->setTZbyID('UTC');
-            $temp->addSeconds($editOffset);
+            $temp->addSeconds();
             $eventStart = $this->getStart();
             $eventHasntStartedYet = $eventStart->after($temp);
         }
@@ -2077,7 +2124,7 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'Phpicalendar ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(',', $this->row);
     }
@@ -2085,7 +2132,7 @@ class EventModel extends Model
     /**
      * @return array
      */
-    public function getAttendees()
+    public function getAttendees(): array
     {
         return $this->attendees;
     }
@@ -2100,18 +2147,16 @@ class EventModel extends Model
     public function getAttendeeMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###ATTENDEE###'] = '';
+        /** @var RightsService $rightsObj */
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $cObj = &Registry::Registry('basic', 'cobj');
         $globalAttendeeArray = $this->getAttendees();
 
         $isChairMan = false;
-        $chairmanEmail = 'none';
         foreach ($globalAttendeeArray as $serviceKey => $attendeeArray) {
             foreach ($attendeeArray as $attendee) {
-                if ($attendee->getAttendance() == 'CHAIR') {
-                    $chairmanEmail = $attendee->getEmail();
-                }
-                if ($attendee->getAttendance() == 'CHAIR' && $rightsObj->getUserId() == $attendee->getFeUserId()) {
+                /** @var AttendeeModel $attendee */
+                if ($attendee->getAttendance() === 'CHAIR' && $rightsObj->getUserId() === $attendee->getFeUserId()) {
                     $isChairMan = true;
                     break;
                 }
@@ -2125,131 +2170,130 @@ class EventModel extends Model
             if (!empty($globalAttendeeArray)) {
                 foreach ($globalAttendeeArray as $serviceType => $attendeeArray) {
                     foreach ($attendeeArray as $attendee) {
-                        if ($attendee->getAttendance() == 'CHAIR') {
+                        /** @var AttendeeModel $attendee */
+                        if ($attendee->getAttendance() === 'CHAIR') {
                             $sims['###ORGANIZER###'] = 'ORGANIZER;ROLE=' . $attendee->getAttendance() . ':MAILTO:' . $attendee->getEmail();
                         }
-                        if ($this->limitAttendeeToThisEmail != '' && $attendee->getEmail() != $this->limitAttendeeToThisEmail) {
+                        if ($this->limitAttendeeToThisEmail !== '' && $attendee->getEmail() !== $this->limitAttendeeToThisEmail) {
                             continue;
                         }
-                        if ($attendee->getStatus() == 0) {
+                        if ($attendee->getStatus() === 0) {
                             $attendee->setStatus('NEEDS-ACTION');
                         }
                         $sims['###ATTENDEE###'] .= 'ATTENDEE;ROLE=' . $attendee->getAttendance() . ';PARTSTAT=' . $attendee->getStatus() . ';RSVP=TRUE:MAILTO:' . $attendee->getEmail();
                     }
                 }
             }
-        } else {
-            if ($rightsObj->isLoggedIn() && !empty($globalAttendeeArray)) {
-                $formattedArray = [];
-                $partOf = false;
-                foreach ($globalAttendeeArray as $serviceKey => $attendeeArray) {
-                    foreach ($attendeeArray as $attendee) {
-                        if ($attendee->getFeUserId()) {
-                            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                                '*',
-                                'fe_users',
-                                'pid in (' . $this->conf['pidList'] . ')' . $cObj->enableFields('fe_users') . ' AND uid =' . $attendee->getFeUserId()
-                            );
-                            if ($result) {
-                                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                                    $this->initLocalCObject($row);
-                                    $displayConfig = $this->conf['view.'][$view . '.']['event.']['attendeeFeUserDisplayName'] ? 'attendeeFeUserDisplayName' : 'defaultFeUserDisplayName';
-                                    $attendee->setName($this->local_cObj->cObjGetSingle(
-                                        $this->conf['view.'][$view . '.']['event.'][$displayConfig],
-                                        $this->conf['view.'][$view . '.']['event.'][$displayConfig . '.']
-                                    ));
-                                    $attendee->setEmail($row['email']);
-                                }
-                                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-                            }
-                            $finalString = $attendee->getName() . ' ';
-                        } else {
-                            $finalString = $attendee->getEmail() . ' ';
-                        }
-
-                        if ($attendee->getAttendance() == 'CHAIR') {
-                            $finalString .= sprintf(
-                                $this->conf['view.'][$view . '.']['event.']['attendeeIcon'],
-                                $attendee->getAttendance(),
-                                $this->controller->pi_getLL('l_event_attendee_' . $attendee->getAttendance()),
-                                $this->controller->pi_getLL('l_event_attendee_' . $attendee->getAttendance())
-                            );
-                        } else {
-                            $finalString .= sprintf(
-                                $this->conf['view.'][$view . '.']['event.']['attendeeIcon'],
-                                $attendee->getStatus(),
-                                $this->controller->pi_getLL('l_event_attendee_' . $attendee->getStatus()),
-                                $this->controller->pi_getLL('l_event_attendee_' . $attendee->getStatus())
-                            );
-                        }
-                        if ($rightsObj->getUserId() == $attendee->getFeUserId() || $isChairMan) {
-                            $partOf = true;
-                            $this->initLocalCObject($this->getValuesAsArray());
-                            if ($attendee->getAttendance() != 'CHAIR') {
-                                $finalString .= $this->controller->pi_getLL('l_meeting_changestatus');
-                            }
-                            if ($attendee->getAttendance() != 'CHAIR' && ($attendee->getStatus() == 'ACCEPTED' || $attendee->getStatus() == '0' || $attendee->getStatus() == 'NEEDS-ACTION')) {
-                                $this->local_cObj->setCurrentVal(sprintf(
-                                    $this->conf['view.'][$view . '.']['event.']['attendeeIcon'],
-                                    'DECLINE',
-                                    $this->controller->pi_getLL('l_meeting_decline'),
-                                    $this->controller->pi_getLL('l_meeting_decline')
+        } elseif (!empty($globalAttendeeArray) && $rightsObj->isLoggedIn()) {
+            $formattedArray = [];
+            $partOf = false;
+            foreach ($globalAttendeeArray as $serviceKey => $attendeeArray) {
+                foreach ($attendeeArray as $attendee) {
+                    if ($attendee->getFeUserId()) {
+                        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+                            '*',
+                            'fe_users',
+                            'pid in (' . $this->conf['pidList'] . ')' . $cObj->enableFields('fe_users') . ' AND uid =' . $attendee->getFeUserId()
+                        );
+                        if ($result) {
+                            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                                $this->initLocalCObject($row);
+                                $displayConfig = $this->conf['view.'][$view . '.']['event.']['attendeeFeUserDisplayName'] ? 'attendeeFeUserDisplayName' : 'defaultFeUserDisplayName';
+                                $attendee->setName($this->local_cObj->cObjGetSingle(
+                                    $this->conf['view.'][$view . '.']['event.'][$displayConfig],
+                                    $this->conf['view.'][$view . '.']['event.'][$displayConfig . '.']
                                 ));
-                                $this->controller->getParametersForTyposcriptLink(
-                                    $this->local_cObj->data,
-                                    [
-                                        'view' => 'meeting',
-                                        'attendee' => $attendee->getUid(),
-                                        'uid' => $this->getUid(),
-                                        'status' => 'decline',
-                                        'sid' => md5($this->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
-                                    ],
-                                    $this->conf['cache'],
-                                    $this->conf['clear_anyway'],
-                                    $this->conf['view.']['event.']['meeting.']['statusViewPid']
-                                ) . ' ';
-                                $finalString .= $this->local_cObj->cObjGetSingle(
-                                    $this->conf['view.'][$view . '.']['event.']['declineMeetingLink'],
-                                    $this->conf['view.'][$view . '.']['event.']['declineMeetingLink.']
-                                );
+                                $attendee->setEmail($row['email']);
                             }
-                            if ($attendee->getAttendance() != 'CHAIR' && ($attendee->getStatus() == 'DECLINE' || $attendee->getStatus() == '0' || $attendee->getStatus() == 'NEEDS-ACTION')) {
-                                $this->local_cObj->setCurrentVal(sprintf(
-                                    $this->conf['view.'][$view . '.']['event.']['attendeeIcon'],
-                                    'ACCEPTED',
-                                    $this->controller->pi_getLL('l_meeting_accept'),
-                                    $this->controller->pi_getLL('l_meeting_accept')
-                                ));
-                                $this->controller->getParametersForTyposcriptLink(
-                                    $this->local_cObj->data,
-                                    [
-                                        'view' => 'meeting',
-                                        'attendee' => $attendee->getUid(),
-                                        'uid' => $this->getUid(),
-                                        'status' => 'accept',
-                                        'sid' => md5($this->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
-                                    ],
-                                    $this->conf['cache'],
-                                    $this->conf['clear_anyway'],
-                                    $this->conf['view.']['event.']['meeting.']['statusViewPid']
-                                );
-                                $finalString .= $this->local_cObj->cObjGetSingle(
-                                    $this->conf['view.'][$view . '.']['event.']['acceptMeetingLink'],
-                                    $this->conf['view.'][$view . '.']['event.']['acceptMeetingLink.']
-                                );
-                            }
+                            $GLOBALS['TYPO3_DB']->sql_free_result($result);
                         }
-                        $formattedArray[] = $finalString;
+                        $finalString = $attendee->getName() . ' ';
+                    } else {
+                        $finalString = $attendee->getEmail() . ' ';
                     }
+
+                    if ($attendee->getAttendance() === 'CHAIR') {
+                        $finalString .= sprintf(
+                            $this->conf['view.'][$view . '.']['event.']['attendeeIcon'],
+                            $attendee->getAttendance(),
+                            $this->controller->pi_getLL('l_event_attendee_' . $attendee->getAttendance()),
+                            $this->controller->pi_getLL('l_event_attendee_' . $attendee->getAttendance())
+                        );
+                    } else {
+                        $finalString .= sprintf(
+                            $this->conf['view.'][$view . '.']['event.']['attendeeIcon'],
+                            $attendee->getStatus(),
+                            $this->controller->pi_getLL('l_event_attendee_' . $attendee->getStatus()),
+                            $this->controller->pi_getLL('l_event_attendee_' . $attendee->getStatus())
+                        );
+                    }
+                    if ($isChairMan || $rightsObj->getUserId() === $attendee->getFeUserId()) {
+                        $partOf = true;
+                        $this->initLocalCObject($this->getValuesAsArray());
+                        if ($attendee->getAttendance() !== 'CHAIR') {
+                            $finalString .= $this->controller->pi_getLL('l_meeting_changestatus');
+                        }
+                        if ($attendee->getAttendance() !== 'CHAIR' && ($attendee->getStatus() === 'ACCEPTED' || $attendee->getStatus() === '0' || $attendee->getStatus() === 'NEEDS-ACTION')) {
+                            $this->local_cObj->setCurrentVal(sprintf(
+                                $this->conf['view.'][$view . '.']['event.']['attendeeIcon'],
+                                'DECLINE',
+                                $this->controller->pi_getLL('l_meeting_decline'),
+                                $this->controller->pi_getLL('l_meeting_decline')
+                            ));
+                            $this->controller->getParametersForTyposcriptLink(
+                                $this->local_cObj->data,
+                                [
+                                    'view' => 'meeting',
+                                    'attendee' => $attendee->getUid(),
+                                    'uid' => $this->getUid(),
+                                    'status' => 'decline',
+                                    'sid' => md5($this->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
+                                ],
+                                $this->conf['cache'],
+                                $this->conf['clear_anyway'],
+                                $this->conf['view.']['event.']['meeting.']['statusViewPid']
+                            );
+                            $finalString .= $this->local_cObj->cObjGetSingle(
+                                $this->conf['view.'][$view . '.']['event.']['declineMeetingLink'],
+                                $this->conf['view.'][$view . '.']['event.']['declineMeetingLink.']
+                            );
+                        }
+                        if ($attendee->getAttendance() !== 'CHAIR' && ($attendee->getStatus() === 'DECLINE' || $attendee->getStatus() === '0' || $attendee->getStatus() === 'NEEDS-ACTION')) {
+                            $this->local_cObj->setCurrentVal(sprintf(
+                                $this->conf['view.'][$view . '.']['event.']['attendeeIcon'],
+                                'ACCEPTED',
+                                $this->controller->pi_getLL('l_meeting_accept'),
+                                $this->controller->pi_getLL('l_meeting_accept')
+                            ));
+                            $this->controller->getParametersForTyposcriptLink(
+                                $this->local_cObj->data,
+                                [
+                                    'view' => 'meeting',
+                                    'attendee' => $attendee->getUid(),
+                                    'uid' => $this->getUid(),
+                                    'status' => 'accept',
+                                    'sid' => md5($this->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
+                                ],
+                                $this->conf['cache'],
+                                $this->conf['clear_anyway'],
+                                $this->conf['view.']['event.']['meeting.']['statusViewPid']
+                            );
+                            $finalString .= $this->local_cObj->cObjGetSingle(
+                                $this->conf['view.'][$view . '.']['event.']['acceptMeetingLink'],
+                                $this->conf['view.'][$view . '.']['event.']['acceptMeetingLink.']
+                            );
+                        }
+                    }
+                    $formattedArray[] = $finalString;
                 }
-                if ($partOf) {
-                    $this->initLocalCObject();
-                    $this->local_cObj->setCurrentVal(implode('<br/>', $formattedArray));
-                    $sims['###ATTENDEE###'] = $this->local_cObj->cObjGetSingle(
-                        $this->conf['view.'][$view . '.']['event.']['attendee'],
-                        $this->conf['view.'][$view . '.']['event.']['attendee.']
-                    );
-                }
+            }
+            if ($partOf) {
+                $this->initLocalCObject();
+                $this->local_cObj->setCurrentVal(implode('<br/>', $formattedArray));
+                $sims['###ATTENDEE###'] = $this->local_cObj->cObjGetSingle(
+                    $this->conf['view.'][$view . '.']['event.']['attendee'],
+                    $this->conf['view.'][$view . '.']['event.']['attendee.']
+                );
             }
         }
     }
@@ -2259,26 +2303,27 @@ class EventModel extends Model
      * @param $view
      * @param $date
      * @param bool $urlOnly
+     * @return string
      */
-    public function getLinkToEvent($linktext, $view, $date, $urlOnly = false)
+    public function getLinkToEvent($linktext, $view, $date, $urlOnly = false): string
     {
         /* new */
-        if ($linktext == '') {
+        if ($linktext === '') {
             $linktext = $this->controller->pi_getLL('l_no_title');
         }
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
 
-        if ($this->getEventType() == Model::EVENT_TYPE_SHORTCUT || $this->getEventType() == Model::EVENT_TYPE_EXTERNAL || $rightsObj->isViewEnabled($this->getObjectType()) || $this->conf['view.'][$this->getObjectType() . '.'][$this->getObjectType() . 'ViewPid']) {
+        if (
+            $this->getEventType() === Model::EVENT_TYPE_SHORTCUT
+            || $this->getEventType() === Model::EVENT_TYPE_EXTERNAL
+            || $rightsObj->isViewEnabled($this->getObjectType())
+            || $this->conf['view.'][$this->getObjectType() . '.'][$this->getObjectType() . 'ViewPid']
+        ) {
             $this->initLocalCObject($this->getValuesAsArray());
             $this->local_cObj->setCurrentVal($linktext);
 
             if (!$this->conf['view.'][$view . '.'][$this->getObjectType() . '.'][$this->getObjectType() . 'Link']) {
                 $view = $this->getObjectType();
-            }
-
-            /* new */
-            if ($this->isExternalPluginEvent()) {
-                return $this->getExternalPluginEventLink();
             }
 
             // create the link if the event points to a page or external URL
@@ -2302,7 +2347,6 @@ class EventModel extends Model
                         'type' => $this->getType(),
                         'uid' => $this->getUid()
                     ];
-                    $this->addAdditionalSingleViewUrlParams($linkParams);
                     if ($this->conf['view.'][$this->getObjectType() . '.']['isPreview']) {
                         $linkParams['preview'] = 1;
                     }
@@ -2310,11 +2354,10 @@ class EventModel extends Model
                     $categories = &$this->getCategories();
                     if (is_array($categories) && count($categories)) {
                         foreach ($this->getCategories() as $category) {
-                            if (is_object($category)) {
-                                if ($category->getSinglePid()) {
-                                    $pid = $category->getSinglePid();
-                                    break;
-                                }
+                            /** @var CategoryModel $category */
+                            if (is_object($category) && $category->getSinglePid()) {
+                                $pid = $category->getSinglePid();
+                                break;
                             }
                         }
                     }
@@ -2373,10 +2416,10 @@ class EventModel extends Model
      */
     public function getGuidMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        if ($this->row['icsUid'] != '') {
+        if ($this->row['icsUid'] !== '') {
             $sims['###GUID###'] = $this->row['icsUid'];
         } else {
-            $eventArray = ['calendar_id' => $this->getCalendarUid(), 'uid' => $this->getUid()];
+            $eventArray = ['calendar_id' => $this->getCalendarId(), 'uid' => $this->getUid()];
             $sims['###GUID###'] = Functions::getIcsUid($this->conf, $eventArray);
         }
     }
@@ -2390,9 +2433,9 @@ class EventModel extends Model
      */
     public function getDtstampMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims['###DTSTAMP###'] = 'DTSTAMP:' . gmdate('Ymd', $this->getCreationDate()) . 'T' . gmdate(
+        $sims['###DTSTAMP###'] = 'DTSTAMP:' . gmdate('Ymd', $this->getCrdate()) . 'T' . gmdate(
                 'His',
-                $this->getCreationDate()
+                $this->getCrdate()
             );
     }
 
@@ -2406,9 +2449,9 @@ class EventModel extends Model
     public function getDtstartYearMonthDayHourMinuteMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART;VALUE=DATE:' . $eventStart->format('%Y%m%d');
-        } elseif ($this->conf['view.']['ics.']['timezoneId'] != '') {
+        } elseif ($this->conf['view.']['ics.']['timezoneId'] !== '') {
             $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('%Y%m%dT%H%M%S');
         } else {
             $offset = Functions::strtotimeOffset($eventStart->getTime());
@@ -2427,12 +2470,11 @@ class EventModel extends Model
      */
     public function getDtendYearMonthDayHourMinuteMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
-        if ($this->isAllday()) {
+        if ($this->isAllDay()) {
             $eventEnd->addSeconds(84600);
             $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND;VALUE=DATE:' . $eventEnd->format('%Y%m%d');
-        } elseif ($this->conf['view.']['ics.']['timezoneId'] != '') {
+        } elseif ($this->conf['view.']['ics.']['timezoneId'] !== '') {
             $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventEnd->format('%Y%m%dT%H%M%S');
         } else {
             $offset = Functions::strtotimeOffset($eventEnd->getTime());
@@ -2459,10 +2501,10 @@ class EventModel extends Model
     }
 
     /**
-     * @param $event
+     * @param EventModel $event
      * @return string
      */
-    public function getRRule(&$event)
+    public function getRRule(&$event): string
     {
         $rrule = '';
         $allowedValues = [
@@ -2474,12 +2516,12 @@ class EventModel extends Model
             'month',
             'year'
         ];
-        if (in_array($event->getFreq(), $allowedValues)) {
+        if (in_array($event->getFreq(), $allowedValues, true)) {
             $rruleConfiguration = [];
             $rruleConfiguration['FREQ'] = 'FREQ=' . $event->getIcsFreqLabel($event->getFreq());
             $rruleConfiguration['INTERVAL'] = 'INTERVAL=' . $event->getInterval();
 
-            if ($event->getCount() != 0) {
+            if ($event->getCount() !== 0) {
                 $rruleConfiguration['COUNT'] = 'COUNT=' . $event->getCount();
             }
             if (count($event->getByDay()) > 0) {
@@ -2524,6 +2566,7 @@ class EventModel extends Model
                 }
                 $rruleConfiguration['BYWEEKDAY'] = 'BYWEEKDAY=' . implode(',', $byWeekDay);
             }
+            /** @var CalDate $until */
             $until = $event->getUntil();
             if (is_object($until) && $until->format('%Y%m%d') > 19700101) {
                 $eventEnd = $this->getEnd();
@@ -2547,7 +2590,7 @@ class EventModel extends Model
     public function getRdateMarker(&$template, &$sims, &$rems, &$wrapped, $view)
     {
         $sims['###RDATE###'] = '';
-        if ($this->getRdateType() != '' && $this->getRdateType() != 'none' && $this->getRdate() != '') {
+        if ($this->getRdateType() !== '' && $this->getRdateType() !== 'none' && $this->getRdate() != '') {
             $sims['###RDATE###'] = 'RDATE;VALUE=' . strtoupper($this->getRdateType() . ':' . $this->getRdate());
         }
     }
@@ -2566,12 +2609,11 @@ class EventModel extends Model
         $daySeconds = $this->getStart()->getHour() * 3600 + $this->getStart()->getMinute() * 60;
         $offset = $daySeconds - Functions::strtotimeOffset($this->getStart()->getTime());
         $exceptionEventStart = new CalDate();
+        /** @var EventModel $exceptionEvent */
         foreach ($this->getExceptionEvents() as $exceptionEvent) {
-            // if ($exceptionEvent->getFreq() == 'none') {
             $exceptionEventStart->copy($exceptionEvent->getStart());
             $exceptionEventStart->addSeconds($offset);
             $exceptionDates[] = 'EXDATE:' . $exceptionEventStart->format('%Y%m%dT%H%M%SZ');
-            // }
         }
 
         if (count($exceptionDates)) {
@@ -2589,24 +2631,13 @@ class EventModel extends Model
     public function getExruleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $sims['###EXRULE###'] = '';
-        return; // multiple exrules are not supported
-        $exceptionRules = [];
-        foreach ($this->getExceptionEvents() as $exceptionEvent) {
-            if ($exceptionEvent->getFreq() != 'none') {
-                $exceptionRules .= $this->getRRule($exceptionEvent);
-            }
-        }
-
-        if (count($exceptionRules)) {
-            $sims['###EXRULE###'] = 'EXRULE:' . implode(',', $exceptionRules);
-        }
     }
 
     /**
      * @param $eventFreq
      * @return string
      */
-    public function getIcsFreqLabel($eventFreq)
+    public function getIcsFreqLabel($eventFreq): string
     {
         $freq_type = '';
         switch ($eventFreq) {
@@ -2731,7 +2762,7 @@ class EventModel extends Model
     /**
      * @return CalDate
      */
-    public function getNow()
+    public function getNow(): CalDate
     {
         $now = new CalDate();
         $now->setTZbyID('UTC');
@@ -2741,7 +2772,7 @@ class EventModel extends Model
     /**
      * @return CalDate
      */
-    public function getToday()
+    public function getToday(): CalDate
     {
         $today = new CalDate();
         $today->setTZbyID('UTC');
@@ -2762,7 +2793,7 @@ class EventModel extends Model
     /**
      * @return bool
      */
-    public function getSendOutInvitation()
+    public function getSendOutInvitation(): bool
     {
         return $this->sendOutInvitation;
     }
@@ -2776,9 +2807,9 @@ class EventModel extends Model
      */
     public function getCreatedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims['###CREATED###'] = 'CREATED:' . gmdate('Ymd', $this->getCreationDate()) . 'T' . gmdate(
+        $sims['###CREATED###'] = 'CREATED:' . gmdate('Ymd', $this->getCrdate()) . 'T' . gmdate(
                 'His',
-                $this->getCreationDate()
+                $this->getCrdate()
             ) . 'Z';
     }
 
@@ -2800,11 +2831,12 @@ class EventModel extends Model
     /**
      * @return string
      */
-    public function getAjaxEditLink()
+    public function getAjaxEditLink(): string
     {
-        if ($this->isUserAllowedToEdit() && $this->conf['view.']['enableAjax']) {
+        if ($this->conf['view.']['enableAjax'] && $this->isUserAllowedToEdit()) {
             return 'dragZones[\'dragZone' . $this->getUid() . '\'] = new CalEvent.dd.MyDragZone(' . '\'cal_event_' . $this->getUid() . '\',' . '{ddGroup: \'cal_event\',' . 'scroll: false,' . 'start_time:\'' . ($this->getStart()->getHour() * 3600 + $this->getStart()->getMinute() * 60) . '\',' . 'start_day:\'' . $this->getStart()->format('%Y%m%d') . '\',' . 'end_time:\'' . ($this->getEnd()->getHour() * 3600 + $this->getEnd()->getMinute() * 60) . '\',' . 'end_day:\'' . $this->getEnd()->format('%Y%m%d') . '\',' . 'uid:\'' . $this->getUid() . '\',' . 'eventType:\'' . $this->getType() . '\'});';
         }
+        return '';
     }
 
     /**
@@ -2819,6 +2851,7 @@ class EventModel extends Model
         $this->initLocalCObject();
         $arr = &$this->getCategories();
         foreach ($arr as $cat) {
+            /** @var CategoryModel $cat */
             $icon = $cat->getIcon();
             if ($icon) {
                 $search = [

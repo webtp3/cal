@@ -22,17 +22,60 @@ use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
  */
 class DateParser
 {
+    /**
+     * @var string
+     */
     public $tokenString = '';
+
+    /**
+     * @var int
+     */
     public $mode = -1; // 0 = string, 1 = number, 2 = range
+
+    /**
+     * @var array
+     */
     public $stack = [];
+
+    /**
+     * @var int
+     */
     public $day = 0;
+
+    /**
+     * @var int
+     */
     public $week = 0;
+
+    /**
+     * @var int
+     */
     public $weekday = -1;
+
+    /**
+     * @var int
+     */
     public $month = 0;
+
+    /**
+     * @var int
+     */
     public $year = 0;
+
+    /**
+     * @var string
+     */
     public $special = '';
+
+    /**
+     * @var CalDate
+     */
     public $timeObj;
-    public $conf;
+
+    /**
+     * @var array
+     */
+    public $conf = [];
 
     /**
      * @param $value
@@ -41,14 +84,14 @@ class DateParser
      */
     public function parse($value, $conf = [], $timeObj = '')
     {
-        if ($timeObj == '') {
+        if ($timeObj === '') {
             $timeObj = new CalDate();
             $timeObj->setTZbyID('UTC');
         }
         $this->timeObj = $timeObj;
         $this->conf = &$conf;
-        for ($i = 0; $i < strlen($value); $i++) {
-            $chr = $value{$i};
+        foreach ($value as $iValue) {
+            $chr = $iValue;
 
             switch ($chr) {
                 case ' ':
@@ -57,8 +100,8 @@ class DateParser
                 case ':':
                 case ',':
                 case '/':
-                    if ($this->tokenString != '') {
-                        if ($this->mode == 0) {
+                    if ($this->tokenString !== '') {
+                        if ($this->mode === 0) {
                             $this->_parseString($this->tokenString);
                         } else {
                             $this->_parseNumber($this->tokenString);
@@ -69,12 +112,12 @@ class DateParser
                     break;
                 case '-':
                 case '+':
-                    if ($this->mode == -1) {
+                    if ($this->mode === -1) {
                         $this->mode = 2;
-                        array_push($this->stack, [
+                        $this->stack[] = [
                             '?',
                             $chr
-                        ]);
+                        ];
                     } else {
                         $this->_parseString($this->tokenString);
                         $this->tokenString = '';
@@ -91,20 +134,20 @@ class DateParser
                 case '7':
                 case '8':
                 case '9':
-                    if ($this->mode == 1) {
+                    if ($this->mode === 1) {
                         $firstPart = array_pop($this->stack);
                         $firstPart = array_pop($firstPart);
                         $this->_parseNumber($firstPart . $chr);
-                    } elseif ($this->mode == 2) {
+                    } elseif ($this->mode === 2) {
                         $firstPart = array_pop($this->stack);
                         $firstPart = array_pop($firstPart);
-                        array_push($this->stack, [
+                        $this->stack[] = [
                             'range' => intval($firstPart . $chr)
-                        ]);
+                        ];
                     } else {
                         $this->_parseNumber($chr);
                     }
-                    if ($this->mode != 2) {
+                    if ($this->mode !== 2) {
                         $this->mode = 1;
                     }
                     $this->tokenString = '';
@@ -161,7 +204,7 @@ class DateParser
                 case 'x':
                 case 'y':
                 case 'z':
-                    if ($this->mode == 1) {
+                    if ($this->mode === 1) {
                         $this->_parseString($this->tokenString);
                         $this->tokenString = '';
                     }
@@ -173,8 +216,8 @@ class DateParser
             }
         }
 
-        if ($this->tokenString != '') {
-            if ($this->mode == 0) {
+        if ($this->tokenString !== '') {
+            if ($this->mode === 0) {
                 $this->_parseString($this->tokenString);
             } else {
                 $this->_parseNumber($this->tokenString);
@@ -188,23 +231,23 @@ class DateParser
     public function _parseNumber($num)
     {
         $number = intval($num);
-        if ($this->mode != 2) {
+        if ($this->mode !== 2) {
             if ($number > 31) {
-                array_push($this->stack, [
+                $this->stack[] = [
                     'year' => $number
-                ]);
+                ];
                 return;
             }
             if ($number > 12) {
-                array_push($this->stack, [
+                $this->stack[] = [
                     'day' => $number
-                ]);
+                ];
                 return;
             }
         }
-        array_push($this->stack, [
+        $this->stack[] = [
             '?' => $number
-        ]);
+        ];
     }
 
     /**
@@ -215,70 +258,70 @@ class DateParser
         $value = strtolower($value);
         switch ($value) {
             case 'last':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'range' => 'last'
-                ]);
+                ];
                 break;
             case 'next':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'range' => 'next'
-                ]);
+                ];
                 break;
             case 'now':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'abs' => $this->timeObj->getTime()
-                ]);
+                ];
                 break;
             case 'today':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'today' => $this->timeObj->getTime()
-                ]);
+                ];
                 break;
             case 'current':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'today' => $this->timeObj->getTime()
-                ]);
+                ];
                 break;
             case 'tomorrow':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'tomorrow' => $this->timeObj->getTime()
-                ]);
+                ];
                 break;
             case 'yesterday':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'yesterday' => $this->timeObj->getTime()
-                ]);
+                ];
                 break;
 
             case 'yearstart':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'date' => Calendar::calculateStartYearTime($this->timeObj)
-                ]);
+                ];
                 break;
             case 'monthstart':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'date' => Calendar::calculateStartMonthTime($this->timeObj)
-                ]);
+                ];
                 break;
             case 'weekstart':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'date' => Calendar::calculateStartWeekTime($this->timeObj)
-                ]);
+                ];
                 break;
             case 'weekend':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'date' => Calendar::calculateEndWeekTime($this->timeObj)
-                ]);
+                ];
                 break;
             case 'monthend':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'date' => Calendar::calculateEndMonthTime($this->timeObj)
-                ]);
+                ];
                 break;
             case 'yearend':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'date' => Calendar::calculateEndYearTime($this->timeObj)
-                ]);
+                ];
                 break;
             case 'quarterstart':
                 $timeObj = $this->timeObj;
@@ -299,9 +342,9 @@ class DateParser
                 $timeObj->setHour(0);
                 $timeObj->setMinute(0);
                 $timeObj->setSecond(0);
-                array_push($this->stack, [
+                $this->stack[] = [
                     'date' => $timeObj
-                ]);
+                ];
                 break;
             case 'quarterend':
                 $timeObj = $this->timeObj;
@@ -326,168 +369,168 @@ class DateParser
                 $timeObj->setHour(23);
                 $timeObj->setMinute(59);
                 $timeObj->setSecond(59);
-                array_push($this->stack, [
+                $this->stack[] = [
                     'date' => $timeObj
-                ]);
+                ];
                 break;
             case 'day':
             case 'days':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'value' => 86400
-                ]);
+                ];
                 break;
             case 'week':
             case 'weeks':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'value' => 604800
-                ]);
+                ];
                 break;
             case 'h':
             case 'hour':
             case 'hours':
                 $value = array_pop(array_pop($this->stack));
-                array_push($this->stack, [
+                $this->stack[] = [
                     'range' => $value
-                ]);
-                array_push($this->stack, [
+                ];
+                $this->stack[] = [
                     'value' => 'hour'
-                ]);
+                ];
                 break;
             case 'm':
             case 'minute':
             case 'minutes':
                 $value = array_pop(array_pop($this->stack));
-                array_push($this->stack, [
+                $this->stack[] = [
                     'range' => $value
-                ]);
-                array_push($this->stack, [
+                ];
+                $this->stack[] = [
                     'value' => 'minute'
-                ]);
+                ];
                 break;
             case 'month':
             case 'months':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'value' => 'month'
-                ]);
+                ];
                 break;
             case 'year':
             case 'years':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'value' => 'year'
-                ]);
+                ];
                 break;
             case 'mon':
             case 'monday':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'weekday' => 1
-                ]);
+                ];
                 break;
             case 'tue':
             case 'tuesday':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'weekday' => 2
-                ]);
+                ];
                 break;
             case 'wed':
             case 'wednesday':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'weekday' => 3
-                ]);
+                ];
                 break;
             case 'thu':
             case 'thursday':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'weekday' => 4
-                ]);
+                ];
                 break;
             case 'fri':
             case 'friday':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'weekday' => 5
-                ]);
+                ];
                 break;
             case 'sat':
             case 'saturday':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'weekday' => 6
-                ]);
+                ];
                 break;
             case 'sun':
             case 'sunday':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'weekday' => 0
-                ]);
+                ];
                 break;
             case 'jan':
             case 'january':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 1
-                ]);
+                ];
                 break;
             case 'feb':
             case 'february':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 2
-                ]);
+                ];
                 break;
             case 'mar':
             case 'march':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 3
-                ]);
+                ];
                 break;
             case 'apr':
             case 'april':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 4
-                ]);
+                ];
                 break;
             case 'may':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 5
-                ]);
+                ];
                 break;
             case 'jun':
             case 'june':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 6
-                ]);
+                ];
                 break;
             case 'jul':
             case 'july':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 7
-                ]);
+                ];
                 break;
             case 'aug':
             case 'august':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 8
-                ]);
+                ];
                 break;
             case 'sep':
             case 'september':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 9
-                ]);
+                ];
                 break;
             case 'oct':
             case 'october':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 10
-                ]);
+                ];
                 break;
             case 'nov':
             case 'november':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 11
-                ]);
+                ];
                 break;
             case 'dec':
             case 'december':
-                array_push($this->stack, [
+                $this->stack[] = [
                     'month' => 12
-                ]);
+                ];
                 break;
             default:
                 break;
@@ -497,7 +540,7 @@ class DateParser
     /**
      * @return CalDate
      */
-    public function getDateObjectFromStack()
+    public function getDateObjectFromStack(): CalDate
     {
         $date = new CalDate();
         $date->setTZbyID('UTC');
@@ -512,7 +555,7 @@ class DateParser
             foreach ($valueArray as $key => $value) {
                 switch ($key) {
                     case 'year':
-                        if (strlen($value) == 8) {
+                        if (strlen($value) === 8) {
                             $date->setYear(intval(substr($value, 0, 4)));
                             $date->setMonth(intval(substr($value, 4, 2)));
                             $date->setDay(intval(substr($value, 6, 2)));
@@ -555,13 +598,13 @@ class DateParser
                         $date->setHour(0);
                         break;
                     case '?':
-                        if ($lastKey == 'month') {
+                        if ($lastKey === 'month') {
                             $date->setDay($value);
                             $date->setMinute(0);
                             $date->setSecond(0);
                             $date->setHour(0);
                             $key = 'day';
-                        } elseif ($lastKey == 'year') {
+                        } elseif ($lastKey === 'year') {
                             if ($this->conf['USmode']) {
                                 $date->setDay($value);
                                 $date->setMinute(0);
@@ -576,7 +619,7 @@ class DateParser
                                 $foundMonth = true;
                                 $key = 'month';
                             }
-                        } elseif ($lastKey == 'day') {
+                        } elseif ($lastKey === 'day') {
                             $date->setMonth($value);
                             $date->setMinute(0);
                             $date->setSecond(0);
@@ -635,19 +678,15 @@ class DateParser
         while (!empty($post)) {
             $valueArray = array_pop($post);
             foreach ($valueArray as $key => $value) {
-                switch ($key) {
-                    case '?':
-                        if ($foundMonth) {
-                            $date->setDay($value);
-                        } else {
-                            if ($this->conf['USmode']) {
-                                $date->setDay($value);
-                            } else {
-                                $date->setMonth($value);
-                                $foundMonth = true;
-                            }
-                        }
-                        break;
+                if ($key === '?') {
+                    if ($foundMonth) {
+                        $date->setDay($value);
+                    } elseif ($this->conf['USmode']) {
+                        $date->setDay($value);
+                    } else {
+                        $date->setMonth($value);
+                        $foundMonth = true;
+                    }
                 }
             }
         }
@@ -655,16 +694,16 @@ class DateParser
     }
 
     /**
-     * @param $date
+     * @param CalDate$date
      * @param $range
      * @param $rangeValue
      */
     public function evaluateRange(&$date, $range, $rangeValue)
     {
         if (!is_numeric($range)) {
-            if ($range == 'last') {
+            if ($range === 'last') {
                 $range = -1;
-            } elseif ($range == 'next') {
+            } elseif ($range === 'next') {
                 $range = 1;
             }
         }
@@ -672,7 +711,7 @@ class DateParser
             $date->addSeconds($rangeValue * $range);
         } elseif (is_array($rangeValue)) {
             foreach ($rangeValue as $key => $value) {
-                if ($key == 'weekday' && $range > 0) {
+                if ($key === 'weekday' && $range > 0) {
                     for ($i = 0; $i < $range; $i++) {
                         $formatedDate = Calc::nextDayOfWeek(
                             $value,
@@ -683,7 +722,7 @@ class DateParser
                         $date = new CalDate($formatedDate);
                         $date->setTZbyID('UTC');
                     }
-                } elseif ($key == 'weekday' && $range < 0) {
+                } elseif ($key === 'weekday' && $range < 0) {
                     for ($i = 0; $i > $range; $i--) {
                         $formatedDate = Calc::prevDayOfWeek(
                             $value,
@@ -694,14 +733,14 @@ class DateParser
                         $date = new CalDate($formatedDate);
                         $date->setTZbyID('UTC');
                     }
-                } elseif ($value == 'week' && $range > 0) {
+                } elseif ($value === 'week' && $range > 0) {
                     $date->addSeconds($range * 604800);
-                } elseif ($value == 'week' && $range < 0) {
+                } elseif ($value === 'week' && $range < 0) {
                     $date->subtractSeconds($range * 604800);
                 }
             }
         } elseif ($range > 0) {
-            if ($rangeValue == 'month') {
+            if ($rangeValue === 'month') {
                 for ($i = 0; $i < $range; $i++) {
                     $days = Calc::daysInMonth($date->getMonth(), $date->getYear());
                     $endOfNextMonth = new CalDate(Calc::endOfNextMonth(
@@ -716,17 +755,17 @@ class DateParser
                         $date->setYear($endOfNextMonth->getYear());
                     }
                 }
-            } elseif ($rangeValue == 'year') {
+            } elseif ($rangeValue === 'year') {
                 $date->setYear($date->getYear() + $range);
-            } elseif ($rangeValue == 'hour') {
+            } elseif ($rangeValue === 'hour') {
                 $date->addSeconds($range * 3600);
-            } elseif ($rangeValue == 'minute') {
+            } elseif ($rangeValue === 'minute') {
                 $date->addSeconds($range * 60);
             } else {
                 $date->addSeconds($range * 86400);
             }
         } elseif ($range < 0) {
-            if ($rangeValue == 'month') {
+            if ($rangeValue === 'month') {
                 for ($i = 0; $i > $range; $i--) {
                     $endOfPrevMonth = new CalDate(Calc::endOfPrevMonth(
                         $date->getDay(),
@@ -736,11 +775,11 @@ class DateParser
                     $days = Calc::daysInMonth($endOfPrevMonth->getMonth(), $endOfPrevMonth->getYear());
                     $date->subtractSeconds(60 * 60 * 24 * $days);
                 }
-            } elseif ($rangeValue == 'year') {
+            } elseif ($rangeValue === 'year') {
                 $date->setYear($date->getYear() - abs($range));
-            } elseif ($rangeValue == 'hour') {
+            } elseif ($rangeValue === 'hour') {
                 $date->subtractSeconds(abs($range) * 3600);
-            } elseif ($rangeValue == 'minute') {
+            } elseif ($rangeValue === 'minute') {
                 $date->subtractSeconds(abs($range) * 60);
             } else {
                 $date->subtractSeconds(abs($range) * 86400);

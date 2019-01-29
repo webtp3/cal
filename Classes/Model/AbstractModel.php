@@ -16,12 +16,15 @@ namespace TYPO3\CMS\Cal\Model;
  */
 abstract class AbstractModel
 {
+    /**
+     * @var array
+     */
     public $noAutoFetchMethods = []; // array with method names as array values, where the method has the naming scheme 'getCustomMethodName', where a setter with the same naming and where the get-method itself expects parameters and thus can not be fetched dynamically
 
     /**
      * @return array
      */
-    public function getNoAutoFetchMethods()
+    public function getNoAutoFetchMethods(): array
     {
         return $this->noAutoFetchMethods;
     }

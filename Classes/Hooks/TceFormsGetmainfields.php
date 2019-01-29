@@ -30,41 +30,22 @@ class TceFormsGetmainfields
      */
     public function getMainFields_preProcess($table, &$row, $tceform)
     {
-        if ($table == 'tx_cal_event') {
+        if ($table === 'tx_cal_event') {
 
             /* If the event is temporary, make it read only. */
             if ($row['isTemp']) {
                 $GLOBALS['TCA']['tx_cal_event']['ctrl']['readOnly'] = 1;
             }
             /* If we have posted data and a new record, preset values to what they were on the previous record */
-            if (is_array($GLOBALS['HTTP_POST_VARS']['data']['tx_cal_event']) && strstr($row['uid'], 'NEW')) {
+            if (is_array($GLOBALS['HTTP_POST_VARS']['data']['tx_cal_event']) && false !== strpos($row['uid'], 'NEW')) {
                 $eventPostData = array_pop($GLOBALS['HTTP_POST_VARS']['data']['tx_cal_event']);
 
                 /* Set the calendar if there's not already a value set (from TSConfig) */
                 if (!$row['calendar_id']) {
                     $row['calendar_id'] = $eventPostData['calendar_id'];
                 }
-            } elseif (!strstr($row['uid'], 'NEW')) {
-                if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] == '1') {
-                    $format = '%m-%d-%Y';
-                } else {
-                    $format = '%d-%m-%Y';
-                }
-
-                $row['start_date'] = $this->formatDate($row['start_date'], $format);
-                $row['end_date'] = $this->formatDate($row['end_date'], $format);
-                $row['until'] = $this->formatDate($row['until'], $format);
-            }
-
-            /* If we have a calendar, set the category query to take this calendar into account */
-            if ($row['calendar_id']) {
-                $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-            }
-        }
-
-        if ($table == 'tx_cal_exception_event') {
-            if (!strstr($row['uid'], 'NEW')) {
-                if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] == '1') {
+            } elseif (false === strpos($row['uid'], 'NEW')) {
+                if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] === '1') {
                     $format = '%m-%d-%Y';
                 } else {
                     $format = '%d-%m-%Y';
@@ -76,7 +57,19 @@ class TceFormsGetmainfields
             }
         }
 
-        if ($table == 'tx_cal_fe_user_event_monitor_mm') {
+        if (($table === 'tx_cal_exception_event') && false === strpos($row['uid'], 'NEW')) {
+            if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] === '1') {
+                $format = '%m-%d-%Y';
+            } else {
+                $format = '%d-%m-%Y';
+            }
+
+            $row['start_date'] = $this->formatDate($row['start_date'], $format);
+            $row['end_date'] = $this->formatDate($row['end_date'], $format);
+            $row['until'] = $this->formatDate($row['until'], $format);
+        }
+
+        if ($table === 'tx_cal_fe_user_event_monitor_mm') {
             $rec = BackendUtility::getRecord($table, $row['uid']);
 
             switch ($row['tablenames']) {
@@ -95,7 +88,7 @@ class TceFormsGetmainfields
             }
         }
 
-        if ($table == 'tx_cal_attendee') {
+        if ($table === 'tx_cal_attendee') {
             $row['fe_group_id'] = '';
         }
     }

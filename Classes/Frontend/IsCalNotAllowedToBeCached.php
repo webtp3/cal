@@ -79,7 +79,7 @@ function IsCalNotAllowedToBeCached()
         'remove_organizer'
     ];
 
-    if (in_array($view, $frontendEditingViews)) {
+    if (in_array($view, $frontendEditingViews, true)) {
         return true;
     }
 
@@ -90,7 +90,7 @@ function IsCalNotAllowedToBeCached()
         'search_organizer',
         'search_location'
     ];
-    if (in_array($view, $searchViews)) {
+    if (in_array($view, $searchViews, true)) {
         return true;
     }
 

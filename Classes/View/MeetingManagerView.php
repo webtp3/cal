@@ -14,8 +14,13 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\AttendeeModel;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
+/**
+ * Class MeetingManagerView
+ */
 class MeetingManagerView extends BaseView
 {
     /**
@@ -23,7 +28,7 @@ class MeetingManagerView extends BaseView
      *
      * @return string output of the meeting manager.
      */
-    public function drawMeetingManager()
+    public function drawMeetingManager(): string
     {
         $rems = [];
         $sims = [];
@@ -36,7 +41,7 @@ class MeetingManagerView extends BaseView
 
         /* Get the meeting manager template */
         $page = Functions::getContent($this->conf['view.']['event.']['meeting.']['managerTemplate']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no meeting manager template file found:</h3>' . $this->conf['view.']['meeting.']['managerTemplate'];
         }
 
@@ -58,14 +63,7 @@ class MeetingManagerView extends BaseView
                 true
             );
 
-            unset($this->controller->piVars['monitor']);
-            unset($this->controller->piVars['attendee']);
-            unset($this->controller->piVars['sid']);
-            $local_rems = [];
-            $local_sims = [];
-            $local_wrapped = [];
-
-            $status = $this->markerBasedTemplateService->getSubpart($page, '###STATUS###');
+            unset($this->controller->piVars['monitor'], $this->controller->piVars['attendee'], $this->controller->piVars['sid']);
             switch ($attendeeStatus) {
                 case 'accept': /* user comes to the meeting */
                     if ($this->changeStatus($attendeeUid, $event, $meetingHash, 'ACCEPTED')) {
@@ -84,7 +82,6 @@ class MeetingManagerView extends BaseView
                     break;
                 case 'decline': /* user does not come to the meeting */
                     if ($this->changeStatus($attendeeUid, $event, $meetingHash, 'DECLINE')) {
-                        $status = $this->markerBasedTemplateService->getSubpart($page, '###STATUS_START###');
                         $sims['###STATUS###'] = sprintf(
                             $this->controller->pi_getLL('l_meeting_declined'),
                             $event->getTitle()
@@ -110,25 +107,24 @@ class MeetingManagerView extends BaseView
      * Attempts to change the status of a meeting participant of
      * a particular event if the meeting hash matches.
      *
-     * @param
-     *            string        The uid of the attendee.
-     * @param
-     *            object        Event object.
-     * @param
-     *            string        Unique hash of email and event.
+     * @param $attendeeUid
+     * @param EventModel $event Event object.
+     * @param $meetingHash
+     * @param $status
      * @return string status to set the attendee to.
      */
-    public function changeStatus($attendeeUid, $event, $meetingHash, $status)
+    public function changeStatus($attendeeUid, $event, $meetingHash, $status): string
     {
         $attendeeArray = $event->getAttendees();
 
         if ($attendeeArray['tx_cal_attendee'][$attendeeUid]) {
+            /** @var AttendeeModel $attendeeObject */
             $attendeeObject = $attendeeArray['tx_cal_attendee'][$attendeeUid];
-            $md5 = md5($event->getUid() . $attendeeObject->getEmail() . $attendeeObject->row['crdate']);
-            if ($md5 == $meetingHash) {
+            $md5 = md5($event->getUid() . $attendeeObject->getEmail() . $attendeeObject->getCrdate());
+            if ($md5 === $meetingHash) {
                 $table = 'tx_cal_attendee';
                 $where = 'uid = ' . $attendeeUid;
-                $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, [
+                $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, [
                     'status' => $status
                 ]);
                 return true;

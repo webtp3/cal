@@ -26,7 +26,7 @@ class EventLinkHandler
      */
     public function main($linktxt, $conf, $linkHandlerKeyword, $linkHandlerValue, $link_param, & $pObj)
     {
-        if ($linkHandlerKeyword != 'calendar') {
+        if ($linkHandlerKeyword !== 'calendar') {
             return;
         }
 

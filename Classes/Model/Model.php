@@ -23,97 +23,392 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class Model extends BaseModel
+abstract class Model extends BaseModel
 {
-    public $row;
+    /**
+     * @var CalDate
+     */
+    protected $start;
+
+    /**
+     * @var CalDate
+     */
+    protected $end;
+
+    /**
+     * @var int
+     */
+    protected $allday = 0;
+
+    /**
+     * @var string
+     */
+    protected $timezone = '';
+
+    /**
+     * @var string
+     */
+    protected $title = '';
+
+    /**
+     * @var int
+     */
+    protected $calendar_id = 0;
+
+    /**
+     * Name of the organizer (if one-time)
+     * @var string
+     */
+    protected $organizer = '';
+
+    /**
+     * ID of the organizer within the TYPO3 system
+     * @var int
+     */
+    protected $organizer_id = 0;
+
+    /**
+     * Link to the organizers page within the TYPO3 system
+     * @var int
+     */
+    protected $organizer_pid = 0;
+
+    /**
+     * Link to the organizers homepage
+     * @var string
+     */
+    protected $organizer_link = '';
+
+    /**
+     * @var bool
+     */
     public $isClone = false;
-    public $tstamp;
-    public $sequence = 1;
-    public $title;
-    public $organizer;
+
+    /**
+     * @var
+     */
     public $location;
+
+    /**
+     * @var
+     */
     public $content;
-    public $start;
-    public $end;
-    public $allday = 0;
-    public $timezone;
+
+    /**
+     * @var int
+     */
     public $calnumber = 1;
-    public $calname;
-    public $calendarUid;
+
+    /**
+     * @var string
+     */
+    public $calname = '';
+
+    /**
+     * @var
+     */
     public $url;
+
+    /**
+     * @var
+     */
     public $alarmdescription;
+
+    /**
+     * @var
+     */
     public $summary;
+
+    /**
+     * @var
+     */
     public $description;
+
+    /**
+     * @var int
+     */
     public $overlap = 1;
+
+    /**
+     * @var
+     */
     public $_class;
+
+    /**
+     * @var CalDate
+     */
     public $until;
+
+    /**
+     * @var string
+     */
     public $freq = '';
+
+    /**
+     * @var
+     */
     public $reccuring_end;
-    public $cnt;
+
+    /**
+     * @var int
+     */
+    public $cnt = 0;
+
+    /**
+     * @var array
+     */
     public $bysecond = [];
+
+    /**
+     * @var array
+     */
     public $byminute = [];
+
+    /**
+     * @var array
+     */
     public $byhour = [];
+
+    /**
+     * @var array
+     */
     public $byday = [];
+
+    /**
+     * @var array
+     */
     public $byweekno = [];
+
+    /**
+     * @var array
+     */
     public $bymonth = [];
+
+    /**
+     * @var array
+     */
     public $byyearday = [];
+
+    /**
+     * @var array
+     */
     public $bymonthday = [];
+
+    /**
+     * @var array
+     */
     public $byweekday = [];
+
+    /**
+     * @var array
+     */
     public $bysetpos = [];
+
+    /**
+     * @var int
+     */
+    protected $intrval = 0;
+
+    /**
+     * @var string
+     */
     public $wkst = '';
+
+    /**
+     * @var string
+     */
     public $rdateType = '';
+
+    /**
+     * @var string
+     */
     public $rdate = '';
-    public $rdateValues = [];
+
+    /**
+     * @var string
+     */
+    public $rdateValues = '';
+
+    /**
+     * @var
+     */
     public $displayend;
+
+    /**
+     * @var
+     */
     public $spansday;
+
+    /**
+     * @var array <CategoryModel>
+     */
     public $categories = [];
+
+    /**
+     * @var
+     */
     public $categoriesAsString;
+
+    /**
+     * @var
+     */
     public $categoryUidsAsArray;
+
+    /**
+     * @var int
+     */
     public $location_id = 0;
-    public $organizer_id = 0;
+
+    /**
+     * @var
+     */
     public $locationLink;
-    public $organizerLink;
+
+    /**
+     * @var
+     */
     public $locationPage;
-    public $organizerPage;
-    public $organizerObject;
+
+    /**
+     * @var
+     */
     public $locationObject;
+
+    /**
+     * @var array
+     */
     public $exception_single_ids = [];
+
+    /**
+     * @var array
+     */
     public $notifyUserIds = [];
+
+    /**
+     * @var array
+     */
     public $exceptionGroupIds = [];
+
+    /**
+     * @var array
+     */
     public $notifyGroupIds = [];
+
+    /**
+     * @var array
+     */
     public $creatorUserIds = [];
+
+    /**
+     * @var array
+     */
     public $creatorGroupIds = [];
+
+    /**
+     * @var array
+     */
     public $exceptionEvents = [];
+
+    /**
+     * @var bool
+     */
     public $editable = false;
+
+    /**
+     * @var string
+     */
     public $headerstyle = 'default_catheader'; // '#557CA3';//'#0000ff';
+
+    /**
+     * @var string
+     */
     public $bodystyle = 'default_catbody'; // ''#6699CC';//'#ccffcc';
-    public $crdate = 0;
+
+    /**
+     * @var
+     */
     public $deviationDates;
 
     /* new */
-    public $event_type;
+    /**
+     * @var int
+     */
+    public $event_type = 0;
+
+    /**
+     * @var
+     */
     public $page;
+
+    /**
+     * @var
+     */
     public $ext_url;
     /* new */
+    /**
+     * @var int
+     */
     public $externalPlugin = 0;
-    public $sharedUsers = [];
-    public $sharedGroups = [];
+
+    /**
+     * @var
+     */
     public $eventOwner;
+
+    /**
+     * @var array
+     */
     public $attendees = [];
+
+    /**
+     * @var int
+     */
     public $status = 0;
+
+    /**
+     * @var int
+     */
     public $priority = 0;
-    public $completetd = 0;
+
+    /**
+     * @var int
+     */
+    public $completed = 0;
+    /**
+     *
+     */
     const EVENT_TYPE_DEFAULT = 0;
+    /**
+     *
+     */
     const EVENT_TYPE_SHORTCUT = 1;
+    /**
+     *
+     */
     const EVENT_TYPE_EXTERNAL = 2;
+    /**
+     *
+     */
     const EVENT_TYPE_MEETING = 3;
+    /**
+     *
+     */
     const EVENT_TYPE_TODO = 4;
+
+    /**
+     * @var Organizer
+     */
+    public $organizerObject;
+
+    /**
+     * @var CalendarModel
+     */
+    private $calendarObject;
 
     /**
      * Constructor.
      *
-     * @param $serviceKey String
-     *            serviceKey for this model
+     * @param string $serviceKey
      */
     public function __construct($serviceKey)
     {
@@ -122,50 +417,9 @@ class Model extends BaseModel
     }
 
     /**
-     * Returns the timestamp value.
-     *
-     * @return int timestamp.
-     */
-    public function getTstamp()
-    {
-        return $this->tstamp;
-    }
-
-    /**
-     * Sets the timestamp value.
-     *
-     * @param $timestamp Integer
-     */
-    public function setTstamp($timestamp)
-    {
-        $this->tstamp = $timestamp;
-    }
-
-    /**
-     * Returns the sequence value.
-     *
-     * @return array sequence.
-     */
-    public function getSequence()
-    {
-        return $this->sequence;
-    }
-
-    /**
-     * Sets the sequence value.
-     *
-     * @param $sequence array
-     */
-    public function setSequence($sequence)
-    {
-        $this->sequence = $sequence;
-    }
-
-    /**
      * Sets the event organizer.
      *
-     * @param $organizer String
-     *            of the event.
+     * @param string $organizer
      */
     public function setOrganizer($organizer)
     {
@@ -177,7 +431,7 @@ class Model extends BaseModel
      *
      * @return string organizer of the event.
      */
-    public function getOrganizer()
+    public function getOrganizer(): string
     {
         return $this->organizer;
     }
@@ -185,8 +439,7 @@ class Model extends BaseModel
     /**
      * Sets the event title.
      *
-     * @param $title String
-     *            of the event.
+     * @param string $title
      */
     public function setTitle($title)
     {
@@ -198,30 +451,9 @@ class Model extends BaseModel
      *
      * @return string title of the event.
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
-    }
-
-    /**
-     * Sets the event creation time.
-     *
-     * @param $timestamp Integer
-     *            the event creation.
-     */
-    public function setCreationDate($timestamp)
-    {
-        $this->crdate = $timestamp;
-    }
-
-    /**
-     * Returns timestamp of the event creation.
-     *
-     * @return int of the event creation.
-     */
-    public function getCreationDate()
-    {
-        return $this->crdate;
     }
 
     /**
@@ -229,13 +461,13 @@ class Model extends BaseModel
      *
      * @return string event.
      */
-    public function renderEvent()
+    public function renderEvent(): string
     {
         $cObj = &Registry::Registry('basic', 'cobj');
         $d = nl2br($cObj->parseFunc($this->getDescription(), $this->conf['parseFunc.']));
         $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
-        return '<h3>' . $this->getTitle() . '</h3><font color="#000000"><ul>' . '<li>Start: ' . $eventStart->format('%H:%M') . '</li>' . '<li>End: ' . $eventEnd->format('%H:%M') . '</li>' . '<li> Organizer: ' . $this->getOrganizer() . '</li>' . '<li>Location: ' . $this->getLocation() . '</li>' . '<li>Description: ' . $d . '</li></ul></font>';
+        return '<h3>' . $this->getTitle() . '</h3><span style="color: #000000; "><ul>' . '<li>Start: ' . $eventStart->format('%H:%M') . '</li>' . '<li>End: ' . $eventEnd->format('%H:%M') . '</li>' . '<li> Organizer: ' . $this->getOrganizer() . '</li>' . '<li>Location: ' . $this->getLocation() . '</li>' . '<li>Description: ' . $d . '</li></ul></span>';
     }
 
     /**
@@ -243,7 +475,7 @@ class Model extends BaseModel
      *
      * @return string event for allday -> the title.
      */
-    public function renderEventForAllDay()
+    public function renderEventForAllDay(): string
     {
         return $this->getTitle();
     }
@@ -253,7 +485,7 @@ class Model extends BaseModel
      *
      * @return string event for day -> the title.
      */
-    public function renderEventForDay()
+    public function renderEventForDay(): string
     {
         return $this->title;
     }
@@ -263,7 +495,7 @@ class Model extends BaseModel
      *
      * @return string event for week -> the title.
      */
-    public function renderEventForWeek()
+    public function renderEventForWeek(): string
     {
         return $this->title;
     }
@@ -273,7 +505,7 @@ class Model extends BaseModel
      *
      * @return string event for month -> the title.
      */
-    public function renderEventForMonth()
+    public function renderEventForMonth(): string
     {
         return $this->title;
     }
@@ -283,7 +515,7 @@ class Model extends BaseModel
      *
      * @return string event for a mini month -> the title.
      */
-    public function renderEventForMiniMonth()
+    public function renderEventForMiniMonth(): string
     {
         return $this->title;
     }
@@ -293,7 +525,7 @@ class Model extends BaseModel
      *
      * @return string event for year -> the title.
      */
-    public function renderEventForYear()
+    public function renderEventForYear(): string
     {
         return $this->title;
     }
@@ -303,7 +535,7 @@ class Model extends BaseModel
      *
      * @return string location.
      */
-    public function getLocation()
+    public function getLocation(): string
     {
         return $this->location;
     }
@@ -323,7 +555,7 @@ class Model extends BaseModel
      *
      * @return string location link.
      */
-    public function getLocationLinkUrl()
+    public function getLocationLinkUrl(): string
     {
         return $this->locationLink;
     }
@@ -331,8 +563,7 @@ class Model extends BaseModel
     /**
      * Sets the event location link value.
      *
-     * @param $locationLink String
-     *            link.
+     * @param string $locationLink
      */
     public function setLocationLinkUrl($locationLink)
     {
@@ -342,8 +573,7 @@ class Model extends BaseModel
     /**
      * Sets the event location page value.
      *
-     * @param $page Integer
-     *            page.
+     * @param int $page
      */
     public function setLocationPage($page)
     {
@@ -355,7 +585,7 @@ class Model extends BaseModel
      *
      * @return int pid to link the location to
      */
-    public function getLocationPage()
+    public function getLocationPage(): int
     {
         return $this->locationPage;
     }
@@ -363,9 +593,9 @@ class Model extends BaseModel
     /**
      * Returns the startdate object.
      *
-     * @return int startdate timeObject
+     * @return CalDate startdate timeObject
      */
-    public function getStart()
+    public function getStart(): CalDate
     {
         return $this->start;
     }
@@ -373,9 +603,9 @@ class Model extends BaseModel
     /**
      * Returns the enddate object.
      *
-     * @return int enddate timeObject
+     * @return CalDate enddate timeObject
      */
-    public function getEnd()
+    public function getEnd(): CalDate
     {
         if (!$this->end) {
             $this->setEnd($this->getStart());
@@ -387,8 +617,7 @@ class Model extends BaseModel
     /**
      * Sets the event start.
      *
-     * @param $start Object
-     *            object
+     * @param CalDate $start
      */
     public function setStart($start)
     {
@@ -401,8 +630,7 @@ class Model extends BaseModel
     /**
      * Sets the event end.
      *
-     * @param $end Object
-     *            object
+     * @param CalDate $end
      */
     public function setEnd($end)
     {
@@ -417,7 +645,7 @@ class Model extends BaseModel
      *
      * @return int startdate as unix timestamp
      */
-    public function getStartAsTimestamp()
+    public function getStartAsTimestamp(): int
     {
         $start = &$this->getStart();
         return $start->getDate(DATE_FORMAT_UNIXTIME);
@@ -428,32 +656,10 @@ class Model extends BaseModel
      *
      * @return int enddate as unix timestamp
      */
-    public function getEndAsTimestamp()
+    public function getEndAsTimestamp(): int
     {
         $end = &$this->getEnd();
         return $end->getDate(DATE_FORMAT_UNIXTIME);
-    }
-
-    /**
-     * Returns the ? value.
-     *
-     * @return ? ?
-     * @TODO field is missing
-     */
-    public function getConfirmed()
-    {
-        return;
-    }
-
-    /**
-     * Returns the cal recu value.
-     *
-     * @return array ? - empty array
-     * @TODO What is that for?
-     */
-    public function getCalRecu()
-    {
-        return [];
     }
 
     /**
@@ -461,7 +667,7 @@ class Model extends BaseModel
      *
      * @return string calnumber
      */
-    public function getCalNumber()
+    public function getCalNumber(): string
     {
         return $this->calnumber;
     }
@@ -481,32 +687,31 @@ class Model extends BaseModel
      *
      * @return int calendar uid
      */
-    public function getCalendarUid()
+    public function getCalendarId(): int
     {
-        return $this->calendarUid;
+        return $this->calendar_id;
     }
 
     /**
      * Sets the calendar uid.
      *
-     * @param $uid Integer
-     *            uid.
+     * @param $uid int
      */
-    public function setCalendarUid($uid)
+    public function setCalendarId($uid)
     {
-        $this->calendarUid = $uid;
+        $this->calendar_id = $uid;
     }
 
     /**
      * Returns the calendar object
      *
-     * @return Model calendar object
+     * @return CalendarModel calendar
      */
-    public function getCalendarObject()
+    public function getCalendarObject(): CalendarModel
     {
         if (!$this->calendarObject) {
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
-            $this->calendarObject = $modelObj->findCalendar($this->getCalendarUid());
+            $this->calendarObject = $modelObj->findCalendar($this->getCalendarId());
         }
 
         return $this->calendarObject;
@@ -517,7 +722,7 @@ class Model extends BaseModel
      *
      * @return string calendar name
      */
-    public function getCalName()
+    public function getCalName(): string
     {
         return $this->calname;
     }
@@ -525,8 +730,7 @@ class Model extends BaseModel
     /**
      * Sets the calendar name.
      *
-     * @param $name String
-     *            name.
+     * @param string $calname
      */
     public function setCalName($calname)
     {
@@ -536,7 +740,7 @@ class Model extends BaseModel
     /**
      * @return int
      */
-    public function getOverlap()
+    public function getOverlap(): int
     {
         return $this->overlap;
     }
@@ -550,9 +754,9 @@ class Model extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTimezone()
+    public function getTimezone(): string
     {
         return $this->timezone;
     }
@@ -566,9 +770,9 @@ class Model extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getDuration()
+    public function getDuration(): int
     {
         return $this->end->getTime() - $this->start->getTime();
     }
@@ -577,7 +781,7 @@ class Model extends BaseModel
      * @param $duration
      * @return string
      */
-    public function getFormatedDurationString($duration)
+    public function getFormatedDurationString($duration): string
     {
         $durationString = '';
         if ($duration < 0) {
@@ -597,8 +801,8 @@ class Model extends BaseModel
             $durationString .= $hours . 'H';
         }
 
-        $rest3 = $rest2 % (60);
-        $minutes = ($rest2 - $rest3) / (60);
+        $rest3 = $rest2 % 60;
+        $minutes = ($rest2 - $rest3) / 60;
         if ($minutes > 0) {
             $durationString .= $minutes . 'M';
         }
@@ -612,7 +816,7 @@ class Model extends BaseModel
     /**
      * @return int
      */
-    public function isAllday()
+    public function isAllDay(): int
     {
         return $this->allday;
     }
@@ -620,7 +824,7 @@ class Model extends BaseModel
     /**
      * @return int
      */
-    public function getAllday()
+    public function getAllDay(): int
     {
         return $this->allday;
     }
@@ -628,31 +832,9 @@ class Model extends BaseModel
     /**
      * @param $boolean
      */
-    public function setAllday($boolean)
+    public function setAllDay($boolean)
     {
-        $this->allday = $boolean;
-    }
-
-    /**
-     * @return array|void
-     */
-    public function getRecurringRule()
-    {
-        if ($this->freq != 'none' && $this->freq != '') {
-            $return = [];
-            $return['FREQ'] = $this->freq;
-            $return['INTERVAL'] = $this->interval;
-            return $return;
-        }
-        return;
-    }
-
-    /**
-     * @param array $recur
-     */
-    public function setRecur($recur = [])
-    {
-        // TODO?
+        $this->allday = (int)$boolean;
     }
 
     /**
@@ -690,7 +872,7 @@ class Model extends BaseModel
     /**
      * @return bool
      */
-    public function isClone()
+    public function isClone(): bool
     {
         return $this->isClone;
     }
@@ -706,32 +888,20 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getRecurrance()
-    {
-        $a = [];
-        $a['tzid'] = $this->getTimezone();
-        $a['date'] = $this->startdate;
-        $a['time'] = $this->starthour;
-        return $a;
-    }
-
-    /**
-     * @return array
-     */
-    public function getByMonth()
+    public function getByMonth(): array
     {
         return $this->bymonth;
     }
 
     /**
-     * @param $bymonth
+     * @param string $bymonth
      */
     public function setByMonth($bymonth)
     {
-        if ($bymonth != '') {
+        if ($bymonth !== '') {
             $this->bymonth = explode(',', $bymonth);
         }
-        if (strtoupper($bymonth) == 'ALL' || in_array('all', $this->bymonth)) {
+        if (strtoupper($bymonth) === 'ALL' || in_array('all', $this->bymonth, true)) {
             $this->bymonth = [
                 1,
                 2,
@@ -752,22 +922,22 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getByDay()
+    public function getByDay(): array
     {
         return $this->byday;
     }
 
     /**
-     * @param $byday
+     * @param string $byday
      */
     public function setByDay($byday)
     {
         $byday = strtoupper($byday);
-        if ($byday != '') {
+        if ($byday !== '') {
             $this->byday = explode(',', $byday);
         }
 
-        if (strtoupper($byday) == 'ALL' || in_array('all', $this->byday)) {
+        if (strtoupper($byday) === 'ALL' || in_array('all', $this->byday, true)) {
             $this->byday = [
                 'MO',
                 'TU',
@@ -783,20 +953,20 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getByMonthDay()
+    public function getByMonthDay(): array
     {
         return $this->bymonthday;
     }
 
     /**
-     * @param $bymonthday
+     * @param string $byMonthDay
      */
-    public function setByMonthday($bymonthday)
+    public function setByMonthDay($byMonthDay)
     {
-        if ($bymonthday != '') {
-            $this->bymonthday = GeneralUtility::trimExplode(',', $bymonthday, 1);
+        if ($byMonthDay !== '') {
+            $this->bymonthday = GeneralUtility::trimExplode(',', $byMonthDay, 1);
         }
-        if (strtoupper($bymonthday) == 'ALL' || in_array('all', $this->bymonthday)) {
+        if (strtoupper($byMonthDay) === 'ALL' || in_array('all', $this->bymonthday, true)) {
             $this->bymonthday = [
                 1,
                 2,
@@ -836,7 +1006,7 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getByWeekDay()
+    public function getByWeekDay(): array
     {
         return $this->byweekday;
     }
@@ -852,7 +1022,7 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getByWeekNo()
+    public function getByWeekNo(): array
     {
         return $this->byweekno;
     }
@@ -868,7 +1038,7 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getByMinute()
+    public function getByMinute(): array
     {
         return $this->byminute;
     }
@@ -884,7 +1054,7 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getByHour()
+    public function getByHour(): array
     {
         return $this->byhour;
     }
@@ -900,7 +1070,7 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getBySecond()
+    public function getBySecond(): array
     {
         return $this->bysecond;
     }
@@ -916,7 +1086,7 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getByYearDay()
+    public function getByYearDay(): array
     {
         return $this->byyearday;
     }
@@ -932,7 +1102,7 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getBySetPos()
+    public function getBySetPos(): array
     {
         return $this->bysetpos;
     }
@@ -948,7 +1118,7 @@ class Model extends BaseModel
     /**
      * @return string
      */
-    public function getWkst()
+    public function getWkst(): string
     {
         return $this->wkst;
     }
@@ -962,11 +1132,11 @@ class Model extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getInterval()
+    public function getInterval(): int
     {
-        return $this->interval;
+        return $this->intrval;
     }
 
     /**
@@ -974,7 +1144,7 @@ class Model extends BaseModel
      */
     public function setInterval($interval)
     {
-        $this->interval = $interval;
+        $this->intrval = $interval;
     }
 
     /**
@@ -1050,10 +1220,9 @@ class Model extends BaseModel
     }
 
     /**
-     * Sets the discription attribute
+     * Sets the description attribute
      *
-     * @param $description string
-     *            the event
+     * @param string $description
      */
     public function setDescription($description)
     {
@@ -1063,7 +1232,7 @@ class Model extends BaseModel
     /**
      * Returns the until date object
      */
-    public function getUntil()
+    public function getUntil(): CalDate
     {
         return $this->until;
     }
@@ -1071,8 +1240,7 @@ class Model extends BaseModel
     /**
      * Sets the until object.
      *
-     * @param $until object
-     *            object
+     * @param CalDate $until
      */
     public function setUntil($until)
     {
@@ -1082,13 +1250,14 @@ class Model extends BaseModel
     /**
      * @return string
      */
-    public function getFreq()
+    public function getFreq(): string
     {
         return $this->freq;
     }
 
     /**
      * Sets the recurring frequency
+     * @param $freq
      */
     public function setFreq($freq)
     {
@@ -1096,18 +1265,17 @@ class Model extends BaseModel
     }
 
     /**
-     * Returns how often a recurring event is supposed to recurr as max
+     * Returns how often a recurring event is supposed to recur as max
      */
-    public function getCount()
+    public function getCount(): int
     {
         return $this->cnt;
     }
 
     /**
-     * Sets how often a recurring event is supposed to recurr as max
+     * Sets how often a recurring event is supposed to recur as max
      *
      * @param $count int
-     *            a recurring event is supposed to recurr as max
      */
     public function setCount($count)
     {
@@ -1119,7 +1287,7 @@ class Model extends BaseModel
      *
      * @return string rdate value
      */
-    public function getRdate()
+    public function getRdate(): string
     {
         return $this->rdate;
     }
@@ -1127,8 +1295,7 @@ class Model extends BaseModel
     /**
      * Sets the rdate value.
      *
-     * @param $rdate String
-     *            value
+     * @param string $rdate
      */
     public function setRdate($rdate)
     {
@@ -1140,20 +1307,19 @@ class Model extends BaseModel
      *
      * @return array
      */
-    public function getRdateValues()
+    public function getRdateValues(): array
     {
-        return GeneralUtility::trimExplode(',', $this->rdate, 1);
+        return GeneralUtility::trimExplode(',', $this->rdateValues, 1);
     }
 
     /**
      * Sets the rdate value.
      *
-     * @param $rdate String
-     *            value
+     * @param $rdateArray
      */
     public function setRdateValues($rdateArray)
     {
-        $this->rdate = implode(',', $rdateArray);
+        $this->rdateValues = implode(',', $rdateArray);
     }
 
     /**
@@ -1161,7 +1327,7 @@ class Model extends BaseModel
      *
      * @return string rdate type value
      */
-    public function getRdateType()
+    public function getRdateType(): string
     {
         return $this->rdateType;
     }
@@ -1169,8 +1335,7 @@ class Model extends BaseModel
     /**
      * Sets the rdate type value.
      *
-     * @param $rdateType String
-     *            type value
+     * @param string $rdateType
      */
     public function setRdateType($rdateType)
     {
@@ -1188,8 +1353,7 @@ class Model extends BaseModel
     /**
      * Sets the spansday attribute
      *
-     * @param $spansday boolean
-     *            the event lasts the whole day
+     * @param $spansday boolean the event lasts the whole day
      */
     public function setSpansDay($spansday)
     {
@@ -1198,8 +1362,9 @@ class Model extends BaseModel
 
     /**
      * Returns the categories (array)
+     * @return array
      */
-    public function getCategories()
+    public function getCategories(): array
     {
         return $this->categories;
     }
@@ -1219,19 +1384,17 @@ class Model extends BaseModel
     /**
      * Adds an event to the exceptionEvents array
      *
-     * @param $ex_events object
-     *            this class (tx_cal_model)
+     * @param $ex_event
      */
     public function addExceptionEvent($ex_event)
     {
-        array_push($this->exceptionEvents, $ex_event);
+        $this->exceptionEvents[] = $ex_event;
     }
 
     /**
      * Sets the exceptionEvents
      *
-     * @param $ex_events array
-     *            exception events
+     * @param array $ex_events
      */
     public function setExceptionEvents($ex_events)
     {
@@ -1241,7 +1404,7 @@ class Model extends BaseModel
     /**
      * Returns the exceptionEvents array
      */
-    public function getExceptionEvents()
+    public function getExceptionEvents(): array
     {
         return $this->exceptionEvents;
     }
@@ -1249,8 +1412,7 @@ class Model extends BaseModel
     /**
      * Sets the editable value
      *
-     * @param $editable boolean
-     *            the event should be editable
+     * @param bool $editable
      */
     public function setEditable($editable)
     {
@@ -1260,7 +1422,7 @@ class Model extends BaseModel
     /**
      * Returns TRUE if this event is editable
      */
-    public function getEditable()
+    public function getEditable(): bool
     {
         return $this->editable;
     }
@@ -1269,7 +1431,6 @@ class Model extends BaseModel
      * Sets the organizer_id
      *
      * @param $id int
-     *            id
      */
     public function setOrganizerId($id)
     {
@@ -1279,7 +1440,7 @@ class Model extends BaseModel
     /**
      * Returns the organizer_id
      */
-    public function getOrganizerId()
+    public function getOrganizerId(): int
     {
         return $this->organizer_id;
     }
@@ -1291,7 +1452,7 @@ class Model extends BaseModel
     {
         if (!$this->organizerObject) {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-            $useOrganizerStructure = ($confArr['useOrganizerStructure'] ? $confArr['useOrganizerStructure'] : 'tx_cal_organizer');
+            $useOrganizerStructure = ($confArr['useOrganizerStructure'] ?: 'tx_cal_organizer');
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $this->organizerObject = $modelObj->findOrganizer(
                 $this->getOrganizerId(),
@@ -1306,48 +1467,45 @@ class Model extends BaseModel
     /**
      * Sets the organizerLink
      *
-     * @param $id string
-     *            link to an organizer
+     * @param $url string link to an organizer
      */
-    public function setOrganizerLinkUrl($id)
+    public function setOrganizerLink($url)
     {
-        $this->organizerLink = $id;
+        $this->organizer_link = $url;
     }
 
     /**
      * Return the organizerLink.
-     * A html link to an organizer
+     * @param string $view
+     * @return string
      */
-    public function getOrganizerLinkUrl()
+    public function getOrganizerLink($view = ''): string
     {
-        return $this->organizerLink;
+        return $this->organizer_link;
     }
 
     /**
-     * Return the organizerpage.
      * The pid to link the organizer to
      */
-    public function getOrganizerPage()
+    public function getOrganizerPid(): int
     {
-        return $this->organizerPage;
+        return $this->organizer_pid;
     }
 
     /**
      * Sets the organizerPage
      *
      * @param $pid int
-     *            to link the organizer to
      */
-    public function setOrganizerPage($pid)
+    public function setOrganizerPid($pid)
     {
-        $this->organizerPage = $pid;
+        $this->organizer_pid = $pid;
     }
 
     /**
      * Sets the location_id
      *
      * @param $id int
-     *            id
      */
     public function setLocationId($id)
     {
@@ -1357,7 +1515,7 @@ class Model extends BaseModel
     /**
      * Returns the location_id
      */
-    public function getLocationId()
+    public function getLocationId(): int
     {
         return $this->location_id;
     }
@@ -1369,7 +1527,7 @@ class Model extends BaseModel
     {
         if (!$this->locationObject) {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-            $useLocationStructure = ($confArr['useLocationStructure'] ? $confArr['useLocationStructure'] : 'tx_cal_location');
+            $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $this->locationObject = $modelObj->findLocation(
                 $this->getLocationId(),
@@ -1383,8 +1541,7 @@ class Model extends BaseModel
     /**
      * Adds an id to the exception_single_ids array
      *
-     * @param $id int
-     *            to be added
+     * @param int $id
      */
     public function addExceptionSingleId($id)
     {
@@ -1394,7 +1551,7 @@ class Model extends BaseModel
     /**
      * Returns the exception_single_ids array
      */
-    public function getExceptionSingleIds()
+    public function getExceptionSingleIds(): array
     {
         return $this->exception_single_ids;
     }
@@ -1412,8 +1569,7 @@ class Model extends BaseModel
     /**
      * Adds an id to the notifyUserIds array
      *
-     * @param $id int
-     *            to be added
+     * @param int $id
      */
     public function addNotifyUser($id)
     {
@@ -1423,8 +1579,7 @@ class Model extends BaseModel
     /**
      * Adds an category object to the category array
      *
-     * @param $category object
-     *            to be added
+     * @param CategoryModel $category
      */
     public function addCategory($category)
     {
@@ -1434,7 +1589,7 @@ class Model extends BaseModel
     /**
      * Returns the notifyUserIds array
      */
-    public function getNotifyUserIds()
+    public function getNotifyUserIds(): array
     {
         return $this->notifyUserIds;
     }
@@ -1442,20 +1597,19 @@ class Model extends BaseModel
     /**
      * Adds am id to the exceptionGroupIds array
      *
-     * @param $id int
-     *            to be added
+     * @param int $id
      */
     public function addExceptionGroupId($id)
     {
         if ($id > 0) {
-            array_push($this->exceptionGroupIds, $id);
+            $this->exceptionGroupIds[] = $id;
         }
     }
 
     /**
      * Returns the exceptionGroupIds array
      */
-    public function getExceptionGroupIds()
+    public function getExceptionGroupIds(): array
     {
         return $this->exceptionGroupIds;
     }
@@ -1473,8 +1627,7 @@ class Model extends BaseModel
     /**
      * Adds an id to the notifyGroupIds array
      *
-     * @param $id int
-     *            to be added
+     * @param int $id
      */
     public function addNotifyGroup($id)
     {
@@ -1486,7 +1639,7 @@ class Model extends BaseModel
     /**
      * Returns the notifyGroupIds array
      */
-    public function getNotifyGroupIds()
+    public function getNotifyGroupIds(): array
     {
         return $this->notifyGroupIds;
     }
@@ -1494,18 +1647,17 @@ class Model extends BaseModel
     /**
      * Adds an id to the creatorUserIds array
      *
-     * @param $id int
-     *            to be added
+     * @param int $id
      */
     public function addCreatorUserId($id)
     {
-        array_push($this->creatorUserIds, $id);
+        $this->creatorUserIds[] = $id;
     }
 
     /**
      * Returns the creatorUserIds array
      */
-    public function getCreatorUserIds()
+    public function getCreatorUserIds(): array
     {
         return $this->creatorUserIds;
     }
@@ -1513,8 +1665,7 @@ class Model extends BaseModel
     /**
      * Adds an id to the creatorGroupIds array
      *
-     * @param $id int
-     *            to be added
+     * @param int $id
      */
     public function addCreatorGroupId($id)
     {
@@ -1524,7 +1675,7 @@ class Model extends BaseModel
     /**
      * Returns the creatorGroupIds array
      */
-    public function getCreatorGroupIds()
+    public function getCreatorGroupIds(): array
     {
         return $this->creatorGroupIds;
     }
@@ -1532,20 +1683,17 @@ class Model extends BaseModel
     /**
      * Sets the headerstyle
      *
-     * @param $style String
-     *            name
+     * @param string $style
      */
     public function setHeaderStyle($style)
     {
-        if ($style != '') {
-            $this->headerstyle = $style;
-        }
+        $this->headerstyle = $style;
     }
 
     /**
      * Returns the headerstyle name
      */
-    public function getHeaderStyle()
+    public function getHeaderStyle(): string
     {
         return $this->headerstyle;
     }
@@ -1553,20 +1701,17 @@ class Model extends BaseModel
     /**
      * Sets the bodystyle
      *
-     * @param $style String
-     *            name
+     * @param string $style
      */
     public function setBodyStyle($style)
     {
-        if ($style != '') {
-            $this->bodystyle = $style;
-        }
+        $this->bodystyle = $style;
     }
 
     /**
      * Returns the bodystyle name
      */
-    public function getBodyStyle()
+    public function getBodyStyle(): string
     {
         return $this->bodystyle;
     }
@@ -1597,9 +1742,9 @@ class Model extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getEventType()
+    public function getEventType(): int
     {
         return $this->event_type;
     }
@@ -1618,54 +1763,6 @@ class Model extends BaseModel
      */
     public function search($pidList = '')
     {
-    }
-
-    /**
-     * @param $id
-     */
-    public function addSharedUser($id)
-    {
-        $this->sharedUsers[] = $id;
-    }
-
-    /**
-     * @param $id
-     */
-    public function addSharedGroup($id)
-    {
-        $this->sharedGroups[] = $id;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSharedUsers()
-    {
-        return $this->sharedUsers;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSharedGroups()
-    {
-        return $this->sharedGroups;
-    }
-
-    /**
-     * @param $userIds
-     */
-    public function setSharedUsers($userIds)
-    {
-        $this->sharedUsers = $userIds;
-    }
-
-    /**
-     * @param $groupIds
-     */
-    public function setSharedGroups($groupIds)
-    {
-        $this->sharedGroups = $groupIds;
     }
 
     /**
@@ -1689,42 +1786,23 @@ class Model extends BaseModel
      * @param $groupIdArray
      * @return bool
      */
-    public function isEventOwner($userId, $groupIdArray)
+    public function isEventOwner($userId, $groupIdArray): bool
     {
-        if (is_array($this->eventOwner['fe_users']) && in_array($userId, $this->eventOwner['fe_users'])) {
+        if (is_array($this->eventOwner['fe_users']) && in_array($userId, $this->eventOwner['fe_users'], true)) {
             return true;
         }
         foreach ($groupIdArray as $id) {
-            if (is_array($this->eventOwner['fe_groups']) && in_array($id, $this->eventOwner['fe_groups'])) {
+            if (is_array($this->eventOwner['fe_groups']) && in_array($id, $this->eventOwner['fe_groups'], true)) {
                 return true;
             }
         }
-        return false;
-    }
-
-    /**
-     * @param $userId
-     * @param $groupIdArray
-     * @return bool
-     */
-    public function isSharedUser($userId, $groupIdArray)
-    {
-        if (is_array($this->getSharedUsers()) && in_array($userId, $this->getSharedUsers())) {
-            return true;
-        }
-        foreach ($groupIdArray as $id) {
-            if (is_array($this->getSharedGroups()) && in_array($id, $this->getSharedGroups())) {
-                return true;
-            }
-        }
-
         return false;
     }
 
     /**
      * @return array
      */
-    public function getAdditionalValuesAsArray()
+    public function getAdditionalValuesAsArray(): array
     {
         $values = [];
 
@@ -1734,14 +1812,15 @@ class Model extends BaseModel
         $values['intrval'] = $this->getInterval();
         $values['cnt'] = $this->getCount();
 
+        /** @var CalDate $until */
         $until = $this->getUntil();
         if (is_object($until)) {
             $values['until'] = $until->format('%Y%m%d');
         } else {
             $values['until'] = '00000101';
         }
-        $values['category_headerstyle'] = $this->getHeaderstyle();
-        $values['category_bodystyle'] = $this->getBodystyle();
+        $values['category_headerstyle'] = $this->getHeaderStyle();
+        $values['category_bodystyle'] = $this->getBodyStyle();
         $start = &$this->getStart();
         $values['start_date'] = $start->format('%Y%m%d');
         $values['start_time'] = $start->getHour() * 3600 + $start->getMinute() * 60;
@@ -1750,8 +1829,8 @@ class Model extends BaseModel
         $values['end_date'] = $end->format('%Y%m%d');
         $values['end_time'] = $end->getHour() * 3600 + $end->getMinute() * 60;
         $values['end'] = $this->getEndAsTimestamp();
-        $values['allday'] = $this->isAllday();
-        $values['calendar_id'] = $this->getCalendarUid();
+        $values['allday'] = $this->isAllDay();
+        $values['calendar_id'] = $this->getCalendarId();
         $values['category_string'] = $this->getCategoriesAsString(false);
 
         return $values;
@@ -1761,11 +1840,8 @@ class Model extends BaseModel
      * @param bool $asLink
      * @return string
      */
-    public function getCategoriesAsString($asLink = true)
+    public function getCategoriesAsString($asLink = true): string
     {
-        /*
-         * if($this->categoriesAsString){ return $this->categoriesAsString; }
-         */
         $this->categoriesAsString = [];
         $rememberCats = [];
         $objectType = $this->getObjectType();
@@ -1773,7 +1849,7 @@ class Model extends BaseModel
         if (count($this->categories)) {
             foreach ($this->categories as $categoryObject) {
                 if (is_object($categoryObject)) {
-                    if (in_array($categoryObject->getUid(), $rememberCats)) {
+                    if (in_array($categoryObject->getUid(), $rememberCats, true)) {
                         continue;
                     }
 
@@ -1787,7 +1863,7 @@ class Model extends BaseModel
 
                     if ($asLink) {
                         $headerstyle = $categoryObject->getHeaderStyle();
-                        $this->local_cObj->data['link_ATagParams'] = $headerstyle != '' ? ' class="' . $headerstyle . '"' : '';
+                        $this->local_cObj->data['link_ATagParams'] = $headerstyle !== '' ? ' class="' . $headerstyle . '"' : '';
                         $parameter['category'] = $categoryObject->getUid();
                         $parameter['offset'] = null;
 
@@ -1822,7 +1898,7 @@ class Model extends BaseModel
     /**
      * @return array
      */
-    public function getCategoryUidsAsArray()
+    public function getCategoryUidsAsArray(): array
     {
         if ($this->categoryUidsAsArray) {
             return $this->categoryUidsAsArray;
@@ -1851,6 +1927,7 @@ class Model extends BaseModel
     public function cloneEvent()
     {
         $thisClass = get_class($this);
+        /** @var EventModel $event */
         $event = new $thisClass($this->getType());
         $event->setIsClone(true);
         return $event;
@@ -1859,10 +1936,8 @@ class Model extends BaseModel
     /**
      * Calls user function defined in TypoScript
      *
-     * @param int $mConfKey
-     *            if this value is empty the var $mConfKey is not processed
-     * @param mixed $passVar
-     *            this var is processed in the user function
+     * @param int $mConfKey if this value is empty the var $mConfKey is not processed
+     * @param mixed $passVar this var is processed in the user function
      * @return mixed processed $passVar
      */
     public function userProcess($mConfKey, $passVar)
@@ -1873,25 +1948,6 @@ class Model extends BaseModel
             $passVar = $this->controller->cObj->callUserFunction($this->conf[$mConfKey], $funcConf, $passVar);
         }
         return $passVar;
-    }
-
-    /**
-     * @return int
-     */
-    public function isExternalPluginEvent()
-    {
-        return $this->externalPlugin;
-    }
-
-    public function getExternalPluginEventLink()
-    {
-    }
-
-    /**
-     * @param $currentParams
-     */
-    public function addAdditionalSingleViewUrlParams(&$currentParams)
-    {
     }
 
     /**
@@ -1915,7 +1971,7 @@ class Model extends BaseModel
     }
 
     /**
-     * @param $attendee
+     * @param AttendeeModel $attendee
      */
     public function addAttendee(&$attendee)
     {
@@ -1933,7 +1989,7 @@ class Model extends BaseModel
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -1949,7 +2005,7 @@ class Model extends BaseModel
     /**
      * @return int
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return $this->priority;
     }
@@ -1963,9 +2019,9 @@ class Model extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getCompleted()
+    public function getCompleted(): int
     {
         return $this->completed;
     }

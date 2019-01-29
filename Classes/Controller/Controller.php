@@ -21,9 +21,11 @@ use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Cache;
+use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
@@ -54,11 +56,6 @@ class Controller extends AbstractPlugin
      * @var string
      */
     public $extKey = 'cal'; // The extension key.
-
-    /**
-     * @var bool
-     */
-    public $pi_checkCHash = false;
 
     /**
      * todo: check
@@ -134,13 +131,12 @@ class Controller extends AbstractPlugin
     /**
      * Main controller function that serves as the entry point from TYPO3.
      *
-     * @param
-     *            array        The content array.
-     * @param
-     *            array        The conf array.
+     * @param $content
+     * @param $conf
      * @return string of calendar data.
+     * @throws \TYPO3\CMS\Core\Http\ImmediateResponseException
      */
-    public function main($content, $conf)
+    public function main($content, $conf): string
     {
         $this->conf = &$conf;
 
@@ -150,7 +146,6 @@ class Controller extends AbstractPlugin
 
         $this->conf ['useInternalCaching'] = 1;
         $this->conf ['cachingEngine'] = 'cachingFramework';
-        $this->conf ['writeCachingInfoToDevlog'] = 0;
 
         $this->cacheHandling();
 
@@ -179,19 +174,19 @@ class Controller extends AbstractPlugin
         return $return;
     }
 
+    /**
+     * @throws \TYPO3\CMS\Core\Http\ImmediateResponseException
+     */
     protected function cacheHandling()
     {
-        // switch for more intelligent caching
-        if ($this->conf ['isUserInt']) {
-            // this->pi_USER_INT_obj=1;
-        } else {
+        if (!$this->conf ['isUserInt']) {
             $this->pi_checkCHash = true;
             $requestedNoCache = GeneralUtility::_GP('no_cache');
             if ($requestedNoCache) {
                 $this->pi_checkCHash = false;
                 $GLOBALS ['TSFE']->set_no_cache();
             }
-            if (count($this->piVars) && !$requestedNoCache) {
+            if (!$requestedNoCache && count($this->piVars)) {
                 $GLOBALS ['TSFE']->reqCHash();
             }
             $this->pi_USER_INT_obj = 0;
@@ -202,8 +197,7 @@ class Controller extends AbstractPlugin
      * Cleans all piVars for XSS vulnerabilities using external library and
      * updates values within $this->piVars as it cleans.
      *
-     * @param
-     *            mixed    Array of nested piVars or individual piVar value.
+     * @param mixed    Array of nested piVars or individual piVar value.
      */
     public function cleanPiVarParam(&$param)
     {
@@ -214,7 +208,7 @@ class Controller extends AbstractPlugin
             }
         } else {
             // Don't use default replaceString of <x> because strip-tags will later remove it.
-            $param = \TYPO3\CMS\Cal\Utility\Functions::removeXSS($param, '--xxx--');
+            $param = Functions::removeXSS($param, '--xxx--');
         }
     }
 
@@ -261,7 +255,7 @@ class Controller extends AbstractPlugin
      * @param bool
      * @return string
      */
-    public function getContent($notEmpty = true)
+    public function getContent($notEmpty = true): string
     {
         $return = '';
         $count = 0;
@@ -270,7 +264,7 @@ class Controller extends AbstractPlugin
             $catArray = GeneralUtility::trimExplode(',', $this->conf ['category'], 1);
             $allowedCatArray = GeneralUtility::trimExplode(',', $this->conf ['view.'] ['allowedCategory'], 1);
             $compareResult = array_diff($allowedCatArray, $catArray);
-            if (empty($compareResult) && $this->conf ['view'] != 'create_event' && $this->conf ['view'] != 'edit_event') {
+            if (empty($compareResult) && $this->conf ['view'] !== 'create_event' && $this->conf ['view'] !== 'edit_event') {
                 unset($this->piVars ['category']);
             }
             $count++; // Just to make sure we are not getting an endless loop
@@ -278,7 +272,7 @@ class Controller extends AbstractPlugin
             $viewFunction = str_replace('_', '', $this->conf ['view']);
 
             /* @todo Hack! List is a reserved name so we have to change the function name. */
-            if ($viewFunction == 'list') {
+            if ($viewFunction === 'list') {
                 $viewFunction = 'listView';
             }
 
@@ -293,11 +287,11 @@ class Controller extends AbstractPlugin
                     $return .= $customModel->start();
                 }
             }
-        } while ($return == '' && $count < 4 && $notEmpty);
+        } while ($return === '' && $count < 4 && $notEmpty);
 
         $return = $this->finish($return);
 
-        if ($this->conf ['view'] == 'rss' || $this->conf ['view'] == 'ics' || $this->conf ['view'] == 'single_ics' || $this->conf ['view'] == 'load_events' || $this->conf ['view'] == 'load_todos' || $this->conf ['view'] == 'load_rights') {
+        if ($this->conf ['view'] === 'rss' || $this->conf ['view'] === 'ics' || $this->conf ['view'] === 'single_ics' || $this->conf ['view'] === 'load_events' || $this->conf ['view'] === 'load_todos' || $this->conf ['view'] === 'load_rights') {
             return $return;
         }
         if ($this->conf ['view.'] [$this->conf ['view'] . '.'] ['sendOutWithXMLHeader']) {
@@ -315,7 +309,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function initConfigs()
+    public function initConfigs(): string
     {
         // If an event record has been added through Insert Records, set some defaults.
         if ($this->conf ['displayCurrentRecord']) {
@@ -343,7 +337,7 @@ class Controller extends AbstractPlugin
         $this->conf ['pages'] = $this->cObj->stdWrap($this->conf ['pages'], $this->conf ['pages.']);
         $this->conf ['pidList'] = $this->cObj->stdWrap($this->conf ['pidList'], $this->conf ['pidList.']);
 
-        Controller::updateIfNotEmpty($this->conf ['pages'], $this->cObj->data ['pages']);
+        self::updateIfNotEmpty($this->conf ['pages'], $this->cObj->data ['pages']);
         // don't use "updateIfNotEmpty" here, as the default value of "recursive" is 0 and thus not empty and will always override TS settings.
         if ($this->cObj->data ['recursive']) {
             $this->conf ['recursive'] = $this->cObj->data ['recursive'];
@@ -354,7 +348,7 @@ class Controller extends AbstractPlugin
             $this->conf ['recursive']
         );
 
-        if (!$this->conf ['pidList'] || $this->conf ['pidList'] == '') {
+        if (!$this->conf ['pidList'] || $this->conf ['pidList'] === '') {
             $this->error = true;
             return '<b>Calendar error: please configure the pidList (calendar plugin -> startingpoints or plugin.tx_cal_controller.pidList or for ics in constants)</b>';
         }
@@ -372,13 +366,13 @@ class Controller extends AbstractPlugin
             'cal'
         ]);
 
-        $location = Controller::convertLinkVarArrayToList($this->piVars ['location_ids']);
+        $location = self::convertLinkVarArrayToList($this->piVars ['location_ids']);
 
-        if ($this->piVars ['view'] == $this->piVars ['lastview']) {
+        if ($this->piVars ['view'] === $this->piVars ['lastview']) {
             unset($this->piVars ['lastview']);
         }
 
-        if ($this->piVars ['getdate'] == '') {
+        if ($this->piVars ['getdate'] === '') {
             $this->conf ['getdate'] = date('Ymd');
         } else {
             $this->conf ['getdate'] = intval($this->piVars ['getdate']);
@@ -390,22 +384,18 @@ class Controller extends AbstractPlugin
             $dp->parse($this->piVars ['jumpto'], $this->conf ['dateParserConf.']);
             $newGetdate = $dp->getDateObjectFromStack();
             $this->conf ['getdate'] = $newGetdate->format('%Y%m%d');
-            unset($this->piVars ['getdate']);
-            unset($this->piVars ['jumpto']);
+            unset($this->piVars ['getdate'], $this->piVars ['jumpto']);
         }
 
         // date and strtotime should be ok here
         if ($this->conf ['getdate'] <= date(
-            'Ymd',
+                'Ymd',
                 strtotime($this->conf ['view.'] ['startLinkRange'])
-        ) || $this->conf ['getdate'] >= date(
-                    'Ymd',
+            ) || $this->conf ['getdate'] >= date(
+                'Ymd',
                 strtotime($this->conf ['view.'] ['endLinkRange'])
-                )) {
-            // Set additional META-Tag for google et al
+            )) {
             $GLOBALS ['TSFE']->additionalHeaderData ['cal'] = '<meta name="robots" content="index,nofollow" />';
-
-            // Set / override no_search for current page-object
             $GLOBALS ['TSFE']->page ['no_search'] = 0;
         }
 
@@ -455,10 +445,8 @@ class Controller extends AbstractPlugin
 
         if ($this->getDateTimeObject->month > 12) {
             $this->getDateTimeObject->month = 12;
-        } else {
-            if ($this->getDateTimeObject->month < 1) {
-                $this->getDateTimeObject->month = 1;
-            }
+        } elseif ($this->getDateTimeObject->month < 1) {
+            $this->getDateTimeObject->month = 1;
         }
         while (!Calc::isValidDate(
             $this->getDateTimeObject->day,
@@ -467,14 +455,12 @@ class Controller extends AbstractPlugin
         )) {
             if ($this->getDateTimeObject->day > 28) {
                 $this->getDateTimeObject->day--;
-            } else {
-                if ($this->getDateTimeObject->day < 1) {
-                    $this->getDateTimeObject->day = 1;
-                }
+            } elseif ($this->getDateTimeObject->day < 1) {
+                $this->getDateTimeObject->day = 1;
             }
         }
 
-        $this->getDateTimeObject->setTZbyId('UTC');
+        $this->getDateTimeObject->setTZbyID('UTC');
         $this->conf ['day'] = $this->getDateTimeObject->getDay();
         $this->conf ['month'] = $this->getDateTimeObject->getMonth();
         $this->conf ['year'] = $this->getDateTimeObject->getYear();
@@ -485,7 +471,7 @@ class Controller extends AbstractPlugin
         $rightsObj->setDefaultSaveToPage();
 
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
-        $modelObj = new \TYPO3\CMS\Cal\Controller\ModelController();
+        $modelObj = new ModelController();
 
         $viewObj = &Registry::Registry('basic', 'viewcontroller');
         $viewObj = GeneralUtility::makeInstance(ViewController::class);
@@ -494,7 +480,7 @@ class Controller extends AbstractPlugin
 
         $this->conf ['view'] = $rightsObj->checkView($this->conf ['view']);
 
-        $this->pointerName = $this->conf ['view.'] ['list.'] ['pageBrowser.'] ['pointer'] ? $this->conf ['view.'] ['list.'] ['pageBrowser.'] ['pointer'] : $this->pointerName;
+        $this->pointerName = $this->conf ['view.'] ['list.'] ['pageBrowser.'] ['pointer'] ?: $this->pointerName;
 
         // links to files will be rendered with an absolute path
         if (in_array($this->conf ['view'], [
@@ -529,12 +515,10 @@ class Controller extends AbstractPlugin
             $this->SIM_ACCESS_TIME = $simTime - ($simTime % 60);
         }
 
-        $lifetime = 0;
-
         if ($this->conf ['useInternalCaching']) {
             $cachingEngine = $this->conf ['cachingEngine'];
 
-            if ($cachingEngine == 'cachingFramework') {
+            if ($cachingEngine === 'cachingFramework') {
                 if (!is_object($GLOBALS ['typo3CacheFactory']) || !isset($GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['backend'])) {
                     // if there's no cacheFactory object fall back to internal caching (TYPO3 < 4.3)
                     $cachingEngine = 'internal';
@@ -545,27 +529,12 @@ class Controller extends AbstractPlugin
                 $cachingEngine = 'internal';
             }
 
-            // TODO check if necessary: $this->writeCachingInfoToDevlog
-            if ($this->conf ['writeCachingInfoToDevlog']) {
-                $tmp = GeneralUtility::trimExplode('|', $this->conf ['writeCachingInfoToDevlog'], 0);
-                if ($tmp [1]) {
-                    $this->writeCachingInfoToDevlog = $tmp [1];
-                }
-            }
+            $i = $this->conf ['cacheClearMode'];
 
-            switch ($this->conf ['cacheClearMode']) {
-                case 'lifetime':
-                    $lifetime = $this->conf ['cacheLifetime'];
-                    break;
-
-                default: // normal
-                    if (method_exists($GLOBALS ['TSFE'], 'get_cache_timeout')) { // TYPO3 >= 4.2
-                        $lifetime = $GLOBALS ['TSFE']->get_cache_timeout(); // seconds until a cached page is too old
-                    } else {
-                        $lifetime = 86400;
-                    }
-                    break;
-                // the case 'never' uses the default: $lifetime = 0;
+            if ($i === 'lifetime') {
+                $lifetime = $this->conf ['cacheLifetime'];
+            } else { // normal
+                $lifetime = $GLOBALS ['TSFE']->get_cache_timeout(); // seconds until a cached page is too old
             }
             $this->cache = new Cache($cachingEngine);
             $this->cache->lifetime = $lifetime;
@@ -578,8 +547,6 @@ class Controller extends AbstractPlugin
      */
     public function checkCalendarAndCategory()
     {
-        // new Mode - category can be configurred
-        $category = '';
         $calendar = '';
 
         $allCategoryByParentId = [];
@@ -597,7 +564,7 @@ class Controller extends AbstractPlugin
             $catIDs [] = $row ['uid'];
         }
 
-        if ($this->piVars ['categorySelection'] == 1 && empty($this->piVars ['category'])) {
+        if ((int)$this->piVars ['categorySelection'] === 1 && empty($this->piVars ['category'])) {
             $catIDs = [];
         } else {
             unset($this->piVars ['categorySelection']);
@@ -612,7 +579,7 @@ class Controller extends AbstractPlugin
         $category = $this->conf ['view.'] ['category'];
         $this->conf ['view.'] ['allowedCategory'] = $this->conf ['view.'] ['category'];
 
-        $piVarCategory = Controller::convertLinkVarArrayToList($this->piVars ['category']);
+        $piVarCategory = self::convertLinkVarArrayToList($this->piVars ['category']);
 
         if ($piVarCategory) {
             if ($this->conf ['view.'] ['category']) {
@@ -622,7 +589,7 @@ class Controller extends AbstractPlugin
                 if (empty($sameValues)) {
                     $category = $this->conf ['view.'] ['category'];
                 } else {
-                    $category = Controller::convertLinkVarArrayToList($sameValues);
+                    $category = self::convertLinkVarArrayToList($sameValues);
                 }
             } else {
                 $category = $piVarCategory;
@@ -679,7 +646,7 @@ class Controller extends AbstractPlugin
             }
         }
 
-        if ($this->conf ['view.'] ['calendar.'] ['subscription'] != '') {
+        if ($this->conf ['view.'] ['calendar.'] ['subscription'] !== '') {
             $calendar = $this->conf ['view.'] ['allowedCalendar'] = $this->conf ['view.'] ['calendar'] = implode(
                 ',',
                 array_diff(
@@ -689,13 +656,13 @@ class Controller extends AbstractPlugin
             );
         }
 
-        $piVarCalendar = Controller::convertLinkVarArrayToList($this->piVars ['calendar']);
+        $piVarCalendar = self::convertLinkVarArrayToList($this->piVars ['calendar']);
         if ($piVarCalendar) {
             if ($this->conf ['view.'] ['calendar']) {
                 $calendarArray = explode(',', $calendar);
                 $piVarCalendarArray = explode(',', $piVarCalendar);
                 $sameValues = array_intersect($calendarArray, $piVarCalendarArray);
-                $calendar = Controller::convertLinkVarArrayToList($sameValues);
+                $calendar = self::convertLinkVarArrayToList($sameValues);
             } else {
                 $calendar = $piVarCalendar;
             }
@@ -705,7 +672,7 @@ class Controller extends AbstractPlugin
         if ($this->conf ['view.'] ['freeAndBusy.'] ['enable']) {
             $this->conf ['option'] = 'freeandbusy';
             $this->conf ['view.'] ['calendarMode'] = 1;
-            $calendar = intval($this->piVars ['calendar']) ? intval($this->piVars ['calendar']) : $this->conf ['view.'] ['freeAndBusy.'] ['defaultCalendarUid'];
+            $calendar = intval($this->piVars ['calendar']) ?: $this->conf ['view.'] ['freeAndBusy.'] ['defaultCalendarUid'];
             $this->conf ['view.'] ['calendar'] = $calendar;
         }
 
@@ -720,9 +687,9 @@ class Controller extends AbstractPlugin
      * @param    string    The name of the hook.
      * @return    array    The array of objects implementing this hoook.
      */
-    public function getHookObjectsArray($hookName)
+    public function getHookObjectsArray($hookName): array
     {
-        return \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray($this->prefixId, $hookName);
+        return Functions::getHookObjectsArray($this->prefixId, $hookName);
     }
 
     /**
@@ -757,7 +724,7 @@ class Controller extends AbstractPlugin
     /**
      * @return array
      */
-    public function getAllowedViewsByViewPid()
+    public function getAllowedViewsByViewPid(): array
     {
         // for now, ownly check basic views.
         $allowedViews = [];
@@ -819,11 +786,11 @@ class Controller extends AbstractPlugin
         $uid = intval($this->piVars ['uid']);
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
 
-        if ($GLOBALS ['TSFE']->fe_user->getKey('ses', 'tx_cal_controller_creatingEvent') == '1') {
+        if ((int)$GLOBALS ['TSFE']->fe_user->getKey('ses', 'tx_cal_controller_creatingEvent') === '1') {
 
             /** @var EventModel $event */
             $event = null;
-            if ($eventType == Model::EVENT_TYPE_TODO) {
+            if ($eventType === Model::EVENT_TYPE_TODO) {
                 $event = $modelObj->saveTodo($this->conf ['uid'], $this->conf ['type'], $pid);
             } else {
                 $event = $modelObj->saveEvent($this->conf ['uid'], $this->conf ['type'], $pid);
@@ -844,7 +811,7 @@ class Controller extends AbstractPlugin
                                 'datetime',
                                 'period'
                             ]))) {
-                        $this->conf ['view.'] [$this->conf ['view'] . '.'] ['minDate'] = $event->start->format('%Y%m%d');
+                        $this->conf ['view.'] [$this->conf ['view'] . '.'] ['minDate'] = $event->getStart()->format('%Y%m%d');
                         $this->conf ['view.'] [$this->conf ['view'] . '.'] ['maxDate'] = $this->piVars ['maxDate'];
 
                         $eventArray = $modelObj->findEvent(
@@ -889,8 +856,7 @@ class Controller extends AbstractPlugin
             }
         }
 
-        unset($this->piVars ['type']);
-        unset($this->conf ['type']);
+        unset($this->piVars ['type'], $this->conf ['type']);
         $this->conf ['type'] = '';
         $this->clearConfVars();
 
@@ -903,14 +869,14 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function removeEvent()
+    public function removeEvent(): string
     {
         $eventType = intval($this->piVars ['event_type']);
         $hookObjectsArr = $this->getHookObjectsArray('removeEventClass');
         // Hook: preRemoveEvent
         $this->executeHookObjectsFunction($hookObjectsArr, 'preRemoveEvent');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
-        if ($eventType == Model::EVENT_TYPE_TODO) {
+        if ($eventType === Model::EVENT_TYPE_TODO) {
             $modelObj->removeTodo($this->conf ['uid'], $this->conf ['type']);
         } else {
             $modelObj->removeEvent($this->conf ['uid'], $this->conf ['type']);
@@ -932,7 +898,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function createExceptionEvent()
+    public function createExceptionEvent(): string
     {
         $getdate = $this->conf ['getdate'];
         $pidList = $this->conf ['pidList'];
@@ -1055,7 +1021,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function saveLocation()
+    public function saveLocation(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('saveLocationClass');
 
@@ -1085,7 +1051,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function saveOrganizer()
+    public function saveOrganizer(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('saveOrganizerClass');
         // Hook: preSaveOrganizer
@@ -1114,7 +1080,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function saveCalendar()
+    public function saveCalendar(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('saveCalendarClass');
         // Hook: preSaveCalendar
@@ -1156,7 +1122,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function saveCategory()
+    public function saveCategory(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('saveCategoryClass');
 
@@ -1186,7 +1152,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function event()
+    public function event(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -1196,7 +1162,7 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawEventClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = null;
         }
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
@@ -1207,7 +1173,7 @@ class Controller extends AbstractPlugin
             if (is_string($event)) {
                 return $event;
             }
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The event you are looking for could not be found.',
                 'Please verify your URL parameter: tx_cal_controller[uid]'
             );
@@ -1216,13 +1182,11 @@ class Controller extends AbstractPlugin
         $categoryArray = implode(',', $event->getCategoryUidsAsArray());
         $relatedEvents = [];
 
-        if ($categoryArray != '') {
+        if ($categoryArray !== '') {
             $tempCategoryMode = $this->conf ['view.'] ['categoryMode'];
             $tempCategory = $this->conf ['view.'] ['category'];
 
-            if ($tempCategoryMode == 1 || $tempCategoryMode == 3) {
-                // nothing to do here
-            } else {
+            if ((int)$tempCategoryMode !== 1 && (int)$tempCategoryMode !== 3) {
                 $this->conf ['view.'] ['categoryMode'] = 1;
             }
             $this->conf ['view.'] ['category'] = $categoryArray;
@@ -1256,7 +1220,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function day()
+    public function day(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -1266,11 +1230,11 @@ class Controller extends AbstractPlugin
 
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
         $timeObj = new CalDate($this->conf ['getdate'] . '000000');
-        $timeObj->setTZbyId('UTC');
+        $timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForDay($timeObj, $type, $pidList);
         // Hook: preDayRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1293,7 +1257,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function week()
+    public function week(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -1302,11 +1266,11 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawWeekClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
         $timeObj = new CalDate($this->conf ['getdate'] . '000000');
-        $timeObj->setTZbyId('UTC');
+        $timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForWeek($timeObj, $type, $pidList);
         // Hook: preWeekRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1329,7 +1293,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function month()
+    public function month(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -1342,12 +1306,12 @@ class Controller extends AbstractPlugin
         } else {
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-            if (!in_array($type, $availableTypes)) {
+            if (!in_array($type, $availableTypes, true)) {
                 $type = '';
             }
 
             $timeObj = new CalDate($this->conf ['getdate'] . '000000');
-            $timeObj->setTZbyId('UTC');
+            $timeObj->setTZbyID('UTC');
             $master_array = $modelObj->findEventsForMonth($timeObj, $type, $pidList);
         }
         // Hook: preMonthRendering
@@ -1370,7 +1334,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function year()
+    public function year(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -1379,11 +1343,11 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawYearClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
         $timeObj = new CalDate($this->conf ['getdate'] . '000000');
-        $timeObj->setTZbyId('UTC');
+        $timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForYear($timeObj, $type, $pidList);
         // Hook: preYearRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1407,7 +1371,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function ics()
+    public function ics(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -1415,7 +1379,7 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawIcsClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
 
@@ -1443,7 +1407,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function singleIcs()
+    public function singleIcs(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -1478,19 +1442,19 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function rss()
+    public function rss(): string
     {
         $type = $this->conf ['type'];
         $getdate = $this->conf ['getdate'];
         $pidList = $this->conf ['pidList'];
-        if ($pidList == 0) {
+        if ((int)$pidList === 0) {
             return 'Please define plugin.tx_cal_controller.pidList in constants';
         }
 
         $hookObjectsArr = $this->getHookObjectsArray('drawRssClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
 
@@ -1522,7 +1486,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function location()
+    public function location(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -1533,7 +1497,7 @@ class Controller extends AbstractPlugin
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_location_model', 'location');
 
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
 
@@ -1542,7 +1506,7 @@ class Controller extends AbstractPlugin
             if (is_string($location)) {
                 return $location;
             }
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The location you are looking for could not be found.',
                 'Please verify your URL parameter: tx_cal_controller[uid]'
             );
@@ -1575,7 +1539,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function organizer()
+    public function organizer(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -1584,7 +1548,7 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawOrganizerClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_organizer_model', 'organizer');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
 
@@ -1593,7 +1557,7 @@ class Controller extends AbstractPlugin
             if (is_string($organizer)) {
                 return $organizer;
             }
-            return \TYPO3\CMS\Cal\Utility\Functions::createErrorMessage(
+            return Functions::createErrorMessage(
                 'Missing or wrong parameter. The organizer you are looking for could not be found.',
                 'Please verify your URL parameter: tx_cal_controller[uid]'
             );
@@ -1625,7 +1589,7 @@ class Controller extends AbstractPlugin
      * @param  CalDate       The starting point that timeString is relative to.
      * @return CalDate for list view start or end time.
      */
-    public function getListViewTime($timeString, $timeObj = null)
+    public function getListViewTime($timeString, $timeObj = null): CalDate
     {
         /** @var DateParser $dp */
         $dp = new DateParser();
@@ -1636,7 +1600,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function listview()
+    public function listview(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -1644,7 +1608,7 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawListClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
 
@@ -1662,36 +1626,34 @@ class Controller extends AbstractPlugin
 
         if (!$this->conf ['view.'] ['list.'] ['useGetdate']) {
             // do nothing - removed "continue" at this point, due to #543
-        } else {
-            if ($this->conf ['view'] == 'list' && !$this->conf ['view.'] ['list.'] ['doNotUseGetdateTheFirstTime'] && $this->conf ['getdate']) {
-                if ($this->conf ['view.'] ['list.'] ['useCustomStarttime']) {
-                    if ($this->conf ['view.'] ['list.'] ['customStarttimeRelativeToGetdate']) {
-                        $starttime = $this->getListViewTime($starttimePreset, $this->getDateTimeObject);
-                    } // on't parse the starttime twice as it done just a few lines above
-                    /*
-                     * else { $starttime = $this->getListViewTime($starttimePreset); }
-                     */
-                } else {
-                    $starttime = Calendar::calculateStartDayTime($this->getDateTimeObject);
-                }
+        } elseif ($this->conf ['view'] === 'list' && !$this->conf ['view.'] ['list.'] ['doNotUseGetdateTheFirstTime'] && $this->conf ['getdate']) {
+            if ($this->conf ['view.'] ['list.'] ['useCustomStarttime']) {
+                if ($this->conf ['view.'] ['list.'] ['customStarttimeRelativeToGetdate']) {
+                    $starttime = $this->getListViewTime($starttimePreset, $this->getDateTimeObject);
+                } // on't parse the starttime twice as it done just a few lines above
+                /*
+                 * else { $starttime = $this->getListViewTime($starttimePreset); }
+                 */
+            } else {
+                $starttime = Calendar::calculateStartDayTime($this->getDateTimeObject);
+            }
 
-                if ($this->conf ['view.'] ['list.'] ['useCustomEndtime']) {
-                    if ($this->conf ['view.'] ['list.'] ['customEndtimeRelativeToGetdate']) {
-                        $endtime = $this->getListViewTime($endtimePreset, $this->getDateTimeObject);
-                    } // on't parse the endtime twice as it done just a few lines above
-                    /*
-                     * else { $endtime = $this->getListViewTime($endtimePreset); }
-                     */
+            if ($this->conf ['view.'] ['list.'] ['useCustomEndtime']) {
+                if ($this->conf ['view.'] ['list.'] ['customEndtimeRelativeToGetdate']) {
+                    $endtime = $this->getListViewTime($endtimePreset, $this->getDateTimeObject);
+                } // on't parse the endtime twice as it done just a few lines above
+                /*
+                 * else { $endtime = $this->getListViewTime($endtimePreset); }
+                 */
+            } else {
+                if ($this->conf ['view.'] ['list.'] ['useCustomStarttime']) {
+                    // if we have a custom starttime but use getdate, calculate the endtime based on the getdate and not on the changed startdate
+                    $endtime = Calendar::calculateStartDayTime($this->getDateTimeObject);
                 } else {
-                    if ($this->conf ['view.'] ['list.'] ['useCustomStarttime']) {
-                        // if we have a custom starttime but use getdate, calculate the endtime based on the getdate and not on the changed startdate
-                        $endtime = Calendar::calculateStartDayTime($this->getDateTimeObject);
-                    } else {
-                        $endtime = new CalDate();
-                        $endtime->copy($starttime);
-                    }
-                    $endtime->addSeconds(86340);
+                    $endtime = new CalDate();
+                    $endtime->copy($starttime);
                 }
+                $endtime->addSeconds(86340);
             }
         }
 
@@ -1719,7 +1681,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function icslist()
+    public function icslist(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -1751,7 +1713,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function admin()
+    public function admin(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawAdminClass');
 
@@ -1771,7 +1733,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function searchEvent()
+    public function searchEvent(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -1787,37 +1749,37 @@ class Controller extends AbstractPlugin
             $start_day = $this->getListViewTime($this->conf ['view.'] ['search.'] ['defaultValues.'] ['start_day']);
             $start_day = Calendar::calculateStartDayTime($start_day);
         } else {
-            $start_day = new CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
-                $this->conf,
+            $start_day = new CalDate(Functions::getYmdFromDateString(
+                    $this->conf,
                     $start_day
-            ) . '000000');
+                ) . '000000');
             $start_day->setHour(0);
             $start_day->setMinute(0);
             $start_day->setSecond(0);
-            $start_day->setTZbyId('UTC');
+            $start_day->setTZbyID('UTC');
         }
         if (!$end_day) {
             $end_day = $this->getListViewTime($this->conf ['view.'] ['search.'] ['defaultValues.'] ['end_day']);
             $end_day = Calendar::calculateEndDayTime($end_day);
         } else {
-            $end_day = new CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
-                $this->conf,
+            $end_day = new CalDate(Functions::getYmdFromDateString(
+                    $this->conf,
                     $end_day
-            ) . '000000');
+                ) . '000000');
             $end_day->setHour(23);
             $end_day->setMinute(59);
             $end_day->setSecond(59);
-            $end_day->setTZbyId('UTC');
+            $end_day->setTZbyID('UTC');
         }
         if ($this->piVars ['single_date']) {
-            $start_day = new CalDate(\TYPO3\CMS\Cal\Utility\Functions::getYmdFromDateString(
+            $start_day = new CalDate(Functions::getYmdFromDateString(
                 $this->conf,
                 $this->piVars ['single_date']
             ));
             $start_day->setHour(0);
             $start_day->setMinute(0);
             $start_day->setSecond(0);
-            $start_day->setTZbyId('UTC');
+            $start_day->setTZbyID('UTC');
             $end_day = new CalDate();
             $end_day->copy($start_day);
             $end_day->addSeconds(86399);
@@ -1843,8 +1805,8 @@ class Controller extends AbstractPlugin
             $end_day->copy($start_day);
         }
 
-        $locationIds = strip_tags(Controller::convertLinkVarArrayToList($this->piVars ['location_ids']));
-        $organizerIds = strip_tags(Controller::convertLinkVarArrayToList($this->piVars ['organizer_ids']));
+        $locationIds = strip_tags(self::convertLinkVarArrayToList($this->piVars ['location_ids']));
+        $organizerIds = strip_tags(self::convertLinkVarArrayToList($this->piVars ['organizer_ids']));
 
         $this->getDateTimeObject->copy($start_day);
 
@@ -1901,7 +1863,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function createEvent()
+    public function createEvent(): string
     {
         $getDate = $this->conf ['getdate'];
         $pidList = $this->conf ['pidList'];
@@ -1930,7 +1892,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function confirmEvent()
+    public function confirmEvent(): string
     {
         $pidList = $this->conf ['pidList'];
 
@@ -1958,7 +1920,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function editEvent()
+    public function editEvent(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -1990,7 +1952,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function deleteEvent()
+    public function deleteEvent(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2022,7 +1984,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function createLocation()
+    public function createLocation(): string
     {
         $getdate = $this->conf ['getdate'];
         $pidList = $this->conf ['pidList'];
@@ -2051,7 +2013,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function confirmLocation()
+    public function confirmLocation(): string
     {
         $pidList = $this->conf ['pidList'];
 
@@ -2079,7 +2041,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function editLocation()
+    public function editLocation(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2111,7 +2073,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function deleteLocation()
+    public function deleteLocation(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2144,7 +2106,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function createOrganizer()
+    public function createOrganizer(): string
     {
         $getdate = $this->conf ['getdate'];
         $pidList = $this->conf ['pidList'];
@@ -2173,7 +2135,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function confirmOrganizer()
+    public function confirmOrganizer(): string
     {
         $pidList = $this->conf ['pidList'];
 
@@ -2201,7 +2163,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function editOrganizer()
+    public function editOrganizer(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2233,7 +2195,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function deleteOrganizer()
+    public function deleteOrganizer(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2266,7 +2228,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function createCalendar()
+    public function createCalendar(): string
     {
         $getdate = $this->conf ['getdate'];
         $pidList = $this->conf ['pidList'];
@@ -2295,7 +2257,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function confirmCalendar()
+    public function confirmCalendar(): string
     {
         $pidList = $this->conf ['pidList'];
 
@@ -2323,7 +2285,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function editCalendar()
+    public function editCalendar(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2355,7 +2317,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function deleteCalendar()
+    public function deleteCalendar(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2388,7 +2350,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function createCategory()
+    public function createCategory(): string
     {
         $getdate = $this->conf ['getdate'];
         $pidList = $this->conf ['pidList'];
@@ -2417,7 +2379,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function confirmCategory()
+    public function confirmCategory(): string
     {
         $pidList = $this->conf ['pidList'];
 
@@ -2445,7 +2407,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function editCategory()
+    public function editCategory(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2478,7 +2440,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function deleteCategory()
+    public function deleteCategory(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2511,25 +2473,25 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function searchAll()
+    public function searchAll(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawSearchAllClass');
 
-        if (intval($this->piVars ['start_day']) == 0) {
+        if (intval($this->piVars ['start_day']) === 0) {
             $starttime = $this->getListViewTime($this->conf ['view.'] ['search.'] ['defaultValues.'] ['start_day']);
         } else {
             $starttime = new CalDate(intval($this->piVars ['start_day']) . '000000');
         }
-        if (intval($this->piVars ['end_day']) == 0) {
+        if (intval($this->piVars ['end_day']) === 0) {
             $endtime = $this->getListViewTime($this->conf ['view.'] ['search.'] ['defaultValues.'] ['end_day']);
         } else {
             $endtime = new CalDate(intval($this->piVars ['end_day']) . '000000');
         }
         $searchword = strip_tags($this->piVars ['query']);
-        if ($searchword == '') {
+        if ($searchword === '') {
             $searchword = $this->cObj->stdWrap(
                 $this->conf ['view.'] ['search.'] ['defaultValues.'] ['query'],
                 $this->conf ['view.'] ['search.'] ['event.'] ['defaultValues.'] ['query.']
@@ -2562,8 +2524,8 @@ class Controller extends AbstractPlugin
             $endtime->copy($starttime);
         }
 
-        $locationIds = strip_tags(Controller::convertLinkVarArrayToList($this->piVars ['location_ids']));
-        $organizerIds = strip_tags(Controller::convertLinkVarArrayToList($this->piVars ['organizer_ids']));
+        $locationIds = strip_tags(self::convertLinkVarArrayToList($this->piVars ['location_ids']));
+        $organizerIds = strip_tags(self::convertLinkVarArrayToList($this->piVars ['organizer_ids']));
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $list = [];
         if ($this->piVars ['query'] && ($this->piVars ['submit'] || !$this->conf ['view.'] ['search.'] ['startSearchAfterSubmit'])) {
@@ -2621,7 +2583,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function searchLocation()
+    public function searchLocation(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -2629,14 +2591,11 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawSearchLocationClass');
 
         $searchword = strip_tags($this->piVars ['query']);
-        if ($searchword == '') {
+        if ($searchword === '') {
             $searchword = $this->cObj->stdWrap(
                 $this->conf ['view.'] ['search.'] ['location.'] ['defaultValues.'] ['query'],
                 $this->conf ['view.'] ['search.'] ['location.'] ['defaultValues.'] ['query.']
             );
-            if ($searchword == '') {
-                //
-            }
         }
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $list = $modelObj->searchLocation($type, $pidList, $searchword);
@@ -2672,7 +2631,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function searchOrganizer()
+    public function searchOrganizer(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -2680,14 +2639,11 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawSearchOrganizerClass');
 
         $searchword = strip_tags($this->piVars ['query']);
-        if ($searchword == '') {
+        if ($searchword === '') {
             $searchword = $this->cObj->stdWrap(
                 $this->conf ['view.'] ['search.'] ['organizer.'] ['defaultValues.'] ['query'],
                 $this->conf ['view.'] ['search.'] ['organizer.'] ['defaultValues.'] ['query.']
             );
-            if ($searchword == '') {
-                //
-            }
         }
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $list = $modelObj->searchOrganizer($type, $pidList, $searchword);
@@ -2723,7 +2679,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function searchUserAndGroup()
+    public function searchUserAndGroup(): string
     {
         $builder = $this->connectionPool->getQueryBuilderForTable('fe_users');
 
@@ -2736,7 +2692,7 @@ class Controller extends AbstractPlugin
             $builder->andWhere($builder->expr()->in('uid', $allowedUsers));
         }
 
-        if ($searchword != '') {
+        if ($searchword !== '') {
             $builder->andWhere($this->cObj->searchWhere(
                 $searchword,
                 $this->conf ['view.'] ['search.'] ['searchUserFieldList'],
@@ -2759,8 +2715,7 @@ class Controller extends AbstractPlugin
         $result = $builder->select('*')->from('fe_users')->andWhere($additionalWhere)->execute();
         if ($result->rowCount() > 0) {
             while ($row = $result->fetch(FetchMode::ASSOCIATIVE)) {
-                unset($row ['username']);
-                unset($row ['password']);
+                unset($row ['username'], $row ['password']);
                 $userList [] = $row;
             }
         }
@@ -2779,7 +2734,7 @@ class Controller extends AbstractPlugin
             $builder->andWhere($builder->expr()->in('pid', implode(',', $allowedGroups)));
         }
 
-        if ($searchword != '') {
+        if ($searchword !== '') {
             $builder->andWhere($this->cObj->searchWhere(
                 $searchword,
                 $this->conf ['view.'] ['search.'] ['searchGroupFieldList'],
@@ -2822,15 +2777,15 @@ class Controller extends AbstractPlugin
             $ajaxGroupStringArray [] = '{' . $this->getEventAjaxString($group) . '}';
         }
         return '{"fe_users":[' . implode(',', $ajaxUserStringArray) . '],"fe_groups":[' . implode(
-            ',',
+                ',',
                 $ajaxGroupStringArray
-        ) . ']}';
+            ) . ']}';
     }
 
     /**
      * @return string
      */
-    public function subscription()
+    public function subscription(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawSubscriptionClass');
 
@@ -2856,7 +2811,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function meeting()
+    public function meeting(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawMeetingClass');
 
@@ -2882,7 +2837,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function translation()
+    public function translation(): string
     {
         $type = $this->conf ['type'];
         $overlay = intval($this->piVars ['overlay']);
@@ -2908,9 +2863,7 @@ class Controller extends AbstractPlugin
                 }
             }
         }
-        unset($this->piVars ['overlay']);
-        unset($this->piVars ['servicename']);
-        unset($this->piVars ['subtype']);
+        unset($this->piVars ['overlay'], $this->piVars ['servicename'], $this->piVars ['subtype']);
         $viewParams = $this->shortenLastViewAndGetTargetViewParameters(false);
         $this->conf ['view'] = $viewParams ['view'];
         $this->conf ['lastview'] = $viewParams ['lastview'];
@@ -2924,7 +2877,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function todo()
+    public function todo(): string
     {
         $uid = $this->conf ['uid'];
         $type = $this->conf ['type'];
@@ -2936,7 +2889,7 @@ class Controller extends AbstractPlugin
         $todoSubtype = $this->confArr ['todoSubtype'];
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', $todoSubtype);
 
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
@@ -2964,7 +2917,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function loadEvents()
+    public function loadEvents(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -2972,7 +2925,7 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadEventsClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
 
@@ -2980,17 +2933,17 @@ class Controller extends AbstractPlugin
             $this->piVars ['start'] = $this->confArr ['recurrenceStart'];
         }
         $startObj = new CalDate($this->piVars ['start'] . '000000');
-        $startObj->setTZbyId('UTC');
+        $startObj->setTZbyID('UTC');
 
         if (!$this->piVars ['end']) {
             $this->piVars ['end'] = $this->confArr ['recurrenceEnd'];
         }
 
         $endObj = new CalDate($this->piVars ['end'] . '000000');
-        $endObj->setTZbyId('UTC');
+        $endObj->setTZbyID('UTC');
         $eventTypes = '0,1,2,3';
 
-        if ($this->confArr ['todoSubtype'] == 'event') {
+        if ($this->confArr ['todoSubtype'] === 'event') {
             $eventTypes = '0,1,2,3,4';
         }
 
@@ -3004,6 +2957,7 @@ class Controller extends AbstractPlugin
         }
 
         $this->conf ['view'] = $this->piVars ['targetView'];
+        $ajaxString = '';
         if (!empty($master_array)) {
             // use array keys for the loop in order to be able to use referenced events instead of copies and save some memory
             $masterArrayKeys = array_keys($master_array);
@@ -3022,15 +2976,14 @@ class Controller extends AbstractPlugin
                 }
             }
             $ajaxString = implode(',', $ajaxStringArray);
-            // $ajaxString .= $ajaxEdit;
         }
         $this->conf ['view'] = 'load_events';
 
         $sims = [];
         $rems = [];
         $wrapped = [];
-        $sims ['###IMG_PATH###'] = \TYPO3\CMS\Cal\Utility\Functions::expandPath($this->conf ['view.'] ['imagePath']);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+        $sims ['###IMG_PATH###'] = Functions::expandPath($this->conf ['view.'] ['imagePath']);
+        $page = Functions::substituteMarkerArrayNotCached(
             '[' . $ajaxString . ']',
             $sims,
             $rems,
@@ -3052,7 +3005,7 @@ class Controller extends AbstractPlugin
      * @param string $eventType
      * @return string
      */
-    public function loadEvent($uid, $eventType = '')
+    public function loadEvent($uid, $eventType = ''): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -3060,17 +3013,18 @@ class Controller extends AbstractPlugin
         $eventType = intval($this->piVars ['event_type']);
 
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadEventClass');
+        /** @var ModelController $modelObj */
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
-        if ($eventType == Model::EVENT_TYPE_TODO) {
+        if ($eventType === Model::EVENT_TYPE_TODO) {
             $todoSubtype = $this->confArr ['todoSubtype'];
             $availableTypes = $modelObj->getServiceTypes('cal_event_model', $todoSubtype);
-            if (!in_array($type, $availableTypes)) {
+            if (!in_array($type, $availableTypes, true)) {
                 $type = '';
             }
             $event = $modelObj->findTodo($uid, $type, $pidList);
         } else {
             $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-            if (!in_array($type, $availableTypes)) {
+            if (!in_array($type, $availableTypes, true)) {
                 $type = '';
             }
             $event = $modelObj->findEvent($uid, $type, $pidList);
@@ -3082,8 +3036,6 @@ class Controller extends AbstractPlugin
                 $hookObj->preLoadEventRendering($event, $this);
             }
         }
-
-        $ajaxString = '';
 
         if (is_object($event)) {
             $ajaxString = $this->getEventAjaxString($event);
@@ -3107,16 +3059,11 @@ class Controller extends AbstractPlugin
      * @param EventModel $event
      * @return string
      */
-    public function getEventAjaxString(&$event)
+    public function getEventAjaxString(&$event): string
     {
-        if (is_object($event)) {
-            $eventValues = $event->getValuesAsArray();
-        } else {
-            if (is_array($event)) {
-                $eventValues = $event;
-            }
-        }
-        if ($eventValues ['isFreeAndBusyEvent'] == 1) {
+        $eventValues = $event->getValuesAsArray();
+
+        if ((int)$eventValues ['isFreeAndBusyEvent'] === 1) {
             $eventValues ['titel'] = $this->conf ['view.'] ['freeAndBusy.'] ['eventTitle'];
             $eventValues ['description'] = $event->getCalendarObject()->getTitle();
         }
@@ -3129,14 +3076,10 @@ class Controller extends AbstractPlugin
                 } else {
                     $ajaxStringArray [] = '"' . $key . '":' . '[]';
                 }
-            } else {
-                if (is_object($value)) {
-                    $ajaxStringArray [] = '"' . $key . '":' . '{' . $this->getEventAjaxString($eventValues [$key]) . '}';
-                } else {
-                    if ($key !== 'l18n_diffsource') {
-                        $ajaxStringArray [] = '"' . $key . '":' . json_encode($value);
-                    }
-                }
+            } elseif (is_object($value)) {
+                $ajaxStringArray [] = '"' . $key . '":' . '{' . $this->getEventAjaxString($eventValues [$key]) . '}';
+            } elseif ($key !== 'l18n_diffsource') {
+                $ajaxStringArray [] = '"' . $key . '":' . json_encode($value);
             }
         }
 
@@ -3146,7 +3089,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function loadTodos()
+    public function loadTodos(): string
     {
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
@@ -3154,7 +3097,7 @@ class Controller extends AbstractPlugin
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadTodosClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
-        if (!in_array($type, $availableTypes)) {
+        if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
 
@@ -3194,11 +3137,11 @@ class Controller extends AbstractPlugin
         $sims = [];
         $rems = [];
         $wrapped = [];
-        $sims ['###IMG_PATH###'] = \TYPO3\CMS\Cal\Utility\Functions::expandPath($this->conf ['view.'] ['imagePath']);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached('[' . implode(
-            ',',
+        $sims ['###IMG_PATH###'] = Functions::expandPath($this->conf ['view.'] ['imagePath']);
+        $page = Functions::substituteMarkerArrayNotCached('[' . implode(
+                ',',
                 $ajaxStringArray
-        ) . ']', $sims, $rems, $wrapped);
+            ) . ']', $sims, $rems, $wrapped);
 
         // Hook: postLoadTodosRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -3213,7 +3156,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function loadCalendars()
+    public function loadCalendars(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadCalendarsClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
@@ -3239,7 +3182,8 @@ class Controller extends AbstractPlugin
         }
 
         foreach ($calendarArray ['tx_cal_calendar'] as $calendar) {
-            if (!in_array($calendar->getUid(), $calendarIds)) {
+            /** @var CalendarModel $calendar */
+            if (!in_array($calendar->getUid(), $calendarIds, true)) {
                 $ajaxStringArray [] = '{' . $this->getEventAjaxString($calendar) . '}';
             }
         }
@@ -3256,7 +3200,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function loadCategories()
+    public function loadCategories(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadCategoriesClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
@@ -3290,7 +3234,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function loadLocations()
+    public function loadLocations(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadLocationsClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
@@ -3323,7 +3267,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function loadOrganizers()
+    public function loadOrganizers(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadOrganizersClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
@@ -3356,7 +3300,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function loadRights()
+    public function loadRights(): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadRightsClass');
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
@@ -3372,7 +3316,7 @@ class Controller extends AbstractPlugin
             $isAllowedToOptionEvent = $rightsObj->isAllowedTo($option, 'event') ? 'true' : 'false';
             $isAllowedToOptionLocation = $rightsObj->isAllowedTo($option, 'location') ? 'true' : 'false';
             $isAllowedToOptionOrganizer = $rightsObj->isAllowedTo($option, 'organizer') ? 'true' : 'false';
-            $rights [] = '"' . ($option == 'delete' ? 'del' : $option) . '":{"calendar":' . $isAllowedToOptionCalendar . ',"category":' . $isAllowedToOptionCategory . ',"event":' . $isAllowedToOptionEvent . ',"location":' . $isAllowedToOptionLocation . ',"organizer":' . $isAllowedToOptionOrganizer . '}';
+            $rights [] = '"' . ($option === 'delete' ? 'del' : $option) . '":{"calendar":' . $isAllowedToOptionCalendar . ',"category":' . $isAllowedToOptionCategory . ',"event":' . $isAllowedToOptionEvent . ',"location":' . $isAllowedToOptionLocation . ',"organizer":' . $isAllowedToOptionOrganizer . '}';
         }
         $rights [] = '"admin":' . ($rightsObj->isCalAdmin() ? 'true' : 'false');
         $rights [] = '"userId":' . $rightsObj->getUserId();
@@ -3392,231 +3336,229 @@ class Controller extends AbstractPlugin
      */
     public function updateConfWithFlexform(&$piFlexForm)
     {
-        // Controller::updateIfNotEmpty($this->conf['pages'], $this->pi_getFFvalue($piFlexForm, 'pages'));
-        // Controller::updateIfNotEmpty($this->conf['recursive'], $this->pi_getFFvalue($piFlexForm, 'recursive'));
-        if ($this->conf ['dontListenToFlexForm'] == 1) {
+        if ((int)$this->conf ['dontListenToFlexForm'] === 1) {
             return;
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['general.'] ['calendarName'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['general.'] ['calendarName'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['calendarName'],
                 $this->pi_getFFvalue($piFlexForm, 'calendarName')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['general.'] ['allowSubscribe'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['general.'] ['allowSubscribe'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['allowSubscribe'],
-                $this->pi_getFFvalue($piFlexForm, 'subscription') == 1 ? 1 : -1
+                (int)$this->pi_getFFvalue($piFlexForm, 'subscription') === 1 ? 1 : -1
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['general.'] ['subscribeFeUser'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['general.'] ['subscribeFeUser'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['subscribeFeUser'],
-                $this->pi_getFFvalue($piFlexForm, 'subscription') == 2 ? 1 : -1
+                (int)$this->pi_getFFvalue($piFlexForm, 'subscription') === 2 ? 1 : -1
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['general.'] ['subscribeWithCaptcha'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['general.'] ['subscribeWithCaptcha'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['subscribeWithCaptcha'],
                 $this->pi_getFFvalue($piFlexForm, 'subscribeWithCaptcha')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['general.'] ['allowedViews'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['general.'] ['allowedViews'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['allowedViews'],
                 $this->pi_getFFvalue($piFlexForm, 'allowedViews')
             );
         }
 
-        if ($this->conf ['dontListenToFlexForm.'] ['day.'] ['dayViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['day.'] ['dayViewPid'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['day.'] ['dayViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'dayViewPid', 's_Day_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['day.'] ['dayStart'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['day.'] ['dayStart'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['day.'] ['dayStart'],
                 $this->pi_getFFvalue($piFlexForm, 'dayStart', 's_Day_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['day.'] ['dayEnd'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['day.'] ['dayEnd'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['day.'] ['dayEnd'],
                 $this->pi_getFFvalue($piFlexForm, 'dayEnd', 's_Day_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['day.'] ['gridLength'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['day.'] ['gridLength'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['day.'] ['gridLength'],
                 $this->pi_getFFvalue($piFlexForm, 'gridLength', 's_Day_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['day.'] ['weekViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['day.'] ['weekViewPid'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['week.'] ['weekViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'weekViewPid', 's_Week_View')
             );
         }
 
-        if ($this->conf ['dontListenToFlexForm.'] ['month.'] ['monthViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['month.'] ['monthViewPid'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['month.'] ['monthViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'monthViewPid', 's_Month_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['month.'] ['monthMakeMiniCal'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['month.'] ['monthMakeMiniCal'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['month.'] ['monthMakeMiniCal'],
                 $this->pi_getFFvalue($piFlexForm, 'monthMakeMiniCal', 's_Month_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['month.'] ['monthShowListView'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['month.'] ['monthShowListView'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['month.'] ['showListInMonthView'],
                 $this->pi_getFFvalue($piFlexForm, 'monthShowListView', 's_Month_View')
             );
         }
 
-        if ($this->conf ['dontListenToFlexForm.'] ['year.'] ['yearViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['year.'] ['yearViewPid'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['year.'] ['yearViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'yearViewPid', 's_Year_View')
             );
         }
 
-        if ($this->conf ['dontListenToFlexForm.'] ['event.'] ['eventViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['event.'] ['eventViewPid'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['event.'] ['eventViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'eventViewPid', 's_Event_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['event.'] ['isPreview'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['event.'] ['isPreview'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['event.'] ['isPreview'],
                 $this->pi_getFFvalue($piFlexForm, 'isPreview', 's_Event_View')
             );
         }
 
-        if ($this->conf ['dontListenToFlexForm.'] ['list.'] ['listViewPid'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['listViewPid'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['listViewPid'],
                 $this->pi_getFFvalue($piFlexForm, 'listViewPid', 's_List_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['list.'] ['starttime'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['starttime'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['starttime'],
                 $this->pi_getFFvalue($piFlexForm, 'starttime', 's_List_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['list.'] ['endtime'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['endtime'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['endtime'],
                 $this->pi_getFFvalue($piFlexForm, 'endtime', 's_List_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['list.'] ['maxEvents'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['maxEvents'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['maxEvents'],
                 $this->pi_getFFvalue($piFlexForm, 'maxEvents', 's_List_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['list.'] ['maxRecurringEvents'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['maxRecurringEvents'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['maxRecurringEvents'],
                 $this->pi_getFFvalue($piFlexForm, 'maxRecurringEvents', 's_List_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['list.'] ['usePageBrowser'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['usePageBrowser'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['pageBrowser.'] ['usePageBrowser'],
                 $this->pi_getFFvalue($piFlexForm, 'usePageBrowser', 's_List_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['list.'] ['recordsPerPage'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['recordsPerPage'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['pageBrowser.'] ['recordsPerPage'],
                 $this->pi_getFFvalue($piFlexForm, 'recordsPerPage', 's_List_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['list.'] ['pagesCount'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['pagesCount'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['pageBrowser.'] ['pagesCount'],
                 $this->pi_getFFvalue($piFlexForm, 'pagesCount', 's_List_View')
             );
         }
 
-        if ($this->conf ['dontListenToFlexForm.'] ['ics.'] ['showIcsLinks'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['ics.'] ['showIcsLinks'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['ics.'] ['showIcsLinks'],
                 $this->pi_getFFvalue($piFlexForm, 'showIcsLinks', 's_Ics_View')
             );
         }
 
-        if ($this->conf ['dontListenToFlexForm.'] ['other.'] ['showLogin'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['other.'] ['showLogin'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['other.'] ['showLogin'],
                 $this->pi_getFFvalue($piFlexForm, 'showLogin', 's_Other_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['other.'] ['showSearch'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['other.'] ['showSearch'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['other.'] ['showSearch'],
                 $this->pi_getFFvalue($piFlexForm, 'showSearch', 's_Other_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['other.'] ['showJumps'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['other.'] ['showJumps'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['other.'] ['showJumps'],
                 $this->pi_getFFvalue($piFlexForm, 'showJumps', 's_Other_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['other.'] ['showGoto'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['other.'] ['showGoto'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['other.'] ['showGoto'],
                 $this->pi_getFFvalue($piFlexForm, 'showGoto', 's_Other_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['other.'] ['showCalendarSelection'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['other.'] ['showCalendarSelection'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['other.'] ['showCalendarSelection'],
                 $this->pi_getFFvalue($piFlexForm, 'showCalendarSelection', 's_Other_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['other.'] ['showCategorySelection'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['other.'] ['showCategorySelection'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['other.'] ['showCategorySelection'],
                 $this->pi_getFFvalue($piFlexForm, 'showCategorySelection', 's_Other_View')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['other.'] ['showTomorrowEvents'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['other.'] ['showTomorrowEvents'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['other.'] ['showTomorrowEvents'],
                 $this->pi_getFFvalue($piFlexForm, 'showTomorrowEvents', 's_Other_View')
             );
         }
 
-        if ($this->conf ['dontListenToFlexForm.'] ['filters.'] ['categorySelection'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['filters.'] ['categorySelection'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['category'],
                 $this->pi_getFFvalue($piFlexForm, 'categorySelection', 's_Cat')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['filters.'] ['categoryMode'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['filters.'] ['categoryMode'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['categoryMode'],
                 $this->pi_getFFvalue($piFlexForm, 'categoryMode', 's_Cat')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['filters.'] ['calendarSelection'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['filters.'] ['calendarSelection'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['calendar'],
                 $this->pi_getFFvalue($piFlexForm, 'calendarSelection', 's_Cat')
             );
         }
-        if ($this->conf ['dontListenToFlexForm.'] ['filters.'] ['calendarMode'] != 1) {
-            Controller::updateIfNotEmpty(
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['filters.'] ['calendarMode'] !== 1) {
+            self::updateIfNotEmpty(
                 $this->conf ['view.'] ['calendarMode'],
                 $this->pi_getFFvalue($piFlexForm, 'calendarMode', 's_Cat')
             );
@@ -3640,29 +3582,29 @@ class Controller extends AbstractPlugin
      */
     public static function updateIfNotEmpty(&$confVar, $newConfVar)
     {
-        if ($newConfVar != '') {
+        if ($newConfVar !== '') {
             $confVar = $newConfVar;
         }
     }
 
     /**
-     * @param array $linkVar
+     * @param string|array $linkVar
      * @return string
      */
-    public static function convertLinkVarArrayToList($linkVar)
+    public static function convertLinkVarArrayToList($linkVar): string
     {
         if (is_array($linkVar)) {
             $first = true;
             $new = '';
             foreach ($linkVar as $key => $value) {
                 if ($first) {
-                    if ($value == 'on') {
+                    if ($value === 'on') {
                         $value = intval($key);
                     }
                     $new .= intval($value);
                     $first = false;
                 } else {
-                    if ($value == 'on') {
+                    if ($value === 'on') {
                         $value = intval($key);
                     }
                     $new .= ',' . intval($value);
@@ -3678,35 +3620,35 @@ class Controller extends AbstractPlugin
      * @param string $page
      * @return string
      */
-    public static function replace_tags($tags, $page)
+    public static function replace_tags($tags, $page): string
     {
         if (count($tags) > 0) {
             $sims = [];
             foreach ($tags as $tag => $data) {
                 // This replaces any tags
-                $sims ['###' . strtoupper($tag) . '###'] = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached(
+                $upperTag = strtoupper($tag);
+                $sims ['###' . $upperTag . '###'] = Functions::substituteMarkerArrayNotCached(
                     $data,
-                    '###' . strtoupper($tag) . '###',
+                    '###' . $upperTag . '###',
                     [],
                     []
                 );
             }
 
-            $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+            $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         }
-        //die('No tags designated for replacement.');
 
         return $page;
     }
 
     /**
-     * @param string $takeFirstInsteadOfLast
-     * @return Ambigous <multitype:NULL string Ambigous <NULL, string> , \TYPO3\CMS\Cal\Controller\multitype:>
+     * @param bool $takeFirstInsteadOfLast
+     * @return mixed
      */
     public function shortenLastViewAndGetTargetViewParameters($takeFirstInsteadOfLast = false)
     {
         $returnParams = [];
-        if (count($this->conf ['view.'] ['allowedViews']) == 1 && count($this->conf ['view.'] ['allowedViewsToLinkTo']) == 1) {
+        if (count($this->conf ['view.'] ['allowedViews']) === 1 && count($this->conf ['view.'] ['allowedViewsToLinkTo']) === 1) {
             $returnParams ['lastview'] = null;
             $returnParams ['view'] = $this->conf ['view.'] ['allowedViews'] [0];
         } else {
@@ -3719,7 +3661,7 @@ class Controller extends AbstractPlugin
             }
             $lastview = implode('||', $views);
 
-            $viewParams = Controller::convertLastViewParamsToArray($target);
+            $viewParams = self::convertLastViewParamsToArray($target);
             $returnParams = $viewParams [0];
 
             switch (trim($returnParams ['view'])) {
@@ -3737,7 +3679,7 @@ class Controller extends AbstractPlugin
                     $returnParams ['type'] = null;
                     $returnParams ['gettime'] = null;
                     $returnParams ['getdate'] = $this->conf ['getdate'];
-                    $returnParams ['page_id'] = $returnParams ['page_id'] . ',151';
+                    $returnParams ['page_id'] .= ',151';
                     break;
                 default:
                     $returnParams ['uid'] = null;
@@ -3764,12 +3706,12 @@ class Controller extends AbstractPlugin
     }
 
     /**
-     * @param string $overrideParams
+     * @param bool $overrideParams
      * @return string|null
      */
     public function extendLastView($overrideParams = false)
     {
-        if (count($this->conf ['view.'] ['allowedViews']) == 1 && count($this->conf ['view.'] ['allowedViewsToLinkTo']) == 1) {
+        if (count($this->conf ['view.'] ['allowedViews']) === 1 && count($this->conf ['view.'] ['allowedViewsToLinkTo']) === 1) {
             return null;
         }
 
@@ -3801,14 +3743,14 @@ class Controller extends AbstractPlugin
             $paramsForUrl [] = $key . '-' . $val;
         }
 
-        return ($this->conf ['lastview'] != null ? $this->conf ['lastview'] . '||' : '') . implode('|', $paramsForUrl);
+        return ($this->conf ['lastview'] !== null ? $this->conf ['lastview'] . '||' : '') . implode('|', $paramsForUrl);
     }
 
     /**
      * @param  string $config
      * @return array:
      */
-    public static function convertLastViewParamsToArray($config)
+    public static function convertLastViewParamsToArray($config): array
     {
         $views = explode('||', $config);
         $result = [];
@@ -3858,7 +3800,7 @@ class Controller extends AbstractPlugin
      * @param array $additionalClasses
      * @return string
      */
-    public function pi_wrapInBaseClass($str, $additionalClasses = [])
+    public function pi_wrapInBaseClass($str, $additionalClasses = []): string
     {
         $content = '<div class="' . str_replace('_', '-', $this->prefixId) . ' ' . implode(' ', $additionalClasses) . '">
 		' . $str . '</div>';
@@ -3891,7 +3833,7 @@ class Controller extends AbstractPlugin
         $sessionPiVars = GeneralUtility::trimExplode(',', $this->conf ['sessionPiVars'], 1);
 
         foreach ((array)$params [$this->prefixId] as $key => $value) {
-            if (in_array($key, $sessionPiVars)) {
+            if (in_array($key, $sessionPiVars, true)) {
                 $_SESSION [$this->prefixId] [$key] = $value;
                 unset($params [$this->prefixId] [$key]);
             }
@@ -3906,18 +3848,12 @@ class Controller extends AbstractPlugin
         if (!$this->piVars ['view']) {
             if ($this->piVars ['week']) {
                 $this->piVars ['view'] = 'week';
-            } else {
-                if ($this->piVars ['day']) {
-                    $this->piVars ['view'] = 'day';
-                } else {
-                    if ($this->piVars ['month']) {
-                        $this->piVars ['view'] = 'month';
-                    } else {
-                        if ($this->piVars ['year']) {
-                            $this->piVars ['view'] = 'year';
-                        }
-                    }
-                }
+            } elseif ($this->piVars ['day']) {
+                $this->piVars ['view'] = 'day';
+            } elseif ($this->piVars ['month']) {
+                $this->piVars ['view'] = 'month';
+            } elseif ($this->piVars ['year']) {
+                $this->piVars ['view'] = 'year';
             }
         }
 
@@ -3935,15 +3871,13 @@ class Controller extends AbstractPlugin
         }
         if (!$this->piVars ['getdate']) {
             if ($this->piVars ['week']) {
-                $this->piVars ['getdate'] = \TYPO3\CMS\Cal\Utility\Functions::getDayByWeek(
+                $this->piVars ['getdate'] = Functions::getDayByWeek(
                     $this->piVars ['year'],
                     $this->piVars ['week'],
                     $this->piVars ['weekday']
                 );
 
-                unset($this->piVars ['year']);
-                unset($this->piVars ['week']);
-                unset($this->piVars ['weekday']);
+                unset($this->piVars ['year'], $this->piVars ['week'], $this->piVars ['weekday']);
             } else {
                 $date = new CalDate();
                 $date->setTZbyID('UTC');
@@ -3956,38 +3890,44 @@ class Controller extends AbstractPlugin
                 if (!$this->piVars ['day']) {
                     $this->piVars ['day'] = $date->format('%d');
                 }
-                if ($this->piVars ['month'] == 2) {
-                    if ((($this->piVars ['year'] % 400) == 0 || (($this->piVars ['year'] % 4) == 0 && ($this->piVars ['year'] % 100) != 0)) && $this->piVars ['day'] >= 29) {
+                if ((int)$this->piVars ['month'] === 2) {
+                    if (
+                        $this->piVars ['day'] >= 29
+                        && (
+                            ((int)$this->piVars ['year'] % 400) === 0
+                            || (
+                                ((int)$this->piVars ['year'] % 4) === 0
+                                && ((int)$this->piVars ['year'] % 100) !== 0
+                            )
+                        )
+                    ) {
                         $this->piVars ['day'] = 29;
-                    } else {
-                        if ($this->piVars ['day'] > 28) {
-                            $this->piVars ['day'] = 28;
-                        }
+                    } elseif ($this->piVars ['day'] > 28) {
+                        $this->piVars ['day'] = 28;
                     }
-                } else {
-                    if (in_array($this->piVars ['month'], [
-                            4,
-                            6,
-                            9,
-                            11
-                        ]) && $this->piVars ['day'] > 30) {
-                        $this->piVars ['day'] = 30;
-                    }
+                } elseif (
+                    $this->piVars ['day'] > 30
+                    && in_array($this->piVars ['month'], [
+                        4,
+                        6,
+                        9,
+                        11
+                    ], true)
+                ) {
+                    $this->piVars ['day'] = 30;
                 }
                 $this->piVars ['getdate'] = str_pad(
-                    (int)$this->piVars ['year'],
-                    4,
-                    '0',
+                        (int)$this->piVars ['year'],
+                        4,
+                        '0',
                         STR_PAD_LEFT
-                ) . str_pad(
-                            (int)$this->piVars ['month'],
-                            2,
-                            '0',
+                    ) . str_pad(
+                        (int)$this->piVars ['month'],
+                        2,
+                        '0',
                         STR_PAD_LEFT
-                        ) . str_pad((int)$this->piVars ['day'], 2, '0', STR_PAD_LEFT);
-                unset($this->piVars ['year']);
-                unset($this->piVars ['month']);
-                unset($this->piVars ['day']);
+                    ) . str_pad((int)$this->piVars ['day'], 2, '0', STR_PAD_LEFT);
+                unset($this->piVars ['year'], $this->piVars ['month'], $this->piVars ['day']);
             }
         }
         unset($_SESSION [$this->prefixId]);
@@ -3998,12 +3938,12 @@ class Controller extends AbstractPlugin
      */
     public function clearPiVarParams()
     {
-        if ($this->conf ['dontListenToPiVars'] || $this->conf ['clearPiVars'] == 'all') {
+        if ($this->conf ['dontListenToPiVars'] || $this->conf ['clearPiVars'] === 'all') {
             $this->piVars = [];
         } else {
             $clearPiVars = GeneralUtility::trimExplode(',', $this->conf ['clearPiVars'], 1);
             foreach ((array)$this->piVars as $key => $value) {
-                if (in_array($key, $clearPiVars)) {
+                if (in_array($key, $clearPiVars, true)) {
                     unset($this->piVars [$key]);
                 }
             }
@@ -4032,7 +3972,7 @@ class Controller extends AbstractPlugin
         if (is_array($this->piVars) && is_array($overrulePIvars) && !$clearAnyway) {
             $piVars = $this->piVars;
             unset($piVars ['DATA']);
-            \TYPO3\CMS\Core\Utility\ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
+            ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
             $overrulePIvars = $piVars;
             if ($this->pi_autoCacheEn) {
                 $cache = $this->pi_autoCache($overrulePIvars);
@@ -4055,12 +3995,11 @@ class Controller extends AbstractPlugin
                     $piVars [$this->prefixId] ['weekday'] = $date->getDayOfWeek();
                     $sessionVars ['month'] = substr($piVars [$this->prefixId] ['getdate'], 4, 2);
                     $sessionVars ['day'] = substr($piVars [$this->prefixId] ['getdate'], 6, 2);
-                    if ($date->getMonth() == 12 && $piVars [$this->prefixId] ['week'] == 1) {
+                    if ($date->getMonth() === 12 && (int)$piVars [$this->prefixId] ['week'] === 1) {
                         $piVars [$this->prefixId] ['year']++;
                     }
 
-                    unset($piVars [$this->prefixId] ['view']);
-                    unset($piVars [$this->prefixId] ['getdate']);
+                    unset($piVars [$this->prefixId] ['view'], $piVars [$this->prefixId] ['getdate']);
                     break;
                 case 'event':
                 case 'todo':
@@ -4083,12 +4022,7 @@ class Controller extends AbstractPlugin
                     $piVars [$this->prefixId] ['year'] = substr($piVars [$this->prefixId] ['getdate'], 0, 4);
                     $sessionVars ['month'] = substr($piVars [$this->prefixId] ['getdate'], 4, 2);
                     $sessionVars ['day'] = substr($piVars [$this->prefixId] ['getdate'], 6, 2);
-                    unset($piVars [$this->prefixId] ['view']);
-                    unset($piVars [$this->prefixId] ['getdate']);
-            }
-
-            foreach ($sessionVars as $key => $value) {
-                //$_SESSION[$this->prefixId][$key] = $value;
+                    unset($piVars [$this->prefixId] ['view'], $piVars [$this->prefixId] ['getdate']);
             }
         }
         /* TEST */
@@ -4100,18 +4034,22 @@ class Controller extends AbstractPlugin
         // once useCacheHash property in typolinks has stdWrap, we can use this flag - until then it's unfortunately useless :(
         //$parameterArray['link_useCacheHash'] = $this->pi_USER_INT_obj ? 0 : $cache;
         $parameterArray ['link_no_cache'] = $this->pi_USER_INT_obj ? 0 : !$cache;
-        $parameterArray ['link_parameter'] = $altPageId ? $altPageId : ($this->pi_tmpPageId ? $this->pi_tmpPageId : $GLOBALS ['TSFE']->id);
+        if ($this->pi_tmpPageId) {
+            $parameterArray ['link_parameter'] = $altPageId ?: $this->pi_tmpPageId;
+        } else {
+            $parameterArray ['link_parameter'] = $altPageId ?: $GLOBALS ['TSFE']->id;
+        }
         $parameterArray ['link_additionalParams'] = $this->conf ['parent.'] ['addParams'] . GeneralUtility::implodeArrayForUrl(
-            '',
+                '',
                 $piVars,
-            '',
-            true
-        ) . $this->pi_moreParams;
+                '',
+                true
+            ) . $this->pi_moreParams;
         $parameterArray ['link_ATagParams'] = 'class="url"';
 
         // add time/date related parameters to all link objects, so that they can use them e.g. to display the monthname etc.
         $parameterArray ['getdate'] = $this->conf ['getdate'];
-        if ($overrulePIvars ['getdate'] && is_object($date)) {
+        if (is_object($date) && $overrulePIvars ['getdate']) {
             $parameterArray ['link_timestamp'] = $date->getTime();
             $parameterArray ['link_getdate'] = $overrulePIvars ['getdate'];
         }
@@ -4129,7 +4067,7 @@ class Controller extends AbstractPlugin
      * @return string input string wrapped in <a> tags
      * @see pi_linkTP_keepPIvars(), \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::typoLink()
      */
-    public function pi_linkTP($str, $urlParameters = [], $cache = false, $altPageId = 0)
+    public function pi_linkTP($str, $urlParameters = [], $cache = false, $altPageId = 0): string
     {
         $this->cleanupUrlParameter($urlParameters);
         $link = parent::pi_linkTP($str, $urlParameters, $cache, $altPageId);
@@ -4169,7 +4107,7 @@ class Controller extends AbstractPlugin
                         'query'
                     ];
                 }
-                if ($params [$this->getPointerName] || ($params ['category'] && $params ['view'] != 'event')) {
+                if ($params [$this->getPointerName] || ($params ['category'] && $params ['view'] !== 'event')) {
                     $useLastView = false;
                 }
                 break;
@@ -4204,7 +4142,7 @@ class Controller extends AbstractPlugin
         }
         if ($this->conf ['view.'] [$action . '_' . $object . '.'] ['redirectAfter' . ucwords($action) . 'ToPid'] || $this->conf ['view.'] [$action . '_' . $object . '.'] ['redirectAfter' . ucwords($action) . 'ToView']) {
             $linkParams = [];
-            if ($object == 'event') {
+            if ($object === 'event') {
                 $linkParams [$this->prefixId . '[getdate]'] = $this->conf ['getdate'];
             }
             if ($this->conf ['view.'] [$action . '_' . $object . '.'] ['redirectAfter' . ucwords($action) . 'ToView']) {
@@ -4232,9 +4170,10 @@ class Controller extends AbstractPlugin
     /**
      * Method for post processing the rendered event
      *
+     * @param $content
      * @return string $content
      */
-    public function finish(&$content)
+    public function finish(&$content): string
     {
         $hookObjectsArr = $this->getHookObjectsArray('finishViewRendering');
         // Hook: preFinishViewRendering
@@ -4257,9 +4196,10 @@ class Controller extends AbstractPlugin
     }
 
     /**
-     *
+     * @param $content
+     * @return string
      */
-    public function translateLanguageMarker(&$content)
+    public function translateLanguageMarker(&$content): string
     {
         // translate leftover markers
 
@@ -4272,17 +4212,13 @@ class Controller extends AbstractPlugin
             foreach ($allLanguageMarkers as $key => $marker) {
                 $wrapper = $match [1] [$key];
                 if (preg_match('/.*_LABEL$/', $marker)) {
-                    $value = $this->pi_getLL('l_' . strtolower(substr($marker, 0, strlen($marker) - 6)));
+                    $value = $this->pi_getLL('l_' . strtolower(substr($marker, 0, -6)));
+                } elseif (preg_match('/^L_.*/', $marker)) {
+                    $value = $this->pi_getLL(strtolower($marker));
+                } elseif ($wrapper === '%%%') {
+                    $value = $this->pi_getLL('l_' . strtolower($marker));
                 } else {
-                    if (preg_match('/^L_.*/', $marker)) {
-                        $value = $this->pi_getLL(strtolower($marker));
-                    } else {
-                        if ($wrapper == '%%%') {
-                            $value = $this->pi_getLL('l_' . strtolower($marker));
-                        } else {
-                            $value = '';
-                        }
-                    }
+                    $value = '';
                 }
                 $sims [$wrapper . $marker . $wrapper] = $value;
             }
@@ -4296,7 +4232,7 @@ class Controller extends AbstractPlugin
     /**
      * @return string
      */
-    public function getPointerName()
+    public function getPointerName(): string
     {
         return $this->pointerName;
     }
@@ -4306,11 +4242,11 @@ class Controller extends AbstractPlugin
      * @param string $additionalWhere
      * @return array
      */
-    public function findRelatedEvents($objectType, $additionalWhere)
+    public function findRelatedEvents($objectType, $additionalWhere): array
     {
         $relatedEvents = [];
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
-        if ($this->conf ['view.'] [$this->conf ['view'] . '.'] [$objectType . '.'] ['includeEventsInResult'] == 1) {
+        if ((int)$this->conf ['view.'] [$this->conf ['view'] . '.'] [$objectType . '.'] ['includeEventsInResult'] === 1) {
             $starttime = $this->getListViewTime($this->conf ['view.'] [$this->conf ['view'] . '.'] [$this->conf ['view'] . '.'] ['includeEventsInResult.'] ['starttime']);
             $endtime = $this->getListViewTime($this->conf ['view.'] [$this->conf ['view'] . '.'] [$this->conf ['view'] . '.'] ['includeEventsInResult.'] ['endtime']);
             $relatedEvents = $modelObj->findEventsForList(
@@ -4336,14 +4272,14 @@ class Controller extends AbstractPlugin
             $this->pi_initPIflexForm(); // Init and get the flexform data of the plugin
             $piFlexForm = $this->cObj->data ['pi_flexform'];
 
-            if ($this->conf ['dontListenToFlexForm.'] ['day.'] ['weekStartDay'] != 1) {
-                Controller::updateIfNotEmpty(
+            if ((int)$this->conf ['dontListenToFlexForm.'] ['day.'] ['weekStartDay'] !== 1) {
+                self::updateIfNotEmpty(
                     $this->conf ['view.'] ['weekStartDay'],
                     $this->pi_getFFvalue($piFlexForm, 'weekStartDay')
                 );
             }
         }
 
-        define('DATE_CALC_BEGIN_WEEKDAY', $this->conf ['view.'] ['weekStartDay'] == 'Sunday' ? 0 : 1);
+        define('DATE_CALC_BEGIN_WEEKDAY', $this->conf ['view.'] ['weekStartDay'] === 'Sunday' ? 0 : 1);
     }
 }

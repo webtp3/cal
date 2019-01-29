@@ -16,17 +16,45 @@ namespace TYPO3\CMS\Cal\Model;
  */
 class AttendeeModel extends BaseModel
 {
-    public $row = [];
+    /**
+     * @var int
+     */
     public $eventUid = 0;
+
+    /**
+     * @var int
+     */
     public $feUserId = 0;
+
+    /**
+     * @var string
+     */
     public $email = '';
+
+    /**
+     * @var string
+     */
     public $attendance = '';
+
+    /**
+     * @var int
+     */
     public $status = 0;
+
+    /**
+     * @var string
+     */
     public $name = '';
-    public $eventId;
+
+    /**
+     * @var int
+     */
+    public $eventId = 0;
 
     /**
      * Constructor.
+     * @param $row
+     * @param $serviceKey
      */
     public function __construct($row, $serviceKey)
     {
@@ -36,6 +64,9 @@ class AttendeeModel extends BaseModel
         $this->init($row);
     }
 
+    /**
+     * @param $row
+     */
     private function init(&$row)
     {
         $this->row = $row;
@@ -65,67 +96,108 @@ class AttendeeModel extends BaseModel
         }
     }
 
+    /**
+     * @param $uid
+     */
     public function setEventUid($uid)
     {
         $this->eventUid = $uid;
     }
 
-    public function getEventUid()
+    /**
+     * @return int
+     */
+    public function getEventUid(): int
     {
         return $this->eventUid;
     }
 
+    /**
+     * @param $uid
+     */
     public function setFeUserId($uid)
     {
         $this->feUserId = $uid;
     }
 
-    public function getFeUserId()
+    /**
+     * @return int
+     */
+    public function getFeUserId(): int
     {
         return $this->feUserId;
     }
 
+    /**
+     * @param $email
+     */
     public function setEmail($email)
     {
         $this->email = $email;
     }
 
-    public function getEmail()
+    /**
+     * @return string
+     */
+    public function getEmail(): string
     {
         return $this->email;
     }
 
+    /**
+     * @param $attendance
+     */
     public function setAttendance($attendance)
     {
         $this->attendance = $attendance;
     }
 
-    public function getAttendance()
+    /**
+     * @return string
+     */
+    public function getAttendance(): string
     {
         return $this->attendance;
     }
 
+    /**
+     * @param $status
+     */
     public function setStatus($status)
     {
         $this->status = $status;
     }
 
-    public function getStatus()
+    /**
+     * @return int
+     */
+    public function getStatus(): int
     {
         return $this->status;
     }
 
+    /**
+     * @param $name
+     */
     public function setName($name)
     {
         $this->name = $name;
     }
 
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
+    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
         if (!$this->rightsObj->isViewEnabled('edit_attendee')) {
             return false;
@@ -134,15 +206,8 @@ class AttendeeModel extends BaseModel
             return true;
         }
 
-        if ($feUserUid == '') {
-            $feUserUid = $this->rightsObj->getUserId();
-        }
-        if (empty($feGroupsArray)) {
-            $feGroupsArray = $this->rightsObj->getUserGroups();
-        }
-
         $isAttendee = false;
-        if ($this->getFeUserId() == $this->rightsObj->getUserId()) {
+        if ($this->getFeUserId() === $this->rightsObj->getUserId()) {
             $isAttendee = true;
         }
 
@@ -151,7 +216,12 @@ class AttendeeModel extends BaseModel
         return $isAllowedToEditAttendee && $isAttendee;
     }
 
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
+    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
         if (!$this->rightsObj->isViewEnabled('delete_attendee')) {
             return false;
@@ -160,14 +230,8 @@ class AttendeeModel extends BaseModel
             return true;
         }
 
-        if ($feUserUid == '') {
-            $feUserUid = $this->rightsObj->getUserId();
-        }
-        if (empty($feGroupsArray)) {
-            $feGroupsArray = $this->rightsObj->getUserGroups();
-        }
         $isAttendee = false;
-        if ($this->getFeUserId() == $this->rightsObj->getUserId()) {
+        if ($this->getFeUserId() === $this->rightsObj->getUserId()) {
             $isAttendee = true;
         }
 
@@ -176,7 +240,10 @@ class AttendeeModel extends BaseModel
         return $isAllowedToDeleteAttendee && $isAttendee;
     }
 
-    public function __toString()
+    /**
+     * @return string
+     */
+    public function __toString(): string
     {
         return 'Attendee ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(',', $this->row);
     }

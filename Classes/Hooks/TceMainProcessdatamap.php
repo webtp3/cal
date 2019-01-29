@@ -150,7 +150,6 @@ class TceMainProcessdatamap
             $fieldArray ['uid_foreign'] = array_pop($values);
             $fieldArray ['tablenames'] = implode('_', $values);
         }
-
     }
 
     public static function processDatamap_afterDatabaseOperations($status, $table, $id, &$fieldArray, &$tcemain)

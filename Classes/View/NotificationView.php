@@ -14,7 +14,11 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\AttendeeModel;
+use TYPO3\CMS\Cal\Model\CategoryModel;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Service\BaseService;
+use TYPO3\CMS\Cal\Service\EventService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Mail\MailMessage;
@@ -25,14 +29,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class NotificationView extends BaseService
 {
+    /**
+     * @var MailMessage
+     */
     public $mailer;
-    public $baseUrl;
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->baseUrl = ''; // GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-    }
+    /**
+     * @var string
+     */
+    public $baseUrl = '';
 
     /**
      * @param $oldEventDataArray
@@ -43,7 +48,7 @@ class NotificationView extends BaseService
         unset($oldEventDataArray['starttime'], $oldEventDataArray['endtime'], $newEventDataArray['starttime'], $newEventDataArray['endtime']);
 
         $pidArray = GeneralUtility::trimExplode(',', $this->conf['pidList'], 1);
-        if (!in_array($oldEventDataArray['pid'], $pidArray)) {
+        if (!in_array($oldEventDataArray['pid'], $pidArray, true)) {
             GeneralUtility::sysLog(
                 'Event PID (' . $oldEventDataArray['pid'] . ') is outside the configured pidList (' . $this->conf['pidList'] . ') so notifications cannot be sent.',
                 'cal',
@@ -75,8 +80,8 @@ class NotificationView extends BaseService
 
         // Make sure we have an old event and new event before notifying.
         if (is_object($event_old) && is_object($event_new)) {
-            $event_old->updateWithPiVars($oldEventDataArray);
-            $event_new->updateWithPiVars($eventDataArray);
+            $event_old->updateWithPIVars($oldEventDataArray);
+            $event_new->updateWithPIVars($eventDataArray);
 
             $this->startMailer();
 
@@ -85,7 +90,7 @@ class NotificationView extends BaseService
             $where = 'fe_users.uid = tx_cal_fe_user_event_monitor_mm.uid_foreign AND tx_cal_fe_user_event_monitor_mm.tablenames = "fe_users" AND tx_cal_fe_user_event_monitor_mm.uid_local = tx_cal_event.uid AND tx_cal_event.uid = ' . $oldEventDataArray['uid'];
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
             while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['email'] != '' && GeneralUtility::validEmail($row1['email'])) {
+                if ($row1['email'] !== '' && GeneralUtility::validEmail($row1['email'])) {
                     $template = $this->conf['view.']['event.']['notify.'][$row1['uid'] . '.']['onChangeTemplate'];
                     if (!$template) {
                         $template = $this->conf['view.']['event.']['notify.']['all.']['onChangeTemplate'];
@@ -123,7 +128,7 @@ class NotificationView extends BaseService
             $where = 'tx_cal_unknown_users.uid = tx_cal_fe_user_event_monitor_mm.uid_foreign AND tx_cal_fe_user_event_monitor_mm.tablenames = "tx_cal_unknown_users" AND tx_cal_fe_user_event_monitor_mm.uid_local = tx_cal_event.uid AND tx_cal_event.uid = ' . $oldEventDataArray['uid'];
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
             while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['email'] != '' && GeneralUtility::validEmail($row1['email'])) {
+                if ($row1['email'] !== '' && GeneralUtility::validEmail($row1['email'])) {
                     $template = $this->conf['view.']['event.']['notify.']['all.']['onChangeTemplate'];
                     $titleText = $this->conf['view.']['event.']['notify.']['all.']['onChangeEmailTitle'];
                     $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
@@ -149,10 +154,11 @@ class NotificationView extends BaseService
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
+            /** @var CategoryModel $category */
             foreach ($event_new->getCategories() as $category) {
                 if (is_object($category)) {
                     foreach ($category->getNotificationEmails() as $emailAddress) {
-                        if ($emailAddress != '' && GeneralUtility::validEmail($emailAddress)) {
+                        if ($emailAddress !== '' && GeneralUtility::validEmail($emailAddress)) {
                             $template = $this->conf['view.']['category.']['notify.'][$category->getUid() . '.']['onChangeTemplate'];
                             if (!$template) {
                                 $template = $this->conf['view.']['category.']['notify.']['all.']['onChangeTemplate'];
@@ -177,9 +183,8 @@ class NotificationView extends BaseService
 
             $subType = 'getGroupsFE';
             $groups = [];
-            $serviceObj = null;
             $serviceObj = GeneralUtility::makeInstanceService('auth', $subType);
-            if ($serviceObj == null) {
+            if ($serviceObj === null) {
                 return;
             }
 
@@ -201,7 +206,7 @@ class NotificationView extends BaseService
 						AND fe_users.deleted = 0';
                 $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
                 while ($row2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2)) {
-                    if ($row2['email'] != '' && GeneralUtility::validEmail($row2['email'])) {
+                    if ($row2['email'] !== '' && GeneralUtility::validEmail($row2['email'])) {
                         $template = $this->conf['view.']['event.']['notify.'][$row2['uid'] . '.']['onChangeTemplate'];
                         if (!$template) {
                             $template = $this->conf['view.']['event.']['notify.']['all.']['onChangeTemplate'];
@@ -239,8 +244,8 @@ class NotificationView extends BaseService
     }
 
     /**
-     * @param $event_old
-     * @param $event_new
+     * @param EventModel $event_old
+     * @param EventModel $event_new
      * @param $email
      * @param $templatePath
      * @param $titleText
@@ -314,11 +319,12 @@ class NotificationView extends BaseService
      * @param $template
      * @return string
      */
-    public function getModifyingUser($template)
+    public function getModifyingUser($template): string
     {
+        $modifyingUser = '';
         $currentUserSubpart = $this->markerBasedTemplateService->getSubpart($template, '###CURRENT_USER_SUBPART###');
 
-        if (TYPO3_MODE == 'FE') {
+        if (TYPO3_MODE === 'FE') {
             $feUser = $GLOBALS['TSFE']->fe_user->user;
             $sims = [];
             foreach ($feUser as $index => $value) {
@@ -334,7 +340,7 @@ class NotificationView extends BaseService
     }
 
     /**
-     * @param $event
+     * @param EventModel $event
      * @param $eventHTMLSubpart
      * @param $eventPlainSubpart
      */
@@ -388,7 +394,7 @@ class NotificationView extends BaseService
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
 
             while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['email'] != '' && GeneralUtility::validEmail($row1['email'])) {
+                if ($row1['email'] !== '' && GeneralUtility::validEmail($row1['email'])) {
                     if (($newEventDataArray['deleted'] + $forceDeletionMode) > 0) {
                         $template = $this->conf['view.']['event.']['notify.']['fe_users_' . $row1['uid'] . '.']['onDeleteTemplate'];
                         if (!$template) {
@@ -430,7 +436,7 @@ class NotificationView extends BaseService
             $where = 'tx_cal_unknown_users.uid = tx_cal_fe_user_event_monitor_mm.uid_foreign AND  tx_cal_fe_user_event_monitor_mm.uid_local = tx_cal_event.uid AND tx_cal_event.uid = ' . $event->getUid();
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
             while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['email'] != '' && GeneralUtility::validEmail($row1['email'])) {
+                if ($row1['email'] !== '' && GeneralUtility::validEmail($row1['email'])) {
                     $template = $this->conf['view.']['event.']['notify.']['all.']['onCreateTemplate'];
                     $titleText = $this->conf['view.']['event.']['notify.']['all.']['onCreateEmailTitle'];
                     if (($newEventDataArray['deleted'] + $forceDeletionMode) > 0) {
@@ -453,9 +459,10 @@ class NotificationView extends BaseService
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
+            /** @var CategoryModel $category */
             foreach ($event->getCategories() as $category) {
                 foreach ($category->getNotificationEmails() as $emailAddress) {
-                    if ($emailAddress != '' && GeneralUtility::validEmail($emailAddress)) {
+                    if ($emailAddress !== '' && GeneralUtility::validEmail($emailAddress)) {
                         if (($newEventDataArray['deleted'] + $forceDeletionMode) > 0) {
                             $template = $this->conf['view.']['event.']['notify.'][$category->getUid() . '.']['onDeleteTemplate'];
                             if (!$template) {
@@ -483,9 +490,8 @@ class NotificationView extends BaseService
 
             $subType = 'getGroupsFE';
             $groups = [];
-            $serviceObj = null;
             $serviceObj = GeneralUtility::makeInstanceService('auth', $subType);
-            if ($serviceObj == null) {
+            if ($serviceObj === null) {
                 return;
             }
 
@@ -507,7 +513,7 @@ class NotificationView extends BaseService
 						AND fe_users.deleted = 0';
                 $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
                 while ($row2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2)) {
-                    if ($row2['email'] != '' && GeneralUtility::validEmail($row2['email'])) {
+                    if ($row2['email'] !== '' && GeneralUtility::validEmail($row2['email'])) {
                         if (($newEventDataArray['deleted'] + $forceDeletionMode) > 0) {
                             $template = $this->conf['view.']['event.']['notify.']['fe_groups_' . $row2['uid'] . '.']['onDeleteTemplate'];
                             if (!$template) {
@@ -549,7 +555,7 @@ class NotificationView extends BaseService
     }
 
     /**
-     * @param $event
+     * @param EventModel $event
      * @param $email
      * @param $templatePath
      * @param $titleText
@@ -643,7 +649,7 @@ class NotificationView extends BaseService
         // no need for executing the same query twice, is it?
         // event_new = $this->modelObj->findEvent($oldEventDataArray['uid'],'tx_cal_phpicalendar', $this->conf['pidList'], false, false, false, true, false);
         if (count($newEventDataArray) > 0) {
-            $event_new->updateWithPiVars(array_merge($oldEventDataArray, $newEventDataArray));
+            $event_new->updateWithPIVars(array_merge($oldEventDataArray, $newEventDataArray));
         }
 
         $this->startMailer();
@@ -651,6 +657,7 @@ class NotificationView extends BaseService
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $globalAttendeeArray = $modelObj->findEventAttendees($event_new->getUid());
 
+        /** @var EventService $eventService */
         $eventService = $modelObj->getServiceObjByKey('cal_event_model', 'event', $event_new->getType());
 
         $this->setChairmanAsMailer($globalAttendeeArray);
@@ -661,6 +668,10 @@ class NotificationView extends BaseService
         ];
 
         foreach ($globalAttendeeArray as $serviceType => $attendeeArray) {
+            /**
+             * @var int $uid
+             * @var AttendeeModel $attendee
+             */
             foreach ($attendeeArray as $uid => $attendee) {
                 if ($attendee->getFeUserId()) {
                     $eventService->updateAttendees($event_new->getUid());
@@ -674,10 +685,10 @@ class NotificationView extends BaseService
                         'tx_cal_controller[attendee]' => $attendee->getUid(),
                         'tx_cal_controller[uid]' => $event_old->getUid(),
                         'tx_cal_controller[status]' => 'accept',
-                        'tx_cal_controller[sid]' => md5($event_old->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
+                        'tx_cal_controller[sid]' => md5($event_old->getUid() . $attendee->getEmail() . $attendee->getCrdate())
                     ];
                     $conf['additionalParams'] .= GeneralUtility::implodeArrayForUrl('', $urlParameters);
-                    $this->controller->cObj->typolink('', $conf);
+                    $this->controller->cObj->typoLink('', $conf);
                     $acceptLink = $this->controller->cObj->lastTypoLinkUrl;
 
                     $urlParameters = [
@@ -685,10 +696,10 @@ class NotificationView extends BaseService
                         'tx_cal_controller[attendee]' => $attendee->getUid(),
                         'tx_cal_controller[uid]' => $event_old->getUid(),
                         'tx_cal_controller[status]' => 'decline',
-                        'tx_cal_controller[sid]' => md5($event_old->getUid() . $attendee->getEmail() . $attendee->row['crdate'])
+                        'tx_cal_controller[sid]' => md5($event_old->getUid() . $attendee->getEmail() . $attendee->getCrdate())
                     ];
                     $conf['additionalParams'] .= GeneralUtility::implodeArrayForUrl('', $urlParameters);
-                    $this->controller->cObj->typolink('', $conf);
+                    $this->controller->cObj->typoLink('', $conf);
                     $declineLink = $this->controller->cObj->lastTypoLinkUrl;
 
                     $ics = $viewObj->drawIcs($eventArray, $this->conf['getdate'], false, $attendee->getEmail());
@@ -736,8 +747,9 @@ class NotificationView extends BaseService
     {
         foreach (array_keys($globalAttendeeArray) as $serviceType) {
             foreach (array_keys($globalAttendeeArray[$serviceType]) as $uid) {
+                /** @var AttendeeModel $attendee */
                 $attendee = &$globalAttendeeArray[$serviceType][$uid];
-                if ($attendee->getAttendance() == 'CHAIR') {
+                if ($attendee->getAttendance() === 'CHAIR') {
                     $this->mailer->setFrom([
                         $attendee->getEmail() => $attendee->getName()
                     ]);
@@ -809,7 +821,7 @@ class NotificationView extends BaseService
      * @param $filename
      * @return string
      */
-    public function createTempIcsFile($content, $filename)
+    public function createTempIcsFile($content, $filename): string
     {
         $theDestFile = GeneralUtility::getFileAbsFileName('uploads/tx_cal/' . $filename);
         $fh = fopen($theDestFile, 'w');

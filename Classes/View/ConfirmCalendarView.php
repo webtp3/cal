@@ -25,25 +25,23 @@ class ConfirmCalendarView extends FeEditingBaseView
     /**
      * Draws a create calendar form.
      *
-     * @param
-     *            string        Comma separated list of pids.
-     * @param
-     *            object        A location or organizer object to be updated
+     * @param string        Comma separated list of pids.
+     * @param object        A location or organizer object to be updated
      * @return string HTML output.
      */
-    public function drawConfirmCalendar()
+    public function drawConfirmCalendar(): string
     {
         $this->objectString = 'calendar';
         $this->isConfirm = true;
         unset($this->controller->piVars['formCheck']);
         $page = Functions::getContent($this->conf['view.']['confirm_calendar.']['template']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no create calendar template file found:</h3>' . $this->conf['view.']['confirm_calendar.']['template'];
         }
 
         $lastViewParams = $this->controller->shortenLastViewAndGetTargetViewParameters();
 
-        if ($lastViewParams['view'] == 'edit_calendar') {
+        if ($lastViewParams['view'] === 'edit_calendar') {
             $this->isEditMode = true;
         }
 
@@ -157,7 +155,7 @@ class ConfirmCalendarView extends FeEditingBaseView
                 $activateFreeAndBusy,
                 'activateFreeAndBusy_stdWrap'
             );
-            $sims['###ACTIVATE_FREEANDBUSY_VALUE###'] = $activateFreeAndBusy == 'true' ? 1 : 0;
+            $sims['###ACTIVATE_FREEANDBUSY_VALUE###'] = $activateFreeAndBusy === 'true' ? 1 : 0;
         }
     }
 
@@ -169,12 +167,12 @@ class ConfirmCalendarView extends FeEditingBaseView
     public function getFreeAndBusyUserMarker(& $template, & $sims, & $rems)
     {
         $sims['###FREEANDBUSYUSER###'] = '';
-        if ($this->isAllowed('freeAndBusyUser') && is_array($this->controller->piVars['freeAndBusyUser'])) {
+        if (is_array($this->controller->piVars['freeAndBusyUser']) && $this->isAllowed('freeAndBusyUser')) {
             $displaylist = [];
             $idlist = [];
             foreach ($this->controller->piVars['freeAndBusyUser'] as $value) {
                 preg_match('/(^[a-z])_([0-9]+)_(.*)/', $value, $idname);
-                if ($idname[1] == 'u' || $idname[1] == 'g') {
+                if ($idname[1] === 'u' || $idname[1] === 'g') {
                     $idlist[] = $idname[1] . '_' . $idname[2];
                     $displaylist[] = $idname[3];
                 }
@@ -192,12 +190,12 @@ class ConfirmCalendarView extends FeEditingBaseView
     public function getOwnerMarker(& $template, & $sims, & $rems)
     {
         $sims['###OWNER###'] = '';
-        if ($this->isAllowed('owner') && is_array($this->controller->piVars['owner'])) {
+        if (is_array($this->controller->piVars['owner']) && $this->isAllowed('owner')) {
             $ownerdisplaylist = [];
             $ownerids = [];
             foreach ($this->controller->piVars['owner'] as $value) {
                 preg_match('/(^[a-z])_([0-9]+)_(.*)/', $value, $idname);
-                if ($idname[1] == 'u' || $idname[1] == 'g') {
+                if ($idname[1] === 'u' || $idname[1] === 'g') {
                     $ownerids[] = $idname[1] . '_' . $idname[2];
                     $ownerdisplaylist[] = $idname[3];
                 }

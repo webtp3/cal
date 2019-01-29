@@ -25,6 +25,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 
+/**
+ * Class RecurrenceGenerator
+ */
 class RecurrenceGenerator
 {
 
@@ -80,7 +83,7 @@ class RecurrenceGenerator
     /**
      * @return string
      */
-    public function getInfo()
+    public function getInfo(): string
     {
         return $this->info;
     }
@@ -160,7 +163,7 @@ class RecurrenceGenerator
      *
      * @return int
      */
-    public function countRecurringEvents($eventPage = 0)
+    public function countRecurringEvents($eventPage = 0): int
     {
         $databaseConnection = $this->getDatabaseConnection();
         $count = 0;
@@ -192,7 +195,7 @@ class RecurrenceGenerator
     /**
      * @return array
      */
-    public function getRecurringEventPages()
+    public function getRecurringEventPages(): array
     {
         $pages = [];
         $table = 'tx_cal_event';
@@ -239,6 +242,7 @@ class RecurrenceGenerator
      * Generate index
      *
      * @param int $eventPage
+     * @throws Exception
      */
     public function generateIndex($eventPage = 0)
     {
@@ -261,7 +265,7 @@ class RecurrenceGenerator
         if ($results) {
             while ($row = $databaseConnection->sql_fetch_assoc($results)) {
                 // make sure that rdate is empty in case that something went wrong during event creation (e.g. by copying)
-                if ($row['rdate_type'] == 'none' || $row['rdate_type'] == '' || $row['rdate_type'] == '0') {
+                if ($row['rdate_type'] === 'none' || $row['rdate_type'] === '' || $row['rdate_type'] === '0') {
                     $row['rdate'] = '';
                 }
                 $this->info .= '<li>' . $row['title'] . '</li>';
@@ -295,6 +299,7 @@ class RecurrenceGenerator
      *
      * @param int $uid
      * @param string $table
+     * @throws Exception
      */
     public function generateIndexForUid($uid, $table)
     {
@@ -312,7 +317,7 @@ class RecurrenceGenerator
         $where = 'uid = ' . (int)$uid;
         $rows = $databaseConnection->exec_SELECTgetRows($select, $table, $where);
         foreach ($rows as $row) {
-            $event = $eventService->createEvent($row, $table == 'tx_cal_exception_event');
+            $event = $eventService->createEvent($row, $table === 'tx_cal_exception_event');
             $eventService->recurringEvent($event);
         }
         $this->info = 'Done.';
@@ -322,6 +327,7 @@ class RecurrenceGenerator
      * Generate index for the given calendar
      *
      * @param int $uid
+     * @throws Exception
      */
     public function generateIndexForCalendarUid($uid)
     {
@@ -350,6 +356,7 @@ class RecurrenceGenerator
      * Generate the index for the given exception group id
      *
      * @param int $uid
+     * @throws Exception
      */
     public function generateIndexForExceptionGroupUid($uid)
     {
@@ -388,7 +395,7 @@ class RecurrenceGenerator
      * @return EventService
      * @throws Exception
      */
-    public function getEventService()
+    public function getEventService(): EventService
     {
         static $eventService = null;
         if (is_object($eventService)) {
@@ -422,7 +429,7 @@ class RecurrenceGenerator
      *
      * @return CalDate
      */
-    protected function getTimeParsed($timeString)
+    protected function getTimeParsed($timeString): CalDate
     {
         /** @var DateParser $dp */
         $dp = GeneralUtility::makeInstance(DateParser::class);
@@ -435,7 +442,7 @@ class RecurrenceGenerator
      *
      * @return DatabaseConnection
      */
-    protected function getDatabaseConnection()
+    protected function getDatabaseConnection(): DatabaseConnection
     {
         return $GLOBALS['TYPO3_DB'];
     }

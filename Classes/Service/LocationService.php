@@ -17,8 +17,6 @@ namespace TYPO3\CMS\Cal\Service;
 use RuntimeException;
 use TYPO3\CMS\Cal\Model\Location;
 use TYPO3\CMS\Cal\Utility\Functions;
-use TYPO3\CMS\Cal\Utility\Registry;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -37,13 +35,10 @@ class LocationService extends BaseService
      *            to search for
      * @param string $pidList
      *            to search in
-     * @return object tx_cal_organizer object
+     * @return Location
      */
-    public function find($uid, $pidList)
+    public function find($uid, $pidList): Location
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $locationArray = $this->getLocationFromTable($pidList, ' AND tx_cal_location.uid=' . $uid);
         return $locationArray[0];
     }
@@ -52,14 +47,10 @@ class LocationService extends BaseService
      * Looks for an organizer with a given uid on a certain pid-list
      *
      * @param string $pidList
-     *            to search in
-     * @return array tx_cal_organizer object array
+     * @return array
      */
-    public function findAll($pidList)
+    public function findAll($pidList): array
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         return $this->getLocationFromTable($pidList);
     }
 
@@ -67,12 +58,10 @@ class LocationService extends BaseService
      * Search for locations
      *
      * @param string $pidList
-     *            to search in
      * @param string $searchword
-     *            term
      * @return array containing the location objects
      */
-    public function search($pidList = '', $searchword)
+    public function search($pidList, $searchword): array
     {
         if (!$this->isAllowedService()) {
             return [];
@@ -84,16 +73,14 @@ class LocationService extends BaseService
      * Generates the sql query and builds location objects out of the result rows
      *
      * @param string $pidList
-     *            to search in
      * @param string $additionalWhere
-     *            where clause
      * @return array containing the location objects
      */
-    public function getLocationFromTable($pidList = '', $additionalWhere = '')
+    public function getLocationFromTable($pidList, $additionalWhere = ''): array
     {
         $locations = [];
         $orderBy = Functions::getOrderBy('tx_cal_location');
-        if ($pidList != '') {
+        if ($pidList !== '') {
             $additionalWhere .= ' AND tx_cal_location.pid IN (' . $pidList . ')';
         }
         $additionalWhere .= $this->getAdditionalWhereForLocalizationAndVersioning('tx_cal_location');
@@ -102,10 +89,6 @@ class LocationService extends BaseService
         $where = ' l18n_parent = 0 ' . $additionalWhere . $this->cObj->enableFields('tx_cal_location');
         $groupBy = '';
         $limit = '';
-
-        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
-        $feUserUid = $rightsObj->getUserId();
-        $feGroupsArray = $rightsObj->getUserGroups();
 
         $hookObjectsArr = Functions::getHookObjectsArray(
             'tx_cal_location_service',
@@ -126,11 +109,10 @@ class LocationService extends BaseService
                         'tx_cal_location',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
-                if ($GLOBALS['TSFE']->sys_page->versioningPreview == true) {
+                if ($GLOBALS['TSFE']->sys_page->versioningPreview === true) {
                     // get workspaces Overlay
                     $GLOBALS['TSFE']->sys_page->versionOL('tx_cal_location', $row);
                 }
@@ -144,9 +126,9 @@ class LocationService extends BaseService
                 $sharedUserResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
                 if ($sharedUserResult) {
                     while ($sharedUserRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($sharedUserResult)) {
-                        if ($sharedUserRow['tablenames'] == 'fe_users') {
+                        if ($sharedUserRow['tablenames'] === 'fe_users') {
                             $lastLocation->addSharedUser($sharedUserRow['uid_foreign']);
-                        } elseif ($sharedUserRow['tablenames'] == 'fe_groups') {
+                        } elseif ($sharedUserRow['tablenames'] === 'fe_groups') {
                             $lastLocation->addSharedGroup($sharedUserRow['uid_foreign']);
                         }
                     }
@@ -165,7 +147,6 @@ class LocationService extends BaseService
      */
     public function _addEventLinkToLocation(&$location, $event_uid)
     {
-        return;
     }
 
     /**
@@ -174,7 +155,7 @@ class LocationService extends BaseService
      * @param string $sw :
      * @return string
      */
-    public function searchWhere($sw)
+    public function searchWhere($sw): string
     {
         if (!$this->isAllowedService()) {
             $where = '';
@@ -190,13 +171,10 @@ class LocationService extends BaseService
 
     /**
      * @param $uid
-     * @return object|void
+     * @return Location
      */
-    public function updateLocation($uid)
+    public function updateLocation($uid): Location
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $insertFields = [
             'tstamp' => time()
         ];
@@ -216,21 +194,21 @@ class LocationService extends BaseService
         }
         foreach ($values as $entry) {
             preg_match('/(^[a-z])_([0-9]+)/', $entry, $idname);
-            if ($idname[1] == 'u') {
+            if ($idname[1] === 'u') {
                 $sharedUsers[] = $idname[2];
-            } elseif ($idname[1] == 'g') {
+            } elseif ($idname[1] === 'g') {
                 $sharedGroups[] = $idname[2];
             }
         }
         if ($this->rightsObj->isAllowedTo('edit', 'location', 'shared')) {
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_location_shared_user_mm', 'uid_local =' . $uid);
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_location_shared_user_mm',
                 array_unique($sharedUsers),
                 $uid,
                 'fe_users'
             );
-            $this->insertIdsIntoTableWithMMRelation(
+            self::insertIdsIntoTableWithMMRelation(
                 'tx_cal_location_shared_user_mm',
                 array_unique($sharedGroups),
                 $uid,
@@ -267,13 +245,13 @@ class LocationService extends BaseService
             }
             if (!empty($userIdArray) || !empty($groupIdArray)) {
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_location_shared_user_mm', 'uid_local =' . $uid);
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_location_shared_user_mm',
                     array_unique($userIdArray),
                     $uid,
                     'fe_users'
                 );
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_location_shared_user_mm',
                     array_unique($groupIdArray),
                     $uid,
@@ -287,11 +265,11 @@ class LocationService extends BaseService
             }
         }
 
-        $uid = $this->checkUidForLanguageOverlay($uid, 'tx_cal_location');
+        $uid = self::checkUidForLanguageOverlay($uid, 'tx_cal_location');
         // Creating DB records
         $table = 'tx_cal_location';
         $where = 'uid = ' . $uid;
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
         $this->unsetPiVars();
         return $this->find($uid, $this->conf['pidList']);
     }
@@ -301,9 +279,6 @@ class LocationService extends BaseService
      */
     public function removeLocation($uid)
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         if ($this->rightsObj->isAllowedToDeleteLocation()) {
             $updateFields = [
                 'tstamp' => time(),
@@ -311,7 +286,7 @@ class LocationService extends BaseService
             ];
             $table = 'tx_cal_location';
             $where = 'uid = ' . $uid;
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
         }
         $this->unsetPiVars();
     }
@@ -322,19 +297,17 @@ class LocationService extends BaseService
     public function retrievePostData(&$insertFields)
     {
         $hidden = 0;
-        if ($this->conf['rights.']['create.']['location.']['fields.']['hidden.']['default'] && !$this->rightsObj->isAllowedTo(
-                'create',
-                'location',
-                'hidden'
-            ) && !$this->rightsObj->isAllowedTo('create', 'location', 'hidden')) {
+        if (
+            !$this->rightsObj->isAllowedTo('create', 'location', 'hidden')
+            && $this->conf['rights.']['create.']['location.']['fields.']['hidden.']['default']
+        ) {
             $hidden = $this->conf['rights.']['create.']['location.']['fields.']['hidden.']['default'];
-        } elseif ($this->conf['rights.']['edit.']['location.']['fields.']['hidden.']['default'] && !$this->rightsObj->isAllowedTo(
-                'edit',
-                'location',
-                'hidden'
-            ) && !$this->rightsObj->isAllowedTo('create', 'location', 'hidden')) {
+        } elseif (
+            !$this->rightsObj->isAllowedTo('edit', 'location', 'hidden')
+            && $this->conf['rights.']['edit.']['location.']['fields.']['hidden.']['default']
+        ) {
             $hidden = $this->conf['rights.']['location.']['event.']['fields.']['hidden.']['default'];
-        } elseif ($this->controller->piVars['hidden'] == 'true' && ($this->rightsObj->isAllowedTo(
+        } elseif ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedTo(
                     'edit',
                     'location',
                     'hidden'
@@ -348,7 +321,7 @@ class LocationService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedToEditLocationDescription() || $this->rightsObj->isAllowedToCreateLocationDescription()) {
-            $insertFields['description'] = $this->cObj->removeBadHTML(
+            $insertFields['description'] = htmlspecialchars(
                 $this->controller->piVars['description'],
                 $this->conf
             );
@@ -397,18 +370,14 @@ class LocationService extends BaseService
             )) {
             $insertFields['link'] = strip_tags($this->controller->piVars['link']);
         }
-
     }
 
     /**
      * @param $pid
-     * @return object|void
+     * @return Location
      */
-    public function saveLocation($pid)
+    public function saveLocation($pid): Location
     {
-        if (!$this->isAllowedService()) {
-            return;
-        }
         $crdate = time();
         $insertFields = [
             'pid' => $pid,
@@ -454,9 +423,9 @@ class LocationService extends BaseService
         }
         foreach ($values as $entry) {
             preg_match('/(^[a-z])_([0-9]+)/', $entry, $idname);
-            if ($idname[1] == 'u') {
+            if ($idname[1] === 'u') {
                 $sharedUsers[] = $idname[2];
-            } elseif ($idname[1] == 'g') {
+            } elseif ($idname[1] === 'g') {
                 $sharedGroups[] = $idname[2];
             }
         }
@@ -465,8 +434,8 @@ class LocationService extends BaseService
             if ($this->conf['rights.']['create.']['location.']['addFeUserToShared']) {
                 $sharedUsers[] = $this->rightsObj->getUserId();
             }
-            if (count($sharedUsers) > 0 && $sharedUsers[0] != 0) {
-                $this->insertIdsIntoTableWithMMRelation(
+            if (count($sharedUsers) > 0 && (int)$sharedUsers[0] !== 0) {
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_location_shared_user_mm',
                     array_unique($sharedUsers),
                     $uid,
@@ -479,8 +448,8 @@ class LocationService extends BaseService
                 1
             );
             $groupArray = array_diff($sharedGroups, $ignore);
-            if (count($groupArray) > 0 && $groupArray[0] != 0) {
-                $this->insertIdsIntoTableWithMMRelation(
+            if (count($groupArray) > 0 && (int)$groupArray[0] !== 0) {
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_location_shared_user_mm',
                     array_unique($groupArray),
                     $uid,
@@ -494,7 +463,7 @@ class LocationService extends BaseService
             }
         } else {
             $idArray = [];
-            if ($this->conf['rights.']['create.']['location.']['fields.']['shared.']['defaultUser'] != '') {
+            if ($this->conf['rights.']['create.']['location.']['fields.']['shared.']['defaultUser'] !== '') {
                 $idArray = explode(
                     ',',
                     $this->conf['rights.']['create.']['location.']['fields.']['shared.']['defaultUser']
@@ -504,8 +473,8 @@ class LocationService extends BaseService
                 $idArray[] = $this->rightsObj->getUserId();
             }
 
-            if (count($idArray) > 0 && $idArray[0] != 0) {
-                $this->insertIdsIntoTableWithMMRelation(
+            if (count($idArray) > 0 && (int)$idArray[0] !== 0) {
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_location_shared_user_mm',
                     array_unique($idArray),
                     $uid,
@@ -514,7 +483,7 @@ class LocationService extends BaseService
             }
 
             $groupArray = [];
-            if ($this->conf['rights.']['create.']['location.']['fields.']['shared.']['defaultGroup'] != '') {
+            if ($this->conf['rights.']['create.']['location.']['fields.']['shared.']['defaultGroup'] !== '') {
                 $groupArray = GeneralUtility::trimExplode(
                     ',',
                     $this->conf['rights.']['create.']['location.']['fields.']['shared.']['defaultGroup'],
@@ -529,7 +498,7 @@ class LocationService extends BaseService
                     );
                     $groupArray = array_diff($idArray, $ignore);
                 }
-                $this->insertIdsIntoTableWithMMRelation(
+                self::insertIdsIntoTableWithMMRelation(
                     'tx_cal_location_shared_user_mm',
                     array_unique($groupArray),
                     $uid,
@@ -548,14 +517,11 @@ class LocationService extends BaseService
     /**
      * @return bool
      */
-    public function isAllowedService()
+    public function isAllowedService(): bool
     {
-        $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        $useLocationStructure = ($this->confArr['useLocationStructure'] ? $this->confArr['useLocationStructure'] : 'tx_cal_location');
-        if ($useLocationStructure == $this->keyId) {
-            return true;
-        }
-        return false;
+        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
+        return $useLocationStructure === $this->keyId;
     }
 
     /**
@@ -581,7 +547,6 @@ class LocationService extends BaseService
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
-        return;
     }
 
     public function unsetPiVars()

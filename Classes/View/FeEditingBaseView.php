@@ -14,6 +14,8 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalendarModel;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
@@ -25,12 +27,39 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FeEditingBaseView extends BaseView
 {
+    /**
+     * @var EventModel
+     */
     public $object;
+
+    /**
+     * @var string
+     */
     public $objectString = '';
+
+    /**
+     * @var bool
+     */
     public $isEditMode = false;
+
+    /**
+     * @var bool
+     */
     public $isConfirm = false;
+
+    /**
+     * @var string
+     */
     public $serviceName = 'insertServiceName';
+
+    /**
+     * @var string
+     */
     public $table = 'insertTableName';
+
+    /**
+     * @var array
+     */
     public $lastPiVars = [];
 
     /**
@@ -45,101 +74,97 @@ class FeEditingBaseView extends BaseView
         $allSingleMarkers = array_unique($match[1]);
         foreach ($allSingleMarkers as $marker) {
             $required = '';
-            switch ($marker) {
-                default:
-                    if (preg_match('/.*_LABEL/', $marker)) {
-                        $sims['###' . $marker . '###'] = $this->controller->pi_getLL('l_' . $this->objectString . '_' . strtolower(substr(
-                                $marker,
-                                0,
-                                strlen($marker) - 6
-                            )));
-                        if ($sims['###' . $marker . '###'] == '') {
-                            $sims['###' . $marker . '###'] = $this->controller->pi_getLL('l_' . strtolower(substr(
-                                    $marker,
-                                    0,
-                                    strlen($marker) - 6
-                                )));
-                        }
-                        continue;
-                    }
-                    $funcFromMarker = 'get' . str_replace(
-                            ' ',
-                            '',
-                            ucwords(str_replace('_', ' ', strtolower($marker)))
-                        ) . 'Marker';
-                    if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
-                        $module = GeneralUtility::makeInstanceService(substr($marker, 8), 'module');
-                        if (is_object($module)) {
-                            $sims['###' . $marker . '###'] = $module->start($this);
-                        }
-                    } elseif (method_exists($this, $funcFromMarker)) {
-                        $this->$funcFromMarker($template, $sims, $rems, $view);
-                    } else {
-                        $functionName = 'get' . ucwords(strtolower($marker));
-                        if ($this->isConfirm && $this->isAllowed(strtolower($marker))) {
-                            $value = '';
-                            if (method_exists($this->object, $functionName)) {
-                                $value = $this->object->$functionName();
-                            } else {
-                                $value = $this->object->row[strtolower($marker)];
-                            }
-
-                            $sims['###' . $marker . '_VALUE###'] = $value;
-                            $sims['###' . $marker . '###'] = $this->applyStdWrap(
-                                $value,
-                                strtolower($marker) . '_stdWrap'
-                            );
-                        } elseif ($this->isEditMode && $this->isAllowed(strtolower($marker))) {
-                            /**
-                             * @fixme Quick fix for the RTE related Javascript.
-                             *
-                             * If the marker hasn't been defined already and the value for the marker isn't blank, set it. Otherwise, let the previous value stick.
-                             */
-                            if (!($sims['###' . $marker . '###'] && !$this->object->row[strtolower($marker)])) {
-                                $sims['###' . $marker . '_VALUE###'] = $this->object->row[strtolower($marker)];
-                                $sims['###' . $marker . '###'] = $this->applyStdWrap(
-                                    $this->object->row[strtolower($marker)],
-                                    strtolower($marker) . '_stdWrap'
-                                );
-                            }
-                        } elseif (!$this->isEditMode && $this->isAllowed(strtolower($marker))) {
-                            $value = '';
-                            if (method_exists($this->object, $functionName)) {
-                                $value = $this->object->$functionName();
-                            }
-                            if ($value == '') {
-                                if (!empty($this->conf['rights.']['create.'][$this->objectString . '.']['fields.'][strtolower($marker) . '.']['default'])) {
-                                    $value = $this->conf['rights.']['create.'][$this->objectString . '.']['fields.'][strtolower($marker) . '.']['default'];
-                                } else {
-                                    $value = $this->object->row[strtolower($marker)];
-                                }
-                            }
-                            /**
-                             * @fixme Quick fix for the RTE related Javascript.
-                             *
-                             * If the marker hasn't been defined already and the value for the marker isn't blank, set it. Otherwise, let the previous value stick.
-                             */
-                            if (!($sims['###' . $marker . '###'] && $value == '')) {
-                                $sims['###' . $marker . '###'] = $this->applyStdWrap(
-                                    $value,
-                                    strtolower($marker) . '_stdWrap'
-                                );
-                            }
-                        } else {
-                            $sims['###' . $marker . '###'] = '';
-                            $sims['###' . $marker . '_VALUE###'] = '';
-                        }
-                    }
-                    if (!$this->isConfirm && $this->conf['rights.'][($this->isEditMode ? 'edit' : 'create') . '.'][$this->objectString . '.']['fields.'][strtolower($marker) . '.']['required']) {
-                        $required = $this->conf['view.']['required'];
-                    }
-                    $sims['###' . $marker . '###'] = str_replace(
-                        '###REQUIRED###',
-                        $required,
-                        $sims['###' . $marker . '###']
-                    );
-                    break;
+            if (preg_match('/.*_LABEL/', $marker)) {
+                $sims['###' . $marker . '###'] = $this->controller->pi_getLL('l_' . $this->objectString . '_' . strtolower(substr(
+                        $marker,
+                        0,
+                        -6
+                    )));
+                if ($sims['###' . $marker . '###'] === '') {
+                    $sims['###' . $marker . '###'] = $this->controller->pi_getLL('l_' . strtolower(substr(
+                            $marker,
+                            0,
+                            -6
+                        )));
+                }
+                continue;
             }
+            $funcFromMarker = 'get' . str_replace(
+                    ' ',
+                    '',
+                    ucwords(str_replace('_', ' ', strtolower($marker)))
+                ) . 'Marker';
+            if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
+                $module = GeneralUtility::makeInstanceService(substr($marker, 8), 'module');
+                if (is_object($module)) {
+                    $sims['###' . $marker . '###'] = $module->start($this);
+                }
+            } elseif (method_exists($this, $funcFromMarker)) {
+                $this->$funcFromMarker($template, $sims, $rems, $view);
+            } else {
+                $functionName = 'get' . ucwords(strtolower($marker));
+                if ($this->isConfirm && $this->isAllowed(strtolower($marker))) {
+                    if (method_exists($this->object, $functionName)) {
+                        $value = $this->object->$functionName();
+                    } else {
+                        $value = $this->object->row[strtolower($marker)];
+                    }
+
+                    $sims['###' . $marker . '_VALUE###'] = $value;
+                    $sims['###' . $marker . '###'] = $this->applyStdWrap(
+                        $value,
+                        strtolower($marker) . '_stdWrap'
+                    );
+                } elseif ($this->isEditMode && $this->isAllowed(strtolower($marker))) {
+                    /**
+                     * @fixme Quick fix for the RTE related Javascript.
+                     *
+                     * If the marker hasn't been defined already and the value for the marker isn't blank, set it. Otherwise, let the previous value stick.
+                     */
+                    if (!($sims['###' . $marker . '###'] && !$this->object->row[strtolower($marker)])) {
+                        $sims['###' . $marker . '_VALUE###'] = $this->object->row[strtolower($marker)];
+                        $sims['###' . $marker . '###'] = $this->applyStdWrap(
+                            $this->object->row[strtolower($marker)],
+                            strtolower($marker) . '_stdWrap'
+                        );
+                    }
+                } elseif (!$this->isEditMode && $this->isAllowed(strtolower($marker))) {
+                    $value = '';
+                    if (method_exists($this->object, $functionName)) {
+                        $value = $this->object->$functionName();
+                    }
+                    if ($value === '') {
+                        if (!empty($this->conf['rights.']['create.'][$this->objectString . '.']['fields.'][strtolower($marker) . '.']['default'])) {
+                            $value = $this->conf['rights.']['create.'][$this->objectString . '.']['fields.'][strtolower($marker) . '.']['default'];
+                        } else {
+                            $value = $this->object->row[strtolower($marker)];
+                        }
+                    }
+                    /**
+                     * @fixme Quick fix for the RTE related Javascript.
+                     *
+                     * If the marker hasn't been defined already and the value for the marker isn't blank, set it. Otherwise, let the previous value stick.
+                     */
+                    if (!($value === '' && $sims['###' . $marker . '###'])) {
+                        $sims['###' . $marker . '###'] = $this->applyStdWrap(
+                            $value,
+                            strtolower($marker) . '_stdWrap'
+                        );
+                    }
+                } else {
+                    $sims['###' . $marker . '###'] = '';
+                    $sims['###' . $marker . '_VALUE###'] = '';
+                }
+            }
+            if (!$this->isConfirm && $this->conf['rights.'][($this->isEditMode ? 'edit' : 'create') . '.'][$this->objectString . '.']['fields.'][strtolower($marker) . '.']['required']) {
+                $required = $this->conf['view.']['required'];
+            }
+            $sims['###' . $marker . '###'] = str_replace(
+                '###REQUIRED###',
+                $required,
+                $sims['###' . $marker . '###']
+            );
+            break;
         }
     }
 
@@ -252,7 +277,7 @@ class FeEditingBaseView extends BaseView
                 );
             } elseif (!$this->isEditMode && $this->rightsObj->isAllowedTo('create', $this->objectString, 'hidden')) {
                 $hidden = ' ';
-                if ($this->conf['rights.']['create.'][$this->objectString . '.']['fields.']['hidden.']['default'] || $this->controller->piVars['hidden']) {
+                if ($this->controller->piVars['hidden'] || $this->conf['rights.']['create.'][$this->objectString . '.']['fields.']['hidden.']['default']) {
                     $hidden = ' checked="checked" ';
                 }
                 $sims['###HIDDEN###'] = $this->applyStdWrap($hidden, 'hidden_stdWrap');
@@ -296,7 +321,7 @@ class FeEditingBaseView extends BaseView
      * @param $rems
      * @return string
      */
-    public function getCalendarIdMarker(& $template, & $sims, & $rems)
+    public function getCalendarIdMarker(& $template, & $sims, & $rems): string
     {
         $sims['###CALENDAR_ID###'] = '';
         if ($this->isAllowed('calendar_id')) {
@@ -312,27 +337,26 @@ class FeEditingBaseView extends BaseView
 
             $calendarSelect = '';
             if (!empty($calendarArray['tx_cal_calendar'])) {
-                if ($this->objectString == 'category' && $this->rightsObj->isAllowedToCreateGeneralCategory()) {
+                if ($this->objectString === 'category' && $this->rightsObj->isAllowedToCreateGeneralCategory()) {
                     $calendarSelect .= '<option value="0" >' . $this->controller->pi_getLL('l_global_category') . '</option>';
                 } else {
                     $calendarSelect .= '<option value="" >' . $this->controller->pi_getLL('l_select') . '</option>';
                 }
             }
+            /** @var CalendarModel $calendar */
             foreach ($calendarArray['tx_cal_calendar'] as $calendar) {
-                if ($this->objectString == 'calendar') {
+                if ($this->objectString === 'calendar') {
                     if ($calendar->isUserAllowedToEdit() || $calendar->isUserAllowedToDelete()) {
-                        if ($calendar->getUid() == $calendarID) {
+                        if ($calendar->getUid() === $calendarID) {
                             $selected = 'selected="selected"';
                         } else {
                             $selected = '';
                         }
                         $calendarSelect .= '<option value="' . $calendar->getUid() . '" ' . $selected . '>' . $calendar->getTitle() . '</option>';
                     }
-                } elseif ($this->objectString == 'event') {
-                    if (!$this->rightsObj->isAllowedToCreatePublicEvent() && $calendar->isPublic()) {
-                        // do nothing
-                    } else {
-                        if ($calendar->getUid() == $calendarID) {
+                } elseif ($this->objectString === 'event') {
+                    if ($this->rightsObj->isAllowedToCreatePublicEvent() && !$calendar->isPublic()) {
+                        if ($calendar->getUid() === $calendarID) {
                             $selected = 'selected="selected"';
                         } else {
                             $selected = '';
@@ -340,7 +364,7 @@ class FeEditingBaseView extends BaseView
                         $calendarSelect .= '<option value="' . $calendar->getUid() . '" ' . $selected . '>' . $calendar->getTitle() . '</option>';
                     }
                 } else {
-                    if ($calendar->getUid() == $calendarID) {
+                    if ($calendar->getUid() === $calendarID) {
                         $selected = 'selected="selected"';
                     } else {
                         $selected = '';
@@ -349,12 +373,13 @@ class FeEditingBaseView extends BaseView
                 }
             }
             /* Only in create */
-            if (count($calendarArray['tx_cal_calendar']) == 1) {
+            if (count($calendarArray['tx_cal_calendar']) === 1) {
                 $this->conf['switch_calendar'] = $calendarArray['tx_cal_calendar'][0]->getUid();
             }
 
             $sims['###CALENDAR_ID###'] = $this->applyStdWrap($calendarSelect, 'calendar_id_stdWrap');
         }
+        return '';
     }
 
     /**
@@ -395,6 +420,7 @@ class FeEditingBaseView extends BaseView
      */
     protected function getFileMarker($marker, & $template, & $sims, & $rems)
     {
+        $temp = '';
         if (!$this->isAllowed($marker)) {
             return;
         }
@@ -411,9 +437,9 @@ class FeEditingBaseView extends BaseView
             $fileFunc = new BasicFileUtility();
             $allowedExt = [];
             $denyExt = [];
-            if ($marker == 'image') {
+            if ($marker === 'image') {
                 $allowedExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']);
-            } elseif ($marker == 'attachment') {
+            } elseif ($marker === 'attachment') {
                 $allowedExt = ['*'];
                 $denyExt = explode(',', PHP_EXTENSIONS_DEFAULT);
             }
@@ -422,17 +448,16 @@ class FeEditingBaseView extends BaseView
             // new files
             if (is_array($_FILES[$this->prefixId]['name'][$marker])) {
                 foreach ($_FILES[$this->prefixId]['name'][$marker] as $id => $filename) {
-                    $theDestFile = '';
                     $iConf = $this->conf['view.'][$this->conf['view'] . '.'][strtolower($marker) . '_stdWrap.'];
                     if ($_FILES[$this->prefixId]['error'][$marker][$id]) {
                         continue;
                     }
                     $theFile = GeneralUtility::upload_to_tempfile($_FILES[$this->prefixId]['tmp_name'][$marker][$id]);
                     $fI = GeneralUtility::split_fileref($filename);
-                    if (in_array($fI['fileext'], $denyExt)) {
+                    if (in_array($fI['fileext'], $denyExt, true)) {
                         continue;
                     }
-                    if ($marker == 'image' && !in_array($fI['fileext'], $allowedExt)) {
+                    if ($marker === 'image' && !in_array($fI['fileext'], $allowedExt, true)) {
                         continue;
                     }
                     $theDestFile = $fileFunc->getUniqueName($fileFunc->cleanFileName($fI['file']), 'typo3temp');
@@ -444,7 +469,7 @@ class FeEditingBaseView extends BaseView
                     $temp_sims['###INDEX###'] = $id;
                     $temp_sims['###' . strtoupper($marker) . '_VALUE###'] = $return;
                     $temp = '';
-                    if ($marker == 'image') {
+                    if ($marker === 'image') {
                         $temp = $this->renderImage(
                             $iConf['file'],
                             $this->controller->piVars[$marker . '_caption'][$id],
@@ -452,7 +477,7 @@ class FeEditingBaseView extends BaseView
                             $marker,
                             true
                         );
-                    } elseif ($marker == 'attachment' || $marker == 'ics_file') {
+                    } elseif ($marker === 'attachment' || $marker === 'ics_file') {
                         $temp = $this->renderFile(
                             $iConf['file'],
                             $this->controller->piVars[$marker . '_caption'][$id],
@@ -484,7 +509,7 @@ class FeEditingBaseView extends BaseView
                 }
             }
 
-            $removeFiles = $this->controller->piVars['remove_' . $marker] ? $this->controller->piVars['remove_' . $marker] : [];
+            $removeFiles = $this->controller->piVars['remove_' . $marker] ?: [];
             $where = 'uid_foreign = ' . $this->conf['uid'] . ' AND  tablenames=\'tx_cal_' . $this->objectString . '\' AND fieldname=\'' . $marker . '\' AND deleted=0';
             if (!empty($removeFiles)) {
                 $where .= ' AND uid not in (' . implode(',', array_values($removeFiles)) . ')';
@@ -492,16 +517,16 @@ class FeEditingBaseView extends BaseView
 
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'sys_file_reference', $where);
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($marker == 'image') {
+                if ($marker === 'image') {
                     $temp = $this->renderImage($row, $row['description'], $row['title'], $marker, false);
-                } elseif ($marker == 'attachment' || $marker == 'ics_file') {
+                } elseif ($marker === 'attachment' || $marker === 'ics_file') {
                     $temp = $this->renderFile($row, $row['description'], $row['title'], $marker, false);
                 }
                 $temp_sims = [];
                 $temp_sims['###' . strtoupper($marker) . '_VALUE###'] = $row['uid'];
 
                 foreach ($this->controller->piVars[$marker] as $index => $image) {
-                    if ($image == $row['uid']) {
+                    if ($image === $row['uid']) {
                         if (isset($this->controller->piVars[$marker . '_caption'][$index])) {
                             $row['description'] = $this->controller->piVars[$marker . '_caption'][$index];
                         }
@@ -530,101 +555,98 @@ class FeEditingBaseView extends BaseView
             foreach ($removeFiles as $removeFile) {
                 $sims['###' . strtoupper($marker) . '###'] .= '<input type="hidden" name="tx_cal_controller[remove_' . $marker . '][]" value="' . $removeFile . '">';
             }
-        } else {
-            if ($this->isEditMode && $this->rightsObj->isAllowedTo('edit', $this->objectString, $marker)) {
-                $sims['###' . strtoupper($marker) . '###'] = '';
-                $i = 0;
-                $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                    '*',
-                    'sys_file_reference',
-                    'uid_foreign = ' . $this->conf['uid'] . ' AND  tablenames=\'tx_cal_' . $this->objectString . '\' AND fieldname=\'' . $marker . '\' AND deleted=0'
+        } elseif ($this->isEditMode && $this->rightsObj->isAllowedTo('edit', $this->objectString, $marker)) {
+            $sims['###' . strtoupper($marker) . '###'] = '';
+            $i = 0;
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+                '*',
+                'sys_file_reference',
+                'uid_foreign = ' . $this->conf['uid'] . ' AND  tablenames=\'tx_cal_' . $this->objectString . '\' AND fieldname=\'' . $marker . '\' AND deleted=0'
+            );
+            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                $temp_sims = [];
+                $temp_sims['###' . strtoupper($marker) . '_VALUE###'] = $row['uid'];
+                $temp = $this->cObj->stdWrap(
+                    '',
+                    $this->conf['view.'][$this->conf['view'] . '.'][strtolower($marker) . '_stdWrap.']
                 );
-                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    $temp_sims = [];
-                    $temp_sims['###' . strtoupper($marker) . '_VALUE###'] = $row['uid'];
-                    $temp = $this->cObj->stdWrap(
-                        '',
-                        $this->conf['view.'][$this->conf['view'] . '.'][strtolower($marker) . '_stdWrap.']
+                if ($marker === 'image') {
+                    $temp_sims['###' . strtoupper($marker) . '_PREVIEW###'] = $this->renderImage(
+                        $row,
+                        $row['description'],
+                        $row['title'],
+                        $marker,
+                        false
                     );
-                    if ($marker == 'image') {
-                        $temp_sims['###' . strtoupper($marker) . '_PREVIEW###'] = $this->renderImage(
-                            $row,
-                            $row['description'],
-                            $row['title'],
-                            $marker,
-                            false
-                        );
-                    } elseif ($marker == 'attachment' || $marker == 'ics_file') {
-                        $temp_sims['###' . strtoupper($marker) . '_PREVIEW###'] = $this->renderFile(
-                            $row,
-                            $row['description'],
-                            $row['title'],
-                            $marker,
-                            false
-                        );
-                    }
+                } elseif ($marker === 'attachment' || $marker === 'ics_file') {
+                    $temp_sims['###' . strtoupper($marker) . '_PREVIEW###'] = $this->renderFile(
+                        $row,
+                        $row['description'],
+                        $row['title'],
+                        $marker,
+                        false
+                    );
+                }
 
-                    $temp = Functions::substituteMarkerArrayNotCached($temp, $temp_sims, [], []);
-                    if ($this->isAllowed($marker . '_caption')) {
-                        $temp .= $this->applyStdWrap($row['description'], $marker . '_caption_stdWrap');
-                    }
-                    if ($this->isAllowed($marker . '_title')) {
-                        $temp .= $this->applyStdWrap($row['title'], $marker . '_title_stdWrap');
-                    }
-                    $temp_sims['###INDEX###'] = $i;
-                    $sims['###' . strtoupper($marker) . '###'] .= Functions::substituteMarkerArrayNotCached(
-                        $temp,
-                        $temp_sims,
-                        [],
-                        []
-                    );
-                    $i++;
+                $temp = Functions::substituteMarkerArrayNotCached($temp, $temp_sims, [], []);
+                if ($this->isAllowed($marker . '_caption')) {
+                    $temp .= $this->applyStdWrap($row['description'], $marker . '_caption_stdWrap');
                 }
-                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-                $upload = '';
-                for (; $i < $max; $i++) {
-                    $temp_sims = [];
-                    $upload .= $this->cObj->stdWrap(
-                        '',
-                        $this->conf['view.'][$this->conf['view'] . '.'][$marker . 'Upload_stdWrap.']
-                    );
-                    if ($this->isAllowed($marker . '_caption')) {
-                        $upload .= $this->applyStdWrap('', $marker . '_caption_stdWrap');
-                    }
-                    if ($this->isAllowed($marker . '_title')) {
-                        $upload .= $this->applyStdWrap('', $marker . '_title_stdWrap');
-                    }
-                    $temp_sims['###INDEX###'] = $i;
-                    $upload = Functions::substituteMarkerArrayNotCached(
-                        $upload,
-                        $temp_sims,
-                        [],
-                        []
-                    );
+                if ($this->isAllowed($marker . '_title')) {
+                    $temp .= $this->applyStdWrap($row['title'], $marker . '_title_stdWrap');
                 }
-                $sims['###' . strtoupper($marker) . '###'] .= $upload;
-            } elseif (!$this->isEditMode && $this->rightsObj->isAllowedTo('create', $this->objectString, $marker)) {
-                for ($i = 0; $i < $max; $i++) {
-                    $value = '';
-                    $upload = $this->cObj->stdWrap(
-                        $value,
-                        $this->conf['view.'][$this->conf['view'] . '.'][$marker . 'Upload_stdWrap.']
-                    );
-                    $value = '';
-                    if ($this->isAllowed($marker . '_caption')) {
-                        $upload .= $this->applyStdWrap('', $marker . '_caption_stdWrap');
-                    }
-                    if ($this->isAllowed($marker . '_title')) {
-                        $upload .= $this->applyStdWrap('', $marker . '_title_stdWrap');
-                    }
-                    $temp_sims['###INDEX###'] = $i;
-                    $sims['###' . strtoupper($marker) . '###'] .= Functions::substituteMarkerArrayNotCached(
-                        $upload,
-                        $temp_sims,
-                        [],
-                        []
-                    );
+                $temp_sims['###INDEX###'] = $i;
+                $sims['###' . strtoupper($marker) . '###'] .= Functions::substituteMarkerArrayNotCached(
+                    $temp,
+                    $temp_sims,
+                    [],
+                    []
+                );
+                $i++;
+            }
+            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+            $upload = '';
+            for (; $i < $max; $i++) {
+                $temp_sims = [];
+                $upload .= $this->cObj->stdWrap(
+                    '',
+                    $this->conf['view.'][$this->conf['view'] . '.'][$marker . 'Upload_stdWrap.']
+                );
+                if ($this->isAllowed($marker . '_caption')) {
+                    $upload .= $this->applyStdWrap('', $marker . '_caption_stdWrap');
                 }
+                if ($this->isAllowed($marker . '_title')) {
+                    $upload .= $this->applyStdWrap('', $marker . '_title_stdWrap');
+                }
+                $temp_sims['###INDEX###'] = $i;
+                $upload = Functions::substituteMarkerArrayNotCached(
+                    $upload,
+                    $temp_sims,
+                    [],
+                    []
+                );
+            }
+            $sims['###' . strtoupper($marker) . '###'] .= $upload;
+        } elseif (!$this->isEditMode && $this->rightsObj->isAllowedTo('create', $this->objectString, $marker)) {
+            for ($i = 0; $i < $max; $i++) {
+                $value = '';
+                $upload = $this->cObj->stdWrap(
+                    $value,
+                    $this->conf['view.'][$this->conf['view'] . '.'][$marker . 'Upload_stdWrap.']
+                );
+                if ($this->isAllowed($marker . '_caption')) {
+                    $upload .= $this->applyStdWrap('', $marker . '_caption_stdWrap');
+                }
+                if ($this->isAllowed($marker . '_title')) {
+                    $upload .= $this->applyStdWrap('', $marker . '_title_stdWrap');
+                }
+                $temp_sims['###INDEX###'] = $i;
+                $sims['###' . strtoupper($marker) . '###'] .= Functions::substituteMarkerArrayNotCached(
+                    $upload,
+                    $temp_sims,
+                    [],
+                    []
+                );
             }
         }
     }
@@ -710,8 +732,8 @@ class FeEditingBaseView extends BaseView
      */
     protected function getCurrentTranslationMarker(& $template, & $sims, & $rems)
     {
-        if ($this->rightsObj->isViewEnabled('translation') && $this->isEditMode) {
-            if ($this->object->row['sys_language_uid'] != 0) {
+        if ($this->isEditMode && $this->rightsObj->isViewEnabled('translation')) {
+            if ($this->object->row['sys_language_uid'] !== 0) {
                 $sims['###CURRENT_TRANSLATION###'] = 'Current translation: ' . $this->cObj->cObjGetSingle(
                         $this->conf['view.']['translation.']['languageMenu.'][$this->object->row['sys_language_uid']],
                         $this->conf['view.']['translation.']['languageMenu.'][$this->object->row['sys_language_uid'] . '.']
@@ -728,14 +750,14 @@ class FeEditingBaseView extends BaseView
      * @param $requiredFieldsSims
      * @return bool
      */
-    protected function checkRequiredFields(&$requiredFieldsSims)
+    protected function checkRequiredFields(&$requiredFieldsSims): bool
     {
         $allRequiredFieldsAreFilled = true;
         $viewParts = explode('_', $this->conf['view']);
-        if (count($viewParts) == 2 && is_array($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.']) > 0) {
+        if (count($viewParts) === 2 && is_array($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.']) > 0) {
             foreach ($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.'] as $field => $fieldSetup) {
                 $myField = str_replace('.', '', $field);
-                if ($this->isAllowed($myField) && is_array($fieldSetup) && $fieldSetup['required'] && $this->controller->piVars[$myField] == '') {
+                if (is_array($fieldSetup) && $fieldSetup['required'] && $this->controller->piVars[$myField] === '' && $this->isAllowed($myField)) {
                     $allRequiredFieldsAreFilled = false;
                     $requiredFieldsSims['###' . strtoupper($myField) . '_REQUIRED###'] = $this->conf['view.']['required'];
                 } else {
@@ -743,7 +765,7 @@ class FeEditingBaseView extends BaseView
                 }
             }
         }
-        if ($allRequiredFieldsAreFilled && !$this->controller->piVars['formCheck'] == '1') {
+        if ($allRequiredFieldsAreFilled && !$this->controller->piVars['formCheck'] === '1') {
             $allRequiredFieldsAreFilled = false;
         }
         return $allRequiredFieldsAreFilled;
@@ -752,14 +774,14 @@ class FeEditingBaseView extends BaseView
     /**
      * @return array
      */
-    protected function getDefaultValues()
+    protected function getDefaultValues(): array
     {
         $defaultValues = [];
         $viewParts = explode('_', $this->conf['view']);
-        if (count($viewParts) == 2 && is_array($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.']) > 0) {
+        if (count($viewParts) === 2 && is_array($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.']) > 0) {
             foreach ($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.'] as $field => $fieldSetup) {
                 $myField = str_replace('.', '', $field);
-                if (!$this->controller->piVars[$myField] != '' && $fieldSetup['default'] != '') {
+                if (!$this->controller->piVars[$myField] !== '' && $fieldSetup['default'] !== '') {
                     $defaultValues[$myField] = $fieldSetup['default'];
                 }
             }
@@ -771,19 +793,19 @@ class FeEditingBaseView extends BaseView
      * @param $constrainSims
      * @return bool
      */
-    protected function checkContrains(&$constrainSims)
+    protected function checkContrains(&$constrainSims): bool
     {
         $noComplains = true;
         $viewParts = explode('_', $this->conf['view']);
-        if (count($viewParts) == 2 && is_array($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.']) > 0) {
+        if (count($viewParts) === 2 && is_array($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.']) > 0) {
             foreach ($this->conf['rights.'][$viewParts[0] . '.'][$viewParts[1] . '.']['fields.'] as $field => $fieldSetup) {
                 $myField = str_replace('.', '', $field);
-                if ($fieldSetup['constrain.'] != '') {
+                if ($fieldSetup['constrain.'] !== '') {
                     $constrainSims['###' . strtoupper($myField) . '_CONSTRAIN###'] = $this->constrainParser(
                         $myField,
                         $fieldSetup['constrain.']
                     );
-                    if ($constrainSims['###' . strtoupper($myField) . '_CONSTRAIN###'] != '') {
+                    if ($constrainSims['###' . strtoupper($myField) . '_CONSTRAIN###'] !== '') {
                         $noComplains = false;
                     }
                 }
@@ -797,18 +819,22 @@ class FeEditingBaseView extends BaseView
      * @param $constrainConfig
      * @return string
      */
-    protected function constrainParser($field, $constrainConfig)
+    protected function constrainParser($field, $constrainConfig): string
     {
         $result = [];
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         foreach ($constrainConfig as $rule) {
             $value = $this->ruleParser($field, $rule);
-            if (($value != '') && ($field == 'start' || $field == 'end') && ($rule['rule'] == 'after') && ($rule['field'] == 'now')) {
-                if ($rightsObj->isAllowedToCreateEventInPast()) {
-                    $value = '';
-                }
+            if (
+                ($value !== '')
+                && ($field === 'start' || $field === 'end')
+                && ($rule['rule'] === 'after')
+                && ($rule['field'] === 'now')
+                && $rightsObj->isAllowedToCreateEventInPast()
+            ) {
+                $value = '';
             }
-            if ($value != '') {
+            if ($value !== '') {
                 $result[] = $value;
             }
         }
@@ -820,7 +846,7 @@ class FeEditingBaseView extends BaseView
      * @param $rule
      * @return string
      */
-    protected function ruleParser($field, $rule)
+    protected function ruleParser($field, $rule): string
     {
         $passedAny = [];
         $rules = GeneralUtility::trimExplode('|', $rule['rule'], 1);
@@ -844,8 +870,8 @@ class FeEditingBaseView extends BaseView
                                 if (method_exists($this->object, $functionB)) {
                                     $b = $this->object->$functionB();
                                     if (is_object($a) && method_exists($a, $rulePart)) {
-                                        $result = $a->compareTo($result);
-                                        $failed = $result != -1;
+                                        $result = $a->compareTo($b);
+                                        $failed = $result !== -1;
                                     } elseif (is_numeric($a) && is_numeric($b)) {
                                         $failed = $a >= $b;
                                     }
@@ -872,7 +898,7 @@ class FeEditingBaseView extends BaseView
 
                                     if (is_object($a) && method_exists($a, $rulePart)) {
                                         $result = $a->compareTo($b);
-                                        $failed = $result != 1;
+                                        $failed = $result !== 1;
                                     } elseif (is_numeric($a) && is_numeric($b)) {
                                         $failed = $a <= $b;
                                     }
@@ -897,13 +923,13 @@ class FeEditingBaseView extends BaseView
                                     $b = $this->object->$functionB();
                                     if (is_object($a) && method_exists($a, $rulePart)) {
                                         $result = $a->compareTo($b);
-                                        $failed = $result != 0;
+                                        $failed = $result !== 0;
                                     } else {
-                                        $failed = $a != $b;
+                                        $failed = $a !== $b;
                                     }
                                 }
                             } elseif (isset($rule['value'])) {
-                                $failed = $a != $rule['value'];
+                                $failed = $a !== $rule['value'];
                             }
                         }
                         break;
@@ -923,13 +949,13 @@ class FeEditingBaseView extends BaseView
 
                                     if (is_object($a) && method_exists($a, $rulePart)) {
                                         $result = $a->compareTo($b);
-                                        $failed = $result == 0;
+                                        $failed = $result === 0;
                                     } elseif (is_numeric($a) && is_numeric($b)) {
-                                        $failed = $a == $b;
+                                        $failed = $a === $b;
                                     }
                                 }
-                            } elseif (is_null($rule['value']) || isset($rule['value'])) {
-                                $failed = $a == $rule['value'];
+                            } elseif ($rule['value'] === null || isset($rule['value'])) {
+                                $failed = $a === $rule['value'];
                             }
                         }
                         break;
@@ -960,7 +986,7 @@ class FeEditingBaseView extends BaseView
             }
             $passedAny[] = $failed ? 0 : 1;
         }
-        if (array_sum($passedAny) == 0) {
+        if (array_sum($passedAny) === 0) {
             return $this->cObj->cObjGetSingle($rule['message'], $rule['message.']);
         }
         return '';
@@ -970,18 +996,18 @@ class FeEditingBaseView extends BaseView
      * @param $field
      * @return bool
      */
-    public function isAllowed($field)
+    public function isAllowed($field): bool
     {
         if ($this->isEditMode) {
             $action = 'edit';
         } else {
             $action = 'create';
         }
-        if ($this->conf['rights.'][$action . '.'][$this->objectString . '.']['fields.'][$field . '.']['displayCondition.'] != '') {
+        if ((int)$this->conf['rights.'][$action . '.'][$this->objectString . '.']['fields.'][$field . '.']['displayCondition.'] !== '') {
             $displayCondition = $this->conf['rights.'][$action . '.'][$this->objectString . '.']['fields.'][$field . '.']['displayCondition.'];
             foreach ($displayCondition as $rule) {
                 $value = $this->ruleParser($field, $rule);
-                if ($value != '') {
+                if ($value !== '') {
                     return false;
                 }
             }
@@ -1067,7 +1093,7 @@ class FeEditingBaseView extends BaseView
     {
         $tabbedMenuConf = $this->conf['view.'][$view . '.']['tabbedMenu.'];
         foreach ((array)$tabbedMenuConf as $id => $tab) {
-            if (Functions::endsWith($id, '.') && $tab['requiredFields'] != '') {
+            if ($tab['requiredFields'] !== '' && Functions::endsWith($id, '.')) {
                 $requiredFields = GeneralUtility::trimExplode(',', $tab['requiredFields'], 1);
                 $isAllowed = false;
                 foreach ($requiredFields as $field) {
@@ -1077,8 +1103,7 @@ class FeEditingBaseView extends BaseView
                     }
                 }
                 if (!$isAllowed) {
-                    unset($tabbedMenuConf[$id]);
-                    unset($tabbedMenuConf[$id . '.']);
+                    unset($tabbedMenuConf[$id], $tabbedMenuConf[$id . '.']);
                 }
             }
         }

@@ -26,31 +26,87 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Provides basic model functionality that other
  * models can use or override by extending the class.
  */
-class LocationModel extends BaseModel
+abstract class LocationModel extends BaseModel
 {
-    public $row;
-    public $name;
-    public $description;
-    public $street;
-    public $zip;
-    public $city;
-    public $countryzone;
-    public $country;
-    public $phone;
-    public $fax;
-    public $mobilephone;
-    public $email;
-    public $link;
-    public $longitude;
-    public $latitude;
-    public $eventLinks = [];
-    public $sharedUsers = [];
-    public $sharedGroups = [];
+    /**
+     * @var string
+     */
+    public $name = '';
 
     /**
-     * @return mixed
+     * @var string
      */
-    public function getName()
+    public $description = '';
+
+    /**
+     * @var string
+     */
+    public $street = '';
+
+    /**
+     * @var string
+     */
+    public $zip = '';
+
+    /**
+     * @var string
+     */
+    public $city = '';
+
+    /**
+     * @var string
+     */
+    public $countryzone = '';
+
+    /**
+     * @var string
+     */
+    public $country = '';
+
+    /**
+     * @var string
+     */
+    public $phone = '';
+
+    /**
+     * @var string
+     */
+    public $fax = '';
+
+    /**
+     * @var string
+     */
+    public $mobilephone = '';
+
+    /**
+     * @var string
+     */
+    public $email = '';
+
+    /**
+     * @var string
+     */
+    public $link = '';
+
+    /**
+     * @var string
+     */
+    public $longitude = '';
+
+    /**
+     * @var string
+     */
+    public $latitude = '';
+
+    /**
+     * @var array
+     */
+    public $eventLinks = [];
+
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return $this->name;
     }
@@ -64,9 +120,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -80,9 +136,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getStreet()
+    public function getStreet(): string
     {
         return $this->street;
     }
@@ -96,9 +152,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getZip()
+    public function getZip(): string
     {
         return $this->zip;
     }
@@ -112,9 +168,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getCity()
+    public function getCity(): string
     {
         return $this->city;
     }
@@ -128,9 +184,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getCountryZone()
+    public function getCountryZone(): string
     {
         return $this->countryzone;
     }
@@ -146,9 +202,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getCountry()
+    public function getCountry(): string
     {
         return $this->country;
     }
@@ -164,9 +220,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getPhone()
+    public function getPhone(): string
     {
         return $this->phone;
     }
@@ -180,9 +236,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getMobilephone()
+    public function getMobilephone(): string
     {
         return $this->mobilephone;
     }
@@ -196,9 +252,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getFax()
+    public function getFax(): string
     {
         return $this->fax;
     }
@@ -212,9 +268,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getLink()
+    public function getLink(): string
     {
         return $this->link;
     }
@@ -228,9 +284,9 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -244,17 +300,17 @@ class LocationModel extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getLongitude()
+    public function getLongitude(): string
     {
         return $this->longitude;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getLatitude()
+    public function getLatitude(): string
     {
         return $this->latitude;
     }
@@ -357,7 +413,7 @@ class LocationModel extends BaseModel
             $staticInfo = Functions::makeInstance(PiBaseApi::class);
             $staticInfo->init();
             $current = LocalizationUtility::translate(
-                ['uid' => $this->getCountryzone()],
+                ['uid' => $this->getCountryZone()],
                 'static_country_zones',
                 false
             );
@@ -367,7 +423,7 @@ class LocationModel extends BaseModel
                 $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['countryzoneStaticInfo.']
             );
         } else {
-            $current = $this->getCountryzone();
+            $current = $this->getCountryZone();
             $this->local_cObj->setCurrentVal($current);
             $sims['###COUNTRYZONE###'] = $this->local_cObj->cObjGetSingle(
                 $this->conf['view.'][$this->conf['view'] . '.'][$this->getObjectType() . '.']['countryzone'],
@@ -480,7 +536,7 @@ class LocationModel extends BaseModel
     /**
      * @return array
      */
-    public function getEventLinks()
+    public function getEventLinks(): array
     {
         return $this->eventLinks;
     }
@@ -489,18 +545,18 @@ class LocationModel extends BaseModel
      * @param $linktext
      * @return string
      */
-    public function getLinkToOrganizer($linktext)
+    public function getLinkToOrganizer($linktext): string
     {
         return $this->getLinkToLocation($linktext);
     }
 
     /**
-     * @param $linktext
+     * @param string $linktext
      * @return string
      */
-    public function getLinkToLocation($linktext)
+    public function getLinkToLocation($linktext): string
     {
-        if ($linktext == '') {
+        if ($linktext === '') {
             $linktext = 'no title';
         }
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
@@ -525,9 +581,6 @@ class LocationModel extends BaseModel
      */
     public function updateWithPIVars(&$piVars)
     {
-        $modelObj = &Registry::Registry('basic', 'modelController');
-        $cObj = &$this->controller->cObj;
-
         foreach ($piVars as $key => $value) {
             switch ($key) {
                 case 'uid':
@@ -543,7 +596,7 @@ class LocationModel extends BaseModel
                     unset($piVars['name']);
                     break;
                 case 'description':
-                    $this->setDescription($cObj->removeBadHTML($piVars['description'], []));
+                    $this->setDescription(htmlspecialchars($piVars['description'], []));
                     unset($piVars['description']);
                     break;
                 case 'street':
@@ -614,9 +667,9 @@ class LocationModel extends BaseModel
                     }
                     foreach ($values as $entry) {
                         preg_match('/(^[a-z])_([0-9]+)/', $entry, $idname);
-                        if ($idname[1] == 'u') {
+                        if ($idname[1] === 'u') {
                             $this->addSharedUser($idname[2]);
-                        } elseif ($idname[1] == 'g') {
+                        } elseif ($idname[1] === 'g') {
                             $this->addSharedGroup($idname[2]);
                         }
                     }
@@ -631,72 +684,5 @@ class LocationModel extends BaseModel
     public function __toString()
     {
         return get_class($this) . ': ' . implode(', ', $this->row);
-    }
-
-    /**
-     * @param $id
-     */
-    public function addSharedUser($id)
-    {
-        $this->sharedUsers[] = $id;
-    }
-
-    /**
-     * @param $id
-     */
-    public function addSharedGroup($id)
-    {
-        $this->sharedGroups[] = $id;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSharedUsers()
-    {
-        return $this->sharedUsers;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSharedGroups()
-    {
-        return $this->sharedGroups;
-    }
-
-    /**
-     * @param $userIds
-     */
-    public function setSharedUsers($userIds)
-    {
-        $this->sharedUsers = $userIds;
-    }
-
-    /**
-     * @param $groupIds
-     */
-    public function setSharedGroups($groupIds)
-    {
-        $this->sharedGroups = $groupIds;
-    }
-
-    /**
-     * @param $userId
-     * @param $groupIdArray
-     * @return bool
-     */
-    public function isSharedUser($userId, $groupIdArray)
-    {
-        if (is_array($this->getSharedUsers()) && in_array($userId, $this->getSharedUsers())) {
-            return true;
-        }
-        foreach ($groupIdArray as $id) {
-            if (is_array($this->getSharedGroups()) && in_array($id, $this->getSharedGroups())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

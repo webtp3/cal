@@ -16,7 +16,6 @@ namespace TYPO3\CMS\Cal\Service;
  */
 use RuntimeException;
 use TYPO3\CMS\Cal\Model\CategoryModel;
-use TYPO3\CMS\Cal\TreeProvider\TreeView;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -27,7 +26,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class SysCategoryService extends BaseService
 {
     protected $categoryArrayByEventUid = [];
-    protected $categoryArrayByCalendarUid = null;
+    protected $categoryArrayByCalendarUid;
     protected $categoryArrayByUid = [];
     protected $allCateogryIdsByParentId;
     protected $categoryArrayCached = [];
@@ -37,12 +36,10 @@ class SysCategoryService extends BaseService
      * Looks for a category with a given uid on a certain pid-list
      *
      * @param int $uid
-     *            to search for
      * @param string $pidList
-     *            to search in
-     * @return array array ($row)
+     * @return CategoryModel
      */
-    public function find($uid, $pidList)
+    public function find($uid, $pidList): CategoryModel
     {
         $categoryIds = [];
         $this->getCategoryArray($pidList, $categoryIds, true);
@@ -53,8 +50,7 @@ class SysCategoryService extends BaseService
      * Looks for all categorys on a certain pid-list
      *
      * @param string $pidList
-     *            to search in
-     * @return array array of array (array of $rows)
+     * @param $categoryArrayToBeFilled
      */
     public function findAll($pidList, &$categoryArrayToBeFilled)
     {
@@ -63,9 +59,9 @@ class SysCategoryService extends BaseService
 
     /**
      * @param $uid
-     * @return array
+     * @return CategoryModel
      */
-    public function updateCategory($uid)
+    public function updateCategory($uid): CategoryModel
     {
         $insertFields = [
             'tstamp' => time()
@@ -78,7 +74,7 @@ class SysCategoryService extends BaseService
         $table = 'sys_category';
         $where = 'uid = ' . $uid;
 
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
 
         $this->unsetPiVars();
         return $this->find($uid, $this->conf['pidList']);
@@ -141,13 +137,13 @@ class SysCategoryService extends BaseService
 
     /**
      * @param $pid
-     * @return array
+     * @return CategoryModel
      */
-    public function saveCategory($pid)
+    public function saveCategory($pid): CategoryModel
     {
         $crdate = time();
         $insertFields = [
-            'pid' => $this->conf['rights.']['create.']['calendar.']['saveCategoryToPid'] ? $this->conf['rights.']['create.']['calendar.']['saveCategoryToPid'] : $pid,
+            'pid' => $this->conf['rights.']['create.']['calendar.']['saveCategoryToPid'] ?: $pid,
             'tstamp' => $crdate,
             'crdate' => $crdate
         ];
@@ -184,16 +180,17 @@ class SysCategoryService extends BaseService
      * @param $includePublic
      * @return string
      */
-    public function getCategorySearchString($pidList, $includePublic)
+    public function getCategorySearchString($pidList, $includePublic): string
     {
-        if ($this->conf['category'] != '') {
+        $categorySearchString = '';
+        if ($this->conf['category'] !== '') {
             $categorySearchString .= ' AND sys_category_record_mm.tablenames = "tx_cal_event" AND sys_category_record_mm.uid_local IN (' . $this->conf['category'] . ')';
         }
 
         // Filter events by categories
 
         // Include categories
-        if ($this->conf['view.']['categoryMode'] == 1 && self::$categoryToFilter) {
+        if (self::$categoryToFilter && $this->conf['view.']['categoryMode'] == 1) {
             // Query to select all blacklisted events
             $sql = 'SELECT uid_foreign FROM sys_category_record_mm WHERE uid_local IN (' . self::$categoryToFilter . ')';
             // Add search substring with tx_cal_event.uid NOT IN
@@ -201,7 +198,7 @@ class SysCategoryService extends BaseService
         }
 
         // Exclude categories
-        if ($this->conf['view.']['categoryMode'] == 2 && self::$categoryToFilter) {
+        if (self::$categoryToFilter && $this->conf['view.']['categoryMode'] == 2) {
             // Query to select all blacklisted events
             $sql = 'SELECT uid_foreign FROM sys_category_record_mm WHERE uid_local IN (' . self::$categoryToFilter . ')';
             // Add search substring with tx_cal_event.uid NOT IN
@@ -209,11 +206,11 @@ class SysCategoryService extends BaseService
         }
 
         // Minimum match
-        if ($this->conf['view.']['categoryMode'] == 4 && self::$categoryToFilter) {
+        if (self::$categoryToFilter && $this->conf['view.']['categoryMode'] == 4) {
             $categorySearchString = '';
             $categories = explode(',', self::$categoryToFilter);
-            for ($i = 0; $i < count($categories); $i++) {
-                if ($i == 0) {
+            for ($i = 0, $iMax = count($categories); $i < $iMax; $i++) {
+                if ($i === 0) {
                     $categorySearchString .= ' AND sys_category_record_mm.uid_local = "' . $categories[$i] . '" ';
                 } else {
                     $categorySearchString .= ' AND (';
@@ -238,6 +235,9 @@ class SysCategoryService extends BaseService
 
     /**
      * Search for categories
+     * @param string $pidList
+     * @param array $categoryArrayToBeFilled
+     * @param bool $showPublicCategories
      */
     public function getCategoryArray($pidList, &$categoryArrayToBeFilled, $showPublicCategories = true)
     {
@@ -245,20 +245,11 @@ class SysCategoryService extends BaseService
             $categoryArrayToBeFilled[] = $this->categoryArrayCached[md5($this->conf['view.']['categoryMode'] . $this->conf['view.']['allowedCategories'])];
             return;
         }
-        if ($this->rightsObj->isLoggedIn() && $showPublicCategories) {
-            $feUserId = $this->rightsObj->getUserId();
-        } elseif ($this->rightsObj->isLoggedIn()) {
-            $feUserId = $this->rightsObj->getUserId();
-        }
 
         $this->categoryArrayByUid = [];
         $this->categoryArrayByEventUid = [];
         $this->categoryArrayByCalendarUid = [];
 
-        $categoryIds = [];
-        $dbIds = [];
-        $fileIds = [];
-        $extUrlIds = [];
         $additionalWhere = ' AND sys_category.pid IN (' . $pidList . ')';
 
         // compile category array
@@ -284,7 +275,6 @@ class SysCategoryService extends BaseService
                     $where = 'sys_category.uid NOT IN (' . $implodedAllowedCategories . ')';
 
                     $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby, $orderby);
-                    $foundUids = [];
                     if ($result) {
                         $excludedCategories = [];
                         while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
@@ -320,15 +310,15 @@ class SysCategoryService extends BaseService
                 break;
         }
 
-        if (!$this->rightsObj->isCalAdmin() && $this->conf['rights.'][$this->conf['view'] == 'create_event' ? 'create.' : 'edit.']['event.']['fields.']['category.']['allowedUids'] != '') {
-            $filterWhere = ' AND sys_category.uid IN (' . $this->conf['rights.'][$this->conf['view'] == 'create_event' ? 'create.' : 'edit.']['event.']['fields.']['category.']['allowedUids'] . ')';
+        if (!$this->rightsObj->isCalAdmin() && $this->conf['rights.'][$this->conf['view'] === 'create_event' ? 'create.' : 'edit.']['event.']['fields.']['category.']['allowedUids'] !== '') {
+            $filterWhere = ' AND sys_category.uid IN (' . $this->conf['rights.'][$this->conf['view'] === 'create_event' ? 'create.' : 'edit.']['event.']['fields.']['category.']['allowedUids'] . ')';
         }
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
             $showPublicCategories,
-            $this->conf['calendar'] ? $this->conf['calendar'] : ''
+            $this->conf['calendar'] ?: ''
         );
         // Select all categories for the given pids
         $select = 'sys_category.*,tx_cal_calendar.title AS calendar_title,tx_cal_calendar.uid AS calendar_uid';
@@ -352,8 +342,7 @@ class SysCategoryService extends BaseService
                         'sys_category',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
                 if (!$row['uid']) {
@@ -399,14 +388,13 @@ class SysCategoryService extends BaseService
                             'tx_cal_calendar',
                             $row,
                             $GLOBALS['TSFE']->sys_language_content,
-                            $GLOBALS['TSFE']->sys_language_contentOL,
-                            ''
+                            $GLOBALS['TSFE']->sys_language_contentOL
                         );
                     }
                     if (!$row['uid']) {
                         continue;
                     }
-                    if ($GLOBALS['TSFE']->sys_page->versioningPreview == true) {
+                    if ($GLOBALS['TSFE']->sys_page->versioningPreview === true) {
                         // get workspaces Overlay
                         $GLOBALS['TSFE']->sys_page->versionOL('tx_cal_calendar', $row);
                     }
@@ -438,14 +426,13 @@ class SysCategoryService extends BaseService
                         'sys_category',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
                 if (!$row['uid']) {
                     continue;
                 }
-                if ($GLOBALS['TSFE']->sys_page->versioningPreview == true) {
+                if ($GLOBALS['TSFE']->sys_page->versioningPreview === true) {
                     // get workspaces Overlay
                     $GLOBALS['TSFE']->sys_page->versionOL('sys_category', $row);
                 }
@@ -487,7 +474,7 @@ class SysCategoryService extends BaseService
             $where .= $calendarService->getCalendarSearchString(
                 $pidList,
                 $showPublicCategories,
-                $this->conf['view.']['calendar'] ? $this->conf['view.']['calendar'] : ''
+                $this->conf['view.']['calendar'] ?: ''
             );
             // ' AND tx_cal_event_shared_user_mm.uid_foreign = '.$this->rightsObj->getUserId();
             $where .= $this->cObj->enableFields('tx_cal_calendar') . $this->cObj->enableFields('sys_category') . $this->cObj->enableFields('tx_cal_event');
@@ -502,14 +489,13 @@ class SysCategoryService extends BaseService
                             'sys_category',
                             $row,
                             $GLOBALS['TSFE']->sys_language_content,
-                            $GLOBALS['TSFE']->sys_language_contentOL,
-                            ''
+                            $GLOBALS['TSFE']->sys_language_contentOL
                         );
                     }
                     if (!$row['uid']) {
                         continue;
                     }
-                    if ($GLOBALS['TSFE']->sys_page->versioningPreview == true) {
+                    if ($GLOBALS['TSFE']->sys_page->versioningPreview === true) {
                         // get workspaces Overlay
                         $GLOBALS['TSFE']->sys_page->versionOL('sys_category', $row);
                     }
@@ -538,57 +524,10 @@ class SysCategoryService extends BaseService
     }
 
     /**
-     * @param $categoryArray
-     */
-    private function addChildCategories(&$categoryArray)
-    {
-        $calTreeView = new TreeView();
-
-        $ids = [];
-        $knownUids = [];
-        foreach ($categoryArray as $category) {
-            $ids = $calTreeView->checkChildIds($category->row, $this->getAllCategoryIdsByParentId());
-            $knownUids[] = $category->getUid();
-        }
-        $stillNeededChildCategoryIds = array_diff($ids, $knownUids);
-        if (!empty($stillNeededChildCategoryIds)) {
-            $select = 'sys_category.*';
-            $table = 'sys_category';
-            $where = 'sys_category.uid IN (' . implode(',', $stillNeededChildCategoryIds) . ')';
-            $childCategories = $this->getCategoriesFromTable($select, $table, $where, $groupby);
-        }
-    }
-
-    /**
      * @return array
      */
-    private function getAllCategoryIdsByParentId()
+    public function getCategoriesForSharedUser(): array
     {
-        if ($this->allCateogryIdsByParentId == null) {
-            $categories = [];
-            $select = 'sys_category.uid, sys_category.parent_category';
-            $table = 'sys_category';
-            $where = '1=1' . $this->cObj->enableFields('sys_category');
-            $groupby = '';
-
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby);
-            if ($result) {
-                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    $categories[$row['parent_category']] = $row['uid'];
-                }
-                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-            }
-            $this->allCateogryIdsByParentId = $categories;
-        }
-        return $this->allCateogryIdsByParentId;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCategoriesForSharedUser()
-    {
-        $categories = [];
         $select = '*';
         $table = 'tx_cal_event LEFT JOIN tx_cal_event_shared_user_mm ON tx_cal_event.uid = tx_cal_event_shared_user_mm.uid_local ' . 'LEFT JOIN tx_cal_calendar ON tx_cal_event.calendar_id = tx_cal_calendar.uid ' . 'LEFT JOIN sys_category ON tx_cal_calendar.uid = sys_category.calendar_id';
         $where = 'sys_category.shared_user_allowed = 1' . ' AND tx_cal_event_shared_user_mm.uid_foreign = ' . $this->rightsObj->getUserId() . $this->cObj->enableFields('tx_cal_calendar') . $this->cObj->enableFields('sys_category') . $this->cObj->enableFields('tx_cal_event');
@@ -605,7 +544,7 @@ class SysCategoryService extends BaseService
      * @param string $groupby
      * @return array
      */
-    private function getCategoriesFromTable($select, $table, $where, $groupby = '')
+    private function getCategoriesFromTable($select, $table, $where, $groupby = ''): array
     {
         $categories = [];
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby);
@@ -616,8 +555,7 @@ class SysCategoryService extends BaseService
                         'sys_category',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
                 if (!$row['uid']) {
@@ -641,7 +579,7 @@ class SysCategoryService extends BaseService
      * @param $row
      * @return CategoryModel
      */
-    public function createCategory($row)
+    public function createCategory($row): CategoryModel
     {
         return new CategoryModel($row, $this->getServiceKey());
     }
@@ -652,7 +590,7 @@ class SysCategoryService extends BaseService
      */
     public function getCategoriesForEvent($eventUid)
     {
-        if (count($this->categoryArrayByEventUid) == 0) {
+        if (count($this->categoryArrayByEventUid) === 0) {
             $cats = [];
             $this->findAll($this->conf['pidList'], $cats);
         }
@@ -660,25 +598,23 @@ class SysCategoryService extends BaseService
     }
 
     /**
-     * @param $category
+     * @param CategoryModel $category
      */
     public function checkStyles(&$category)
     {
         $headerStyle = $category->getHeaderStyle();
-        if ($headerStyle == '') {
+        if ($headerStyle === '') {
             $parentUid = $category->getParentUid();
-            if ($parentUid == 0) {
+            if ($parentUid === 0) {
                 $category->setHeaderStyle($this->conf['view.']['category.']['category.']['defaultHeaderStyle']);
                 $category->setBodyStyle($this->conf['view.']['category.']['category.']['defaultBodyStyle']);
+            } elseif ($this->categoryArrayByUid[$parentUid]) {
+                $this->checkStyles($this->categoryArrayByUid[$parentUid]);
+                $category->setHeaderStyle($this->categoryArrayByUid[$parentUid]->getHeaderStyle());
+                $category->setBodyStyle($this->categoryArrayByUid[$parentUid]->getBodyStyle());
             } else {
-                if ($this->categoryArrayByUid[$parentUid]) {
-                    $this->checkStyles($this->categoryArrayByUid[$parentUid]);
-                    $category->setHeaderStyle($this->categoryArrayByUid[$parentUid]->getHeaderStyle());
-                    $category->setBodyStyle($this->categoryArrayByUid[$parentUid]->getBodyStyle());
-                } else {
-                    $category->setHeaderStyle($this->conf['view.']['category.']['category.']['defaultHeaderStyle']);
-                    $category->setBodyStyle($this->conf['view.']['category.']['category.']['defaultBodyStyle']);
-                }
+                $category->setHeaderStyle($this->conf['view.']['category.']['category.']['defaultHeaderStyle']);
+                $category->setBodyStyle($this->conf['view.']['category.']['category.']['defaultBodyStyle']);
             }
         }
         $this->categoryArrayByUid[$category->getUid()] = $category;
@@ -701,16 +637,14 @@ class SysCategoryService extends BaseService
 
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                unset($row['uid']);
-                $crdate = time();
-                $row['tstamp'] = $crdate;
-                $row['crdate'] = $crdate;
-                $row['l18n_parent'] = $uid;
-                $row['sys_language_uid'] = $overlay;
-                $this->_saveCategory($row);
-                return;
-            }
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
+            unset($row['uid']);
+            $crdate = time();
+            $row['tstamp'] = $crdate;
+            $row['crdate'] = $crdate;
+            $row['l18n_parent'] = $uid;
+            $row['sys_language_uid'] = $overlay;
+            $this->_saveCategory($row);
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
     }
@@ -745,7 +679,7 @@ class SysCategoryService extends BaseService
     /**
      * @return array
      */
-    public function getUidsOfEventsWithCategories()
+    public function getUidsOfEventsWithCategories(): array
     {
         $uidCollector = [];
         $select = 'sys_category_record_mm.*, tx_cal_event.pid, tx_cal_event.uid';

@@ -37,7 +37,7 @@ class FnbEventService extends EventService
      * @param string $additionalWhere
      * @return array
      */
-    public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '0,1,2,3', $additionalWhere = '')
+    public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '0,1,2,3', $additionalWhere = ''): array
     {
 
         // How to get the events
@@ -46,15 +46,15 @@ class FnbEventService extends EventService
         // 3rd get all related events
         // make an array out of the list, so we can handle it better
         $includeRecurring = true;
-        if ($this->conf['view'] == 'ics' || $this->conf['view'] == 'single_ics') {
+        if ($this->conf['view'] === 'ics' || $this->conf['view'] === 'single_ics') {
             $includeRecurring = false;
         }
 
         $this->setStartAndEndPoint($start_date, $end_date);
-        $dontShowOldEvents = (integer)$this->conf['view.'][$this->conf['view'] . '.']['dontShowOldEvents'];
+        $dontShowOldEvents = (int)$this->conf['view.'][$this->conf['view'] . '.']['dontShowOldEvents'];
         if ($dontShowOldEvents > 0) {
             $now = new CalDate();
-            if ($dontShowOldEvents == 2) {
+            if ($dontShowOldEvents === 2) {
                 $now->setHour(0);
                 $now->setMinute(0);
                 $now->setSecond(0);
@@ -72,13 +72,12 @@ class FnbEventService extends EventService
         }
         $formattedStarttime = $this->starttime->format('%Y%m%d');
         $formattedEndtime = $this->endtime->format('%Y%m%d');
-        $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
         $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
 
         $calendarSearchString = $this->getFreeAndBusyCalendarSearchString(
             $pidList,
             true,
-            $this->conf['calendar'] ? $this->conf['calendar'] : ''
+            $this->conf['calendar'] ?: ''
         );
 
         $recurringClause = '';
@@ -132,18 +131,14 @@ class FnbEventService extends EventService
      * @param $linkIds
      * @return string
      */
-    public function getFreeAndBusyCalendarSearchString($pidList, $includePublic, $linkIds)
+    public function getFreeAndBusyCalendarSearchString($pidList, $includePublic, $linkIds): string
     {
         $hash = md5($pidList . ' ' . $includePublic . ' ' . $linkIds);
         if ($this->fnbCalendarSearchStringCache[$hash]) {
             return $this->fnbCalendarSearchStringCache[$hash];
         }
 
-        $calendarSearchString = '';
-        $freeNBusyCalendar = [];
-        $calendarOwner = [];
         $ids = [];
-        $excludeIds = [];
         $idArray = $this->getIdsFromTable($linkIds, $pidList, $includePublic);
 
         $excludeIds = array_keys($this->getCalendarOwner());
@@ -201,9 +196,9 @@ class FnbEventService extends EventService
     /**
      * Call this after you have called getCalendarSearchString or getFreeAndBusyCalendarSearchString
      */
-    public function getCalendarOwner()
+    public function getCalendarOwner(): array
     {
-        if ($this->calendarOwner == null) {
+        if (empty($this->calendarOwner)) {
             $this->calendarOwner = [];
             $table = 'tx_cal_calendar_fnb_user_group_mm';
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, '');
@@ -226,33 +221,17 @@ class FnbEventService extends EventService
      * @param bool $onlyPublic
      * @return array
      */
-    public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false)
+    public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false): array
     {
         $this->calendarIds = [];
         $collectedIds = [];
 
-        // Logged in? Show public & private calendar
-
-        // calendar ids specified? show these calendar only - if allowed - else show public calendar
-
         $limitationList = '';
-        if ($list != '') {
+        if ($list !== '') {
             $limitationList = $list;
         }
 
-        // Lets see if the user is logged in
-        if ($this->rightsObj->isLoggedIn() && !$onlyPublic) {
-            $userId = $this->rightsObj->getUserId();
-            $groupIds = implode(',', $this->rightsObj->getUserGroups());
-        }
-
         $ids = [];
-
-        if ($includeData) {
-            $select = 'tx_cal_calendar.*';
-        } else {
-            $select = 'tx_cal_calendar.uid';
-        }
 
         $orderBy = Functions::getOrderBy('tx_cal_calendar');
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -276,7 +255,7 @@ class FnbEventService extends EventService
                 $where .= 'uid NOT IN (' . implode(',', $ids) . ') AND ';
             }
             $where .= 'tx_cal_calendar.activate_fnb = 1 ' . $this->cObj->enableFields('tx_cal_calendar');
-            if ($pidList != '') {
+            if ($pidList !== '') {
                 $where .= ' AND pid IN (' . $pidList . ')';
             }
 
@@ -290,7 +269,7 @@ class FnbEventService extends EventService
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, '', $orderBy);
             if ($result) {
                 while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    if (!in_array($row['uid'], $collectedIds)) {
+                    if (!in_array($row['uid'], $collectedIds, true)) {
                         if ($includeData) {
                             $this->calendarIds[] = $row;
                         } else {
@@ -303,7 +282,7 @@ class FnbEventService extends EventService
             }
         }
 
-        if ($limitationList != '' && !empty($this->calendarIds)) {
+        if ($limitationList !== '' && !empty($this->calendarIds)) {
             $limitationArray = explode(',', $limitationList);
             $this->calendarIds = array_intersect($this->calendarIds, $limitationArray);
         }
@@ -315,7 +294,7 @@ class FnbEventService extends EventService
      * @param $isException
      * @return EventModel
      */
-    public function createEvent($row, $isException)
+    public function createEvent($row, $isException): EventModel
     {
         $event = new EventModel($row, $isException, $this->getServiceKey());
         $event->row['isFreeAndBusyEvent'] = 1;

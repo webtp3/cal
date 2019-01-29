@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\View;
  */
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -38,16 +39,16 @@ class SearchViews extends ListView
     /**
      * Draws a single event.
      *
-     * @param
-     *            array            The events to be drawn.
+     * @param $master_array
+     * @param $getdate
      * @return string HTML output.
      */
-    public function drawSearch(&$master_array, $getdate)
+    public function drawSearch(&$master_array, $getdate): string
     {
         $this->_init($master_array);
 
         $page = Functions::getContent($this->conf['view.']['other.']['searchBoxTemplate']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no template file found:</h3>' . $this->conf['view.']['other.']['searchBoxTemplate'];
         }
         $rems = [];
@@ -57,8 +58,12 @@ class SearchViews extends ListView
     /**
      * Draws a search result view.
      *
-     * @param
-     *            object Array of the events found ()
+     * @param $master_array
+     * @param $starttime
+     * @param $endtime
+     * @param $searchword
+     * @param string $locationIds
+     * @param string $organizerIds
      * @return string HTML output.
      */
     public function drawSearchAllResult(
@@ -68,15 +73,13 @@ class SearchViews extends ListView
         $searchword,
         $locationIds = '',
         $organizerIds = ''
-    ) {
+    ): string {
         $page = Functions::getContent($this->conf['view.']['search.']['searchResultAllTemplate']);
-        if ($page == '') {
+        if ($page === '') {
             return '<h3>calendar: no search result template file found:</h3>' . $this->conf['view.']['search.']['searchResultAllTemplate'];
         }
 
         $sims = [];
-
-        //$this->_init ($master_array);
 
         if (array_key_exists('phpicalendar_event', $master_array)) {
             $sims['SEARCHEVENTRESULTS'] = $this->drawSearchEventResult(
@@ -160,10 +163,11 @@ class SearchViews extends ListView
         }
 
         foreach ($catArrayArray as $categoryArrayFromService) {
+            /** @var CategoryModel $category */
             foreach ($categoryArrayFromService[0][0] as $category) {
                 $uid = $category->getUid();
-                if (!in_array($uid, $rememberUid)) {
-                    if (in_array($uid, $ids)) {
+                if (!in_array($uid, $rememberUid, true)) {
+                    if (in_array($uid, $ids, true)) {
                         $sims['###CATEGORY_IDS###'] .= '<option value="' . $uid . '" selected="selected">' . $category->getTitle() . '</option>';
                     } else {
                         $sims['###CATEGORY_IDS###'] .= '<option value="' . $uid . '" >' . $category->getTitle() . '</option>';
@@ -184,7 +188,7 @@ class SearchViews extends ListView
     {
         $sims['###LOCATION_IDS###'] = '<option  value="">' . $this->controller->pi_getLL('l_all_location') . '</option>';
         $locationArray = $this->modelObj->findAllLocations(
-            $this->extConf['useLocationStructure'] ? $this->extConf['useLocationStructure'] : 'tx_cal_location',
+            $this->extConf['useLocationStructure'] ?: 'tx_cal_location',
             $this->conf['pidList']
         );
 
@@ -195,7 +199,7 @@ class SearchViews extends ListView
 
         if (is_array($locationArray)) {
             foreach ($locationArray as $location) {
-                if (in_array($location->getUid(), $locationIdArray)) {
+                if (in_array($location->getUid(), $locationIdArray, true)) {
                     $sims['###LOCATION_IDS###'] .= '<option value="' . $location->getUid() . '" selected="selected">' . $location->getName() . '</option>';
                 } else {
                     $sims['###LOCATION_IDS###'] .= '<option value="' . $location->getUid() . '">' . $location->getName() . '</option>';
@@ -214,18 +218,18 @@ class SearchViews extends ListView
     {
         $sims['###ORGANIZER_IDS###'] = '<option  value="">' . $this->controller->pi_getLL('l_all_organizer') . '</option>';
         $organizerArray = $this->modelObj->findAllOrganizer(
-            $this->extConf['useOrganizerStructure'] ? $this->extConf['useOrganizerStructure'] : 'tx_cal_organizer',
+            $this->extConf['useOrganizerStructure'] ?: 'tx_cal_organizer',
             $this->conf['pidList']
         );
 
         $organizerIdArray = [];
-        if ($organizerIds != '') {
+        if ($organizerIds !== '') {
             $organizerIdArray = GeneralUtility::intExplode(',', $organizerIds);
         }
 
         if (is_array($organizerArray)) {
             foreach ($organizerArray as $organizer) {
-                if (in_array($organizer->getUid(), $organizerIdArray)) {
+                if (in_array($organizer->getUid(), $organizerIdArray, true)) {
                     $sims['###ORGANIZER_IDS###'] .= '<option value="' . $organizer->getUid() . '" selected="selected">' . $organizer->getName() . '</option>';
                 } else {
                     $sims['###ORGANIZER_IDS###'] .= '<option value="' . $organizer->getUid() . '">' . $organizer->getName() . '</option>';
@@ -249,13 +253,13 @@ class SearchViews extends ListView
             $date = $this->controller->getListViewTime($this->conf['view.']['search.']['defaultValues.']['end_day']);
             $sims['###EVENT_END_DAY###'] = $date->format($outputFormat);
         } else {
-            if (intval($this->controller->piVars['start_day']) == 0) {
+            if (intval($this->controller->piVars['start_day']) === 0) {
                 $sims['###EVENT_START_DAY###'] = $this->starttime->format($outputFormat);
             } else {
                 $sims['###EVENT_START_DAY###'] = htmlspecialchars(strip_tags($this->controller->piVars['start_day']));
             }
 
-            if (intval($this->controller->piVars['end_day']) == 0) {
+            if (intval($this->controller->piVars['end_day']) === 0) {
                 $sims['###EVENT_END_DAY###'] = $this->endtime->format($outputFormat);
             } else {
                 $sims['###EVENT_END_DAY###'] = htmlspecialchars(strip_tags($this->controller->piVars['end_day']));
@@ -292,8 +296,12 @@ class SearchViews extends ListView
     /**
      * Draws a search result view.
      *
-     * @param
-     *            object The events found
+     * @param $master_array
+     * @param $starttime
+     * @param $endtime
+     * @param $searchword
+     * @param string $locationIds
+     * @param string $organizerIds
      * @return string HTML output.
      */
     public function drawSearchEventResult(
@@ -303,7 +311,7 @@ class SearchViews extends ListView
         $searchword,
         $locationIds = '',
         $organizerIds = ''
-    ) {
+    ): string {
         $this->objectType = 'event';
         $this->_init($master_array);
         return $this->drawList($master_array, '', $starttime, $endtime);
@@ -312,11 +320,11 @@ class SearchViews extends ListView
     /**
      * Draws a search result view.
      *
-     * @param
-     *            object The location found
+     * @param $master_array
+     * @param $searchword
      * @return string HTML output.
      */
-    public function drawSearchLocationResult(&$master_array, $searchword)
+    public function drawSearchLocationResult(&$master_array, $searchword): string
     {
         return $this->drawSearchOrganizerResult($master_array, $searchword, 'location');
     }
@@ -324,21 +332,21 @@ class SearchViews extends ListView
     /**
      * Draws a search result view.
      *
-     * @param
-     *            object The organizer found
+     * @param array $master_array
+     * @param string $searchword
+     * @param string $objectType
      * @return string HTML output.
      */
-    public function drawSearchOrganizerResult(&$master_array, $searchword, $objectType = 'organizer')
+    public function drawSearchOrganizerResult(&$master_array, $searchword, $objectType = 'organizer'): string
     {
         $this->objectType = $objectType;
-        $sims = [];
         $this->_init($master_array);
 
-        if (count($master_array, 1) == 2) {        // only one object element in the array
-            if ($this->objectType == 'organizer') {
+        if (count($master_array, 1) === 2) {        // only one object element in the array
+            if ($this->objectType === 'organizer') {
                 return $this->drawOrganizer(array_pop(array_pop($master_array)), $this->conf['getdate']);
             }
-            if ($this->objectType == 'location') {
+            if ($this->objectType === 'location') {
                 return $this->drawLocation(array_pop(array_pop($master_array)), $this->conf['getdate']);
             }
         }
@@ -352,16 +360,16 @@ class SearchViews extends ListView
      */
     public function initTemplate(&$page)
     {
-        if ($page == '') {
+        if ($page === '') {
             $page = Functions::getContent($this->conf['view.']['search.']['searchResult' . ucwords($this->objectType) . 'Template']);
-            if ($page == '') {
+            if ($page === '') {
                 $this->error = true;
                 $this->errorMessage = 'No search ' . $this->objectType . ' result template file found for "view.search.searchResult' . ucwords($this->objectType) . 'Template" at >' . $this->conf['view.']['search.']['searchResult' . ucwords($this->objectType) . 'Template'] . '<';
                 $this->suggestMessage = 'Please make sure the path is correct and that you included the static template and double-check the path using the Typoscript Object Browser.';
                 return;
             }
         }
-        if ($this->conf['view'] == 'search_all') {
+        if ($this->conf['view'] === 'search_all') {
             $rems['###SEARCHFORM###'] = '';
             $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
         }
@@ -370,11 +378,12 @@ class SearchViews extends ListView
 
     /**
      * @param $page
+     * @return string
      */
-    public function getListSubpart($page)
+    public function getListSubpart($page): string
     {
         $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST_TEMPLATE###');
-        if ($listTemplate == '') {
+        if ($listTemplate === '') {
             $this->error = true;
             $this->errorMessage = 'No ###LIST_TEMPLATE### subpart found in "view.search.searchResult' . ucwords($this->objectType) . 'Template" at >' . $this->conf['view.']['search.']['searchResult' . ucwords($this->objectType) . 'Template'] . '<';
             $this->suggestMessage = 'Please include a ###LIST_TEMPLATE### subpart.';
@@ -389,9 +398,9 @@ class SearchViews extends ListView
      * @param $rems
      * @return string
      */
-    public function processObjects(&$master_array, &$sims, &$rems)
+    public function processObjects(&$master_array, &$sims, &$rems): string
     {
-        if ($this->objectType == 'event') {
+        if ($this->objectType === 'event') {
             return parent::processObjects($master_array, $sims, $rems);
         }
         // clear the register
@@ -401,7 +410,6 @@ class SearchViews extends ListView
         $GLOBALS['TSFE']->register['cal_list_eventcounter'] = 0;
         $GLOBALS['TSFE']->register['cal_list_days_total'] = 0;
 
-        $sectionMenu = '';
         $middle = '';
 
         // only proceed if the master_array is not empty
@@ -428,21 +436,11 @@ class SearchViews extends ListView
             }
 
             // start rendering the organizer
-            if (count($this->objectsInList) && $this->count > 0) {
+            if ($this->count > 0 && count($this->objectsInList)) {
                 $times = array_keys($this->objectsInList);
-                if ($times) {
-                    // preset vars
-                    $firstTime = true;
-                }
                 $listItemCount = 0;
                 $alternationCount = 0;
                 $pageItemCount = $this->recordsPerPage * $this->offset;
-
-                // don't assign these dates in one line like "$date1 = $date2 = $date3 = new CalDate()", as this will make all dates references to each other!!!
-                $lastEventDay = new  CalDate('000000001000000');
-                $lastEventWeek = new  CalDate('000000001000000');
-                $lastEventMonth = new  CalDate('000000001000000');
-                $lastEventYear = new  CalDate('000000001000000');
 
                 // prepare alternating layouts
                 $alternatingLayoutConfig = $this->conf['view.'][$this->conf['view'] . '.']['alternatingLayoutMarkers.'];
@@ -450,7 +448,7 @@ class SearchViews extends ListView
                     $alternatingLayouts = [];
                     $layout_keys = array_keys($alternatingLayoutConfig);
                     foreach ($layout_keys as $key) {
-                        if (substr($key, strlen($key) - 1) != '.') {
+                        if (substr($key, strlen($key) - 1) !== '.') {
                             $suffix = $this->cObj->stdWrap(
                                 $alternatingLayoutConfig[$key],
                                 $alternatingLayoutConfig[$key . '.']
@@ -502,10 +500,6 @@ class SearchViews extends ListView
 
                     $layoutNum = $alternationCount % count($alternatingLayouts);
                     $layoutSuffix = $alternatingLayouts[$layoutNum];
-                    $objectText = '';
-                    $tempSims = [];
-                    $tempRems = [];
-                    $wrapped = [];
                     $functionName = 'render' . ucwords($this->objectType) . 'For';
                     $objectText = $object->$functionName(strtoupper($this->conf['view']), $layoutSuffix);
 
@@ -523,8 +517,6 @@ class SearchViews extends ListView
                     }
 
                     $alternationCount++;
-                    $firstTime = false;
-
                     $middle .= $objectText;
                 }
 
@@ -553,7 +545,7 @@ class SearchViews extends ListView
      */
     public function walkThroughMasterArray(&$master_array, $reverse, &$firstEventDate)
     {
-        if ($this->objectType == 'event') {
+        if ($this->objectType === 'event') {
             return parent::walkThroughMasterArray($master_array, $reverse, $firstEventDate);
         }
         if (is_array($master_array)) {
@@ -573,9 +565,10 @@ class SearchViews extends ListView
      * @param $firstEventDate
      * @return bool
      */
-    public function processObject(&$object, &$id, &$firstEventDate)
+    public function processObject(&$object, &$id, &$firstEventDate): bool
     {
-        if ($this->objectType == 'event') {
+        $finished = '';
+        if ($this->objectType === 'event') {
             return parent::processObject($object, $id, $firstEventDate);
         }
         // Pagebrowser
@@ -591,7 +584,7 @@ class SearchViews extends ListView
 
             if ($this->count < $this->recordsPerPage * $this->offset || $this->count > $this->recordsPerPage * $this->offset + $this->recordsPerPage - 1) {
                 $this->count++;
-                if ($this->count == intval($this->conf['view.']['list.']['maxEvents'])) {
+                if ($this->count === intval($this->conf['view.']['list.']['maxEvents'])) {
                     $finished = true;
                 }
                 return $finished;
@@ -610,7 +603,7 @@ class SearchViews extends ListView
     public function getSearchAllLinkMarker(&$page, &$sims, &$rems, $view)
     {
         $sims['###SEARCH_ALL_LINK###'] = '';
-        if ($this->rightsObj->isViewEnabled('search_all') && $this->conf['view'] != 'search_all') {
+        if ($this->conf['view'] !== 'search_all' && $this->rightsObj->isViewEnabled('search_all')) {
             $this->initLocalCObject();
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_search_everything'));
             $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
