@@ -18,6 +18,7 @@ use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\DateParser;
+use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\EventModel;
@@ -61,6 +62,21 @@ class EventService extends BaseService
      * @var string
      */
     public $internalAdditionTable = '';
+
+
+    /**
+     * @var EventSharedUserMMRepository
+     */
+    protected $eventSharedUserMMRepository;
+
+    /**
+     * EventModel constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->eventSharedUserMMRepository = GeneralUtility::makeInstance(EventSharedUserMMRepository::class);
+    }
 
     /**
      * @return int
@@ -341,20 +357,13 @@ class EventService extends BaseService
             }
 
             if ($row['shared_user_cnt'] > 0) {
-                $select = 'uid_foreign,tablenames';
-                $table = 'tx_cal_event_shared_user_mm';
-                $where = 'uid_local = ' . $row['uid'];
-
-                $sharedUserResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-                if ($sharedUserResult) {
-                    while ($sharedUserRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($sharedUserResult)) {
-                        if ($sharedUserRow['tablenames'] === 'fe_users') {
-                            $event->addSharedUser($sharedUserRow['uid_foreign']);
-                        } elseif ($sharedUserRow['tablenames'] === 'fe_groups') {
-                            $event->addSharedGroup($sharedUserRow['uid_foreign']);
-                        }
+                $sharedUids = $this->eventSharedUserMMRepository->findSharedUidsByEventUid($this->getUid());
+                foreach ($sharedUids as $sharedUid) {
+                    if ($sharedUid['tablenames'] === 'fe_users') {
+                        $this->addSharedUser($sharedUid['uid_foreign']);
+                    }elseif ($sharedUid['tablenames'] === 'fe_groups') {
+                        $this->addSharedGroup($sharedUid['uid_foreign']);
                     }
-                    $GLOBALS['TYPO3_DB']->sql_free_result($sharedUserResult);
                 }
             }
 
@@ -964,35 +973,20 @@ class EventService extends BaseService
             if ($this->conf['rights.']['create.']['event.']['addFeUserToShared']) {
                 $user[] = $this->rightsObj->getUserId();
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($user),
-                $uid,
-                'fe_users'
-            );
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($user), $uid, 'fe_users');
             $ignore = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['create.']['event.']['addFeGroupToShared.']['ignore'],
                 1
             );
             $groupArray = array_diff($group, $ignore);
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($groupArray),
-                $uid,
-                'fe_groups'
-            );
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($groupArray), $uid, 'fe_groups');
         } else {
             $idArray = explode(',', $this->conf['rights.']['create.']['event.']['fields.']['shared.']['defaultUser']);
             if ($this->conf['rights.']['create.']['event.']['addFeUserToShared']) {
                 $idArray[] = $this->rightsObj->getUserId();
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($idArray),
-                $uid,
-                'fe_users'
-            );
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($idArray), $uid, 'fe_users');
 
             $groupArray = GeneralUtility::trimExplode(
                 ',',
@@ -1008,12 +1002,7 @@ class EventService extends BaseService
                 );
                 $groupArray = array_diff($idArray, $ignore);
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($groupArray),
-                $uid,
-                'fe_groups'
-            );
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($groupArray), $uid, 'fe_groups');
         }
 
         $category_mm_relation_table = 'sys_category_record_mm';
@@ -1308,19 +1297,9 @@ class EventService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'event', 'shared')) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_shared_user_mm', 'uid_local =' . $uid);
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($object->getSharedUsers()),
-                $uid,
-                'fe_users'
-            );
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($object->getSharedGroups()),
-                $uid,
-                'fe_groups'
-            );
+            $this->eventSharedUserMMRepository->deleteByEventUid($uid);
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($object->getSharedUsers()), $uid, 'fe_users');
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($object->getSharedGroups()), $uid, 'fe_groups');
         } else {
             $userIdArray = GeneralUtility::trimExplode(
                 ',',
@@ -1346,19 +1325,9 @@ class EventService extends BaseService
                 $groupIdArray = array_diff($groupIdArray, $ignore);
             }
             if (!empty($userIdArray) || !empty($groupIdArray)) {
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_shared_user_mm', 'uid_local =' . $uid);
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_event_shared_user_mm',
-                    array_unique($userIdArray),
-                    $uid,
-                    'fe_users'
-                );
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_event_shared_user_mm',
-                    array_unique($groupIdArray),
-                    $uid,
-                    'fe_groups'
-                );
+                $this->eventSharedUserMMRepository->deleteByEventUid($uid);
+                $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($userIdArray), $uid, 'fe_users');
+                $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($groupIdArray), $uid, 'fe_groups');
             }
         }
         if ($this->rightsObj->isAllowedTo(

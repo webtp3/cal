@@ -325,35 +325,20 @@ class TodoService extends EventService
             if ($this->conf['rights.']['create.']['todo.']['addFeUserToShared']) {
                 $user[] = $this->rightsObj->getUserId();
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($user),
-                $uid,
-                'fe_users'
-            );
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($user), $uid, 'fe_users');
             $ignore = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['create.']['todo.']['addFeGroupToShared.']['ignore'],
                 1
             );
             $groupArray = array_diff($group, $ignore);
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($groupArray),
-                $uid,
-                'fe_groups'
-            );
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($groupArray), $uid, 'fe_groups');
         } else {
             $idArray = explode(',', $this->conf['rights.']['create.']['todo.']['fields.']['shared.']['defaultUser']);
             if ($this->conf['rights.']['create.']['todo.']['addFeUserToShared']) {
                 $idArray[] = $this->rightsObj->getUserId();
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($idArray),
-                $uid,
-                'fe_users'
-            );
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($idArray), $uid, 'fe_users');
 
             $groupArray = GeneralUtility::trimExplode(
                 ',',
@@ -369,12 +354,7 @@ class TodoService extends EventService
                 );
                 $groupArray = array_diff($idArray, $ignore);
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($groupArray),
-                $uid,
-                'fe_groups'
-            );
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($groupArray), $uid, 'fe_groups');
         }
 
         if ($this->rightsObj->isAllowedTo('create', 'todo', 'category')) {
@@ -561,19 +541,9 @@ class TodoService extends EventService
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'todo', 'shared')) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_shared_user_mm', 'uid_local =' . $uid);
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($object->getSharedUsers()),
-                $uid,
-                'fe_users'
-            );
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_event_shared_user_mm',
-                array_unique($object->getSharedGroups()),
-                $uid,
-                'fe_groups'
-            );
+            $this->eventSharedUserMMRepository->deleteByEventUid($uid);
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($object->getSharedUsers()), $uid, 'fe_users');
+            $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($object->getSharedGroups()), $uid, 'fe_groups');
         } else {
             $userIdArray = GeneralUtility::trimExplode(
                 ',',
@@ -599,19 +569,9 @@ class TodoService extends EventService
                 $groupIdArray = array_diff($groupIdArray, $ignore);
             }
             if (!empty($userIdArray) || !empty($groupIdArray)) {
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_shared_user_mm', 'uid_local =' . $uid);
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_event_shared_user_mm',
-                    array_unique($userIdArray),
-                    $uid,
-                    'fe_users'
-                );
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_event_shared_user_mm',
-                    array_unique($groupIdArray),
-                    $uid,
-                    'fe_groups'
-                );
+                $this->eventSharedUserMMRepository->deleteByEventUid($uid);
+                $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($userIdArray), $uid, 'fe_users');
+                $this->eventSharedUserMMRepository->insertIdsIntoTableWithMMRelation(array_unique($groupIdArray), $uid, 'fe_groups');
             }
         }
     }

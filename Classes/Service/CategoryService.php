@@ -482,7 +482,6 @@ class CategoryService extends BaseService
                 $showPublicCategories,
                 $this->conf['view.']['calendar'] ? $this->conf['view.']['calendar'] : ''
             );
-            // ' AND tx_cal_event_shared_user_mm.uid_foreign = '.$this->rightsObj->getUserId();
             $where .= $this->cObj->enableFields('tx_cal_calendar') . $this->cObj->enableFields('tx_cal_category') . $this->cObj->enableFields('tx_cal_event');
             $where .= $this->getAdditionalWhereForLocalizationAndVersioning('tx_cal_category');
             $table = 'tx_cal_event LEFT JOIN tx_cal_event_shared_user_mm ON tx_cal_event.uid = tx_cal_event_shared_user_mm.uid_local ' . 'LEFT JOIN tx_cal_calendar ON tx_cal_event.calendar_id = tx_cal_calendar.uid ' . 'LEFT JOIN tx_cal_category ON tx_cal_calendar.uid = tx_cal_category.calendar_id';

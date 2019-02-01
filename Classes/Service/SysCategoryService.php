@@ -476,7 +476,6 @@ class SysCategoryService extends BaseService
                 $showPublicCategories,
                 $this->conf['view.']['calendar'] ?: ''
             );
-            // ' AND tx_cal_event_shared_user_mm.uid_foreign = '.$this->rightsObj->getUserId();
             $where .= $this->cObj->enableFields('tx_cal_calendar') . $this->cObj->enableFields('sys_category') . $this->cObj->enableFields('tx_cal_event');
             $where .= $this->getAdditionalWhereForLocalizationAndVersioning('sys_category');
             $table = 'tx_cal_event LEFT JOIN tx_cal_event_shared_user_mm ON tx_cal_event.uid = tx_cal_event_shared_user_mm.uid_local ' . 'LEFT JOIN tx_cal_calendar ON tx_cal_event.calendar_id = tx_cal_calendar.uid ' . 'LEFT JOIN sys_category ON tx_cal_calendar.uid = sys_category.calendar_id';

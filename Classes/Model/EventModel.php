@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\Model;
  */
 use RuntimeException;
 use TYPO3\CMS\Cal\Controller\Controller;
+use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
 use TYPO3\CMS\Cal\Service\RightsService;
 use TYPO3\CMS\Cal\Service\SysCategoryService;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -75,6 +76,11 @@ class EventModel extends Model
     public $markerCache = [];
 
     /**
+     * @var EventSharedUserMMRepository
+     */
+    protected $eventSharedUserMMRepository;
+
+    /**
      * EventModel constructor.
      * @param $row
      * @param $isException
@@ -84,6 +90,7 @@ class EventModel extends Model
     {
         parent::__construct($serviceKey);
 
+        $this->eventSharedUserMMRepository = GeneralUtility::makeInstance(EventSharedUserMMRepository::class);
         if (is_array($row)) {
             $this->createEvent($row, $isException);
         }
@@ -606,21 +613,13 @@ class EventModel extends Model
             $this->setOrganizerLink($row['organizer_link']);
         }
 
-        $this->sharedUsers = [];
-        $this->sharedGroups = [];
-        $table = 'tx_cal_event_shared_user_mm';
-        $select = 'uid_foreign,tablenames';
-        $where = 'uid_local = ' . $this->getUid();
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-        if ($result) {
-            while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['tablenames'] === 'fe_users') {
-                    $this->addSharedUser($row1['uid_foreign']);
-                } elseif ($row1['tablenames'] === 'fe_groups') {
-                    $this->addSharedGroup($row1['uid_foreign']);
-                }
+        $sharedUids = $this->eventSharedUserMMRepository->findSharedUidsByEventUid($this->getUid());
+        foreach ($sharedUids as $sharedUid) {
+            if ($sharedUid['tablenames'] === 'fe_users') {
+                $this->addSharedUser($sharedUid['uid_foreign']);
+            }elseif ($sharedUid['tablenames'] === 'fe_groups') {
+                $this->addSharedGroup($sharedUid['uid_foreign']);
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
 
         $this->notifyUserIds = [];
