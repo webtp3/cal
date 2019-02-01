@@ -865,9 +865,12 @@ class ModelController extends BaseController
      * @param $serviceName
      * @param $type
      * @param $subtype
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createTranslation($uid, $overlay, $serviceName, $type, $subtype)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $service = $this->getServiceObjByKey($serviceName, $subtype, $type);
         $service->createTranslation($uid, $overlay);
     }

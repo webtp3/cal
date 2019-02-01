@@ -2836,9 +2836,12 @@ class Controller extends AbstractPlugin
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function translation(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $type = $this->conf ['type'];
         $overlay = intval($this->piVars ['overlay']);
         $uid = $this->conf ['uid'];
@@ -2850,6 +2853,7 @@ class Controller extends AbstractPlugin
             // Hook: preCreateTranslation
             foreach ($hookObjectsArr as $hookObj) {
                 if (method_exists($hookObj, 'preCreateTranslation')) {
+                    trigger_error('The hook \'preCreateTranslation\' is deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
                     $hookObj->preCreateTranslation($this);
                 }
             }

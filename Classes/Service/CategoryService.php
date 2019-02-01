@@ -699,6 +699,7 @@ class CategoryService extends BaseService
     /**
      * @param $uid
      * @param $overlay
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createTranslation($uid, $overlay)
     {

@@ -300,9 +300,12 @@ class LocationAddressService extends BaseService
     /**
      * @param $uid
      * @param $overlay
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createTranslation($uid, $overlay)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $table = 'tt_address';
         $select = $table . '.*';
         $where = $table . '.uid = ' . $uid;

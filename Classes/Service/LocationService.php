@@ -527,9 +527,12 @@ class LocationService extends BaseService
     /**
      * @param $uid
      * @param $overlay
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createTranslation($uid, $overlay)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $table = 'tx_cal_location';
         $select = $table . '.*';
         $where = $table . '.uid = ' . $uid;

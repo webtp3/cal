@@ -2841,9 +2841,12 @@ class EventService extends BaseService
     /**
      * @param $uid
      * @param $overlay
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createTranslation($uid, $overlay)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $languageFlag = $GLOBALS['TSFE']->sys_language_content;
         // resetting the language to find the default translation!
         $GLOBALS['TSFE']->sys_language_content = 0;
