@@ -2,7 +2,10 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Cal\Domain\Repository\FnbUserGroupMMRepository;
+use TYPO3\CMS\Cal\Domain\Repository\UserGroupMMRepository;
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -88,12 +91,25 @@ class CalendarModel extends BaseModel
     ]; // array with method names as values, where the method has the naming scheme 'getCustomMethodName' (so, with 'get' prefix) and the method itself expects parameters and thus can not be fetched dynamically
 
     /**
+     * @var UserGroupMMRepository
+     */
+    protected $userGroupMMRepository;
+
+    /**
+     * @var FnbUserGroupMMRepository
+     */
+    protected $fnbUserGroupMMRepository;
+
+    /**
      * Constructor.
      * @param $row
      * @param $serviceKey
      */
     public function __construct($row, $serviceKey)
     {
+        $this->userGroupMMRepository = GeneralUtility::makeInstance(UserGroupMMRepository::class);
+        $this->fnbUserGroupMMRepository = GeneralUtility::makeInstance(FnbUserGroupMMRepository::class);
+
         $this->setType('tx_cal_calendar');
         $this->setObjectType('calendar');
         parent::__construct($serviceKey);
@@ -116,38 +132,13 @@ class CalendarModel extends BaseModel
         $this->setIcsFile($row['ics_file']);
         $this->setRefresh($row['refresh']);
         $this->setMD5($row['md5']);
-        $cObj = &Registry::Registry('basic', 'cobj');
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-            'tx_cal_calendar_fnb_user_group_mm.*',
-            'tx_cal_calendar_fnb_user_group_mm, fe_users, fe_groups',
-            // join on fe_users
-            '((uid_foreign = fe_users.uid AND tablenames="fe_users" ' . $cObj->enableFields('fe_users') . ') OR ' .
-            // join on fe_groups
-            '(uid_foreign = fe_groups.uid AND tablenames="fe_groups" ' . $cObj->enableFields('fe_groups') . ')) AND ' .
-            // general conditions
-            'uid_local=' . $this->getUid() . ' AND (fe_users.uid IS NOT NULL OR fe_groups.uid IS NOT NULL)'
-        );
-        if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $this->addFreeAndBusyUser($row['tablenames'], $row['uid_foreign']);
-            }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+        $fnbUserGroupMMs = $this->fnbUserGroupMMRepository->findAllByCalendarUid($this->getUid());
+        foreach ($fnbUserGroupMMs as $fnbUserGroupMM) {
+            $this->addFreeAndBusyUser($fnbUserGroupMM['tablenames'], $fnbUserGroupMM['uid_foreign']);
         }
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-            'tx_cal_calendar_user_group_mm.*',
-            'tx_cal_calendar_user_group_mm, fe_users, fe_groups',
-            // join on fe_users
-            '((uid_foreign = fe_users.uid AND tablenames="fe_users" ' . $cObj->enableFields('fe_users') . ') OR ' .
-            // join on fe_groups
-            '(uid_foreign = fe_groups.uid AND tablenames="fe_groups" ' . $cObj->enableFields('fe_groups') . ')) AND ' .
-            // general conditions
-            'uid_local=' . $this->getUid() . ' AND (fe_users.uid IS NOT NULL OR fe_groups.uid IS NOT NULL)'
-        );
-        if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $this->addOwner($row['tablenames'], $row['uid_foreign']);
-            }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+        $userGroupMMs = $this->userGroupMMRepository->findAllByCalendarUid($this->getUid());
+        foreach ($userGroupMMs as $userGroupMM) {
+            $this->addOwner($userGroupMM['tablenames'], $userGroupMM['uid_foreign']);
         }
     }
 

@@ -16,6 +16,8 @@ namespace TYPO3\CMS\Cal\Service;
  */
 use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Domain\Repository\FnbUserGroupMMRepository;
+use TYPO3\CMS\Cal\Domain\Repository\UserGroupMMRepository;
 use TYPO3\CMS\Cal\Hooks\TceMainProcessdatamap;
 use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -30,6 +32,26 @@ class CalendarService extends BaseService
     public $calendarSearchStringCache = [];
     public $calendarOwner;
     public $calendarIds;
+
+    /**
+     * @var UserGroupMMRepository
+     */
+    protected $userGroupMMRepository;
+
+    /**
+     * @var FnbUserGroupMMRepository
+     */
+    protected $fnbUserGroupMMRepository;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->userGroupMMRepository = GeneralUtility::makeInstance(UserGroupMMRepository::class);
+        $this->fnbUserGroupMMRepository = GeneralUtility::makeInstance(FnbUserGroupMMRepository::class);
+    }
 
     /**
      * @param $row
@@ -157,7 +179,7 @@ class CalendarService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedToEditCalendarOwner()) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_calendar_user_group_mm', 'uid_local =' . $uid);
+            $this->userGroupMMRepository->deleteByCalendarUid($uid);
             if ($this->controller->piVars['owner_ids'] !== '') {
                 $user = [];
                 $group = [];
@@ -166,8 +188,8 @@ class CalendarService extends BaseService
                     $user,
                     $group
                 );
-                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $user, $uid, 'fe_users');
-                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $group, $uid, 'fe_groups');
+                $this->userGroupMMRepository->insertIdsIntoTableWithMMRelation($user, $uid, 'fe_users');
+                $this->userGroupMMRepository->insertIdsIntoTableWithMMRelation($group, $uid, 'fe_groups');
             }
         }
         if ($this->rightsObj->isAllowedToEditCalendarFreeAndBusyUser()) {
@@ -180,8 +202,8 @@ class CalendarService extends BaseService
                     $user,
                     $group
                 );
-                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $user, $uid, 'fe_users');
-                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $group, $uid, 'fe_groups');
+                $this->fnbUserGroupMMRepository->insertIdsIntoTableWithMMRelation($user, $uid, 'fe_users');
+                $this->fnbUserGroupMMRepository->insertIdsIntoTableWithMMRelation($group, $uid, 'fe_groups');
             }
         }
         $this->unsetPiVars();
@@ -332,17 +354,17 @@ class CalendarService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedToCreateCalendarOwner()) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_calendar_user_group_mm', 'uid_local =' . $uid);
+            $this->userGroupMMRepository->deleteByCalendarUid($uid);
             if ($tempValues['owner_ids'] !== '') {
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['owner_ids'])), $user, $group);
-                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $user, $uid, 'fe_users');
-                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_user_group_mm', $group, $uid, 'fe_groups');
+                $this->userGroupMMRepository->insertIdsIntoTableWithMMRelation($user, $uid, 'fe_users');
+                $this->userGroupMMRepository->insertIdsIntoTableWithMMRelation($group, $uid, 'fe_groups');
             }
         }
         if ($this->rightsObj->isAllowedToCreateCalendarFreeAndBusyUser()) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_calendar_fnb_user_group_mm', 'uid_local =' . $uid);
+            $this->fnbUserGroupMMRepository->deleteByCalendarUid($uid);
             if ($tempValues['freeAndBusyUser_ids'] !== '') {
                 $user = [];
                 $group = [];
@@ -351,8 +373,8 @@ class CalendarService extends BaseService
                     $user,
                     $group
                 );
-                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $user, $uid, 'fe_users');
-                self::insertIdsIntoTableWithMMRelation('tx_cal_calendar_fnb_user_group_mm', $group, $uid, 'fe_groups');
+                $this->fnbUserGroupMMRepository->insertIdsIntoTableWithMMRelation($user, $uid, 'fe_users');
+                $this->fnbUserGroupMMRepository->insertIdsIntoTableWithMMRelation($group, $uid, 'fe_groups');
             }
         }
         return $uid;
@@ -441,19 +463,9 @@ class CalendarService extends BaseService
             return $ids;
         }
 
-        $orderBy = Functions::getOrderBy('tx_cal_calendar');
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-            'tx_cal_calendar_user_group_mm.uid_local',
-            'tx_cal_calendar_user_group_mm LEFT JOIN tx_cal_calendar ON tx_cal_calendar.uid=tx_cal_calendar_user_group_mm.uid_local',
-            '1=1 ' . $this->cObj->enableFields('tx_cal_calendar'),
-            '',
-            $orderBy
-        );
-        if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $ids[] = $row['uid_local'];
-            }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+        $userGroupMMs = $this->userGroupMMRepository->findAll();
+        foreach ($userGroupMMs as $userGroupMM) {
+            $ids[] = $userGroupMM['uid_local'];
         }
 
         $ids = array_unique($ids);
@@ -550,17 +562,13 @@ class CalendarService extends BaseService
     {
         if (empty($this->calendarOwner)) {
             $this->calendarOwner = [];
-            $table = 'tx_cal_calendar_user_group_mm';
             if ($this->conf['option'] === 'freeandbusy') {
-                $table = 'tx_cal_calendar_fnb_user_group_mm';
+                $groupMMs = $this->fnbUserGroupMMRepository->findAll();
+            } else {
+                $groupMMs = $this->userGroupMMRepository->findAll();
             }
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, '');
-            if ($result) {
-                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    $ids[] = $row['uid_local'];
-                    $this->calendarOwner[$row['uid_local']][$row['tablenames']][] = $row['uid_foreign'];
-                }
-                $GLOBALS['TYPO3_DB']->sql_free_result($result);
+            foreach ($groupMMs as $groupMM) {
+                $this->calendarOwner[$groupMM['uid_local']][$groupMM['tablenames']][] = $groupMM['uid_foreign'];
             }
         }
         return $this->calendarOwner;
