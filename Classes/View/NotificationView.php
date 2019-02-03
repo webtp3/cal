@@ -17,7 +17,6 @@ namespace TYPO3\CMS\Cal\View;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
-use TYPO3\CMS\Cal\Service\BaseService;
 use TYPO3\CMS\Cal\Service\EventService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -27,7 +26,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class NotificationView
  */
-class NotificationView extends BaseService
+class NotificationView extends BaseView
 {
     /**
      * @var MailMessage
@@ -85,17 +84,14 @@ class NotificationView extends BaseService
 
             $this->startMailer();
 
-            $select = 'fe_users.*';
-            $table = 'fe_users, tx_cal_fe_user_event_monitor_mm, tx_cal_event';
-            $where = 'fe_users.uid = tx_cal_fe_user_event_monitor_mm.uid_foreign AND tx_cal_fe_user_event_monitor_mm.tablenames = "fe_users" AND tx_cal_fe_user_event_monitor_mm.uid_local = tx_cal_event.uid AND tx_cal_event.uid = ' . $oldEventDataArray['uid'];
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-            while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['email'] !== '' && GeneralUtility::validEmail($row1['email'])) {
-                    $template = $this->conf['view.']['event.']['notify.'][$row1['uid'] . '.']['onChangeTemplate'];
+            $subscribers = $this->subscriptionRepository->findSubscribingUsersByEventUid($oldEventDataArray['uid']);
+            foreach ($subscribers as $subscriber) {
+                if ($subscriber['email'] !== '' && GeneralUtility::validEmail($subscriber['email'])) {
+                    $template = $this->conf['view.']['event.']['notify.'][$subscriber['uid'] . '.']['onChangeTemplate'];
                     if (!$template) {
                         $template = $this->conf['view.']['event.']['notify.']['all.']['onChangeTemplate'];
                     }
-                    $titleText = $this->conf['view.']['event.']['notify.'][$row1['uid'] . '.']['onChangeEmailTitle'];
+                    $titleText = $this->conf['view.']['event.']['notify.'][$subscriber['uid'] . '.']['onChangeEmailTitle'];
                     if (!$titleText) {
                         $titleText = $this->conf['view.']['event.']['notify.']['all.']['onChangeEmailTitle'];
                     }
@@ -105,30 +101,26 @@ class NotificationView extends BaseService
                             '',
                             [
                                 'tx_cal_controller[view]' => 'subscription',
-                                'tx_cal_controller[email]' => $row1['email'],
+                                'tx_cal_controller[email]' => $subscriber['email'],
                                 'tx_cal_controller[uid]' => $event_old->getUid(),
                                 'tx_cal_controller[monitor]' => 'stop',
-                                'tx_cal_controller[sid]' => md5($event_old->getUid() . $row1['email'] . $row1['crdate'])
+                                'tx_cal_controller[sid]' => md5($event_old->getUid() . $subscriber['email'] . $subscriber['crdate'])
                             ]
                         );
                     $this->sendNotificationOfChanges(
                         $event_old,
                         $event_new,
-                        $row1['email'],
+                        $subscriber['email'],
                         $template,
                         $titleText,
                         $unsubscribeLink
                     );
                 }
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
-            $select = 'tx_cal_unknown_users.*';
-            $table = 'tx_cal_unknown_users, tx_cal_fe_user_event_monitor_mm, tx_cal_event';
-            $where = 'tx_cal_unknown_users.uid = tx_cal_fe_user_event_monitor_mm.uid_foreign AND tx_cal_fe_user_event_monitor_mm.tablenames = "tx_cal_unknown_users" AND tx_cal_fe_user_event_monitor_mm.uid_local = tx_cal_event.uid AND tx_cal_event.uid = ' . $oldEventDataArray['uid'];
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-            while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['email'] !== '' && GeneralUtility::validEmail($row1['email'])) {
+            $subscribers = $this->subscriptionRepository->findUnknownSubscribingUsersByEventUid($oldEventDataArray['uid']);
+            foreach ($subscribers as $subscriber) {
+                if ($subscriber['email'] !== '' && GeneralUtility::validEmail($subscriber['email'])) {
                     $template = $this->conf['view.']['event.']['notify.']['all.']['onChangeTemplate'];
                     $titleText = $this->conf['view.']['event.']['notify.']['all.']['onChangeEmailTitle'];
                     $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
@@ -136,23 +128,22 @@ class NotificationView extends BaseService
                             '',
                             [
                                 'tx_cal_controller[view]' => 'subscription',
-                                'tx_cal_controller[email]' => $row1['email'],
+                                'tx_cal_controller[email]' => $subscriber['email'],
                                 'tx_cal_controller[uid]' => $event_old->getUid(),
                                 'tx_cal_controller[monitor]' => 'stop',
-                                'tx_cal_controller[sid]' => md5($event_old->getUid() . $row1['email'] . $row1['crdate'])
+                                'tx_cal_controller[sid]' => md5($event_old->getUid() . $subscriber['email'] . $subscriber['crdate'])
                             ]
                         );
                     $this->sendNotificationOfChanges(
                         $event_old,
                         $event_new,
-                        $row1['email'],
+                        $subscriber['email'],
                         $template,
                         $titleText,
                         $unsubscribeLink
                     );
                 }
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
             /** @var CategoryModel $category */
             foreach ($event_new->getCategories() as $category) {
@@ -188,12 +179,9 @@ class NotificationView extends BaseService
                 return;
             }
 
-            $select = 'tx_cal_fe_user_event_monitor_mm.uid_foreign';
-            $table = 'tx_cal_fe_user_event_monitor_mm';
-            $where = 'tx_cal_fe_user_event_monitor_mm.uid_local = ' . $oldEventDataArray['uid'] . ' AND tx_cal_fe_user_event_monitor_mm.tablenames = "fe_groups"';
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-            while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $serviceObj->getSubGroups($row1['uid_foreign'], '', $groups);
+            $groupUids = $this->subscriptionRepository->findSubscribingGroupsByEventUid($oldEventDataArray['uid']);
+            foreach ($groupUids as $groupUid) {
+                $serviceObj->getSubGroups($groupUid['uid_foreign'], '', $groups);
 
                 $select = 'DISTINCT fe_users.email';
                 $table = 'fe_groups, fe_users';
@@ -239,7 +227,6 @@ class NotificationView extends BaseService
                 }
                 $GLOBALS['TYPO3_DB']->sql_free_result($result2);
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
     }
 
@@ -388,28 +375,24 @@ class NotificationView extends BaseService
 
         if (is_object($event)) {
             $this->startMailer();
-            $select = 'fe_users.*';
-            $table = 'fe_users, tx_cal_fe_user_event_monitor_mm, tx_cal_event';
-            $where = 'fe_users.uid = tx_cal_fe_user_event_monitor_mm.uid_foreign AND  tx_cal_fe_user_event_monitor_mm.uid_local = tx_cal_event.uid AND tx_cal_event.deleted = ' . intval($newEventDataArray['deleted']) . ' AND tx_cal_event.uid = ' . $newEventDataArray['uid'];
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-
-            while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['email'] !== '' && GeneralUtility::validEmail($row1['email'])) {
+            $subscribers = $this->subscriptionRepository->findSubscribingUsersByEventUid($newEventDataArray['uid']);
+            foreach ($subscribers as $subscriber) {
+                if ($subscriber['email'] !== '' && GeneralUtility::validEmail($subscriber['email'])) {
                     if (($newEventDataArray['deleted'] + $forceDeletionMode) > 0) {
-                        $template = $this->conf['view.']['event.']['notify.']['fe_users_' . $row1['uid'] . '.']['onDeleteTemplate'];
+                        $template = $this->conf['view.']['event.']['notify.']['fe_users_' . $subscriber['uid'] . '.']['onDeleteTemplate'];
                         if (!$template) {
                             $template = $this->conf['view.']['event.']['notify.']['all.']['onDeleteTemplate'];
                         }
-                        $titleText = $this->conf['view.']['event.']['notify.']['fe_users_' . $row1['uid'] . '.']['onDeleteEmailTitle'];
+                        $titleText = $this->conf['view.']['event.']['notify.']['fe_users_' . $subscriber['uid'] . '.']['onDeleteEmailTitle'];
                         if (!$titleText) {
                             $titleText = $this->conf['view.']['event.']['notify.']['all.']['onDeleteEmailTitle'];
                         }
                     } else {
-                        $template = $this->conf['view.']['event.']['notify.']['fe_users_' . $row1['uid'] . '.']['onCreateTemplate'];
+                        $template = $this->conf['view.']['event.']['notify.']['fe_users_' . $subscriber['uid'] . '.']['onCreateTemplate'];
                         if (!$template) {
                             $template = $this->conf['view.']['event.']['notify.']['all.']['onCreateTemplate'];
                         }
-                        $titleText = $this->conf['view.']['event.']['notify.']['fe_users_' . $row1['uid'] . '.']['onCreateEmailTitle'];
+                        $titleText = $this->conf['view.']['event.']['notify.']['fe_users_' . $subscriber['uid'] . '.']['onCreateEmailTitle'];
                         if (!$titleText) {
                             $titleText = $this->conf['view.']['event.']['notify.']['all.']['onCreateEmailTitle'];
                         }
@@ -420,23 +403,19 @@ class NotificationView extends BaseService
                             '',
                             [
                                 'tx_cal_controller[view]' => 'subscription',
-                                'tx_cal_controller[email]' => $row1['email'],
+                                'tx_cal_controller[email]' => $subscriber['email'],
                                 'tx_cal_controller[uid]' => $event->getUid(),
                                 'tx_cal_controller[monitor]' => 'stop',
-                                'tx_cal_controller[sid]' => md5($event->getUid() . $row1['email'] . $row1['crdate'])
+                                'tx_cal_controller[sid]' => md5($event->getUid() . $subscriber['email'] . $subscriber['crdate'])
                             ]
                         );
-                    $this->sendNotification($event, $row1['email'], $template, $titleText, $unsubscribeLink);
+                    $this->sendNotification($event, $subscriber['email'], $template, $titleText, $unsubscribeLink);
                 }
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
-            $select = 'tx_cal_unknown_users.*';
-            $table = 'tx_cal_unknown_users, tx_cal_fe_user_event_monitor_mm, tx_cal_event';
-            $where = 'tx_cal_unknown_users.uid = tx_cal_fe_user_event_monitor_mm.uid_foreign AND  tx_cal_fe_user_event_monitor_mm.uid_local = tx_cal_event.uid AND tx_cal_event.uid = ' . $event->getUid();
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-            while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['email'] !== '' && GeneralUtility::validEmail($row1['email'])) {
+            $subscribers = $this->subscriptionRepository->findUnknownSubscribingUsersByEventUid($event->getUid());
+            foreach ($subscribers as $subscriber) {
+                if ($subscriber['email'] !== '' && GeneralUtility::validEmail($subscriber['email'])) {
                     $template = $this->conf['view.']['event.']['notify.']['all.']['onCreateTemplate'];
                     $titleText = $this->conf['view.']['event.']['notify.']['all.']['onCreateEmailTitle'];
                     if (($newEventDataArray['deleted'] + $forceDeletionMode) > 0) {
@@ -448,16 +427,15 @@ class NotificationView extends BaseService
                             '',
                             [
                                 'tx_cal_controller[view]' => 'subscription',
-                                'tx_cal_controller[email]' => $row1['email'],
+                                'tx_cal_controller[email]' => $subscriber['email'],
                                 'tx_cal_controller[uid]' => $event->getUid(),
                                 'tx_cal_controller[monitor]' => 'stop',
-                                'tx_cal_controller[sid]' => md5($event->getUid() . $row1['email'] . $row1['crdate'])
+                                'tx_cal_controller[sid]' => md5($event->getUid() . $subscriber['email'] . $subscriber['crdate'])
                             ]
                         );
-                    $this->sendNotification($event, $row1['email'], $template, $titleText, $unsubscribeLink);
+                    $this->sendNotification($event, $subscriber['email'], $template, $titleText, $unsubscribeLink);
                 }
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
             /** @var CategoryModel $category */
             foreach ($event->getCategories() as $category) {
@@ -491,16 +469,9 @@ class NotificationView extends BaseService
             $subType = 'getGroupsFE';
             $groups = [];
             $serviceObj = GeneralUtility::makeInstanceService('auth', $subType);
-            if ($serviceObj === null) {
-                return;
-            }
-
-            $select = 'tx_cal_fe_user_event_monitor_mm.uid_local';
-            $table = 'tx_cal_fe_user_event_monitor_mm';
-            $where = 'tx_cal_fe_user_event_monitor_mm.uid_foreign = ' . $event->getUid() . ' AND tx_cal_fe_user_event_monitor_mm.tablenames = "fe_groups"';
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-            while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $serviceObj->getSubGroups($row1['uid_local'], '', $groups);
+            $groupUids = $this->subscriptionRepository->findSubscribingGroupsByEventUid($event->getUid());
+            foreach ($groupUids as $groupUid) {
+                $serviceObj->getSubGroups($groupUid['uid_local'], '', $groups);
 
                 $select = 'DISTINCT fe_users.email';
                 $table = 'fe_groups, fe_users';
@@ -550,7 +521,6 @@ class NotificationView extends BaseService
                 }
                 $GLOBALS['TYPO3_DB']->sql_free_result($result2);
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
     }
 

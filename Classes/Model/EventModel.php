@@ -14,9 +14,9 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use RuntimeException;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
+use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
 use TYPO3\CMS\Cal\Service\RightsService;
 use TYPO3\CMS\Cal\Service\SysCategoryService;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -81,6 +81,11 @@ class EventModel extends Model
     protected $eventSharedUserMMRepository;
 
     /**
+     * @var SubscriptionRepository
+     */
+    protected $subscriptionRepository;
+
+    /**
      * EventModel constructor.
      * @param $row
      * @param $isException
@@ -91,6 +96,7 @@ class EventModel extends Model
         parent::__construct($serviceKey);
 
         $this->eventSharedUserMMRepository = GeneralUtility::makeInstance(EventSharedUserMMRepository::class);
+        $this->subscriptionRepository = GeneralUtility::makeInstance(SubscriptionRepository::class);
         if (is_array($row)) {
             $this->createEvent($row, $isException);
         }
@@ -617,26 +623,18 @@ class EventModel extends Model
         foreach ($sharedUids as $sharedUid) {
             if ($sharedUid['tablenames'] === 'fe_users') {
                 $this->addSharedUser($sharedUid['uid_foreign']);
-            }elseif ($sharedUid['tablenames'] === 'fe_groups') {
+            } elseif ($sharedUid['tablenames'] === 'fe_groups') {
                 $this->addSharedGroup($sharedUid['uid_foreign']);
             }
         }
 
-        $this->notifyUserIds = [];
-        $this->notifyGroupIds = [];
-        $table = 'tx_cal_fe_user_event_monitor_mm';
-        $select = 'uid_foreign,tablenames,offset';
-        $where = 'uid_local = ' . $this->getUid();
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-        if ($result) {
-            while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                if ($row1['tablenames'] === 'fe_users') {
-                    $this->addNotifyUser($row1['uid_foreign'] . '|' . $row1['offset']);
-                } elseif ($row1['tablenames'] === 'fe_groups') {
-                    $this->addNotifyGroup($row1['uid_foreign'] . '|' . $row1['offset']);
-                }
+        $events = $this->subscriptionRepository->findSubscribingUsersAndGroupsByEventUid($this->getUid());
+        foreach ($events as $event) {
+            if ($event['tablenames'] === 'fe_users') {
+                $this->addNotifyUser($event['uid_foreign'] . '|' . $event['offset']);
+            } elseif ($event['tablenames'] === 'fe_groups') {
+                $this->addNotifyGroup($event['uid_foreign'] . '|' . $event['offset']);
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
     }
 
@@ -1030,22 +1028,16 @@ class EventModel extends Model
                     case 'start':
                         {
                             if ($user_uid > 0) {
-                                $table = 'tx_cal_fe_user_event_monitor_mm';
-                                $fields_values = [
-                                    'uid_local' => $uid,
-                                    'uid_foreign' => $user_uid,
-                                    'tablenames' => 'fe_users',
-                                    'sorting' => 1,
-                                    'pid' => $this->conf['rights.']['create.']['event.']['saveEventToPid'],
-                                    'offset' => $this->conf['view.']['event.']['remind.']['time']
-                                ];
-                                $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $fields_values);
-                                if (false === $result) {
-                                    throw new RuntimeException(
-                                        'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
-                                        1431458137
-                                    );
-                                }
+                                $this->subscriptionRepository->insert(
+                                    [
+                                        'uid_local' => $uid,
+                                        'uid_foreign' => $user_uid,
+                                        'tablenames' => 'fe_users',
+                                        'sorting' => 1,
+                                        'pid' => $this->conf['rights.']['create.']['event.']['saveEventToPid'],
+                                        'offset' => $this->conf['view.']['event.']['remind.']['time']
+                                    ]
+                                );
 
                                 $date = new CalDate();
                                 $date->setTZbyID('UTC');
@@ -1170,9 +1162,7 @@ class EventModel extends Model
                     case 'stop':
                         {
                             if ($user_uid > 0) {
-                                $table = 'tx_cal_fe_user_event_monitor_mm';
-                                $where = 'uid_foreign = ' . $user_uid . ' AND uid_local = ' . $uid . ' AND tablenames = "fe_users"';
-                                $GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
+                                $this->subscriptionRepository->deleteByEventUidAndSharedUidAndTable($uid, $user_uid, 'fe_users');
                             } else {
                                 if ((int)$this->conf['subscribeWithCaptcha'] === 1 && ExtensionManagementUtility::isLoaded('captcha')) {
                                     session_start();
@@ -1295,40 +1285,22 @@ class EventModel extends Model
 
             /* If we have a logged in user */
             if ($rightsObj->isLoggedIn()) {
-                $select = '*';
-                $from_table = 'tx_cal_fe_user_event_monitor_mm';
-                $whereClause = 'uid_foreign = ' . $rightsObj->getUserId() . ' AND uid_local = ' . $uid;
-
-                $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                    $select,
-                    $from_table,
-                    $whereClause,
-                    $groupBy = '',
-                    $orderBy = '',
-                    $limit = ''
-                );
-                $found_one = false;
                 // create a local cObj with a customized data array, that is allowed to be changed
                 $this->initLocalCObject($this->getValuesAsArray());
-                $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_monitor_event_logged_in_monitoring'));
-                if ($result) {
-                    while ($row1 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                        $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
-                            'view' => 'event',
-                            'monitor' => 'stop',
-                            'type' => $type,
-                            'uid' => $uid
-                        ], $this->conf['cache'], $this->conf['clear_anyway']);
-                        $rems['###SUBSCRIPTION###'] = $this->local_cObj->cObjGetSingle(
-                            $this->conf['view.'][$view . '.']['event.']['isMonitoringEventLink'],
-                            $this->conf['view.'][$view . '.']['event.']['isMonitoringEventLink.']
-                        );
-                        $found_one = true;
-                    }
-                    $GLOBALS['TYPO3_DB']->sql_free_result($result);
-                }
-
-                if (!$found_one) {
+                $result = $this->subscriptionRepository->findSubscriptionByEventUidAndSubscribingUserUid($uid, $rightsObj->getUserId());
+                if (!empty($result)) {
+                    $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_monitor_event_logged_in_monitoring'));
+                    $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
+                        'view' => 'event',
+                        'monitor' => 'stop',
+                        'type' => $type,
+                        'uid' => $uid
+                    ], $this->conf['cache'], $this->conf['clear_anyway']);
+                    $rems['###SUBSCRIPTION###'] = $this->local_cObj->cObjGetSingle(
+                        $this->conf['view.'][$view . '.']['event.']['isMonitoringEventLink'],
+                        $this->conf['view.'][$view . '.']['event.']['isMonitoringEventLink.']
+                    );
+                } else {
                     $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_monitor_event_logged_in_nomonitoring'));
                     $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
                         'view' => 'event',

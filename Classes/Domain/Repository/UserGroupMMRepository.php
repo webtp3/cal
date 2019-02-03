@@ -34,7 +34,7 @@ class UserGroupMMRepository extends DoctrineRepository
             ->from($this->table, 'user_group_mm')
             ->join('user_group_mm', 'fe_groups', 'fe_groups', 'user_group_mm.uid_foreign = fe_groups.uid')
             ->join('user_group_mm', 'fe_users', 'fe_users', 'user_group_mm.uid_foreign = fe_users.uid')
-            ->join('user_group_mm', 'tx_cal_calendar', 'calendar', 'user_group_mm.uid_local = tx_cal_calendar.uid')
+            ->join('user_group_mm', 'tx_cal_calendar', 'calendar', 'user_group_mm.uid_local = calendar.uid')
             ->where(
                 $queryBuilder
                     ->expr()
@@ -59,7 +59,7 @@ class UserGroupMMRepository extends DoctrineRepository
             ->from($this->table, 'user_group_mm')
             ->join('user_group_mm', 'fe_groups', 'fe_groups', 'user_group_mm.uid_foreign = fe_groups.uid')
             ->join('user_group_mm', 'fe_users', 'fe_users', 'user_group_mm.uid_foreign = fe_users.uid')
-            ->join('user_group_mm', 'tx_cal_calendar', 'calendar', 'user_group_mm.uid_local = tx_cal_calendar.uid')
+            ->join('user_group_mm', 'tx_cal_calendar', 'calendar', 'user_group_mm.uid_local = calendar.uid')
             ->execute()
             ->fetchAll();
     }

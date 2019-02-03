@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\View;
  */
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\Controller;
+use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Model\CategoryModel;
@@ -61,10 +62,16 @@ class BaseView extends BaseService
      */
     protected $markerBasedTemplateService;
 
+    /**
+     * @var SubscriptionRepository
+     */
+    protected $subscriptionRepository;
+
     public function __construct()
     {
         parent::__construct();
         $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+        $this->subscriptionRepository = GeneralUtility::makeInstance(SubscriptionRepository::class);
         $this->pointerName = $this->controller->getPointerName();
     }
 

@@ -29,10 +29,53 @@ class DoctrineRepository
     /**
      * @return QueryBuilder
      */
-    protected function getQueryBuilder(): QueryBuilder
+    public function getQueryBuilder(): QueryBuilder
     {
         return GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable($this->table)
             ->createQueryBuilder();
+    }
+
+    /**
+     * @return array
+     */
+    public function findAll(): array
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        return $queryBuilder
+            ->select('*')
+            ->from($this->table)
+            ->execute()
+            ->fetchAll();
+    }
+
+    /**
+     * @param int $uid
+     * @return array
+     */
+    public function findOneByUid(int $uid): array
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        return $queryBuilder
+            ->select('*')
+            ->from($this->table)
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))
+            ->execute()
+            ->fetch();
+    }
+
+    /**
+     * @param int $uid
+     * @param array $values
+     * @return int
+     */
+    public function updateByUid(int $uid, array $values): int
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        return $queryBuilder
+            ->update($this->table)
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))
+            ->values($values)
+            ->execute();
     }
 }

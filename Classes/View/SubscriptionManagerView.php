@@ -24,6 +24,7 @@ use TYPO3\CMS\Cal\Utility\Functions;
  */
 class SubscriptionManagerView extends BaseView
 {
+
     /**
      * Main function to draw the subscription manager view.
      *
@@ -100,25 +101,22 @@ class SubscriptionManagerView extends BaseView
                 $sims['###STATUS###'] = sprintf($this->controller->pi_getLL($noeventmessage));
             }
         } elseif ($this->conf['subscribeFeUser'] && $this->rightsObj->isLoggedIn()) {
-            $select = '*';
-            $table = 'tx_cal_fe_user_event_monitor_mm, tx_cal_event';
-            $where = 'tx_cal_event.uid = tx_cal_fe_user_event_monitor_mm.uid_local AND tx_cal_fe_user_event_monitor_mm.uid_foreign IN (' . $this->rightsObj->getUserId() . ')';
-            $where .= ' AND tx_cal_event.deleted = 0 AND tx_cal_event.hidden = 0';
-            $where .= ' AND tx_cal_event.pid IN (' . $this->conf['pidList'] . ')';
+            $events = $this->subscriptionRepository->findEventsBySubscribersUids($this->rightsObj->getUserId());
 
             /* Save to temporary variables */
             $remUid = $this->conf['uid'];
             $remType = $this->conf['type'];
-
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
             $eventList = [];
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+            foreach ($events as $event) {
                 $local_rems = [];
                 $local_sims = [];
                 $local_wrapped = [];
-                $subscriptionContainer = $this->markerBasedTemplateService->getSubpart($page, '###SUBSCRIPTION_CONTAINER###');
+                $subscriptionContainer = $this->markerBasedTemplateService->getSubpart(
+                    $page,
+                    '###SUBSCRIPTION_CONTAINER###'
+                );
                 $event = $this->modelObj->findEvent(
-                    $row['uid'],
+                    $event['uid'],
                     'tx_cal_phpicalendar',
                     $this->conf['pidList'],
                     true,
@@ -127,7 +125,7 @@ class SubscriptionManagerView extends BaseView
                     true,
                     false
                 );
-                $this->conf['uid'] = $row['uid'];
+                $this->conf['uid'] = $event['uid'];
                 $this->conf['type'] = $event->getType();
                 $event->getMarker($subscriptionContainer, $local_sims, $local_rems, $local_wrapped);
                 $eventList[] = '<li>' . Functions::substituteMarkerArrayNotCached(
@@ -137,7 +135,6 @@ class SubscriptionManagerView extends BaseView
                         $local_wrapped
                     ) . '</li>';
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
 
             /* Restore from temporary variables */
             $this->conf['uid'] = $remUid;
@@ -165,7 +162,7 @@ class SubscriptionManagerView extends BaseView
      * tx_cal_unknown_users table.
      *
      * @param string        Email address to unsubscribe.
-     * @param EventModel $event        Event that email should be unsubscribed from.
+     * @param EventModel $event Event that email should be unsubscribed from.
      * @param string        Unique hash of email and event.
      * @return bool whether unsubscribe was successful.
      * @todo Should we always try to unsubscribe both fe users and unknown
@@ -199,34 +196,28 @@ class SubscriptionManagerView extends BaseView
      */
     public function unsubscribeByTable($table, $email, $eventUID, $subscriptionHash): bool
     {
-        $sqlSelect = 'tx_cal_event.uid, ' . $table . '.crdate, ' . $table . '.email';
-        $sqlTable = 'tx_cal_fe_user_event_monitor_mm, tx_cal_event, ' . $table;
-        $sqlWhere = 'tx_cal_event.uid = ' . $eventUID . ' AND tx_cal_event.pid IN (' . $this->conf['pidList'] . ')' . $this->cObj->enableFields('tx_cal_event');
-        $sqlWhere .= ' AND (tx_cal_event.uid = tx_cal_fe_user_event_monitor_mm.uid_local AND tx_cal_fe_user_event_monitor_mm.uid_foreign = ' . $table . '.uid AND ' . $table . '.email = "' . $email . '")';
+        $returnValue = false;
 
-        $unsubscribeUids = [];
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($sqlSelect, $sqlTable, $sqlWhere);
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-            $md5 = md5($row['uid'] . $row['email'] . $row['crdate']);
-            if ($md5 === $subscriptionHash) {
-                $unsubscribeUids[] = $row['uid'];
+        switch ($table) {
+            case 'fe_users':
+                $elements = $this->subscriptionRepository->findSubscribingUsersByEventUid($eventUID);
+                break;
+            case 'fe_groups':
+                $elements = $this->subscriptionRepository->findSubscribingGroupsByEventUid($eventUID);
+                break;
+            case 'tx_cal_unknown_users':
+                $elements = $this->subscriptionRepository->findUnknownSubscribingUsersByEventUid($eventUID);
+                break;
+            default:
+                $elements = [];
+        }
+
+        foreach ($elements as $element) {
+            if (md5($eventUID . $element['email'] . $element['crdate']) === $subscriptionHash) {
+                $this->subscriptionRepository->deleteByEventUidAndTable($eventUID, $table);
+                $returnValue = true;
             }
         }
-        $GLOBALS['TYPO3_DB']->sql_free_result($result);
-
-        if (!empty($unsubscribeUids)) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-                'tx_cal_fe_user_event_monitor_mm',
-                'tx_cal_fe_user_event_monitor_mm.uid_local IN (' . implode(
-                    ',',
-                    $unsubscribeUids
-                ) . ') AND tx_cal_fe_user_event_monitor_mm.tablenames = "' . $table . '"'
-            );
-            $returnValue = true;
-        } else {
-            $returnValue = false;
-        }
-
         return $returnValue;
     }
 
@@ -235,7 +226,7 @@ class SubscriptionManagerView extends BaseView
      * subscription hash matches.
      *
      * @param string        Email address to subscribe.
-     * @param EventModel $event        Event that email should be subscribed to.
+     * @param EventModel $event Event that email should be subscribed to.
      * @param string        Unique Hash of email and event.
      * @return bool whether subscribe was successful.
      * @todo Should we always try to subscribe as a frontend user first?
@@ -244,9 +235,7 @@ class SubscriptionManagerView extends BaseView
     {
         $md5 = md5($event->getUid() . $email . $event->getCrdate());
         $eventUID = $event->getUid();
-        $eventPID = $event->getPid();
 
-        $offset = $this->conf['view.']['event.']['remind.']['time'];
         /* If the subscription hash matches, subscribe */
         if ($md5 === $subscriptionHash) {
             $user_uid = $this->getFrontendUserUid($email);
@@ -257,16 +246,23 @@ class SubscriptionManagerView extends BaseView
                 $user_table = 'tx_cal_unknown_users';
             }
 
-            /* Insert the user ID into the monitor table */
-            $this->insertMMRow(
-                'tx_cal_fe_user_event_monitor_mm',
+            $result = $this->subscriptionRepository->findByEventUidAndSharedUidAndTable(
                 $eventUID,
                 $user_uid,
-                $user_table,
-                1,
-                $offset,
-                $eventPID
+                $user_table
             );
+            if (empty($result)) {
+                $this->subscriptionRepository->insert(
+                    [
+                        'uid_local' => $eventUID,
+                        'uid_foreign' => $user_uid,
+                        'tablenames' => $user_table,
+                        'sorting' => 1,
+                        'offset' => $this->conf['view.']['event.']['remind.']['time'],
+                        'pid' => $event->getPid()
+                    ]
+                );
+            }
 
             $date = new  CalDate();
             $date->setTZbyID('UTC');
@@ -289,42 +285,32 @@ class SubscriptionManagerView extends BaseView
      * @param int $offset
      * @param int $eventPid
      * @return int whether a new row was inserted.
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function insertMMRow($mmTable, $uid_local, $uid_foreign, $table, $sorting, $offset = 0, $eventPid = 0): int
     {
-        $already_exists = false;
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. If you need it, copy it.', E_USER_DEPRECATED);
 
-        /* Check if row already exists */
-        $where = 'uid_local =' . $uid_local . ' AND uid_foreign = ' . $uid_foreign . ' AND tablenames="' . $table . '"';
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid_local', $mmTable, $where);
-        if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-            $already_exists = true;
-        }
-        $GLOBALS['TYPO3_DB']->sql_free_result($result);
+        $insertedRow = false;
 
-        /* If the row does not exist, insert it */
-        if (!$already_exists) {
-            $fields_values = [
-                'uid_local' => $uid_local,
-                'uid_foreign' => $uid_foreign,
-                'tablenames' => $table,
-                'sorting' => $sorting,
-                'offset' => $offset,
-                'pid' => $eventPid
-            ];
-            $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($mmTable, $fields_values);
-            if (false === $result) {
-                throw new RuntimeException(
-                    'Could not write ' . $mmTable . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
-                    1431458161
-                );
-            }
+        $result = $this->subscriptionRepository->findByEventUidAndSharedUidAndTable(
+            $uid_local,
+            $uid_foreign,
+            $table
+        );
+        if (empty($result)) {
+            $this->subscriptionRepository->insert(
+                [
+                    'uid_local' => $uid_local,
+                    'uid_foreign' => $uid_foreign,
+                    'tablenames' => $table,
+                    'sorting' => $sorting,
+                    'offset' => $offset,
+                    'pid' => $eventPid
+                ]
+            );
             $insertedRow = true;
-        } else {
-            /* Row exists so do nothing */
-            $insertedRow = false;
         }
-
         return $insertedRow;
     }
 

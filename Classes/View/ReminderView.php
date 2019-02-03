@@ -30,6 +30,7 @@ use TYPO3\CMS\Scheduler\Scheduler;
  */
 class ReminderView extends NotificationView
 {
+
     /**
      * @param $event
      * @param $eventMonitor
@@ -107,14 +108,10 @@ class ReminderView extends NotificationView
         // get the related monitoring records
         $taskId = null;
 
-        $select = '*';
-        $table = 'tx_cal_fe_user_event_monitor_mm';
-        $where = 'uid_local = ' . $calEventUID;
-
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-            $taskId = $row['schedulerId'];
-            $offset = $row['offset'];
+        $events = $this->subscriptionRepository->findByEventUid($calEventUID);
+        foreach ($events as $event) {
+            $taskId = $event['schedulerId'];
+            $offset = $event['offset'];
 
             // maybe there is a recurring instance
             // get the uids of recurring events from index
@@ -174,14 +171,14 @@ class ReminderView extends NotificationView
                                 $calEventUID,
                                 $timestamp,
                                 $offset,
-                                $row['uid']
+                                $event['uid']
                             );
                         }
                     } else {
                         $this->deleteReminder($calEventUID);
                     }
                 } else {
-                    $this->createSchedulerTask($scheduler, $date, $calEventUID, $timestamp, $offset, $row['uid']);
+                    $this->createSchedulerTask($scheduler, $date, $calEventUID, $timestamp, $offset, $event['uid']);
                 }
             }
         }
@@ -233,9 +230,7 @@ class ReminderView extends NotificationView
             $execution->setEnd(time() - 1);
             $task->setExecution($execution);
             $scheduler->addTask($task);
-            $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_cal_fe_user_event_monitor_mm', 'uid=' . $uid, [
-                'schedulerId' => $task->getTaskUid()
-            ]);
+            $this->subscriptionRepository->updateByUid($uid, ['schedulerId' => $task->getTaskUid()]);
         }
     }
 
@@ -245,8 +240,8 @@ class ReminderView extends NotificationView
     public function deleteReminder($eventUid)
     {
         if (ExtensionManagementUtility::isLoaded('scheduler')) {
-            $eventRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_fe_user_event_monitor_mm', 'uid_local=' . $eventUid);
-            $taskId = $eventRow['schedulerId'];
+            $events = $this->subscriptionRepository->findByEventUid($eventUid);
+            $taskId = $events[0]['schedulerId'];
             if ($taskId > 0) {
                 $scheduler = new Scheduler();
                 try {
@@ -263,15 +258,9 @@ class ReminderView extends NotificationView
      */
     public function deleteReminderForEvent($eventUid)
     {
-        // get the related monitoring records
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-            'uid_local',
-            'tx_cal_fe_user_event_monitor_mm',
-            'uid_local = ' . $eventUid
-        );
-        while ($monitorRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-            /* Check for existing gabriel events and remove them */
-            $this->deleteReminder($monitorRow['uid_local']);
+        $events = $this->subscriptionRepository->findByEventUid($eventUid);
+        foreach ($events as $event) {
+            $this->deleteReminder($event['uid_local']);
         }
     }
 }

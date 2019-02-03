@@ -442,44 +442,16 @@ class CreateEventView extends FeEditingBaseView
     public function prepareUserArray()
     {
         if ($this->isEditMode) {
-            // selection uids of available notify/monitor users & -groups
             $this->cal_notifyUserIds = [];
-            $where = ' AND tx_cal_event.uid=' . $this->object->getUid() . ' AND fe_users.deleted = 0 AND fe_users.disable = 0' . $this->cObj->enableFields('tx_cal_event');
-            // TODO add this when groups are allowed: AND tx_cal_fe_user_event_monitor_mm.tablenames="fe_users"
-            $orderBy = '';
-            $groupBy = '';
-            $limit = '';
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query(
-                'fe_users.*',
-                'tx_cal_event',
-                'tx_cal_fe_user_event_monitor_mm',
-                'fe_users',
-                $where,
-                $groupBy,
-                $orderBy,
-                $limit
-            );
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $this->cal_notifyUserIds[] = $row['uid'];
+            $users = $this->subscriptionRepository->findSubscribingUsersByEventUid($this->object->getUid());
+            foreach ($users as $user) {
+                $this->cal_notifyUserIds[] = $user['uid'];
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
-
             $this->cal_notifyGroupIds = [];
-            $where = ' AND tx_cal_event.uid=' . $this->object->getUid() . ' AND tx_cal_fe_user_event_monitor_mm.tablenames="fe_groups" ' . $this->cObj->enableFields('tx_cal_event');
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECT_mm_query(
-                'fe_groups.*',
-                'tx_cal_event',
-                'tx_cal_fe_user_event_monitor_mm',
-                'fe_groups',
-                $where,
-                $groupBy,
-                $orderBy,
-                $limit
-            );
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $this->cal_notifyGroupIds[] = $row['uid'];
+            $groups = $this->subscriptionRepository->findSubscribingGroupsByEventUid($this->object->getUid());
+            foreach ($groups as $group) {
+                $this->cal_notifyGroupIds[] = $group['uid_foreign'];
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
     }
 

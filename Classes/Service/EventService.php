@@ -19,6 +19,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\DateParser;
 use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
+use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\EventModel;
@@ -63,11 +64,15 @@ class EventService extends BaseService
      */
     public $internalAdditionTable = '';
 
-
     /**
      * @var EventSharedUserMMRepository
      */
     protected $eventSharedUserMMRepository;
+
+    /**
+     * @var SubscriptionRepository
+     */
+    protected $subscriptionRepository;
 
     /**
      * EventModel constructor.
@@ -76,6 +81,7 @@ class EventService extends BaseService
     {
         parent::__construct();
         $this->eventSharedUserMMRepository = GeneralUtility::makeInstance(EventSharedUserMMRepository::class);
+        $this->subscriptionRepository = GeneralUtility::makeInstance(SubscriptionRepository::class);
     }
 
     /**
@@ -361,7 +367,7 @@ class EventService extends BaseService
                 foreach ($sharedUids as $sharedUid) {
                     if ($sharedUid['tablenames'] === 'fe_users') {
                         $this->addSharedUser($sharedUid['uid_foreign']);
-                    }elseif ($sharedUid['tablenames'] === 'fe_groups') {
+                    } elseif ($sharedUid['tablenames'] === 'fe_groups') {
                         $this->addSharedGroup($sharedUid['uid_foreign']);
                     }
                 }
@@ -875,12 +881,16 @@ class EventService extends BaseService
                 self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
                 foreach ($user as $u) {
                     $userOffsetArray = GeneralUtility::trimExplode('_', $u, 1);
-                    self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
-                        $userOffsetArray[0]
-                    ], $uid, 'fe_users', [
-                        'offset' => $userOffsetArray[1] ?? $this->conf['view.']['event.']['remind.']['time'],
-                        'pid' => $eventData['pid']
-                    ]);
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $userOffsetArray[0],
+                            'tablenames' => 'fe_users',
+                            'sorting' => 1,
+                            'offset' => $userOffsetArray[1] ?? $this->conf['view.']['event.']['remind.']['time'],
+                            'pid' => $eventData['pid']
+                        ]
+                    );
                 }
                 $ignore = GeneralUtility::trimExplode(
                     ',',
@@ -890,12 +900,16 @@ class EventService extends BaseService
                 foreach ($group as $g) {
                     $groupOffsetArray = GeneralUtility::trimExplode('_', $g, 1);
                     if (!in_array($groupOffsetArray[0], $ignore, true)) {
-                        self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
-                            $groupOffsetArray[0]
-                        ], $uid, 'fe_groups', [
-                            'offset' => $groupOffsetArray[1] ?? $this->conf['view.']['event.']['remind.']['time'],
-                            'pid' => $eventData['pid']
-                        ]);
+                        $this->subscriptionRepository->insert(
+                            [
+                                'uid_local' => $uid,
+                                'uid_foreign' => $groupOffsetArray[0],
+                                'tablenames' => 'fe_groups',
+                                'sorting' => 1,
+                                'offset' => $userOffsetArray[1] ?? $this->conf['view.']['event.']['remind.']['time'],
+                                'pid' => $eventData['pid']
+                            ]
+                        );
                     }
                 }
             }
@@ -908,16 +922,18 @@ class EventService extends BaseService
             if ($this->conf['rights.']['create.']['event.']['addFeUserToNotify']) {
                 $idArray[] = $this->rightsObj->getUserId();
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_fe_user_event_monitor_mm',
-                array_unique($idArray),
-                $uid,
-                'fe_users',
-                [
-                    'offset' => $this->conf['view.']['event.']['remind.']['time'],
-                    'pid' => $eventData['pid']
-                ]
-            );
+            foreach (array_unique($idArray) as $key => $userUid) {
+                $this->subscriptionRepository->insert(
+                    [
+                        'uid_local' => $uid,
+                        'uid_foreign' => $userUid,
+                        'tablenames' => 'fe_users',
+                        'sorting' => $key + 1,
+                        'offset' => $this->conf['view.']['event.']['remind.']['time'],
+                        'pid' => $eventData['pid']
+                    ]
+                );
+            }
             $idArray = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['create.']['event.']['fields.']['notify.']['defaultGroup'],
@@ -926,33 +942,43 @@ class EventService extends BaseService
             if ($this->conf['rights.']['create.']['event.']['addFeGroupToNotify']) {
                 $idArray = array_merge($idArray, $this->rightsObj->getUserGroups());
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_fe_user_event_monitor_mm',
-                array_unique($idArray),
-                $uid,
-                'fe_groups',
+            foreach (array_unique($idArray) as $key => $groupUid) {
+                $this->subscriptionRepository->insert(
+                    [
+                        'uid_local' => $uid,
+                        'uid_foreign' => $groupUid,
+                        'tablenames' => 'fe_groups',
+                        'sorting' => $key + 1,
+                        'offset' => $this->conf['view.']['event.']['remind.']['time'],
+                        'pid' => $eventData['pid']
+                    ]
+                );
+            }
+        } elseif ($this->conf['rights.']['create.']['event.']['addFeUserToNotify'] && $this->rightsObj->isLoggedIn()) {
+            $this->subscriptionRepository->insert(
                 [
+                    'uid_local' => $uid,
+                    'uid_foreign' => $this->rightsObj->getUserId(),
+                    'tablenames' => 'fe_users',
+                    'sorting' =>  1,
                     'offset' => $this->conf['view.']['event.']['remind.']['time'],
                     'pid' => $eventData['pid']
                 ]
             );
-        } elseif ($this->conf['rights.']['create.']['event.']['addFeUserToNotify'] && $this->rightsObj->isLoggedIn()) {
-            self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
-                $this->rightsObj->getUserId()
-            ], $uid, 'fe_users', [
-                'offset' => $this->conf['view.']['event.']['remind.']['time'],
-                'pid' => $eventData['pid']
-            ]);
         }
         if ($this->conf['rights.']['create.']['event.']['public']) {
-            self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', GeneralUtility::trimExplode(
-                ',',
-                $this->conf['rights.']['create.']['event.']['notifyUsersOnPublicCreate'],
-                1
-            ), $uid, 'fe_users', [
-                'offset' => $this->conf['view.']['event.']['remind.']['time'],
-                'pid' => $eventData['pid']
-            ]);
+            foreach (GeneralUtility::trimExplode(',', $this->conf['rights.']['create.']['event.']['notifyUsersOnPublicCreate'], 1) as $key => $userUid) {
+                $this->subscriptionRepository->insert(
+                    [
+                        'uid_local' => $uid,
+                        'uid_foreign' => $userUid,
+                        'tablenames' => 'fe_users',
+                        'sorting' => $key + 1,
+                        'offset' => $this->conf['view.']['event.']['remind.']['time'],
+                        'pid' => $eventData['pid']
+                    ]
+                );
+            }
         }
         if ($tempValues['exception_ids'] !== '' && $this->rightsObj->isAllowedToCreateEventException()) {
             $user = [];
@@ -1199,22 +1225,23 @@ class EventService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedToEditEventNotify() && $tempValues['notify_ids'] !== null) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-                'tx_cal_fe_user_event_monitor_mm',
-                'uid_local =' . $uid . ' AND tablenames in ("fe_users","fe_groups")'
-            );
+            $this->subscriptionRepository->deleteByEventUid($uid);
             if ($tempValues['notify_ids'] !== '') {
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
                 foreach ($user as $u) {
                     $userOffsetArray = GeneralUtility::trimExplode('_', $u, 1);
-                    self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
-                        $userOffsetArray[0]
-                    ], $uid, 'fe_users', [
-                        'offset' => $userOffsetArray[1] ?? $this->conf['view.']['event.']['remind.']['time'],
-                        'pid' => $eventData['pid']
-                    ]);
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $userOffsetArray[0],
+                            'tablenames' => 'fe_users',
+                            'sorting' => 1,
+                            'offset' => $userOffsetArray[1] ?? $this->conf['view.']['event.']['remind.']['time'],
+                            'pid' => $eventData['pid']
+                        ]
+                    );
                 }
                 $ignore = GeneralUtility::trimExplode(
                     ',',
@@ -1224,12 +1251,16 @@ class EventService extends BaseService
                 foreach ($group as $g) {
                     $groupOffsetArray = GeneralUtility::trimExplode('_', $g, 1);
                     if (!in_array($groupOffsetArray[0], $ignore, true)) {
-                        self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
-                            $groupOffsetArray[0]
-                        ], $uid, 'fe_groups', [
-                            'offset' => $groupOffsetArray[1] ?? $this->conf['view.']['event.']['remind.']['time'],
-                            'pid' => $eventData['pid']
-                        ]);
+                        $this->subscriptionRepository->insert(
+                            [
+                                'uid_local' => $uid,
+                                'uid_foreign' => $groupOffsetArray[0],
+                                'tablenames' => 'fe_groups',
+                                'sorting' => 1,
+                                'offset' => $groupOffsetArray[1] ?? $this->conf['view.']['event.']['remind.']['time'],
+                                'pid' => $eventData['pid']
+                            ]
+                        );
                     }
                 }
             }
@@ -1258,30 +1289,31 @@ class EventService extends BaseService
                 $groupIdArray = array_diff($groupIdArray, $ignore);
             }
             if (!empty($userIdArray) || !empty($groupIdArray)) {
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-                    'tx_cal_fe_user_event_monitor_mm',
-                    'uid_local =' . $uid . ' AND tablenames in ("fe_users","fe_groups")'
-                );
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_fe_user_event_monitor_mm',
-                    array_unique($userIdArray),
-                    $uid,
-                    'fe_users',
-                    [
-                        'offset' => $tempValues['notify_offset'],
-                        'pid' => $object->row['pid']
-                    ]
-                );
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_fe_user_event_monitor_mm',
-                    array_unique($groupIdArray),
-                    $uid,
-                    'fe_groups',
-                    [
-                        'offset' => $tempValues['notify_offset'],
-                        'pid' => $object->row['pid']
-                    ]
-                );
+                $this->subscriptionRepository->deleteByEventUid($uid);
+                foreach (array_unique($userIdArray) as $key => $userUid) {
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $userUid,
+                            'tablenames' => 'fe_users',
+                            'sorting' => $key + 1,
+                            'offset' => $tempValues['notify_offset'],
+                            'pid' => $object->row['pid']
+                        ]
+                    );
+                }
+                foreach (array_unique($groupIdArray) as $key => $groupUid) {
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $groupUid,
+                            'tablenames' => 'fe_groups',
+                            'sorting' => $key + 1,
+                            'offset' => $tempValues['notify_offset'],
+                            'pid' => $object->row['pid']
+                        ]
+                    );
+                }
             }
         }
 

@@ -263,19 +263,30 @@ class TodoService extends EventService
                 $user = [];
                 $group = [];
                 self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
-                self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $user, $uid, 'fe_users');
+                $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $user,
+                            'tablenames' => 'fe_users',
+                            'sorting' => 1
+                        ]
+                    );
                 $ignore = GeneralUtility::trimExplode(
                     ',',
                     $this->conf['rights.']['create.']['todo.']['addFeGroupToNotify.']['ignore'],
                     1
                 );
                 $groupArray = array_diff($group, $ignore);
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_fe_user_event_monitor_mm',
-                    array_unique($groupArray),
-                    $uid,
-                    'fe_groups'
-                );
+                foreach (array_unique($groupArray) as $key => $groupUid) {
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $groupUid,
+                            'tablenames' => 'fe_groups',
+                            'sorting' => $key + 1
+                        ]
+                    );
+                }
             }
         } elseif ($this->conf['rights.']['create.']['todo.']['fields.']['notify.']['defaultUser'] || $this->conf['rights.']['create.']['todo.']['fields.']['notify.']['defaultGroup']) {
             $idArray = GeneralUtility::trimExplode(
@@ -286,12 +297,16 @@ class TodoService extends EventService
             if ($this->conf['rights.']['create.']['event.']['addFeUserToNotify']) {
                 $idArray[] = $this->rightsObj->getUserId();
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_fe_user_event_monitor_mm',
-                array_unique($idArray),
-                $uid,
-                'fe_users'
-            );
+            foreach (array_unique($idArray) as $key => $userUid) {
+                $this->subscriptionRepository->insert(
+                    [
+                        'uid_local' => $uid,
+                        'uid_foreign' => $userUid,
+                        'tablenames' => 'fe_groups',
+                        'sorting' => $key + 1
+                    ]
+                );
+            }
             $idArray = GeneralUtility::trimExplode(
                 ',',
                 $this->conf['rights.']['create.']['todo.']['fields.']['notify.']['defaultGroup'],
@@ -300,23 +315,37 @@ class TodoService extends EventService
             if ($this->conf['rights.']['create.']['todo.']['addFeGroupToNotify']) {
                 $idArray = array_merge($idArray, $this->rightsObj->getUserGroups());
             }
-            self::insertIdsIntoTableWithMMRelation(
-                'tx_cal_fe_user_event_monitor_mm',
-                array_unique($idArray),
-                $uid,
-                'fe_groups'
-            );
+            foreach (array_unique($idArray) as $key => $groupUid) {
+                $this->subscriptionRepository->insert(
+                    [
+                        'uid_local' => $uid,
+                        'uid_foreign' => $groupUid,
+                        'tablenames' => 'fe_groups',
+                        'sorting' => $key + 1
+                    ]
+                );
+            }
         } elseif ($this->conf['rights.']['create.']['todo.']['addFeUserToNotify'] && $this->rightsObj->isLoggedIn()) {
-            self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', [
-                $this->rightsObj->getUserId()
-            ], $uid, 'fe_users');
+            $this->subscriptionRepository->insert(
+                    [
+                        'uid_local' => $uid,
+                        'uid_foreign' => $this->rightsObj->getUserId(),
+                        'tablenames' => 'fe_groups',
+                        'sorting' => 1
+                    ]
+                );
         }
         if ($this->conf['rights.']['create.']['todo.']['public']) {
-            self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', GeneralUtility::trimExplode(
-                ',',
-                $this->conf['rights.']['create.']['todo.']['notifyUsersOnPublicCreate'],
-                1
-            ), $uid, 'fe_users');
+            foreach (GeneralUtility::trimExplode(',', $this->conf['rights.']['create.']['todo.']['notifyUsersOnPublicCreate'], 1) as $key => $userUid) {
+                $this->subscriptionRepository->insert(
+                    [
+                        'uid_local' => $uid,
+                        'uid_foreign' => $userUid,
+                        'tablenames' => 'fe_users',
+                        'sorting' => $key + 1
+                    ]
+                );
+            }
         }
 
         if ($this->rightsObj->isAllowedTo('create', 'todo', 'shared')) {
@@ -485,16 +514,31 @@ class TodoService extends EventService
         }
 
         if ($tempValues['notify_ids'] !== null && $this->rightsObj->isAllowedTo('edit', 'todo', 'notify')) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-                'tx_cal_fe_user_event_monitor_mm',
-                'uid_local =' . $uid . ' AND tablenames in ("fe_users","fe_groups")'
-            );
+            $this->subscriptionRepository->deleteByEventUid($uid);
             if ($tempValues['notify_ids'] !== '') {
-                $user = [];
-                $group = [];
-                self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
-                self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $user, $uid, 'fe_users');
-                self::insertIdsIntoTableWithMMRelation('tx_cal_fe_user_event_monitor_mm', $group, $uid, 'fe_groups');
+                $users = [];
+                $groups = [];
+                self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $users, $groups);
+                foreach ($users as $key => $userUid) {
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $userUid,
+                            'tablenames' => 'fe_users',
+                            'sorting' => $key + 1
+                        ]
+                    );
+                }
+                foreach ($groups as $key => $groupUid) {
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $groupUid,
+                            'tablenames' => 'fe_groups',
+                            'sorting' => $key + 1
+                        ]
+                    );
+                }
             }
         } else {
             $userIdArray = GeneralUtility::trimExplode(
@@ -521,22 +565,27 @@ class TodoService extends EventService
                 $groupIdArray = array_diff($groupIdArray, $ignore);
             }
             if (!empty($userIdArray) || !empty($groupIdArray)) {
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-                    'tx_cal_fe_user_event_monitor_mm',
-                    'uid_local =' . $uid . ' AND tablenames in ("fe_users","fe_groups")'
-                );
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_fe_user_event_monitor_mm',
-                    array_unique($userIdArray),
-                    $uid,
-                    'fe_users'
-                );
-                self::insertIdsIntoTableWithMMRelation(
-                    'tx_cal_fe_user_event_monitor_mm',
-                    array_unique($groupIdArray),
-                    $uid,
-                    'fe_groups'
-                );
+                $this->subscriptionRepository->deleteByEventUid($uid);
+                foreach (array_unique($userIdArray) as $key => $userUid) {
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $userUid,
+                            'tablenames' => 'fe_users',
+                            'sorting' => $key + 1
+                        ]
+                    );
+                }
+                foreach (array_unique($groupIdArray) as $key => $groupUid) {
+                    $this->subscriptionRepository->insert(
+                        [
+                            'uid_local' => $uid,
+                            'uid_foreign' => $groupUid,
+                            'tablenames' => 'fe_groups',
+                            'sorting' => $key + 1
+                        ]
+                    );
+                }
             }
         }
 

@@ -83,9 +83,9 @@ class DeleteEventView extends FeEditingBaseView
      * @param $template
      * @param $sims
      * @param $rems
-     * @return string|void
+     * @return string
      */
-    public function getCalendarIdMarker(& $template, & $sims, & $rems)
+    public function getCalendarIdMarker(& $template, & $sims, & $rems): string
     {
         $sims['###CALENDAR_ID###'] = '';
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -451,19 +451,14 @@ class DeleteEventView extends FeEditingBaseView
     public function getNotifyMarker(& $template, & $sims, & $rems)
     {
         $sims['###NOTIFY###'] = '';
-        $cal_notify_user = [];
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-            'fe_users.username',
-            'fe_users, tx_cal_fe_user_event_monitor_mm',
-            'tx_cal_fe_user_event_monitor_mm.pid in (' . $this->conf['pidList'] . ') AND fe_users.uid = tx_cal_fe_user_event_monitor_mm.uid_foreign AND tx_cal_fe_user_event_monitor_mm.uid_local = ' . $this->object->getUid()
-        );
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-            $cal_notify_user[] = $row['username'];
-        }
-        $GLOBALS['TYPO3_DB']->sql_free_result($result);
-        if (!empty($cal_notify_user)) {
+        $subscribersEmailArray = [];
+        $subscribers = $this->subscriptionRepository->findSubscribingUsersByEventUid($this->object->getUid());
+        if (!empty($subscribers)) {
+            foreach ($subscribers as $subscriber) {
+                $subscribersEmailArray[] = $subscriber['username'];
+            }
             $sims['###NOTIFY###'] = $this->cObj->stdWrap(
-                implode(',', $cal_notify_user),
+                implode(',', $subscribersEmailArray),
                 $this->conf['view.'][$this->conf['view'] . '.']['notify_stdWrap.']
             );
         }
