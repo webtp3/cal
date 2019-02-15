@@ -12,7 +12,7 @@ $EM_CONF['cal'] = [
     'constraints' => [
         'depends' => [
             'typo3' => '8.7.13 - 9.5.99',
-            'static-info-tables' => '6.7.0 - 6.7.99'
+            'static_info_tables' => '6.7.0 - 6.7.99'
         ],
         'suggests' => []
     ]
