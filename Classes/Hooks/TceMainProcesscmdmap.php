@@ -13,7 +13,7 @@ namespace TYPO3\CMS\Cal\Hooks;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use Doctrine\DBAL\FetchMode;
+use PDO;
 use OutOfBoundsException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Api;
@@ -51,7 +51,7 @@ class TceMainProcesscmdmap
                 $result = $query->select(['*'], 'tx_cal_event', ['uid' => $id]);
 
                 if ($result) {
-                    while ($row = $result->fetch(FetchMode::ASSOCIATIVE)) {
+                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 
                         /* If we're in a workspace, don't notify anyone about the event */
                         if ($row ['pid'] > 0 && !$GLOBALS['BE_USER']->workspace) {
@@ -129,7 +129,7 @@ class TceMainProcesscmdmap
                     $query = $connectionPool->getConnectionForTable($table);
                     $result = $query->select(['*'], $table, ['uid' => $id]);
                     if ($result) {
-                        while ($row = $result->fetch(FetchMode::ASSOCIATIVE)) {
+                        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 
                             /* If we're in a workspace, don't notify anyone about the event */
                             if ($row ['pid'] > 0 && !$GLOBALS['BE_USER']->workspace) {
@@ -157,7 +157,7 @@ class TceMainProcesscmdmap
                             ->join('E', 'tx_cal_index', 'I', 'I.event_uid = E.uid')
                             ->where($query->expr()->eq('I.event_deviation_uid', $id))->execute();
                         if ($result) {
-                            while ($row = $result->fetch(FetchMode::ASSOCIATIVE)) {
+                            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                                 $this->reindexEvent($row['uid'], $row['pid']);
                             }
                         }
@@ -187,7 +187,7 @@ class TceMainProcesscmdmap
                     $result = $query->select(['*'], 'tx_cal_event', ['uid' => $id]);
 
                     if ($result) {
-                        while ($row = $result->fetch(FetchMode::ASSOCIATIVE)) {
+                        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 
                             /* If we're in a workspace, don't notify anyone about the event */
                             if ($row ['pid'] > 0 && !$GLOBALS['BE_USER']->workspace) {

@@ -2,7 +2,7 @@
 
 namespace TYPO3\CMS\Cal\Utility;
 
-use Doctrine\DBAL\FetchMode;
+use PDO;
 use Memcache;
 use RuntimeException;
 use TYPO3\CMS\Core\Cache\Exception\DuplicateIdentifierException;
@@ -137,7 +137,7 @@ class Cache
                 ))
                 ->setParameters([$hash, $this->ACCESS_TIME])
                 ->execute()
-                ->fetchAll(FetchMode::ASSOCIATIVE);
+                ->fetchAll(PDO::FETCH_ASSOC);
 
             if (is_array($cRec [0]) && $cRec [0] ['content'] != '') {
                 $cacheEntry = $cRec [0] ['content'];

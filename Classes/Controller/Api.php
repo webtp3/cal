@@ -14,7 +14,7 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use Doctrine\DBAL\FetchMode;
+use PDO;
 use TYPO3\CMS\Cal\Model\Location;
 use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -169,7 +169,7 @@ class Api
 
         $connection = $this->connectionPool->getConnectionForTable('tt_content');
         $tt_content_row = $connection->select(['*'], 'tt_content', $where)
-            ->fetch(FetchMode::ASSOCIATIVE);
+            ->fetch(PDO::FETCH_ASSOC);
 
         // if starting point didn't return any records, look for general records
         // storage page.
@@ -182,7 +182,7 @@ class Api
                 $builder->andWhere($builder->expr()->eq($identifier, $builder->createNamedParameter($value)));
             }
 
-            $tt_content_row = $builder->execute()->fetch(FetchMode::ASSOCIATIVE);
+            $tt_content_row = $builder->execute()->fetch(PDO::FETCH_ASSOC);
         }
 
         if ($tt_content_row ['pages']) {

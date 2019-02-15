@@ -13,7 +13,7 @@ namespace TYPO3\CMS\Cal\TreeProvider;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use Doctrine\DBAL\FetchMode;
+use PDO;
 use TYPO3\CMS\Backend\Tree\SortedTreeNodeCollection;
 use TYPO3\CMS\Backend\Tree\TreeNode;
 use TYPO3\CMS\Backend\Tree\TreeNodeCollection;
@@ -135,7 +135,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
             $calres = $builder->select('uid', 'title')->from('tx_cal_calendar')
                 ->where($this->getCalendarWhere($calendarId))->execute();
             if ($calres) {
-                while ($calrow = $calres->fetch(FetchMode::ASSOCIATIVE)) {
+                while ($calrow = $calres->fetch(PDO::FETCH_ASSOC)) {
                     $node = GeneralUtility::makeInstance(TreeNode::class);
                     $node->setId(self::CALENDAR_PREFIX . $calrow['uid']);
 
@@ -161,7 +161,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
             ->where($where)->execute();
         $usedCategories = [];
         if ($categoryResult) {
-            while (($categoryRow = $categoryResult->fetch(FetchMode::ASSOCIATIVE))) {
+            while (($categoryRow = $categoryResult->fetch(PDO::FETCH_ASSOC))) {
                 $categoryNode = GeneralUtility::makeInstance(TreeNode::class);
                 $categoryNode->setId($categoryRow['uid']);
                 if ($level < $this->levelMaximum) {

@@ -14,7 +14,7 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use Doctrine\DBAL\FetchMode;
+use PDO;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -79,7 +79,7 @@ class ItemsProcFunc
         $builder = $connectionPool->getQueryBuilderForTable($table);
 
         $res = $builder->select('*')->from($table)->orderBy('title')->execute();
-        while ($row = $res->fetch(FetchMode::ASSOCIATIVE)) {
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
             $label = BackendUtility::getRecordTitle($table, $row);
             $value = -1 * intval($row ['uid']);
             $config ['items'] [] = [
@@ -100,7 +100,7 @@ class ItemsProcFunc
         $builder = $connectionPool->getQueryBuilderForTable($table);
 
         $res = $builder->select('*')->from($table)->orderBy('name')->execute();
-        while ($row = $res->fetch(FetchMode::ASSOCIATIVE)) {
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
             $label = BackendUtility::getRecordTitle($table, $row);
             $value = $row ['uid'];
             $config ['items'] [] = [
@@ -130,7 +130,7 @@ class ItemsProcFunc
         $res = self::getSQLResource($table, $where, $groupBy, $orderBy, $limit, $params ['row'] ['pid']);
 
         /* Loop over all records, adding them to the items array */
-        while ($row = $res->fetch(FetchMode::ASSOCIATIVE)) {
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
             $label = BackendUtility::getRecordTitle($table, $row);
             $value = $row ['uid'];
             $params ['items'] [] = [

@@ -14,7 +14,7 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use Doctrine\DBAL\FetchMode;
+use PDO;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
@@ -882,7 +882,7 @@ class ModelController extends BaseController
         $connection = $this->connectionPool->getConnectionForTable('fe_users');
         $query = $connection->select(['*'], 'fe_users', ['uid' => intval($uid)]);
         if ($query->rowCount() > 0) {
-            $feUser = $query->fetch(FetchMode::ASSOCIATIVE);
+            $feUser = $query->fetch(PDO::FETCH_ASSOC);
         }
         return $feUser;
     }

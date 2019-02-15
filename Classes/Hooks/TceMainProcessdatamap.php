@@ -13,7 +13,7 @@ namespace TYPO3\CMS\Cal\Hooks;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use Doctrine\DBAL\FetchMode;
+use PDO;
 use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Api;
@@ -460,7 +460,7 @@ class TceMainProcessdatamap
                 $result2 = $query->execute();
 
                 $attendeeUids = [];
-                while ($row2 = $result2->fetch(FetchMode::ASSOCIATIVE)) {
+                while ($row2 = $result2->fetch(PDO::FETCH_ASSOC)) {
                     $incomingFieldArray ['fe_user_id'] = $row2 ['fe_users.uid'];
                     $connection = $connectionPool->getConnectionForTable('tx_cal_attendee');
                     $result =  $connection->insert('tx_cal_attendee', $incomingFieldArray);

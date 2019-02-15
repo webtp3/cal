@@ -14,7 +14,7 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use Doctrine\DBAL\FetchMode;
+use PDO;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Model\EventModel;
@@ -641,7 +641,7 @@ class Controller extends AbstractPlugin
                 ['uid' => $rightsObj->getUserId()]
             );
             if ($result->rowCount() > 0) {
-                $row = $result->fetch(FetchMode::ASSOCIATIVE);
+                $row = $result->fetch(PDO::FETCH_ASSOC);
                 $this->conf ['view.'] ['calendar.'] ['subscription'] = $row ['tx_cal_calendar_subscription'];
             }
         }
@@ -2714,7 +2714,7 @@ class Controller extends AbstractPlugin
         $builder->andWhere($builder->expr()->in('pid', $this->conf ['pidList']));
         $result = $builder->select('*')->from('fe_users')->andWhere($additionalWhere)->execute();
         if ($result->rowCount() > 0) {
-            while ($row = $result->fetch(FetchMode::ASSOCIATIVE)) {
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 unset($row ['username'], $row ['password']);
                 $userList [] = $row;
             }
@@ -2756,7 +2756,7 @@ class Controller extends AbstractPlugin
         $builder->andWhere($builder->expr()->in('pid', $this->conf ['pidList']));
         $result = $builder->select('*')->from('fe_groups')->andWhere($additionalWhere)->execute();
         if ($result->rowCount() > 0) {
-            while ($row = $result->fetch(FetchMode::ASSOCIATIVE)) {
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $groupList [] = $row;
             }
         }
