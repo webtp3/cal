@@ -19,7 +19,6 @@
 	],
 	"require": {
 		"typo3/cms-core": "^8.7.13|| ^9.5.0",
-		"friendsoftypo3/typo3db-legacy": "^1.1",
 		"sjbr/static-info-tables": "^6.7"
 	},
 	"autoload": {
