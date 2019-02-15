@@ -1141,13 +1141,6 @@ if (!isset($confArr['enableRealURLAutoConfiguration']) || $confArr['enableRealUR
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/realurl/class.tx_realurl_autoconfgen.php']['extensionConfiguration']['cal'] = RealUrl::class . '->addRealURLConfig';
 }
 
-if (ExtensionManagementUtility::isLoaded('gabriel')) {
-    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['gabriel']['include']['cal'] = [
-        CalendarScheduler::class,
-        ReminderScheduler::class
-    ];
-}
-
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][CalendarScheduler::class] = [
     'extension' => 'cal',
     'title' => 'Updating external calendars (created by saving the calendar record)',

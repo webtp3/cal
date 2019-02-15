@@ -255,8 +255,6 @@ class ReminderView extends NotificationView
                 } catch (OutOfBoundsException $e) {
                 }
             }
-        } elseif (ExtensionManagementUtility::isLoaded('gabriel')) {
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_gabriel', ' crid="' . $eventUid . '"');
         }
     }
 

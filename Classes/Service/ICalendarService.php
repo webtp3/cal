@@ -344,11 +344,7 @@ class ICalendarService extends BaseService
      */
     public function deleteScheduledUpdates($uid)
     {
-        if (ExtensionManagementUtility::isLoaded('gabriel')) {
-            $eventUID = 'tx_cal_calendar:' . $uid;
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_gabriel', ' crid="' . $eventUID . '"');
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_gabriel', ' nextexecution=0');
-        }
+
     }
 
     /**
@@ -486,10 +482,6 @@ class ICalendarService extends BaseService
                 $resultUids[] = $row['uid'];
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);
-        }
-        if (!empty($resultUids)) {
-            $crids = '"tx_cal_event:' . implode('","tx_cal_event:', $resultUids) . '"';
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_gabriel', 'crid in (' . $crids . ')');
         }
     }
 

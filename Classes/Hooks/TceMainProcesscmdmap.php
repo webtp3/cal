@@ -211,7 +211,7 @@ class TceMainProcesscmdmap
                             }
                         }
                     }
-                    // We have to delete the gabriel/scheduler events BEFORE the tx_cal_events and
+                    // We have to delete the scheduler events BEFORE the tx_cal_events and
                     // its related tx_cal_fe_user_event_monitor_mm records are gone
 
                     /* Clean up any pending reminders for this event */
@@ -225,7 +225,7 @@ class TceMainProcesscmdmap
             case 'tx_cal_fe_user_event_monitor_mm':
                 if ($command === 'delete') {
                     $relationRecord = BackendUtility::getRecord('tx_cal_fe_user_event_monitor_mm', $id);
-                    // We have to delete the gabriel events BEFORE the tx_cal_events and
+                    // We have to delete the scheduler events BEFORE the tx_cal_events and
                     // its related tx_cal_fe_user_event_monitor_mm records are gone
 
                     /* Clean up any pending reminders for this event */
