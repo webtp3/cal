@@ -13,10 +13,10 @@ $ll = 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:';
  * Add extra fields to the sys_category record
  */
 $newCalSysCategoryColumns = [
-    'images' => [
+    'icon' => [
         'exclude' => 1,
         'l10n_mode' => 'mergeIfNotBlank',
-        'label' => $ll . 'sys_category.image',
+        'label' => $ll . 'sys_category.icon',
         'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
             'images',
             [
@@ -134,7 +134,7 @@ $newCalSysCategoryColumns = [
 ExtensionManagementUtility::addTCAcolumns('sys_category', $newCalSysCategoryColumns);
 ExtensionManagementUtility::addToAllTCAtypes(
     'sys_category',
-    '--div--;LLL:EXT:frontend/Resources/Private/Language/locallang_tca.xlf:pages.tabs.options, images',
+    '--div--;LLL:EXT:frontend/Resources/Private/Language/locallang_tca.xlf:pages.tabs.options, icon',
     '',
     'before:description'
 );
