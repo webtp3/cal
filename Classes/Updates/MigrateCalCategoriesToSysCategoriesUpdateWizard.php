@@ -19,12 +19,12 @@ namespace TYPO3\CMS\Cal\Updates;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
+use TYPO3\CMS\Install\Updates\AbstractUpdate;
 
 /**
  * Class MigrateCalCategoriesToSysCategoriesUpdateWizard
  */
-class MigrateCalCategoriesToSysCategoriesUpdateWizard implements UpgradeWizardInterface
+class MigrateCalCategoriesToSysCategoriesUpdateWizard extends AbstractUpdate
 {
 
     /**
@@ -56,6 +56,20 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard implements UpgradeWizardIn
     public function getDescription(): string
     {
         return 'As the current version of TYPO3 kicks out the old tree wizard (yay), we take the opportunity to finally get our whole categorization in order.';
+    }
+
+    /**
+     * Performs the database update
+     *
+     * @param array &$databaseQueries Queries done in this update
+     * @param string &$customMessage Custom message
+     * @return bool
+     */
+    public function performUpdate(array &$databaseQueries, &$customMessage): bool
+    {
+        $this->executeUpdate();
+        $this->markWizardAsDone();
+        return true;
     }
 
     /**
@@ -197,6 +211,22 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard implements UpgradeWizardIn
         $queryBuilder->getRestrictions()->removeByType(HiddenRestriction::class);
         return (bool)$queryBuilder->select('*')->from('tx_cal_category')->execute()->rowCount();
     }
+
+
+    /**
+     * Checks if an update is needed
+     *
+     * @param string &$description The description for the update
+     * @return bool Whether an update is needed (TRUE) or not (FALSE)
+     */
+    public function checkForUpdate(&$description)
+    {
+        if ($this->isWizardDone()) {
+            return false;
+        }
+        return $this->updateNecessary();
+    }
+
 
     /**
      * Returns an array of class names of Prerequisite classes
