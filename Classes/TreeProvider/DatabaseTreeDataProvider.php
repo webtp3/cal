@@ -49,8 +49,8 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     /** @var ConnectionPool $connectionPool */
     protected $connectionPool;
 
-    protected const CALENDAR_PREFIX = 'calendar_';
-    protected const GLOBAL_PREFIX = 'global';
+    const CALENDAR_PREFIX = 'calendar_';
+    const GLOBAL_PREFIX = 'global';
 
     /**
      * Required constructor
