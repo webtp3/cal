@@ -861,9 +861,9 @@ class BaseView extends BaseService
                 }
             }
             $funcFromMarker = 'get' . str_replace(
-                    ' ',
-                    '',
-                    ucwords(str_replace('_', ' ', strtolower($marker)))
+                ' ',
+                '',
+                ucwords(str_replace('_', ' ', strtolower($marker)))
                 ) . 'Marker';
             if (method_exists($this, $funcFromMarker)) {
                 $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
@@ -881,9 +881,9 @@ class BaseView extends BaseService
                     continue;
                 }
                 $funcFromMarker = 'get' . str_replace(
-                        ' ',
-                        '',
-                        ucwords(str_replace('_', ' ', strtolower($marker)))
+                    ' ',
+                    '',
+                    ucwords(str_replace('_', ' ', strtolower($marker)))
                     ) . 'Marker';
                 if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
                     $module = GeneralUtility:: makeInstanceService(substr($marker, 8), 'module');
@@ -999,12 +999,12 @@ class BaseView extends BaseService
         ));
 
         $next_year = ($this->conf['year'] + 1) . sprintf('%02d', $this->conf['month']) . sprintf(
-                '%02d',
-                $this->conf['day']
+            '%02d',
+            $this->conf['day']
             );
         $prev_year = ($this->conf['year'] - 1) . sprintf('%02d', $this->conf['month']) . sprintf(
-                '%02d',
-                $this->conf['day']
+            '%02d',
+            $this->conf['day']
             );
 
         $endOfNextMonth = new CalDate(Calc::endOfNextMonth(
@@ -1623,7 +1623,7 @@ class BaseView extends BaseService
                     ((in_array(
                         $parentCategory->getUid(),
                         $selectedCategories,
-                            true
+                        true
                     ) || empty($selectedCategories)) ? ' checked="checked"' : ''),
                     $treeConf['selector.']
                 );

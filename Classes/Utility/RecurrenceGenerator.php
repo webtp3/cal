@@ -289,8 +289,8 @@ class RecurrenceGenerator
         $this->info .= '</ul>';
         $this->info .= 'Done.';
         $this->info .= '<br/><br/><a href="javascript:history.back();">' . LocalizationUtility::translate(
-                'l_back',
-                'cal'
+            'l_back',
+            'cal'
             ) . '</a><br/><br/>';
     }
 
@@ -413,6 +413,7 @@ class RecurrenceGenerator
         } catch (\Exception $e) {
             $this->info = CalIndexer::getMessage($e, FlashMessage::ERROR);
         }
+
         if (!is_object($eventService)) {
             $this->info = CalIndexer::getMessage(
                 'Could not fetch the event service! Please make sure the page id is correct!',

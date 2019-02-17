@@ -77,16 +77,16 @@ class AdminView extends BaseView
             $showCalendarForm = true;
         }
         if (!$this->rightsObj->isAllowedTo(
-                'delete',
-                'calendar'
+            'delete',
+            'calendar'
             ) || !$this->rightsObj->isViewEnabled('delete_calendar')) {
             $rems['###DELETE_CALENDAR###'] = '';
         } else {
             $showCalendarForm = true;
         }
         if (!$this->rightsObj->isAllowedTo('delete', 'calendar') && !$this->rightsObj->isAllowedTo(
-                'edit',
-                'calendar'
+            'edit',
+            'calendar'
             )) {
             $rems['###CHOOSE_CALENDAR###'] = '';
         }
@@ -120,16 +120,16 @@ class AdminView extends BaseView
             $showCategoryForm = true;
         }
         if (!$this->rightsObj->isAllowedTo(
-                'delete',
-                'category'
+            'delete',
+            'category'
             ) || !$this->rightsObj->isViewEnabled('delete_category')) {
             $rems['###DELETE_CATEGORY###'] = '';
         } else {
             $showCategoryForm = true;
         }
         if (!$this->rightsObj->isAllowedTo('delete', 'category') && !$this->rightsObj->isAllowedTo(
-                'edit',
-                'category'
+            'edit',
+            'category'
             )) {
             $rems['###CHOOSE_CATEGORY###'] = '';
         }
@@ -138,8 +138,8 @@ class AdminView extends BaseView
         }
         $createOrganizerLink = '';
         if ($this->rightsObj->isAllowedTo(
-                'create',
-                'organizer'
+            'create',
+            'organizer'
             ) && $this->rightsObj->isViewEnabled('create_organizer')) {
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_create_organizer'));
             $this->controller->getParametersForTyposcriptLink(
@@ -165,16 +165,16 @@ class AdminView extends BaseView
             $showOrganizerForm = true;
         }
         if (!$this->rightsObj->isAllowedTo(
-                'delete',
-                'organizer'
+            'delete',
+            'organizer'
             ) || !$this->rightsObj->isViewEnabled('delete_organizer')) {
             $rems['###DELETE_ORGANIZER###'] = '';
         } else {
             $showOrganizerForm = true;
         }
         if (!$this->rightsObj->isAllowedTo('delete', 'organizer') && !$this->rightsObj->isAllowedTo(
-                'edit',
-                'organizer'
+            'edit',
+            'organizer'
             )) {
             $rems['###CHOOSE_ORGANIZER###'] = '';
         }
@@ -207,16 +207,16 @@ class AdminView extends BaseView
             $showLocationForm = true;
         }
         if (!$this->rightsObj->isAllowedTo(
-                'delete',
-                'location'
+            'delete',
+            'location'
             ) || !$this->rightsObj->isViewEnabled('delete_location')) {
             $rems['###DELETE_LOCATION###'] = '';
         } else {
             $showLocationForm = true;
         }
         if (!$this->rightsObj->isAllowedTo('delete', 'location') && !$this->rightsObj->isAllowedTo(
-                'edit',
-                'location'
+            'edit',
+            'location'
             )) {
             $rems['###CHOOSE_LOCATION###'] = '';
         }
@@ -430,8 +430,8 @@ class AdminView extends BaseView
             }
 
             $sims['###CALENDAR_SUBSCRIPTION###'] .= '<input type="hidden" value="' . implode(
-                    ',',
-                    array_unique($calendarIds)
+                ',',
+                array_unique($calendarIds)
                 ) . '" name="tx_cal_controller[calendarSubscriptionIds]"/>';
         } else {
             $rems['###CALENDAR_SUBSCRIPTION###'] = '';

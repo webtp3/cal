@@ -375,8 +375,8 @@ class SysCategoryService extends BaseService
             $groupby = 'tx_cal_calendar.uid';
             $orderby = 'tx_cal_calendar.title ASC';
             $where = 'tx_cal_calendar.uid IN (' . implode(
-                    ',',
-                    $calendarsWithoutCategory
+                ',',
+                $calendarsWithoutCategory
                 ) . ')' . $calendarSearchString . $this->cObj->enableFields('tx_cal_calendar');
             $where .= $this->getAdditionalWhereForLocalizationAndVersioning('tx_cal_calendar');
 
@@ -672,8 +672,8 @@ class SysCategoryService extends BaseService
 
         if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere']) {
             $where .= ' ' . $this->cObj->cObjGetSingle(
-                    $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere'],
-                    $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere.']
+                $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere'],
+                $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere.']
                 );
         }
     }

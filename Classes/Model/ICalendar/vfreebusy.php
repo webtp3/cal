@@ -21,6 +21,9 @@ class vfreebusy extends ICalendar
 {
     public $_busyPeriods = [];
 
+    /**
+     * @return string
+     */
     public function getType()
     {
         return 'vFreebusy';
@@ -38,7 +41,7 @@ class vfreebusy extends ICalendar
 
         // Do something with all the busy periods.
         foreach ($this->_attributes as $key => $attribute) {
-            if ($attribute['name'] == 'FREEBUSY') {
+            if ($attribute['name'] === 'FREEBUSY') {
                 foreach ($attribute['values'] as $value) {
                     if (isset($value['duration'])) {
                         $this->addBusyPeriod('BUSY', $value['start'], null, $value['duration']);
@@ -51,6 +54,9 @@ class vfreebusy extends ICalendar
         }
     }
 
+    /**
+     * @return string
+     */
     public function exportvCalendar()
     {
         foreach ($this->_busyPeriods as $start => $end) {
@@ -66,7 +72,7 @@ class vfreebusy extends ICalendar
         $res = parent::_exportvData('VFREEBUSY');
 
         foreach ($this->_attributes as $key => $attribute) {
-            if ($attribute['name'] == 'FREEBUSY') {
+            if ($attribute['name'] === 'FREEBUSY') {
                 unset($this->_attributes[$key]);
             }
         }
@@ -79,14 +85,13 @@ class vfreebusy extends ICalendar
      *
      * @return string A clear text name for displaying this object.
      */
-    public function getName()
+    public function getName(): string
     {
-        $name = '';
-        $method = !empty($this->_container) ? $this->_container->getAttribute('METHOD') : 'PUBLISH';
+        $method = $this->_container !== null ? $this->_container->getAttribute('METHOD') : 'PUBLISH';
 
-        if (is_a($method, 'PEAR_Error') || $method == 'PUBLISH') {
+        if (is_a($method, 'PEAR_Error') || $method === 'PUBLISH') {
             $attr = 'ORGANIZER';
-        } elseif ($method == 'REPLY') {
+        } elseif ($method === 'REPLY') {
             $attr = 'ATTENDEE';
         }
 
@@ -108,14 +113,13 @@ class vfreebusy extends ICalendar
      *
      * @return string The email address of this object's owner.
      */
-    public function getEmail()
+    public function getEmail(): string
     {
-        $name = '';
-        $method = !empty($this->_container) ? $this->_container->getAttribute('METHOD') : 'PUBLISH';
+        $method = $this->_container !== null ? $this->_container->getAttribute('METHOD') : 'PUBLISH';
 
-        if (is_a($method, 'PEAR_Error') || $method == 'PUBLISH') {
+        if (is_a($method, 'PEAR_Error') || $method === 'PUBLISH') {
             $attr = 'ORGANIZER';
-        } elseif ($method == 'REPLY') {
+        } elseif ($method === 'REPLY') {
             $attr = 'ATTENDEE';
         }
 
@@ -127,7 +131,10 @@ class vfreebusy extends ICalendar
         return $name['path'];
     }
 
-    public function getBusyPeriods()
+    /**
+     * @return array
+     */
+    public function getBusyPeriods(): array
     {
         return $this->_busyPeriods;
     }
@@ -143,7 +150,7 @@ class vfreebusy extends ICalendar
      * @return array A hash with free time periods, the start times as the
      *         keys and the end times as the values.
      */
-    public function getFreePeriods($startStamp, $endStamp)
+    public function getFreePeriods($startStamp, $endStamp): array
     {
         $this->simplify();
         $periods = [];
@@ -189,15 +196,15 @@ class vfreebusy extends ICalendar
      *            The duration of the period. If specified, the
      *            $end parameter will be ignored.
      */
-    public function addBusyPeriod($type, $start, $end = null, $duration = null)
+    public function addBusyPeriod($type, $start, $end = null, $duration = null): bool
     {
-        if ($type == 'FREE') {
+        if ($type === 'FREE') {
             // Make sure this period is not marked as busy.
             return false;
         }
 
         // Calculate the end time if duration was specified.
-        $tempEnd = is_null($duration) ? $end : $start + $duration;
+        $tempEnd = $duration === null ? $end : $start + $duration;
 
         // Make sure the period length is always positive.
         $end = max($start, $tempEnd);
@@ -221,7 +228,7 @@ class vfreebusy extends ICalendar
      *
      * @return int A timestamp.
      */
-    public function getStart()
+    public function getStart(): int
     {
         if (!is_a($this->getAttribute('DTSTART'), 'PEAR_Error')) {
             return $this->getAttribute('DTSTART');
@@ -238,7 +245,7 @@ class vfreebusy extends ICalendar
      *
      * @return int A timestamp.
      */
-    public function getEnd()
+    public function getEnd(): int
     {
         if (!is_a($this->getAttribute('DTEND'), 'PEAR_Error')) {
             return $this->getAttribute('DTEND');
@@ -259,7 +266,7 @@ class vfreebusy extends ICalendar
      *            If true, simplify() will
      *            called after the merge.
      */
-    public function merge($freebusy, $simplify = true)
+    public function merge($freebusy, $simplify = true): bool
     {
         if (!is_a($freebusy, 'Horde_iCalendar_vfreebusy')) {
             return false;

@@ -133,7 +133,7 @@ class CalIndexer extends BaseScriptClass
      * @param ResponseInterface $response
      * @return ResponseInterface the response with the content
      */
-    public function mainAction(ServerRequestInterface $request, ResponseInterface $response)
+    public function mainAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $GLOBALS['SOBE'] = $this;
         $this->init();
@@ -207,7 +207,7 @@ class CalIndexer extends BaseScriptClass
     /**
      * Generates the module content
      */
-    protected function getModuleContent()
+    protected function getModuleContent(): string
     {
         switch (intval($this->MOD_SETTINGS['function'])) {
             case 2:
@@ -307,8 +307,6 @@ class CalIndexer extends BaseScriptClass
                         $content .= $this->getLanguageService()->getLL('selectPage');
                         $content .= '<br /><br />';
 
-                        $dateFormat = $GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] ? '%H:%M %m-%d-%Y' : '%H:%M %d-%m-%Y';
-
                         $label = '<label>' . $this->getLanguageService()->getLL('indexStart') . '</label>';
                         $value = $extConf['recurrenceStart'];
                         $table[] =
@@ -363,7 +361,7 @@ class CalIndexer extends BaseScriptClass
      * @param $timeString
      * @return CalDate
      */
-    private function getTimeParsed($timeString)
+    private function getTimeParsed($timeString): CalDate
     {
         $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');
@@ -376,7 +374,7 @@ class CalIndexer extends BaseScriptClass
      * @return string
      * @throws Exception
      */
-    public static function getMessage($message, $type)
+    public static function getMessage($message, $type): string
     {
         /** @var $flashMessage FlashMessage */
         $flashMessage = GeneralUtility::makeInstance(

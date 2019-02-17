@@ -98,7 +98,7 @@ class CategoryModel extends BaseModel
     {
         $this->row = $row;
         $this->setUid($row['uid']);
-        $this->setParentUid($row['parent_category']);
+        $this->setParentUid($row['parent_category'] ?? 0);
         if ($row['title']) {
             $this->setTitle($row['title']);
         } else {

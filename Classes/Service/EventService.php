@@ -256,8 +256,8 @@ class EventService extends BaseService
 
         if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere']) {
             $where .= ' ' . $this->cObj->cObjGetSingle(
-                    $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere'],
-                    $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere.']
+                $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere'],
+                $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere.']
                 );
         }
 
@@ -512,12 +512,27 @@ class EventService extends BaseService
             1
         );
 
-        if ((int)$this->conf['view.']['categoryMode'] !== 1 && (int)$this->conf['view.']['categoryMode'] !== 3 && (int)$this->conf['view.']['categoryMode'] !== 4 && $addCategoryWhere && !(($this->conf['view'] === 'ics' || $this->conf['view'] === 'search_event') && !empty($categoryIdArray))) {
+        if (
+            $addCategoryWhere
+            && !(
+                ($this->conf['view'] === 'ics' || $this->conf['view'] === 'search_event')
+                && !empty($categoryIdArray)
+            )
+            && !in_array((int)$this->conf['view.']['categoryMode'], [1, 3, 4], true)
+        ) {
+
+            /**
+             * Jan: I don't see the reason to exclude every event with any
+             * category. Maybe we should add another switch here like
+             * "Find only events without categories"
+             */
+            /*
             $uidCollector = $categoryService->getUidsOfEventsWithCategories();
 
             if (!empty($uidCollector)) {
-                $additionalWhere .= ' AND tx_cal_event.uid NOT IN (' . implode(',', $uidCollector) . ')';
+               $additionalWhere .= ' AND tx_cal_event.uid NOT IN (' . implode(',', $uidCollector) . ')';
             }
+            */
             $eventsWithoutCategory = $this->getEventsFromTable(
                 $categories,
                 $includeRecurring,
@@ -527,6 +542,7 @@ class EventService extends BaseService
                 $onlyMeetingsWithoutStatus,
                 $eventType
             );
+
             if (!empty($eventsWithoutCategory)) {
                 $this->mergeEvents($events, $eventsWithoutCategory);
             }
@@ -779,8 +795,8 @@ class EventService extends BaseService
         $insertFields['crdate'] = $crdate;
 
         if ($GLOBALS['TSFE']->sys_language_content > 0 && $this->conf['showRecordsWithoutDefaultTranslation'] == 1 && $this->rightsObj->isAllowedTo(
-                'create',
-                'translation'
+            'create',
+            'translation'
             )) {
             $insertFields['sys_language_uid'] = $GLOBALS['TSFE']->sys_language_content;
         }
@@ -1055,9 +1071,9 @@ class EventService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedTo(
-                'create',
-                'event',
-                'attendee'
+            'create',
+            'event',
+            'attendee'
             ) && $object->getEventType() === Model::EVENT_TYPE_MEETING) {
             $attendeeUids = [];
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
@@ -1192,7 +1208,7 @@ class EventService extends BaseService
                 1431458130
             );
         }
-        $eventData['pid'] = $object->row['pid'];
+        $eventData['pid'] = $object->getPid();
 
         if ($this->rightsObj->isAllowedTo('edit', 'event', 'image')) {
             $this->checkOnNewOrDeletableFiles('tx_cal_event', 'image', $eventData, $uid);
@@ -1298,7 +1314,7 @@ class EventService extends BaseService
                             'tablenames' => 'fe_users',
                             'sorting' => $key + 1,
                             'offset' => $tempValues['notify_offset'],
-                            'pid' => $object->row['pid']
+                            'pid' => $object->getPid()
                         ]
                     );
                 }
@@ -1310,7 +1326,7 @@ class EventService extends BaseService
                             'tablenames' => 'fe_groups',
                             'sorting' => $key + 1,
                             'offset' => $tempValues['notify_offset'],
-                            'pid' => $object->row['pid']
+                            'pid' => $object->getPid()
                         ]
                     );
                 }
@@ -1363,9 +1379,9 @@ class EventService extends BaseService
             }
         }
         if ($this->rightsObj->isAllowedTo(
-                'edit',
-                'event',
-                'attendee'
+            'edit',
+            'event',
+            'attendee'
             ) && $object->getEventType() === Model::EVENT_TYPE_MEETING) {
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $attendeeServices = $modelObj->findEventAttendees($uid);
@@ -1403,7 +1419,7 @@ class EventService extends BaseService
                     // It's a new attendee -> creating new one
                     $crdate = time();
                     $attendeeValues = [
-                        'pid' => $this->conf['rights.']['create.']['attendee.']['saveAttendeeToPid'] ?: $object->row['pid'],
+                        'pid' => $this->conf['rights.']['create.']['attendee.']['saveAttendeeToPid'] ?: $object->getPid(),
                         'tstamp' => $crdate,
                         'crdate' => $crdate
                     ];
@@ -1885,10 +1901,10 @@ class EventService extends BaseService
                         // 1,2,3,4,5,6,7,8,9,10,11,12
                         foreach ($bymonth as $month) {
                             if ($counter < $count && $until->after($nextOccuranceTime) && intval(str_pad(
-                                        $year,
-                                        2,
-                                        '0',
-                                        STR_PAD_LEFT
+                                $year,
+                                2,
+                                '0',
+                                STR_PAD_LEFT
                                     ) . str_pad(
                                         $month,
                                         2,
@@ -2417,7 +2433,7 @@ class EventService extends BaseService
      */
     public function checkUntil(&$event)
     {
-        if (!$event->row['until']) {
+        if (!$event->getUntil()) {
             $event->setUntil($this->endtime);
         }
     }
@@ -2779,8 +2795,8 @@ class EventService extends BaseService
             if (preg_match('/([-\+]{0,1})?([0-9]{1})?([A-Z]{2})/', $byDayArray[$i], $byDaySplit)) {
                 $dayOfWeekday = Calendar::two2threeCharDays($byDaySplit[3], false);
                 $monthStartTime = new  CalDate($year . '-' . sprintf(
-                        '%02d',
-                        $month
+                    '%02d',
+                    $month
                     ) . '-01 00:00:00');
                 $monthStartTime->setTZbyID('UTC');
                 $monthEndTime = Calendar::calculateEndMonthTime($monthStartTime);
@@ -3006,8 +3022,8 @@ class EventService extends BaseService
                 $select = 'tx_cal_calendar.uid, tx_cal_calendar.pid';
                 $table = 'fe_users, tx_cal_calendar';
                 $where = 'tx_cal_calendar.uid NOT IN (' . implode(
-                        ',',
-                        $updatedCalendar
+                    ',',
+                    $updatedCalendar
                     ) . ') AND fe_users.uid = ' . $attendee->getFeUserId() . ' AND fe_users.tx_cal_calendar=tx_cal_calendar.uid AND fe_users.disable=0 AND fe_users.deleted=0 AND tx_cal_calendar.hidden=0 AND tx_cal_calendar.deleted=0';
                 $groupBy = 'tx_cal_calendar.uid';
                 $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupBy);

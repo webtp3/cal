@@ -2,8 +2,8 @@
 
 namespace TYPO3\CMS\Cal\Utility;
 
-use PDO;
 use Memcache;
+use PDO;
 use RuntimeException;
 use TYPO3\CMS\Core\Cache\Exception\DuplicateIdentifierException;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;

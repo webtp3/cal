@@ -106,7 +106,6 @@ class ConfirmEventView extends FeEditingBaseView
      * @param $template
      * @param $sims
      * @param $rems
-     * @return string|void
      */
     public function getCalendarIdMarker(& $template, & $sims, & $rems)
     {

@@ -76,23 +76,23 @@ class FeEditingBaseView extends BaseView
             $required = '';
             if (preg_match('/.*_LABEL/', $marker)) {
                 $sims['###' . $marker . '###'] = $this->controller->pi_getLL('l_' . $this->objectString . '_' . strtolower(substr(
-                        $marker,
-                        0,
-                        -6
+                    $marker,
+                    0,
+                    -6
                     )));
                 if ($sims['###' . $marker . '###'] === '') {
                     $sims['###' . $marker . '###'] = $this->controller->pi_getLL('l_' . strtolower(substr(
-                            $marker,
-                            0,
-                            -6
+                        $marker,
+                        0,
+                        -6
                         )));
                 }
                 continue;
             }
             $funcFromMarker = 'get' . str_replace(
-                    ' ',
-                    '',
-                    ucwords(str_replace('_', ' ', strtolower($marker)))
+                ' ',
+                '',
+                ucwords(str_replace('_', ' ', strtolower($marker)))
                 ) . 'Marker';
             if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
                 $module = GeneralUtility::makeInstanceService(substr($marker, 8), 'module');
@@ -319,9 +319,8 @@ class FeEditingBaseView extends BaseView
      * @param $template
      * @param $sims
      * @param $rems
-     * @return string
      */
-    public function getCalendarIdMarker(& $template, & $sims, & $rems): string
+    public function getCalendarIdMarker(& $template, & $sims, & $rems)
     {
         $sims['###CALENDAR_ID###'] = '';
         if ($this->isAllowed('calendar_id')) {
@@ -379,7 +378,6 @@ class FeEditingBaseView extends BaseView
 
             $sims['###CALENDAR_ID###'] = $this->applyStdWrap($calendarSelect, 'calendar_id_stdWrap');
         }
-        return '';
     }
 
     /**
@@ -659,8 +657,8 @@ class FeEditingBaseView extends BaseView
     protected function getTranslationOptionsMarker(& $template, & $sims, & $rems)
     {
         if ($this->isEditMode && $this->rightsObj->isViewEnabled('translation') && $this->rightsObj->isAllowedTo(
-                'create',
-                'translation'
+            'create',
+            'translation'
             )) {
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
                 'sys_language_uid',
@@ -707,8 +705,8 @@ class FeEditingBaseView extends BaseView
                         ArrayUtility::mergeRecursiveWithOverrule($piVars, $overrulePIvars);
                         $overrulePIvars = $piVars;
                         $sims['###TRANSLATION_OPTIONS###'] .= ' ' . $this->controller->pi_linkTP($this->cObj->cObjGetSingle(
-                                $this->conf['view.']['translation.']['languageMenu.'][$langId],
-                                $this->conf['view.']['translation.']['languageMenu.'][$langId . '.']
+                            $this->conf['view.']['translation.']['languageMenu.'][$langId],
+                            $this->conf['view.']['translation.']['languageMenu.'][$langId . '.']
                             ), [
                                 $this->controller->prefixId => $overrulePIvars,
                                 [
@@ -735,8 +733,8 @@ class FeEditingBaseView extends BaseView
         if ($this->isEditMode && $this->rightsObj->isViewEnabled('translation')) {
             if ($this->object->row['sys_language_uid'] !== 0) {
                 $sims['###CURRENT_TRANSLATION###'] = 'Current translation: ' . $this->cObj->cObjGetSingle(
-                        $this->conf['view.']['translation.']['languageMenu.'][$this->object->row['sys_language_uid']],
-                        $this->conf['view.']['translation.']['languageMenu.'][$this->object->row['sys_language_uid'] . '.']
+                    $this->conf['view.']['translation.']['languageMenu.'][$this->object->row['sys_language_uid']],
+                    $this->conf['view.']['translation.']['languageMenu.'][$this->object->row['sys_language_uid'] . '.']
                     ) . '<br/>';
             } else {
                 $sims['###CURRENT_TRANSLATION###'] = 'Current translation: default<br/>';
@@ -1142,8 +1140,8 @@ class FeEditingBaseView extends BaseView
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 $name = $this->getFeUserDisplayName($row);
                 if (!empty($allowedUsers) && GeneralUtility::inList(
-                        $this->conf['rights.']['allowedUsers'],
-                        $row['uid']
+                    $this->conf['rights.']['allowedUsers'],
+                    $row['uid']
                     )) {
                     if (GeneralUtility::inList($selectedUsersList, $row['uid'])) {
                         $cal_shared_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '" checked="checked" name="tx_cal_controller[shared][]" />' . $name . '<br />';
@@ -1177,8 +1175,8 @@ class FeEditingBaseView extends BaseView
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 $name = $this->getFeGroupDisplayName($row);
                 if (!empty($allowedGroups) && GeneralUtility::inList(
-                        $this->conf['rights.']['allowedGroups'],
-                        $row['uid']
+                    $this->conf['rights.']['allowedGroups'],
+                    $row['uid']
                     )) {
                     if (GeneralUtility::inList($selectedGroupsList, $row['uid'])) {
                         $cal_shared_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[shared][]" />' . $name . '<br />';

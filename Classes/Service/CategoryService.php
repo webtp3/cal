@@ -50,7 +50,7 @@ class CategoryService extends BaseService
      *            to search in
      * @return array array ($row)
      */
-    public function find($uid, $pidList)
+    public function find($uid, $pidList): array
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 
@@ -77,7 +77,7 @@ class CategoryService extends BaseService
      * @param $uid
      * @return array
      */
-    public function updateCategory($uid)
+    public function updateCategory($uid): array
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 
@@ -92,7 +92,7 @@ class CategoryService extends BaseService
         $table = 'tx_cal_category';
         $where = 'uid = ' . $uid;
 
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
 
         $this->unsetPiVars();
         return $this->find($uid, $this->conf['pidList']);
@@ -113,7 +113,7 @@ class CategoryService extends BaseService
             ];
             $table = 'tx_cal_category';
             $where = 'uid = ' . $uid;
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
 
             $this->unsetPiVars();
         }
@@ -161,13 +161,13 @@ class CategoryService extends BaseService
      * @param $pid
      * @return array
      */
-    public function saveCategory($pid)
+    public function saveCategory($pid): array
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 
         $crdate = time();
         $insertFields = [
-            'pid' => $this->conf['rights.']['create.']['calendar.']['saveCategoryToPid'] ? $this->conf['rights.']['create.']['calendar.']['saveCategoryToPid'] : $pid,
+            'pid' => $this->conf['rights.']['create.']['calendar.']['saveCategoryToPid'] ?: $pid,
             'tstamp' => $crdate,
             'crdate' => $crdate
         ];
@@ -206,7 +206,7 @@ class CategoryService extends BaseService
      * @param $includePublic
      * @return string
      */
-    public function getCategorySearchString($pidList, $includePublic)
+    public function getCategorySearchString($pidList, $includePublic): string
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 
@@ -236,7 +236,7 @@ class CategoryService extends BaseService
         if ($this->conf['view.']['categoryMode'] == 4 && self::$categoryToFilter) {
             $categorySearchString = '';
             $categories = explode(',', self::$categoryToFilter);
-            for ($i = 0; $i < count($categories); $i++) {
+            for ($i = 0, $iMax = count($categories); $i < $iMax; $i++) {
                 if ($i == 0) {
                     $categorySearchString .= ' AND tx_cal_event_category_mm.uid_foreign = "' . $categories[$i] . '" ';
                 } else {
@@ -273,20 +273,11 @@ class CategoryService extends BaseService
             $categoryArrayToBeFilled[] = $this->categoryArrayCached[md5($this->conf['view.']['categoryMode'] . $this->conf['view.']['allowedCategories'])];
             return;
         }
-        if ($this->rightsObj->isLoggedIn() && $showPublicCategories) {
-            $feUserId = $this->rightsObj->getUserId();
-        } elseif ($this->rightsObj->isLoggedIn()) {
-            $feUserId = $this->rightsObj->getUserId();
-        }
 
         $this->categoryArrayByUid = [];
         $this->categoryArrayByEventUid = [];
         $this->categoryArrayByCalendarUid = [];
 
-        $categoryIds = [];
-        $dbIds = [];
-        $fileIds = [];
-        $extUrlIds = [];
         $additionalWhere = ' AND tx_cal_category.pid IN (' . $pidList . ')';
 
         // ompile category array
@@ -312,7 +303,6 @@ class CategoryService extends BaseService
                     $where = 'tx_cal_category.uid NOT IN (' . $implodedAllowedCategories . ')' . ' AND tx_cal_category.pid IN (' . $pidList . ') ' . $this->cObj->enableFields('tx_cal_category');
 
                     $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby, $orderby);
-                    $foundUids = [];
                     if ($result) {
                         $excludedCategories = [];
                         while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
@@ -357,7 +347,7 @@ class CategoryService extends BaseService
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
             $showPublicCategories,
-            $this->conf['calendar'] ? $this->conf['calendar'] : ''
+            $this->conf['calendar'] ?: ''
         );
         // Select all categories for the given pids
         $select = 'tx_cal_category.*,tx_cal_calendar.title AS calendar_title,tx_cal_calendar.uid AS calendar_uid';
@@ -381,8 +371,7 @@ class CategoryService extends BaseService
                         'tx_cal_category',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
                 if (!$row['uid']) {
@@ -431,8 +420,7 @@ class CategoryService extends BaseService
                         'tx_cal_category',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
                 if (!$row['uid']) {
@@ -480,7 +468,7 @@ class CategoryService extends BaseService
             $where .= $calendarService->getCalendarSearchString(
                 $pidList,
                 $showPublicCategories,
-                $this->conf['view.']['calendar'] ? $this->conf['view.']['calendar'] : ''
+                $this->conf['view.']['calendar'] ?: ''
             );
             $where .= $this->cObj->enableFields('tx_cal_calendar') . $this->cObj->enableFields('tx_cal_category') . $this->cObj->enableFields('tx_cal_event');
             $where .= $this->getAdditionalWhereForLocalizationAndVersioning('tx_cal_category');
@@ -494,8 +482,7 @@ class CategoryService extends BaseService
                             'tx_cal_category',
                             $row,
                             $GLOBALS['TSFE']->sys_language_content,
-                            $GLOBALS['TSFE']->sys_language_contentOL,
-                            ''
+                            $GLOBALS['TSFE']->sys_language_contentOL
                         );
                     }
                     if (!$row['uid']) {
@@ -549,14 +536,13 @@ class CategoryService extends BaseService
             $select = 'tx_cal_category.*';
             $table = 'tx_cal_category';
             $where = 'tx_cal_category.uid IN (' . implode(',', $stillNeededChildCategoryIds) . ')';
-            $childCategories = $this->getCategoriesFromTable($select, $table, $where, $groupby);
         }
     }
 
     /**
      * @return array
      */
-    public function getAllCategoryIdsByParentId()
+    public function getAllCategoryIdsByParentId(): array
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 
@@ -582,11 +568,10 @@ class CategoryService extends BaseService
     /**
      * @return array
      */
-    public function getCategoriesForSharedUser()
+    public function getCategoriesForSharedUser(): array
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 
-        $categories = [];
         $select = '*';
         $table = 'tx_cal_event LEFT JOIN tx_cal_event_shared_user_mm ON tx_cal_event.uid = tx_cal_event_shared_user_mm.uid_local ' . 'LEFT JOIN tx_cal_calendar ON tx_cal_event.calendar_id = tx_cal_calendar.uid ' . 'LEFT JOIN tx_cal_category ON tx_cal_calendar.uid = tx_cal_category.calendar_id';
         $where = 'tx_cal_category.shared_user_allowed = 1' . ' AND tx_cal_event_shared_user_mm.uid_foreign = ' . $this->rightsObj->getUserId() . $this->cObj->enableFields('tx_cal_calendar') . $this->cObj->enableFields('tx_cal_category') . $this->cObj->enableFields('tx_cal_event');
@@ -603,7 +588,7 @@ class CategoryService extends BaseService
      * @param string $groupby
      * @return array
      */
-    public function getCategoriesFromTable($select, $table, $where, $groupby = '')
+    public function getCategoriesFromTable($select, $table, $where, $groupby = ''): array
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 
@@ -616,8 +601,7 @@ class CategoryService extends BaseService
                         'tx_cal_category',
                         $row,
                         $GLOBALS['TSFE']->sys_language_content,
-                        $GLOBALS['TSFE']->sys_language_contentOL,
-                        ''
+                        $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
                 if (!$row['uid']) {
@@ -641,7 +625,7 @@ class CategoryService extends BaseService
      * @param $row
      * @return CategoryModel
      */
-    public function createCategory($row)
+    public function createCategory($row): CategoryModel
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 
@@ -748,8 +732,8 @@ class CategoryService extends BaseService
 
         if ($this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere']) {
             $where .= ' ' . $this->cObj->cObjGetSingle(
-                    $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere'],
-                    $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere.']
+                $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere'],
+                $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere.']
                 );
         }
     }
@@ -757,7 +741,7 @@ class CategoryService extends BaseService
     /**
      * @return array
      */
-    public function getUidsOfEventsWithCategories()
+    public function getUidsOfEventsWithCategories(): array
     {
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
 

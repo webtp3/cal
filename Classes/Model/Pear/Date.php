@@ -199,7 +199,7 @@ class Date
     public function Date($date = null)
     {
         $this->tz = TimeZone::getDefault();
-        if (is_null($date)) {
+        if ($date === null) {
             $this->setDate(date('Y-m-d H:i:s'));
         } elseif (is_a($date, 'TYPO3\CMS\Cal\Model\Pear\Date\Date')) {
             $this->copy($date);
@@ -227,9 +227,9 @@ class Date
     public function setDate($date, $format = DATE_FORMAT_ISO)
     {
         if (preg_match(
-                '/^(\d{4})-?(\d{2})-?(\d{2})([T\s]?(\d{2}):?(\d{2}):?(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:?\d{2})?)?$/i',
-                $date,
-                $regs
+            '/^(\d{4})-?(\d{2})-?(\d{2})([T\s]?(\d{2}):?(\d{2}):?(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:?\d{2})?)?$/i',
+            $date,
+            $regs
             ) && $format != DATE_FORMAT_UNIXTIME) {
             // DATE_FORMAT_ISO, ISO_BASIC, ISO_EXTENDED, and TIMESTAMP
             // These formats are extremely close to each other. This regex
@@ -240,9 +240,9 @@ class Date
             $this->year = $regs[1];
             $this->month = $regs[2];
             $this->day = $regs[3];
-            $this->hour = isset($regs[5]) ? $regs[5] : 0;
-            $this->minute = isset($regs[6]) ? $regs[6] : 0;
-            $this->second = isset($regs[7]) ? $regs[7] : 0;
+            $this->hour = $regs[5] ?? 0;
+            $this->minute = $regs[6] ?? 0;
+            $this->second = $regs[7] ?? 0;
             $this->partsecond = isset($regs[8]) ? (float)$regs[8] : (float)0;
 
             // if an offset is defined, convert time to UTC
@@ -384,11 +384,11 @@ class Date
      *            string format the format string for returned date/time
      * @return string date/time in given format
      */
-    public function format($format)
+    public function format($format): string
     {
         $output = '';
 
-        for ($strpos = 0; $strpos < strlen($format); $strpos++) {
+        for ($strpos = 0, $strposMax = strlen($format); $strpos < $strposMax; $strpos++) {
             $char = substr($format, $strpos, 1);
             if ($char == '%') {
                 $nextchar = substr($format, $strpos + 1, 1);
@@ -545,7 +545,7 @@ class Date
      *
      * @return int number of seconds since the unix epoch
      */
-    public function getTime()
+    public function getTime(): int
     {
         return $this->getDate(DATE_FORMAT_UNIXTIME);
     }
@@ -568,7 +568,7 @@ class Date
      */
     public function setTZ($tz)
     {
-        if (is_a($tz, 'TYPO3\CMS\Cal\Model\Pear\Date\Timezone')) {
+        if ($tz instanceof Timezone) {
             $this->tz = $tz;
         } else {
             $this->setTZbyID($tz);
@@ -611,7 +611,7 @@ class Date
      *
      * @return bool true if DST is in effect for this date
      */
-    public function inDaylightTime()
+    public function inDaylightTime(): bool
     {
         return $this->tz->inDaylightTime($this);
     }
@@ -691,7 +691,7 @@ class Date
 
     // }}}
     // {{{ toUTCbyOffset()
-    public function toUTCbyOffset($offset)
+    public function toUTCbyOffset($offset): bool
     {
         if ($offset == 'Z' || $offset == '+00:00' || $offset == '+0000') {
             $this->toUTC();
@@ -758,7 +758,7 @@ class Date
      */
     public function addSpan($span)
     {
-        if (!is_a($span, 'TYPO3\CMS\Cal\Model\Pear\Date\Span')) {
+        if (!is_a($span, Span::class)) {
             return;
         }
 
@@ -837,7 +837,7 @@ class Date
      */
     public function subtractSpan($span)
     {
-        if (!is_a($span, 'TYPO3\CMS\Cal\Model\Pear\Date\Span')) {
+        if (!is_a($span, Span::class)) {
             return;
         }
         if ($span->isEmpty()) {
@@ -897,7 +897,7 @@ class Date
      *            object Date $d2 the second date
      * @return int 0 if the dates are equal, -1 if d1 is before d2, 1 if d1 is after d2
      */
-    public function compare($d1, $d2)
+    public function compare($d1, $d2): int
     {
         $d1->convertTZ(new TimeZone('UTC'));
         $d2->convertTZ(new TimeZone('UTC'));
@@ -942,7 +942,7 @@ class Date
      *            object Date $when the date to test against
      * @return bool true if this date is before $when
      */
-    public function before($when)
+    public function before($when): bool
     {
         if (Date::compare($this, $when) == -1) {
             return true;
@@ -962,7 +962,7 @@ class Date
      *            object Date $when the date to test against
      * @return bool true if this date is after $when
      */
-    public function after($when)
+    public function after($when): bool
     {
         if (Date::compare($this, $when) == 1) {
             return true;
@@ -982,7 +982,7 @@ class Date
      *            object Date $when the date to test against
      * @return bool true if this date is exactly equal to $when
      */
-    public function equals($when)
+    public function equals($when): bool
     {
         if (Date::compare($this, $when) == 0) {
             return true;
@@ -1000,7 +1000,7 @@ class Date
      *
      * @return bool true if this date is in the future
      */
-    public function isFuture()
+    public function isFuture(): bool
     {
         $now = new Date();
         if ($this->after($now)) {
@@ -1019,7 +1019,7 @@ class Date
      *
      * @return bool true if this date is in the past
      */
-    public function isPast()
+    public function isPast(): bool
     {
         $now = new Date();
         if ($this->before($now)) {
@@ -1038,7 +1038,7 @@ class Date
      *
      * @return bool true if this year is a leap year
      */
-    public function isLeapYear()
+    public function isLeapYear(): bool
     {
         return Calc::isLeapYear($this->year);
     }
@@ -1053,7 +1053,7 @@ class Date
      *
      * @return int the Julian date
      */
-    public function getJulianDate()
+    public function getJulianDate(): int
     {
         return Calc::julianDate($this->day, $this->month, $this->year);
     }
@@ -1068,7 +1068,7 @@ class Date
      *
      * @return int the day of the week (0=Sunday)
      */
-    public function getDayOfWeek()
+    public function getDayOfWeek(): int
     {
         return Calc::dayOfWeek($this->day, $this->month, $this->year);
     }
@@ -1098,7 +1098,7 @@ class Date
      *
      * @return int the quarter of the year (1-4)
      */
-    public function getQuarterOfYear()
+    public function getQuarterOfYear(): int
     {
         return Calc::quarterOfYear($this->day, $this->month, $this->year);
     }
@@ -1113,7 +1113,7 @@ class Date
      *
      * @return int number of days in this month
      */
-    public function getDaysInMonth()
+    public function getDaysInMonth(): int
     {
         return Calc::daysInMonth($this->month, $this->year);
     }
@@ -1128,7 +1128,7 @@ class Date
      *
      * @return int number of weeks in this month
      */
-    public function getWeeksInMonth()
+    public function getWeeksInMonth(): int
     {
         return Calc::weeksInMonth($this->month, $this->year);
     }
@@ -1263,7 +1263,7 @@ class Date
      *
      * @return int the year
      */
-    public function getYear()
+    public function getYear(): int
     {
         return (int)$this->year;
     }
@@ -1278,7 +1278,7 @@ class Date
      *
      * @return int the month
      */
-    public function getMonth()
+    public function getMonth(): int
     {
         return (int)$this->month;
     }
@@ -1293,7 +1293,7 @@ class Date
      *
      * @return int the day
      */
-    public function getDay()
+    public function getDay(): int
     {
         return (int)$this->day;
     }
@@ -1308,7 +1308,7 @@ class Date
      *
      * @return int the hour
      */
-    public function getHour()
+    public function getHour(): int
     {
         return $this->hour;
     }
@@ -1323,7 +1323,7 @@ class Date
      *
      * @return int the minute
      */
-    public function getMinute()
+    public function getMinute(): int
     {
         return $this->minute;
     }
@@ -1338,7 +1338,7 @@ class Date
      *
      * @return int the second
      */
-    public function getSecond()
+    public function getSecond(): int
     {
         return $this->second;
     }

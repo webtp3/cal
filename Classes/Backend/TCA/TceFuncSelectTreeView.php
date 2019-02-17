@@ -52,7 +52,7 @@ class TceFuncSelectTreeView extends AbstractTreeView
         if ($v ['uid'] > 0) {
             if (in_array($v ['uid'], $this->MOUNTS, true) || in_array(
                 $v ['uid'],
-                    $this->TCEforms_nonSelectableItemsArray,
+                $this->TCEforms_nonSelectableItemsArray,
                 true
             )) {
                 return '<a href="#" title="' . $v ['title'] . '"><span style="color:#999;cursor:default;">' . $title . '</span></a>';

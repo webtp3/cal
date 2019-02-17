@@ -308,9 +308,9 @@ class LocationService extends BaseService
         ) {
             $hidden = $this->conf['rights.']['location.']['event.']['fields.']['hidden.']['default'];
         } elseif ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedTo(
-                    'edit',
-                    'location',
-                    'hidden'
+            'edit',
+            'location',
+            'hidden'
                 ) || $this->rightsObj->isAllowedTo('create', 'location', 'hidden'))) {
             $hidden = 1;
         }
@@ -352,9 +352,9 @@ class LocationService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'location', 'fax') || $this->rightsObj->isAllowedTo(
-                'create',
-                'location',
-                'fax'
+            'create',
+            'location',
+            'fax'
             )) {
             $insertFields['fax'] = strip_tags($this->controller->piVars['fax']);
         }
@@ -364,9 +364,9 @@ class LocationService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'location', 'link') || $this->rightsObj->isAllowedTo(
-                'create',
-                'location',
-                'link'
+            'create',
+            'location',
+            'link'
             )) {
             $insertFields['link'] = strip_tags($this->controller->piVars['link']);
         }

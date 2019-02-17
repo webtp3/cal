@@ -129,10 +129,10 @@ class SubscriptionManagerView extends BaseView
                 $this->conf['type'] = $event->getType();
                 $event->getMarker($subscriptionContainer, $local_sims, $local_rems, $local_wrapped);
                 $eventList[] = '<li>' . Functions::substituteMarkerArrayNotCached(
-                        $subscriptionContainer,
-                        $local_sims,
-                        $local_rems,
-                        $local_wrapped
+                    $subscriptionContainer,
+                    $local_sims,
+                    $local_rems,
+                    $local_wrapped
                     ) . '</li>';
             }
 
@@ -172,10 +172,10 @@ class SubscriptionManagerView extends BaseView
     {
         $eventUID = $event->getUid();
         return $this->unsubscribeByTable(
-                'fe_users',
-                $email,
-                $eventUID,
-                $subscriptionHash
+            'fe_users',
+            $email,
+            $eventUID,
+            $subscriptionHash
             ) || $this->unsubscribeByTable(
                 'tx_cal_unknown_users',
                 $email,

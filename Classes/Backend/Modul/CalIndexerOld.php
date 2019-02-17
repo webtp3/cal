@@ -86,9 +86,9 @@ class CalIndexerOld extends BaseScriptClass
 			';
 
             $headerSection = $this->doc->getHeader(
-                    'pages',
-                    $this->pageinfo,
-                    $this->pageinfo['_thePath']
+                'pages',
+                $this->pageinfo,
+                $this->pageinfo['_thePath']
                 ) . '<br>' . $GLOBALS['LANG']->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.php:labels.path') . ': ' . GeneralUtility::fixed_lgd_cs(
                     $this->pageinfo['_thePath'],
                     -50
@@ -114,8 +114,8 @@ class CalIndexerOld extends BaseScriptClass
             // ShortCut
             if ($GLOBALS['BE_USER']->mayMakeShortcut()) {
                 $this->content .= $this->doc->spacer(20) . $this->doc->section(
-                        '',
-                        $this->doc->makeShortcutIcon(
+                    '',
+                    $this->doc->makeShortcutIcon(
                             'id',
                             implode(',', array_keys($this->MOD_MENU)),
                             $this->MCONF['name']
@@ -267,7 +267,7 @@ class CalIndexerOld extends BaseScriptClass
      * @param $timeString
      * @return CalDate
      */
-    private function getTimeParsed($timeString)
+    private function getTimeParsed($timeString): CalDate
     {
         $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');
@@ -280,7 +280,7 @@ class CalIndexerOld extends BaseScriptClass
      * @return string
      * @throws Exception
      */
-    public static function getMessage($message, $type)
+    public static function getMessage($message, $type): string
     {
         /** @var $flashMessage FlashMessage */
         $flashMessage = GeneralUtility::makeInstance(

@@ -1,5 +1,6 @@
 <?php
 
+use SJBR\StaticInfoTables\Hook\Backend\Form\Wizard\SuggestReceiver;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
@@ -299,9 +300,9 @@ if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
     ];
 
     $tx_cal_organizer['columns']['country_zone']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountryZonesSelector';
-    $tx_cal_organizer['columns']['country_zone']['config']['wizards']['suggest']['default']['receiverClass'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\Wizard\\SuggestReceiver';
+    $tx_cal_organizer['columns']['country_zone']['config']['wizards']['suggest']['default']['receiverClass'] = SuggestReceiver::class;
     $tx_cal_organizer['columns']['country']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountriesSelector';
-    $tx_cal_organizer['columns']['country']['config']['wizards']['suggest']['default']['receiverClass'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\Wizard\\SuggestReceiver';
+    $tx_cal_organizer['columns']['country']['config']['wizards']['suggest']['default']['receiverClass'] = SuggestReceiver::class;
 }
 
 return $tx_cal_organizer;

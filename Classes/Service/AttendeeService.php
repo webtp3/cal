@@ -138,42 +138,42 @@ class AttendeeService extends BaseService
     {
         $hidden = 0;
         if ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedTo(
-                    'edit',
-                    'attendee',
-                    'hidden'
+            'edit',
+            'attendee',
+            'hidden'
                 ) || $this->rightsObj->isAllowedTo('create', 'attendee', 'hidden'))) {
             $hidden = 1;
         }
         $insertFields['hidden'] = $hidden;
 
         if ($this->rightsObj->isAllowedTo('edit', 'attendee', 'fe_user_id') || $this->rightsObj->isAllowedTo(
-                'create',
-                'attendee',
-                'fe_user_id'
+            'create',
+            'attendee',
+            'fe_user_id'
             )) {
             $insertFields['fe_user_id'] = strip_tags($this->controller->piVars['fe_user_id']);
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'attendee', 'email') || $this->rightsObj->isAllowedTo(
-                'create',
-                'attendee',
-                'email'
+            'create',
+            'attendee',
+            'email'
             )) {
             $insertFields['email'] = intval($this->controller->piVars['email']);
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'attendee', 'attendance') || $this->rightsObj->isAllowedTo(
-                'create',
-                'attendee',
-                'attendance'
+            'create',
+            'attendee',
+            'attendance'
             )) {
             $insertFields['attendance'] = intval($this->controller->piVars['attendance']);
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'attendee', 'status') || $this->rightsObj->isAllowedTo(
-                'create',
-                'attendee',
-                'status'
+            'create',
+            'attendee',
+            'status'
             )) {
             $insertFields['status'] = strip_tags($this->controller->piVars['status']);
         }

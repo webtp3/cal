@@ -268,8 +268,8 @@ class RssView extends BaseView
         if (strpos($icon, 'EXT:') === 0) { // extension
             list($extKey, $local) = explode('/', substr($icon, 4), 2);
             if (strcmp(
-                    $extKey,
-                    ''
+                $extKey,
+                ''
                 ) && ExtensionManagementUtility::isLoaded($extKey) && strcmp(
                     $local,
                     ''
@@ -292,8 +292,8 @@ class RssView extends BaseView
         if ($this->conf['view.']['rss.']['xmlLastBuildDate']) {
             // date should be ok
             $markerArray['###NEWS_LASTBUILD###'] = '<lastBuildDate>' . date(
-                    'D, d M Y H:i:s O',
-                    $lastBuildTimestamp
+                'D, d M Y H:i:s O',
+                $lastBuildTimestamp
                 ) . '</lastBuildDate>';
         } else {
             $markerArray['###NEWS_LASTBUILD###'] = '';

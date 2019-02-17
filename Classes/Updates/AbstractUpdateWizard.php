@@ -74,8 +74,8 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
             $configuration = $storage->getConfiguration();
             $isLocalDriver = $storageRecord['driver'] === 'Local';
             $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
-                    $configuration['basePath'],
-                    $fileadminDirectory
+                $configuration['basePath'],
+                $fileadminDirectory
                 );
             if ($isLocalDriver && $isOnFileadmin) {
                 $this->storage = $storage;
@@ -244,8 +244,8 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
         $mapping = $this->getTableColumnMapping();
 
         $where = sprintf(
-                'WHERE %s <> \'\'',
-                $mapping['mapFieldNames'][$this->getColumnName()]
+            'WHERE %s <> \'\'',
+            $mapping['mapFieldNames'][$this->getColumnName()]
             ) . ' AND ' . $mapping['mapFieldNames'][$this->getColumnName()] . ' <> \'0\' AND cast( ' . $mapping['mapFieldNames'][$this->getColumnName()] . ' AS decimal ) = 0';
 
         return $where;

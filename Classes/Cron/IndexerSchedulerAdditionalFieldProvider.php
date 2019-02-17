@@ -31,7 +31,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    public function getAdditionalFields(array &$taskInfo, $task, SchedulerModuleController $parentObject)
+    public function getAdditionalFields(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         $additionalFields = [];
         $additionalFields['task_eventIndexer_eventFolder'] = $this->getEventFolderAdditionalField(
@@ -65,7 +65,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    protected function getEventFolderAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject)
+    protected function getEventFolderAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         $fieldName = 'tx_scheduler[cal_eventIndexer_eventFolder]';
         $fieldId = 'task_eventIndexer_eventFolder';
@@ -91,7 +91,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         array &$taskInfo,
         $task,
         SchedulerModuleController $parentObject
-    ) {
+    ): array {
         $fieldName = 'tx_scheduler[cal_eventIndexer_typoscriptPage]';
         $fieldId = 'task_eventIndexer_typoscriptPage';
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->typoscriptPage . '" />';
@@ -112,7 +112,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    protected function getStarttimeAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject)
+    protected function getStarttimeAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         $fieldName = 'tx_scheduler[cal_eventIndexer_starttime]';
         $fieldId = 'task_eventIndexer_starttime';
@@ -134,7 +134,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    protected function getEndtimeAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject)
+    protected function getEndtimeAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         $fieldName = 'tx_scheduler[cal_eventIndexer_endtime]';
         $fieldId = 'task_eventIndexer_endtime';
@@ -155,7 +155,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if validation was ok (or selected class is not relevant), false otherwise
      */
-    public function validateAdditionalFields(array &$submittedData, SchedulerModuleController $parentObject)
+    public function validateAdditionalFields(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $validData = $this->validateEventFolderAdditionalField($submittedData, $parentObject);
         $validData &= $this->validateTyposcriptPageAdditionalField($submittedData, $parentObject);
@@ -171,7 +171,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if data is valid
      */
-    public function validateEventFolderAdditionalField(array &$submittedData, SchedulerModuleController $parentObject)
+    public function validateEventFolderAdditionalField(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $validData = false;
         if (!isset($submittedData['cal_eventIndexer_eventFolder'])) {
@@ -192,7 +192,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
     public function validateTyposcriptPageAdditionalField(
         array &$submittedData,
         SchedulerModuleController $parentObject
-    ) {
+    ): bool {
         $validData = false;
         if (!isset($submittedData['cal_eventIndexer_typoscriptPage'])) {
             $validData = true;
@@ -209,7 +209,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if data is valid
      */
-    public function validateStarttimeAdditionalField(array &$submittedData, SchedulerModuleController $parentObject)
+    public function validateStarttimeAdditionalField(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $validData = false;
         if (isset($submittedData['cal_eventIndexer_starttime'])) {
@@ -225,7 +225,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if data is valid
      */
-    public function validateEndtimeAdditionalField(array &$submittedData, SchedulerModuleController $parentObject)
+    public function validateEndtimeAdditionalField(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $validData = false;
         if (isset($submittedData['cal_eventIndexer_endtime'])) {

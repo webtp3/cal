@@ -111,11 +111,9 @@ if ($controllerPiVars['translations']) {
 } else {
     $rightsObj = &Registry::Registry('basic', 'rightscontroller');
     $checkedView = $rightsObj->checkView($view);
-    $res = '';
     $error = true;
 
     if ($checkedView == $view) {
-        $error = false;
         $return = $calAPI->controller->getContent(false);
         echo $return;
         exit();

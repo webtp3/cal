@@ -165,8 +165,8 @@ class TodoService extends EventService
         $insertFields['crdate'] = $crdate;
 
         if ($GLOBALS['TSFE']->sys_language_content > 0 && $this->conf['showRecordsWithoutDefaultTranslation'] == 1 && $this->rightsObj->isAllowedTo(
-                'create',
-                'translation'
+            'create',
+            'translation'
             )) {
             $insertFields['sys_language_uid'] = $GLOBALS['TSFE']->sys_language_content;
         }
@@ -264,7 +264,7 @@ class TodoService extends EventService
                 $group = [];
                 self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['notify_ids'])), $user, $group);
                 $this->subscriptionRepository->insert(
-                        [
+                    [
                             'uid_local' => $uid,
                             'uid_foreign' => $user,
                             'tablenames' => 'fe_users',
@@ -327,7 +327,7 @@ class TodoService extends EventService
             }
         } elseif ($this->conf['rights.']['create.']['todo.']['addFeUserToNotify'] && $this->rightsObj->isLoggedIn()) {
             $this->subscriptionRepository->insert(
-                    [
+                [
                         'uid_local' => $uid,
                         'uid_foreign' => $this->rightsObj->getUserId(),
                         'tablenames' => 'fe_groups',
@@ -710,9 +710,9 @@ class TodoService extends EventService
         }
 
         if ($this->rightsObj->isAllowedTo('create', 'todo', 'starttime') || $this->rightsObj->isAllowedTo(
-                'create',
-                'todo',
-                'startdate'
+            'create',
+            'todo',
+            'startdate'
             )) {
             if (is_object($object->getStart())) {
                 $start = $object->getStart();
@@ -797,9 +797,9 @@ class TodoService extends EventService
         $hidden = 0;
         if (
             !$this->rightsObj->isAllowedTo(
-                        'edit',
-                        'todo',
-                        'hidden'
+                'edit',
+                'todo',
+                'hidden'
                     )
             && !$this->rightsObj->isAllowedTo('create', 'todo', 'hidden')
             && isset($this->conf['rights.']['edit.']['todo.']['fields.']['hidden.']['default'])
@@ -830,9 +830,9 @@ class TodoService extends EventService
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'todo', 'starttime') || $this->rightsObj->isAllowedTo(
-                'edit',
-                'todo',
-                'startday'
+            'edit',
+            'todo',
+            'startday'
             )) {
             if (is_object($object->getStart())) {
                 $start = $object->getStart();

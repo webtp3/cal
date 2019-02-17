@@ -153,15 +153,15 @@ class UriHandler
             if ($imageData['ref']) {
                 // find out if the value had quotes around it
                 $imageData['quotes'] = (substr(
-                        $codepieces[$i],
-                        strpos($codepieces[$i], $imageData['ref']) - 1,
-                        1
+                    $codepieces[$i],
+                    strpos($codepieces[$i], $imageData['ref']) - 1,
+                    1
                     ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
                 if (false === strpos(
                     $this->image_fullpath_list,
-                        '|' . $imageData['subst_str'] . '|'
+                    '|' . $imageData['subst_str'] . '|'
                 )) {
                     $this->image_fullpath_list .= '|' . $imageData['subst_str'] . '|';
                     $imageData['absRef'] = $this->absRef($imageData['ref']);
@@ -188,15 +188,15 @@ class UriHandler
                 $imageData['ref'] = $attributes['href'];
                 // Finds out if the value had quotes around it
                 $imageData['quotes'] = (substr(
-                        $codepieces[$i],
-                        strpos($codepieces[$i], $imageData['ref']) - 1,
-                        1
+                    $codepieces[$i],
+                    strpos($codepieces[$i], $imageData['ref']) - 1,
+                    1
                     ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
                 if ($imageData['ref'] && false === strpos(
                     $this->image_fullpath_list,
-                        '|' . $imageData['subst_str'] . '|'
+                    '|' . $imageData['subst_str'] . '|'
                 )) {
                     $this->image_fullpath_list .= '|' . $imageData['subst_str'] . '|';
                     $imageData['absRef'] = $this->absRef($imageData['ref']);
@@ -225,7 +225,7 @@ class UriHandler
                 case 'jpg':
                     if ($imageData['ref'] && false === strpos(
                         $this->image_fullpath_list,
-                            '|' . $imageData['subst_str'] . '|'
+                        '|' . $imageData['subst_str'] . '|'
                     )) {
                         $this->image_fullpath_list .= '|' . $imageData['subst_str'] . '|';
                         $imageData['absRef'] = $this->absRef($imageData['ref']);
@@ -261,9 +261,9 @@ class UriHandler
             if ($hrefData['ref']) {
                 // Finds out if the value had quotes around it
                 $hrefData['quotes'] = (substr(
-                        $codepieces[$i],
-                        strpos($codepieces[$i], $hrefData['ref']) - 1,
-                        1
+                    $codepieces[$i],
+                    strpos($codepieces[$i], $hrefData['ref']) - 1,
+                    1
                     ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $hrefData['subst_str'] = $hrefData['quotes'] . $hrefData['ref'] . $hrefData['quotes'];
@@ -404,9 +404,9 @@ class UriHandler
                         $theSubStr = 'http://';
                     }
                     $part = substr($part, 0, $thePos) . $theSubStr . substr(
-                            $part,
-                            $thePos + strlen($reg[0]),
-                            strlen($part)
+                        $part,
+                        $thePos + strlen($reg[0]),
+                        strlen($part)
                         );
                 }
             }

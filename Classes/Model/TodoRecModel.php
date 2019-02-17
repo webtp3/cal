@@ -92,9 +92,9 @@ class TodoRecModel extends EventRecModel
         $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
-                    '###',
-                    '',
-                    $subpartMarker
+                '###',
+                '',
+                $subpartMarker
                 ) . '< subpart-marker in ' . $this->parentEvent->conf['view.']['todo.']['todoModelTemplate'];
         }
         $rems = [];

@@ -288,7 +288,6 @@ class Controller extends AbstractPlugin
                 }
             }
         } while ($return === '' && $count < 4 && $notEmpty);
-
         $return = $this->finish($return);
 
         if ($this->conf ['view'] === 'rss' || $this->conf ['view'] === 'ics' || $this->conf ['view'] === 'single_ics' || $this->conf ['view'] === 'load_events' || $this->conf ['view'] === 'load_todos' || $this->conf ['view'] === 'load_rights') {
@@ -389,8 +388,8 @@ class Controller extends AbstractPlugin
 
         // date and strtotime should be ok here
         if ($this->conf ['getdate'] <= date(
-                'Ymd',
-                strtotime($this->conf ['view.'] ['startLinkRange'])
+            'Ymd',
+            strtotime($this->conf ['view.'] ['startLinkRange'])
             ) || $this->conf ['getdate'] >= date(
                 'Ymd',
                 strtotime($this->conf ['view.'] ['endLinkRange'])
@@ -1750,8 +1749,8 @@ class Controller extends AbstractPlugin
             $start_day = Calendar::calculateStartDayTime($start_day);
         } else {
             $start_day = new CalDate(Functions::getYmdFromDateString(
-                    $this->conf,
-                    $start_day
+                $this->conf,
+                $start_day
                 ) . '000000');
             $start_day->setHour(0);
             $start_day->setMinute(0);
@@ -1763,8 +1762,8 @@ class Controller extends AbstractPlugin
             $end_day = Calendar::calculateEndDayTime($end_day);
         } else {
             $end_day = new CalDate(Functions::getYmdFromDateString(
-                    $this->conf,
-                    $end_day
+                $this->conf,
+                $end_day
                 ) . '000000');
             $end_day->setHour(23);
             $end_day->setMinute(59);
@@ -2777,8 +2776,8 @@ class Controller extends AbstractPlugin
             $ajaxGroupStringArray [] = '{' . $this->getEventAjaxString($group) . '}';
         }
         return '{"fe_users":[' . implode(',', $ajaxUserStringArray) . '],"fe_groups":[' . implode(
-                ',',
-                $ajaxGroupStringArray
+            ',',
+            $ajaxGroupStringArray
             ) . ']}';
     }
 
@@ -3143,8 +3142,8 @@ class Controller extends AbstractPlugin
         $wrapped = [];
         $sims ['###IMG_PATH###'] = Functions::expandPath($this->conf ['view.'] ['imagePath']);
         $page = Functions::substituteMarkerArrayNotCached('[' . implode(
-                ',',
-                $ajaxStringArray
+            ',',
+            $ajaxStringArray
             ) . ']', $sims, $rems, $wrapped);
 
         // Hook: postLoadTodosRendering
@@ -3921,10 +3920,10 @@ class Controller extends AbstractPlugin
                     $this->piVars ['day'] = 30;
                 }
                 $this->piVars ['getdate'] = str_pad(
-                        (int)$this->piVars ['year'],
-                        4,
-                        '0',
-                        STR_PAD_LEFT
+                    (int)$this->piVars ['year'],
+                    4,
+                    '0',
+                    STR_PAD_LEFT
                     ) . str_pad(
                         (int)$this->piVars ['month'],
                         2,
@@ -4013,14 +4012,10 @@ class Controller extends AbstractPlugin
                     unset($piVars [$this->prefixId] ['getdate']);
                     break;
                 case 'day':
-                    $piVars [$this->prefixId] ['year'] = substr($piVars [$this->prefixId] ['getdate'], 0, 4);
-                    $piVars [$this->prefixId] ['month'] = substr($piVars [$this->prefixId] ['getdate'], 4, 2);
                     $piVars [$this->prefixId] ['day'] = substr($piVars [$this->prefixId] ['getdate'], 6, 2);
                 // no break
                 case 'month':
-                    $piVars [$this->prefixId] ['year'] = substr($piVars [$this->prefixId] ['getdate'], 0, 4);
                     $piVars [$this->prefixId] ['month'] = substr($piVars [$this->prefixId] ['getdate'], 4, 2);
-                    $sessionVars ['day'] = substr($piVars [$this->prefixId] ['getdate'], 6, 2);
                 // no break
                 case 'year':
                     $piVars [$this->prefixId] ['year'] = substr($piVars [$this->prefixId] ['getdate'], 0, 4);
@@ -4044,10 +4039,10 @@ class Controller extends AbstractPlugin
             $parameterArray ['link_parameter'] = $altPageId ?: $GLOBALS ['TSFE']->id;
         }
         $parameterArray ['link_additionalParams'] = $this->conf ['parent.'] ['addParams'] . GeneralUtility::implodeArrayForUrl(
-                '',
-                $piVars,
-                '',
-                true
+            '',
+            $piVars,
+            '',
+            true
             ) . $this->pi_moreParams;
         $parameterArray ['link_ATagParams'] = 'class="url"';
 

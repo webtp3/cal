@@ -134,7 +134,7 @@ class EventRecModel extends Model
      * @param $view
      * @return string
      */
-    public function getOrganizerLink($view): string
+    public function getOrganizerLink($view = ''): string
     {
         return $this->parentEvent->getOrganizerLink($view);
     }
@@ -271,8 +271,8 @@ class EventRecModel extends Model
             $viewType .= '_FNB';
         }
         if (substr(
-                $viewType,
-                -6
+            $viewType,
+            -6
             ) !== 'ALLDAY' && ($this->isAllDay() || $this->getStart()->format('%Y%m%d') !== $this->getEnd()->format('%Y%m%d'))) {
             $subpartSuffix .= 'ALLDAY';
         }
@@ -324,9 +324,9 @@ class EventRecModel extends Model
         $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
-                    '###',
-                    '',
-                    $subpartMarker
+                '###',
+                '',
+                $subpartMarker
                 ) . '< subpart-marker in ' . $templatePath;
         }
         $rems = [];
@@ -914,8 +914,8 @@ class EventRecModel extends Model
     public function __toString()
     {
         return 'Phpicalendar ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(
-                ',',
-                $this->parentEvent->row
+            ',',
+            $this->parentEvent->row
             );
     }
 

@@ -50,9 +50,8 @@ class ICalendarService extends BaseService
      *            to search in
      * @return array array ($row)
      */
-    public function find($uid, $pidList = '')
+    public function find($uid, $pidList = ''): array
     {
-        $enableFields = '';
         if (TYPO3_MODE == 'BE') {
             $enableFields = BackendUtility::BEenableFields('tx_cal_calendar') . ' AND tx_cal_calendar.deleted = 0';
         } else {
@@ -86,9 +85,8 @@ class ICalendarService extends BaseService
      *            to search in
      * @return array array of array (array of $rows)
      */
-    public function findAll($pidList)
+    public function findAll($pidList): array
     {
-        $enableFields = '';
         $orderBy = Functions::getOrderBy('tx_cal_calendar');
         if (TYPO3_MODE == 'BE') {
             $enableFields = BackendUtility::BEenableFields('tx_cal_calendar') . ' AND tx_cal_calendar.deleted = 0';
@@ -344,7 +342,6 @@ class ICalendarService extends BaseService
      */
     public function deleteScheduledUpdates($uid)
     {
-
     }
 
     /**
@@ -439,8 +436,8 @@ class ICalendarService extends BaseService
                 $where = 'tx_cal_exception_event.uid in (' . implode(',', $exceptionEventUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                        ',',
-                        $exceptionEventUids
+                    ',',
+                    $exceptionEventUids
                     ) . ') and tablenames="tx_cal_exception_event"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
@@ -448,8 +445,8 @@ class ICalendarService extends BaseService
                 $where = 'tx_cal_exception_group.uid in (' . implode(',', $exceptionGroupUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_group', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                        ',',
-                        $exceptionGroupUids
+                    ',',
+                    $exceptionGroupUids
                     ) . ') and tablenames="tx_cal_exception_group"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
@@ -493,7 +490,7 @@ class ICalendarService extends BaseService
      * @return ICalendar
      * @throws RuntimeException
      */
-    public function getiCalendarFromIcsFile($text)
+    public function getiCalendarFromIcsFile($text): ICalendar
     {
         require_once(ICALENDAR_PATH);
         $iCalendar = new ICalendar();
@@ -561,7 +558,7 @@ class ICalendarService extends BaseService
      * @param $calId
      * @return array
      */
-    private function setCategories($component, $insertFields, $pid, $calId)
+    private function setCategories($component, $insertFields, $pid, $calId): array
     {
         $categories = [];
         $categoryString = $component->getAttribute('CATEGORY');
@@ -584,8 +581,8 @@ class ICalendarService extends BaseService
             $categorySelect = '*';
             $categoryTable = 'sys_category';
             $categoryWhere = 'calendar_id = ' . intval($calId) . ' AND title =' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
-                    $category,
-                    $categoryTable
+                $category,
+                $categoryTable
                 );
             $foundCategory = false;
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($categorySelect, $categoryTable, $categoryWhere);
@@ -676,7 +673,7 @@ class ICalendarService extends BaseService
             unset($insertFields['calendar_id']);
 
             if ($indexEntry['event_deviation_uid'] > 0) {
-                $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+                $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
                     $table,
                     'uid=' . $indexEntry['event_deviation_uid'],
                     $insertFields
@@ -853,7 +850,7 @@ class ICalendarService extends BaseService
     {
         $table = 'tx_cal_event';
         if ($eventRow['uid']) {
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid=' . $eventRow['uid'], $insertFields);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid=' . $eventRow['uid'], $insertFields);
             return $eventRow['uid'];
         }
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
@@ -899,15 +896,15 @@ class ICalendarService extends BaseService
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($GLOBALS['TYPO3_DB']->exec_SELECTcountRows(
-                        '*',
-                        'sys_file_reference',
-                        'uid_local=' . $row['uid_local']
+                    '*',
+                    'sys_file_reference',
+                    'uid_local=' . $row['uid_local']
                     ) == 1) {
                     $fileIndexRepository->remove($row['uid_local']);
                 }
             }
         }
-        $result = $GLOBALS['TYPO3_DB']->exec_DELETEquery(
+        $GLOBALS['TYPO3_DB']->exec_DELETEquery(
             'sys_file_reference',
             'tablenames="tx_cal_event" and uid_foreign =' . $uid
         );
@@ -935,7 +932,7 @@ class ICalendarService extends BaseService
 
         $imageExt = explode(',', $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']);
         $type = 'attachment';
-        if (stristr($report['content_type'], 'image') || in_array($ext, $imageExt)) {
+        if (false !== stripos($report['content_type'], 'image') || in_array($ext, $imageExt)) {
             $type = 'image';
         }
 
@@ -949,8 +946,8 @@ class ICalendarService extends BaseService
         }
 
         if ((string)$content === '' || (!empty($denyExt) && in_array(
-                    $ext,
-                    $denyExt
+            $ext,
+            $denyExt
                 )) || (!empty($allowedExt) && !in_array($ext, $allowedExt))) {
             return;
         }
@@ -998,7 +995,7 @@ class ICalendarService extends BaseService
         $cruserId = '',
         $isTemp = 1,
         $deleteNotUsedCategories = true
-    ) {
+    ): array {
         $insertedOrUpdatedEventUids = [];
         $insertedOrUpdatedCategoryUids = [];
         if (empty($iCalendarComponentArray)) {
@@ -1175,7 +1172,6 @@ class ICalendarService extends BaseService
                     if (strlen($until) == 8) {
                         $until = $until . '235959';
                     }
-                    $abs_until = $until;
                     preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/', $until, $regs);
                     $insertFields['until'] = $regs[1] . $regs[2] . $regs[3];
                     break;

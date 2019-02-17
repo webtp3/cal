@@ -45,7 +45,7 @@ class ReminderScheduler extends AbstractTask
      * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
      * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
      */
-    public function execute()
+    public function execute(): bool
     {
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
 

@@ -270,17 +270,17 @@ class CalendarService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'calendar', 'headerstyle') || $this->rightsObj->isAllowedTo(
-                'create',
-                'calendar',
-                'headerstyle'
+            'create',
+            'calendar',
+            'headerstyle'
             )) {
             $insertFields['headerstyle'] = strip_tags($this->controller->piVars['headerstyle']);
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'calendar', 'bodystyle') || $this->rightsObj->isAllowedTo(
-                'create',
-                'calendar',
-                'bodystyle'
+            'create',
+            'calendar',
+            'bodystyle'
             )) {
             $insertFields['bodystyle'] = strip_tags($this->controller->piVars['bodystyle']);
         }

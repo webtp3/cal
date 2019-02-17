@@ -36,7 +36,7 @@ class IndexerScheduler extends AbstractTask
      * @return bool
      * @throws \TYPO3\CMS\Core\Exception
      */
-    public function execute()
+    public function execute(): bool
     {
         $success = true;
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);

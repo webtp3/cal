@@ -83,7 +83,7 @@ class CreateCalendarView extends FeEditingBaseView
             return $this->controller->pi_getLL('l_not_allowed_create') . $this->objectString;
         }
 
-        $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped, $this->conf['view']);
+        $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
 
         $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
         $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
@@ -190,9 +190,9 @@ class CreateCalendarView extends FeEditingBaseView
             }
             $sims['###ACTIVATE_FREEANDBUSY###'] = $this->applyStdWrap($activate, 'activateFreeAndBusy_stdWrap');
         } elseif (!$this->isEditMode && $this->rightsObj->isAllowedTo(
-                'create',
-                $this->objectString,
-                'activateFreeAndBusy'
+            'create',
+            $this->objectString,
+            'activateFreeAndBusy'
             )) {
             $activate = '';
             if ($this->conf['rights.']['create.'][$this->objectString . '.']['fields.']['activateFreeAndBusy.']['default'] || $this->object->isActivateFreeAndBusy()) {

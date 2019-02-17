@@ -13,8 +13,8 @@ namespace TYPO3\CMS\Cal\Hooks;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use PDO;
 use OutOfBoundsException;
+use PDO;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Service\ICalendarService;

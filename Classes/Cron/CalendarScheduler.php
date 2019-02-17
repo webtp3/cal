@@ -27,7 +27,7 @@ class CalendarScheduler extends AbstractTask
     /**
      * @return bool
      */
-    public function execute()
+    public function execute(): bool
     {
         $success = true;
         $service = new ICalendarService();

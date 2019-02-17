@@ -90,129 +90,131 @@ class DateParser
         }
         $this->timeObj = $timeObj;
         $this->conf = &$conf;
-        foreach ($value as $iValue) {
-            $chr = $iValue;
+        if (!empty($value) && is_array($value)) {
+            foreach ($value as $iValue) {
+                $chr = $iValue;
 
-            switch ($chr) {
-                case ' ':
-                case '_':
-                case '.':
-                case ':':
-                case ',':
-                case '/':
-                    if ($this->tokenString !== '') {
-                        if ($this->mode === 0) {
-                            $this->_parseString($this->tokenString);
+                switch ($chr) {
+                    case ' ':
+                    case '_':
+                    case '.':
+                    case ':':
+                    case ',':
+                    case '/':
+                        if ($this->tokenString !== '') {
+                            if ($this->mode === 0) {
+                                $this->_parseString($this->tokenString);
+                            } else {
+                                $this->_parseNumber($this->tokenString);
+                            }
+                            $this->tokenString = '';
+                        }
+                        $this->mode = -1;
+                        break;
+                    case '-':
+                    case '+':
+                        if ($this->mode === -1) {
+                            $this->mode = 2;
+                            $this->stack[] = [
+                                '?',
+                                $chr
+                            ];
                         } else {
-                            $this->_parseNumber($this->tokenString);
+                            $this->_parseString($this->tokenString);
+                            $this->tokenString = '';
+                            $this->mode = 0;
+                        }
+                        break;
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        if ($this->mode === 1) {
+                            $firstPart = array_pop($this->stack);
+                            $firstPart = array_pop($firstPart);
+                            $this->_parseNumber($firstPart . $chr);
+                        } elseif ($this->mode === 2) {
+                            $firstPart = array_pop($this->stack);
+                            $firstPart = array_pop($firstPart);
+                            $this->stack[] = [
+                                'range' => intval($firstPart . $chr)
+                            ];
+                        } else {
+                            $this->_parseNumber($chr);
+                        }
+                        if ($this->mode !== 2) {
+                            $this->mode = 1;
                         }
                         $this->tokenString = '';
-                    }
-                    $this->mode = -1;
-                    break;
-                case '-':
-                case '+':
-                    if ($this->mode === -1) {
-                        $this->mode = 2;
-                        $this->stack[] = [
-                            '?',
-                            $chr
-                        ];
-                    } else {
-                        $this->_parseString($this->tokenString);
-                        $this->tokenString = '';
+                        break;
+                    case 'A':
+                    case 'B':
+                    case 'C':
+                    case 'D':
+                    case 'E':
+                    case 'F':
+                    case 'G':
+                    case 'H':
+                    case 'I':
+                    case 'J':
+                    case 'K':
+                    case 'L':
+                    case 'M':
+                    case 'N':
+                    case 'O':
+                    case 'P':
+                    case 'Q':
+                    case 'R':
+                    case 'S':
+                    case 'T':
+                    case 'U':
+                    case 'V':
+                    case 'W':
+                    case 'X':
+                    case 'Y':
+                    case 'Z':
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                    case 'd':
+                    case 'e':
+                    case 'f':
+                    case 'g':
+                    case 'h':
+                    case 'i':
+                    case 'j':
+                    case 'k':
+                    case 'l':
+                    case 'm':
+                    case 'n':
+                    case 'o':
+                    case 'p':
+                    case 'q':
+                    case 'r':
+                    case 's':
+                    case 't':
+                    case 'u':
+                    case 'v':
+                    case 'w':
+                    case 'x':
+                    case 'y':
+                    case 'z':
+                        if ($this->mode === 1) {
+                            $this->_parseString($this->tokenString);
+                            $this->tokenString = '';
+                        }
                         $this->mode = 0;
-                    }
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    if ($this->mode === 1) {
-                        $firstPart = array_pop($this->stack);
-                        $firstPart = array_pop($firstPart);
-                        $this->_parseNumber($firstPart . $chr);
-                    } elseif ($this->mode === 2) {
-                        $firstPart = array_pop($this->stack);
-                        $firstPart = array_pop($firstPart);
-                        $this->stack[] = [
-                            'range' => intval($firstPart . $chr)
-                        ];
-                    } else {
-                        $this->_parseNumber($chr);
-                    }
-                    if ($this->mode !== 2) {
-                        $this->mode = 1;
-                    }
-                    $this->tokenString = '';
-                    break;
-                case 'A':
-                case 'B':
-                case 'C':
-                case 'D':
-                case 'E':
-                case 'F':
-                case 'G':
-                case 'H':
-                case 'I':
-                case 'J':
-                case 'K':
-                case 'L':
-                case 'M':
-                case 'N':
-                case 'O':
-                case 'P':
-                case 'Q':
-                case 'R':
-                case 'S':
-                case 'T':
-                case 'U':
-                case 'V':
-                case 'W':
-                case 'X':
-                case 'Y':
-                case 'Z':
-                case 'a':
-                case 'b':
-                case 'c':
-                case 'd':
-                case 'e':
-                case 'f':
-                case 'g':
-                case 'h':
-                case 'i':
-                case 'j':
-                case 'k':
-                case 'l':
-                case 'm':
-                case 'n':
-                case 'o':
-                case 'p':
-                case 'q':
-                case 'r':
-                case 's':
-                case 't':
-                case 'u':
-                case 'v':
-                case 'w':
-                case 'x':
-                case 'y':
-                case 'z':
-                    if ($this->mode === 1) {
-                        $this->_parseString($this->tokenString);
-                        $this->tokenString = '';
-                    }
-                    $this->mode = 0;
-                    $this->tokenString .= $chr;
-                    break;
-                default:
-                    break;
+                        $this->tokenString .= $chr;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

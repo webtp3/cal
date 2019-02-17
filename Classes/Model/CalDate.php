@@ -61,7 +61,7 @@ class CalDate extends Date
      * @param $object
      * @return int => less, equals, greater
      */
-    public function compareTo($object)
+    public function compareTo($object): int
     {
         if (is_subclass_of($object, Date::class)) {
             return $this->compare($this, $object);
@@ -75,7 +75,7 @@ class CalDate extends Date
      * @param $compareDate
      * @return bool
      */
-    public function equals($compareDate)
+    public function equals($compareDate): bool
     {
         $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
         $b = floatval($this->format('%Y%m%d%H%M%S'));
@@ -91,7 +91,7 @@ class CalDate extends Date
      * @param $compareDate
      * @return bool
      */
-    public function before($compareDate)
+    public function before($compareDate): bool
     {
         $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
         $b = floatval($this->format('%Y%m%d%H%M%S'));
@@ -107,7 +107,7 @@ class CalDate extends Date
      * @param $compareDate
      * @return bool
      */
-    public function after($compareDate)
+    public function after($compareDate): bool
     {
         $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
         $b = floatval($this->format('%Y%m%d%H%M%S'));
@@ -124,7 +124,7 @@ class CalDate extends Date
      * @param $compareDateB
      * @return int
      */
-    public function compare($compareDateA, $compareDateB)
+    public function compare($compareDateA, $compareDateB): int
     {
         $a = floatval($compareDateA->format('%Y%m%d%H%M%S'));
         $b = floatval($compareDateB->format('%Y%m%d%H%M%S'));
@@ -250,7 +250,7 @@ class CalDate extends Date
      *
      * @return string date/time in given format
      */
-    public function format($format)
+    public function format($format): string
     {
         $output = '';
 
@@ -258,24 +258,24 @@ class CalDate extends Date
         $hn_isoweek = null;
         $hn_isoday = null;
 
-        if ($format == '%Y%m%d') {
+        if ($format === '%Y%m%d') {
             return $this->year . sprintf('%02d%02d', $this->month, $this->day);
         }
-        if ($format == '%Y%m%d%H%M%S') {
+        if ($format === '%Y%m%d%H%M%S') {
             return $this->year . sprintf(
-                    '%02d%02d%02d%02d%02d',
-                    $this->month,
-                    $this->day,
-                    $this->hour,
-                    $this->minute,
-                    $this->second
+                '%02d%02d%02d%02d%02d',
+                $this->month,
+                $this->day,
+                $this->hour,
+                $this->minute,
+                $this->second
                 );
         }
 
-        for ($strpos = 0; $strpos < strlen($format); $strpos++) {
-            $char = substr($format, $strpos, 1);
-            if ($char == '%') {
-                $nextchar = substr($format, $strpos + 1, 1);
+        for ($strpos = 0, $strposMax = strlen($format); $strpos < $strposMax; $strpos++) {
+            $char = $format[$strpos];
+            if ($char === '%') {
+                $nextchar = $format[$strpos + 1];
                 switch ($nextchar) {
                     case 'a':
                         $output .= $this->getDayName(true);
@@ -305,8 +305,8 @@ class CalDate extends Date
                         $output .= Calc::dateToDays($this->day, $this->month, $this->year);
                         break;
                     case 'g':
-                        if (is_null($hn_isoyear)) {
-                            list($hn_isoyear, $hn_isoweek, $hn_isoday) = Calc::isoWeekDate(
+                        if ($hn_isoyear === null) {
+                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
                                 $this->day,
                                 $this->month,
                                 $this->year
@@ -316,8 +316,8 @@ class CalDate extends Date
                         $output .= sprintf('%02d', $hn_isoyear % 100);
                         break;
                     case 'G':
-                        if (is_null($hn_isoyear)) {
-                            list($hn_isoyear, $hn_isoweek, $hn_isoday) = Calc::isoWeekDate(
+                        if ($hn_isoyear === null) {
+                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
                                 $this->day,
                                 $this->month,
                                 $this->year
@@ -344,7 +344,7 @@ class CalDate extends Date
                             return $this->_getErrorInvalidTime();
                         }
                         $hour = $this->hour + 1 > 12 ? $this->hour - 12 : $this->hour;
-                        $output .= $hour == 0 ? 12 : ($nextchar == 'i' ? $hour : sprintf('%02d', $hour));
+                        $output .= $hour == 0 ? 12 : ($nextchar === 'i' ? $hour : sprintf('%02d', $hour));
                         break;
                     case 'j':
                         $output .= sprintf('%03d', Calc::dayOfYear($this->day, $this->month, $this->year));
@@ -440,8 +440,8 @@ class CalDate extends Date
                         $output .= Calc::weekOfYear($this->day, $this->month, $this->year);
                         break;
                     case 'V':
-                        if (is_null($hn_isoyear)) {
-                            list($hn_isoyear, $hn_isoweek, $hn_isoday) = Calc::isoWeekDate(
+                        if ($hn_isoyear === null) {
+                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
                                 $this->day,
                                 $this->month,
                                 $this->year
@@ -497,7 +497,7 @@ class CalDate extends Date
      * @param bool $length
      * @return string
      */
-    public function getDayName($abbr = false, $length = false)
+    public function getDayName($abbr = false, $length = false): string
     {
         $dayName = parent::getDayName();
         if ($abbr) {
@@ -516,7 +516,7 @@ class CalDate extends Date
      * @param bool $length
      * @return string
      */
-    public function getMonthName($abbr = false, $length = false)
+    public function getMonthName($abbr = false, $length = false): string
     {
         $monthName = Calc::getMonthFullname($this->month);
         if ($abbr) {
@@ -533,7 +533,7 @@ class CalDate extends Date
      *
      * @return int
      */
-    public function getMonthAbbreviationLength()
+    public function getMonthAbbreviationLength(): int
     {
         if ($this->conf['dateConfig.']['monthAbbreviationLength']) {
             return intval($this->conf['dateConfig.']['monthAbbreviationLength']);
@@ -546,7 +546,7 @@ class CalDate extends Date
      *
      * @return int
      */
-    public function getWeekdayAbbreviationLength()
+    public function getWeekdayAbbreviationLength(): int
     {
         if ($this->conf['dateConfig.']['weekdayAbbreviationLength']) {
             return intval($this->conf['dateConfig.']['weekdayAbbreviationLength']);
@@ -560,7 +560,7 @@ class CalDate extends Date
      * @param string $value string that should be processed
      * @return string
      */
-    public function applyStdWrap($value = '')
+    public function applyStdWrap($value = ''): string
     {
         // only apply if actually configured
         if (is_array($this->conf['date_stdWrap.']) && count($this->conf['date_stdWrap.']) && $value != '' && is_object($this->cObj) && is_object($GLOBALS['TSFE'])) {
@@ -574,7 +574,7 @@ class CalDate extends Date
     /**
      * @return int
      */
-    public function getWeekOfYear()
+    public function getWeekOfYear(): int
     {
         if (DATE_CALC_BEGIN_WEEKDAY == 0 && $this->getDayOfWeek() == 0) {
             $this->addSeconds(86400);
@@ -593,7 +593,7 @@ class CalDate extends Date
      * @param bool $length The length
      * @return string
      */
-    public function crop($value = '', $length = false)
+    public function crop($value = '', $length = false): string
     {
         if ($length === false) {
             return $value;

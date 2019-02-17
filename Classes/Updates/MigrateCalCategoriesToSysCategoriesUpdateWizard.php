@@ -212,7 +212,6 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard extends AbstractUpdate
         return (bool)$queryBuilder->select('*')->from('tx_cal_category')->execute()->rowCount();
     }
 
-
     /**
      * Checks if an update is needed
      *
@@ -226,7 +225,6 @@ class MigrateCalCategoriesToSysCategoriesUpdateWizard extends AbstractUpdate
         }
         return $this->updateNecessary();
     }
-
 
     /**
      * Returns an array of class names of Prerequisite classes

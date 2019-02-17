@@ -97,9 +97,9 @@ class NotificationView extends BaseView
                     }
 
                     $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
-                            '',
-                            [
+                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                        '',
+                        [
                                 'tx_cal_controller[view]' => 'subscription',
                                 'tx_cal_controller[email]' => $subscriber['email'],
                                 'tx_cal_controller[uid]' => $event_old->getUid(),
@@ -124,9 +124,9 @@ class NotificationView extends BaseView
                     $template = $this->conf['view.']['event.']['notify.']['all.']['onChangeTemplate'];
                     $titleText = $this->conf['view.']['event.']['notify.']['all.']['onChangeEmailTitle'];
                     $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
-                            '',
-                            [
+                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                        '',
+                        [
                                 'tx_cal_controller[view]' => 'subscription',
                                 'tx_cal_controller[email]' => $subscriber['email'],
                                 'tx_cal_controller[uid]' => $event_old->getUid(),
@@ -205,9 +205,9 @@ class NotificationView extends BaseView
                         }
 
                         $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                                $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
-                                '',
-                                [
+                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                            '',
+                            [
                                     'tx_cal_controller[view]' => 'subscription',
                                     'tx_cal_controller[email]' => $row2['email'],
                                     'tx_cal_controller[uid]' => $event_old->getUid(),
@@ -399,9 +399,9 @@ class NotificationView extends BaseView
                     }
 
                     $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
-                            '',
-                            [
+                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                        '',
+                        [
                                 'tx_cal_controller[view]' => 'subscription',
                                 'tx_cal_controller[email]' => $subscriber['email'],
                                 'tx_cal_controller[uid]' => $event->getUid(),
@@ -423,9 +423,9 @@ class NotificationView extends BaseView
                         $titleText = $this->conf['view.']['event.']['notify.']['all.']['onDeleteEmailTitle'];
                     }
                     $unsubscribeLink = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $this->controller->pi_getPageLink(
-                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
-                            '',
-                            [
+                        $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                        '',
+                        [
                                 'tx_cal_controller[view]' => 'subscription',
                                 'tx_cal_controller[email]' => $subscriber['email'],
                                 'tx_cal_controller[uid]' => $event->getUid(),
@@ -506,9 +506,9 @@ class NotificationView extends BaseView
                         }
 
                         $unsubscribeLink = $this->baseUrl . $this->controller->pi_getPageLink(
-                                $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
-                                '',
-                                [
+                            $this->conf['view.']['event.']['notify.']['subscriptionViewPid'],
+                            '',
+                            [
                                     'tx_cal_controller[view]' => 'subscription',
                                     'tx_cal_controller[email]' => $row2['email'],
                                     'tx_cal_controller[uid]' => $event->getUid(),

@@ -112,7 +112,7 @@ class ICalendar
     public function newComponent($type, &$container)
     {
         $type = strtolower($type);
-        $class = ICalendar::class . $type;
+        $class = __CLASS__ . $type;
         if (class_exists($class)) {
             $component = new $class();
             if ($container !== false) {
@@ -195,7 +195,7 @@ class ICalendar
      *            this attribute.
      * @return bool True on success, false if no attribute $name exists.
      */
-    public function setParameter($name, $params)
+    public function setParameter($name, $params): bool
     {
         $keys = array_keys($this->_attributes);
         foreach ($keys as $key) {
@@ -357,7 +357,7 @@ class ICalendar
      *
      * @return array An array containing all the attributes and their types.
      */
-    public function getAllAttributes($tag = false)
+    public function getAllAttributes($tag = false): array
     {
         if ($tag === false) {
             return $this->_attributes;
@@ -379,7 +379,7 @@ class ICalendar
      */
     public function addComponent($component)
     {
-        if (is_a($component, 'TYPO3\CMS\Cal\Model\ICalendar')) {
+        if (is_a($component, __CLASS__)) {
             $component->_container = &$this;
             $this->_components[] = &$component;
         }
@@ -390,12 +390,12 @@ class ICalendar
      *
      * @return array Array of Horde_iCalendar objects.
      */
-    public function getComponents()
+    public function getComponents(): array
     {
         return $this->_components;
     }
 
-    public function getType()
+    public function getType(): string
     {
         return 'vcalendar';
     }
@@ -406,7 +406,7 @@ class ICalendar
      * @return array Hash with class names Horde_iCalendar_xxx as keys
      *         and number of components of this class as value.
      */
-    public function getComponentClasses()
+    public function getComponentClasses(): array
     {
         $r = [];
         foreach ($this->_components as $c) {
@@ -426,7 +426,7 @@ class ICalendar
      *
      * @return int Number of components in this container.
      */
-    public function getComponentCount()
+    public function getComponentCount(): int
     {
         return count($this->_components);
     }
@@ -442,10 +442,7 @@ class ICalendar
      */
     public function getComponent($idx)
     {
-        if (isset($this->_components[$idx])) {
-            return $this->_components[$idx];
-        }
-        return false;
+        return $this->_components[$idx] ?? false;
     }
 
     /**
@@ -488,7 +485,7 @@ class ICalendar
      *         the specified class exists, or a
      *         reference to the requested component.
      */
-    public function &findComponentByAttribute($childclass, $attribute, $value = null)
+    public function &findComponentByAttribute($childclass, $attribute, $value = null): bool
     {
         $childclassB = $childclass;
         $childclass = strtolower($childclass);
@@ -529,7 +526,7 @@ class ICalendar
      *
      * @since Horde 3.1.2
      */
-    public function isOldFormat()
+    public function isOldFormat(): bool
     {
         if ($this->_container !== false) {
             return $this->_container->isOldFormat();
@@ -549,7 +546,7 @@ class ICalendar
     /**
      * Export as vCalendar format.
      */
-    public function exportvCalendar()
+    public function exportvCalendar(): string
     {
         // Default values.
         $requiredAttributes['PRODID'] = '-//The TYPO3 Project//cal extension//EN';
@@ -577,7 +574,7 @@ class ICalendar
      *            If set to true, array keys look like 'LABEL;TYPE=WORK'
      * @return array A hash array with tag names as keys.
      */
-    public function toHash($paramsInKeys = false)
+    public function toHash($paramsInKeys = false): array
     {
         $hash = [];
         foreach ($this->_attributes as $a) {
@@ -608,7 +605,7 @@ class ICalendar
      *
      * @return bool True on successful import, false otherwise.
      */
-    public function parsevCalendar($text, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    public function parsevCalendar($text, $base = 'VCALENDAR', $charset = 'utf8', $clear = true): bool
     {
         if ($clear) {
             $this->clear();
@@ -632,7 +629,7 @@ class ICalendar
                 if ($type != 'VTIMEZONE') {
                     continue;
                 }
-                $component = &ICalendar::newComponent($type, $this);
+                $component = &self::newComponent($type, $this);
                 if ($component === false) {
                     // return PEAR::raiseError("Unable to create object for type $type");
                 }
@@ -650,7 +647,7 @@ class ICalendar
                 if ($type == 'VTIMEZONE') {
                     continue;
                 }
-                $component = &ICalendar::newComponent($type, $this);
+                $component = &self::newComponent($type, $this);
                 if ($component === false) {
                     continue;
                     // return PEAR::raiseError("Unable to create object for type $type");
@@ -680,7 +677,7 @@ class ICalendar
 
         $csConvObj = GeneralUtility::makeInstance(CharsetConverter::class);
 
-        $renderCharset = $csConvObj->parse_charset($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $this->defaultCharSet);
+        $renderCharset = $csConvObj->parse_charset($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ?: $this->defaultCharSet);
 
         // Parse the remaining attributes.
         if (preg_match_all('/(.*):([^\r\n]*)[\r\n]+/', $vCal, $matches)) {
@@ -707,7 +704,7 @@ class ICalendar
 
                     $value = $csConvObj->conv(
                         $value,
-                        $csConvObj->parse_charset[$params['CHARSET']] ? $csConvObj->parse_charset[$params['CHARSET']] : 'utf-8',
+                        $csConvObj->parse_charset[$params['CHARSET']] ?: 'utf-8',
                         $renderCharset,
                         1
                     );
@@ -778,7 +775,7 @@ class ICalendar
                             $periods[] = $this->_parsePeriod($value);
                         }
 
-                        $this->setAttribute($tag, isset($periods[0]) ? $periods[0] : null, $params, true, $periods);
+                        $this->setAttribute($tag, $periods[0] ?? null, $params, true, $periods);
                         break;
 
                     // UTC offset fields.
@@ -889,7 +886,7 @@ class ICalendar
      *
      * @return string vCal format data.
      */
-    public function _exportvData($base = 'VCALENDAR')
+    public function _exportvData($base = 'VCALENDAR'): string
     {
         $result = 'BEGIN:' . strtoupper($base) . $this->_newline;
 
@@ -1122,9 +1119,9 @@ class ICalendar
                  * quotedPrintableEncode does not escape CRLFs, but strange enough single LFs. so convert everything to LF only and replace afterwards.
                  */
                 $result .= $name . $params_str . ':=' . $this->_newline . str_replace(
-                        '=0A',
-                        '=0D=0A',
-                        $this->_quotedPrintableEncode($value)
+                    '=0A',
+                    '=0D=0A',
+                    $this->_quotedPrintableEncode($value)
                     ) . $this->_newline;
             } else {
                 $attr_string = $name . $params_str . ':' . $value;
@@ -1161,7 +1158,7 @@ class ICalendar
     /**
      * Export a UTC Offset field.
      */
-    public function _exportUtcOffset($value)
+    public function _exportUtcOffset($value): string
     {
         $offset = $value['ahead'] ? '+' : '-';
         $offset .= sprintf('%02d%02d', $value['hour'], $value['minute']);
@@ -1198,7 +1195,7 @@ class ICalendar
     /**
      * Export a Time Period field.
      */
-    public function _exportPeriod($value)
+    public function _exportPeriod($value): string
     {
         $period = $this->_exportDateTime($value['start']);
         $period .= '/';
@@ -1214,7 +1211,7 @@ class ICalendar
      * Grok the TZID and return an offset in seconds from UTC for this
      * date and time.
      */
-    public function _parseTZID($date, $time, $tzid)
+    public function _parseTZID($date, $time, $tzid): bool
     {
         $vtimezone = $this->_container->findComponentByAttribute('vtimezone', 'TZID', $tzid);
         if (!$vtimezone) {
@@ -1307,7 +1304,7 @@ class ICalendar
     /**
      * Export a DateTime field.
      */
-    public function _exportDateTime($value)
+    public function _exportDateTime($value): string
     {
         $temp = [];
         if (!is_object($value) && !is_array($value)) {
@@ -1324,16 +1321,16 @@ class ICalendar
             $temp['second'] = date('s', $value);
         } else {
             $dateOb = new CalDate($value);
-            return ICalendar::_exportDateTime($dateOb->timestamp());
+            return self::_exportDateTime($dateOb->timestamp());
         }
 
-        return ICalendar::_exportDate($temp) . 'T' . ICalendar::_exportTime($temp);
+        return self::_exportDate($temp) . 'T' . self::_exportTime($temp);
     }
 
     /**
      * Parse a Time field.
      */
-    public function _parseTime($text)
+    public function _parseTime($text): bool
     {
         $timeParts = [];
         if (preg_match('/([0-9]{2})([0-9]{2})([0-9]{2})(Z)?/', $text, $timeParts)) {
@@ -1353,7 +1350,7 @@ class ICalendar
     /**
      * Export a Time field.
      */
-    public function _exportTime($value)
+    public function _exportTime($value): string
     {
         $time = sprintf('%02d%02d%02d', $value['hour'], $value['minute'], $value['second']);
         if ($value['zone'] == 'UTC') {
@@ -1386,7 +1383,7 @@ class ICalendar
     /**
      * Export a Date field.
      */
-    public function _exportDate($value, $autoconvert = false)
+    public function _exportDate($value, $autoconvert = false): string
     {
         if (is_object($value)) {
             $value = [
@@ -1447,7 +1444,7 @@ class ICalendar
     /**
      * Export a duration value.
      */
-    public function _exportDuration($value)
+    public function _exportDuration($value): string
     {
         $duration = '';
         if ($value < 0) {
@@ -1527,7 +1524,7 @@ class ICalendar
      *
      * @return string The quoted-printable encoded string.
      */
-    public function _quotedPrintableEncode($input = '')
+    public function _quotedPrintableEncode($input = ''): string
     {
         // If imap_8bit() is available, use it.
         if (function_exists('imap_8bit')) {
@@ -1557,7 +1554,7 @@ class ICalendar
         $output = '';
         $len = strlen($input);
         for ($i = 0; $i < $len; ++$i) {
-            $c = substr($input, $i, 1);
+            $c = $input[$i];
             $dec = ord($c);
             $output .= '=' . $hex[floor($dec / 16)] . $hex[floor($dec % 16)];
             if (($i + 1) % 25 == 0) {

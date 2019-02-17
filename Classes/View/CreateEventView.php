@@ -152,7 +152,7 @@ class CreateEventView extends FeEditingBaseView
         $this->dateFormatArray[$this->conf['dateConfig.']['monthPosition']] = 'mm';
         $this->dateFormatArray[$this->conf['dateConfig.']['yearPosition']] = 'yyyy';
 
-        $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped, $this->conf['view']);
+        $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
         $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
         $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
 
@@ -406,8 +406,8 @@ class CreateEventView extends FeEditingBaseView
             );
 
             $sims['###STARTTIME###'] = $this->applyStdWrap(
-                    $start_hours,
-                    'starttime_stdWrap'
+                $start_hours,
+                'starttime_stdWrap'
                 ) . $this->applyStdWrap($start_minutes, 'startminutes_stdWrap');
         }
     }
@@ -433,8 +433,8 @@ class CreateEventView extends FeEditingBaseView
             );
 
             $sims['###ENDTIME###'] = $this->applyStdWrap(
-                    $end_hours,
-                    'endtime_stdWrap'
+                $end_hours,
+                'endtime_stdWrap'
                 ) . $this->applyStdWrap($end_minutes, 'endminutes_stdWrap');
         }
     }
@@ -598,8 +598,8 @@ class CreateEventView extends FeEditingBaseView
                     if (in_array($location->getUid(), $uidList, true)) {
                         if (
                             !$location->isSharedUser(
-                                                        $feUserUid,
-                                                        $feGroupsArray
+                                $feUserUid,
+                                $feGroupsArray
                                                     )
                             && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['onlyOwn']
                         ) {
@@ -625,8 +625,8 @@ class CreateEventView extends FeEditingBaseView
                 foreach ($locations as $location) {
                     if (
                         !$location->isSharedUser(
-                                                $feUserUid,
-                                                $feGroupsArray
+                            $feUserUid,
+                            $feGroupsArray
                                             )
                         && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['onlyOwn']
                     ) {
@@ -1017,7 +1017,7 @@ class CreateEventView extends FeEditingBaseView
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if (is_array($this->object->getExceptionSingleIds()) && in_array(
                     $row['uid'],
-                        $this->object->getExceptionSingleIds(),
+                    $this->object->getExceptionSingleIds(),
                     true
                 )) {
                     $exception .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[exception_ids][]"/>' . $row['title'] . '<br />';
@@ -1035,7 +1035,7 @@ class CreateEventView extends FeEditingBaseView
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if (is_array($this->object->getExceptionGroupIds()) && in_array(
                     $row['uid'],
-                        $this->object->getExceptionGroupIds(),
+                    $this->object->getExceptionGroupIds(),
                     true
                 )) {
                     $exception .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[exception_ids][]" />' . $row['title'] . '<br />';
@@ -1206,8 +1206,8 @@ class CreateEventView extends FeEditingBaseView
                 $name = $this->getFeUserDisplayName($row);
                 $attendee .= '<span>';
                 if (!empty($allowedUsers) && GeneralUtility::inList(
-                        $this->conf['rights.']['allowedUsers'],
-                        $row['uid']
+                    $this->conf['rights.']['allowedUsers'],
+                    $row['uid']
                     )) {
                     if (GeneralUtility::inList($selectedUsersList, $row['uid'])) {
                         $attendee .= '<input type="checkbox" value="u_' . $row['uid'] . '" checked="checked" name="tx_cal_controller[attendee][]" />' . $name;
@@ -1217,13 +1217,13 @@ class CreateEventView extends FeEditingBaseView
                 } elseif (empty($allowedUsers)) {
                     if (GeneralUtility::inList($selectedUsersList, $row['uid'])) {
                         $attendee .= '<input type="checkbox" value="u_' . $row['uid'] . '" checked="checked" name="tx_cal_controller[attendee][]" />' . $name . $this->getAttendeeOptions(
-                                'u_' . $row['uid'],
-                                $attendeeAttendance[$row['uid']]
+                            'u_' . $row['uid'],
+                            $attendeeAttendance[$row['uid']]
                             );
                     } else {
                         $attendee .= '<input type="checkbox" value="u_' . $row['uid'] . '"  name="tx_cal_controller[attendee][]"/>' . $name . $this->getAttendeeOptions(
-                                'u_' . $row['uid'],
-                                $attendeeAttendance[$row['uid']]
+                            'u_' . $row['uid'],
+                            $attendeeAttendance[$row['uid']]
                             );
                     }
                 }
@@ -1231,8 +1231,8 @@ class CreateEventView extends FeEditingBaseView
                     $groups = $this->rightsObj->getUserGroups();
                     $userId = $this->rightsObj->getUserId();
                     $where = 'uid_local = ' . $row['tx_cal_calendar'] . ' AND ((tablenames = "fe_users" AND uid_foreign = ' . $userId . ') OR (tablenames = "fe_groups" AND uid_foreign in (' . implode(
-                            ',',
-                            $groups
+                        ',',
+                        $groups
                         ) . ')))';
                     $result1 = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_cal_calendar_fnb_user_group_mm', $where);
                     $calendarOwner = [];

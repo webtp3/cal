@@ -94,7 +94,7 @@ class CreateCategoryView extends FeEditingBaseView
 
         $sims['###THIS_VIEW###'] = $this->conf['view'];
 
-        $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped, $this->conf['view']);
+        $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
 
         $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
         $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);

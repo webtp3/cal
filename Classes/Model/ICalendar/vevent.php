@@ -35,9 +35,13 @@ class vevent extends ICalendar
         $requiredAttributes = [];
         $requiredAttributes['DTSTAMP'] = time();
         $requiredAttributes['ORGANIZER'] = 'Unknown Organizer';
-        $requiredAttributes['UID'] = $this->_exportDateTime(time()) . '@' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost');
+        if (isset($_SERVER['SERVER_NAME'])) {
+            $requiredAttributes['UID'] = $this->_exportDateTime(time()) . '@' . ($_SERVER['SERVER_NAME']);
+        } else {
+            $requiredAttributes['UID'] = $this->_exportDateTime(time()) . '@' . ('localhost');
+        }
 
-        $method = !empty($this->_container) ? $this->_container->getAttribute('METHOD') : 'PUBLISH';
+        $method = $this->_container !== null ? $this->_container->getAttribute('METHOD') : 'PUBLISH';
 
         switch ($method) {
             case 'PUBLISH':

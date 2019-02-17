@@ -358,7 +358,10 @@ class TceMainProcessdatamap
             }
         }
 
-        if ($table == 'tx_cal_category' && array_key_exists('calendar_id', $incomingFieldArray) && ! strstr($id, 'NEW')) {
+        if ($table == 'tx_cal_category' && array_key_exists('calendar_id', $incomingFieldArray) && false === strpos(
+            $id,
+            'NEW'
+        )) {
             $category = BackendUtility::getRecord('tx_cal_category', $id);
             if ($incomingFieldArray ['calendar_id'] != $category ['calendar_id']) {
                 $incomingFieldArray ['parent_category'] = 0;
@@ -366,7 +369,10 @@ class TceMainProcessdatamap
         }
 
         /* If an existing calendar is updated */
-        if ($table == 'tx_cal_calendar' && array_key_exists('type', $incomingFieldArray) && ! strstr($id, 'NEW')) {
+        if ($table == 'tx_cal_calendar' && array_key_exists('type', $incomingFieldArray) && false === strpos(
+            $id,
+            'NEW'
+        )) {
             /* Get the calendar info from the db */
             $calendar = BackendUtility::getRecord('tx_cal_calendar', $id);
 
@@ -394,7 +400,7 @@ class TceMainProcessdatamap
             }
         }
 
-        if ($table == 'tx_cal_exception_event_group' && ! strstr($id, 'NEW')) {
+        if ($table == 'tx_cal_exception_event_group' && false === strpos($id, 'NEW')) {
             $exceptionEvent = BackendUtility::getRecord('tx_cal_exception_event_group', $id);
 
             /* If we're in a workspace, don't notify anyone about the event */
@@ -482,7 +488,7 @@ class TceMainProcessdatamap
      * @param int $pid
      * @return int
      */
-    private static function getPageIDForPlugin($pid)
+    private static function getPageIDForPlugin($pid): int
     {
         /* Check Page TSConfig for a preview page that we should use */
         $pageTSConf = BackendUtility::getPagesTSconfig($pid);
@@ -531,7 +537,7 @@ class TceMainProcessdatamap
      * @param CalDate $date
      * @return array
      */
-    public static function getWeekdayOccurrence($date)
+    public static function getWeekdayOccurrence($date): array
     {
         return [
                 ceil($date->getDay() / 7),
@@ -545,7 +551,7 @@ class TceMainProcessdatamap
      * @param  string	The date to convert.
      * @return CalDate  the date object
      */
-    public static function convertBackendDateToPear($dateString)
+    public static function convertBackendDateToPear($dateString): CalDate
     {
         $ymdString = self::convertBackendDateToYMD($dateString);
         return new CalDate($ymdString . '000000');
@@ -558,7 +564,7 @@ class TceMainProcessdatamap
      * @param  string	The date to convert.
      * @return string   date in Ymd format.
      */
-    public static function convertBackendDateToYMD($dateString)
+    public static function convertBackendDateToYMD($dateString): string
     {
         $date = new CalDate($dateString);
         return $date->format('%Y%m%d');

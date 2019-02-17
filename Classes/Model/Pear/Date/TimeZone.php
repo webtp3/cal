@@ -215,7 +215,7 @@ class TimeZone
      *            the id to test
      * @return bool true if the supplied ID is valid
      */
-    public static function isValidID($id)
+    public static function isValidID($id): bool
     {
         if (isset($GLOBALS['_DATE_TIMEZONE_DATA'][$id])) {
             return true;
@@ -236,7 +236,7 @@ class TimeZone
      *            object TimeZone $tz the timezone to test
      * @return bool true if this time zone is equal to the supplied time zone
      */
-    public function isEqual($tz)
+    public function isEqual($tz): bool
     {
         if (strcasecmp($this->id, $tz->id) == 0) {
             return true;
@@ -262,7 +262,7 @@ class TimeZone
      *            object TimeZone $tz the timezone object to test
      * @return bool true if this time zone is equivalent to the supplied time zone
      */
-    public function isEquivalent($tz)
+    public function isEquivalent($tz): bool
     {
         if ($this->offset == $tz->offset && $this->hasdst == $tz->hasdst) {
             return true;
@@ -280,7 +280,7 @@ class TimeZone
      *
      * @return bool true if this time zone has DST
      */
-    public function hasDaylightTime()
+    public function hasDaylightTime(): bool
     {
         return $this->hasdst;
     }
@@ -303,7 +303,7 @@ class TimeZone
      *            object Date $date the date/time to test
      * @return bool true if this date is in DST for this time zone
      */
-    public function inDaylightTime($date)
+    public function inDaylightTime($date): bool
     {
         $env_tz = '';
         if (isset($_ENV['TZ']) && getenv('TZ')) {
@@ -330,7 +330,7 @@ class TimeZone
      *
      * @return int the DST offset, in milliseconds or zero if the zone does not observe DST
      */
-    public function getDSTSavings()
+    public function getDSTSavings(): int
     {
         if ($this->hasdst) {
             return 3600000;
@@ -353,7 +353,7 @@ class TimeZone
      *            object Date $date the Date to test
      * @return int the corrected offset to UTC in milliseconds
      */
-    public function getOffset($date)
+    public function getOffset($date): int
     {
         if ($this->inDaylightTime($date)) {
             return $this->offset + $this->getDSTSavings();
@@ -386,7 +386,7 @@ class TimeZone
      *
      * @return string the id
      */
-    public function getID()
+    public function getID(): string
     {
         return $this->id;
     }
@@ -402,7 +402,7 @@ class TimeZone
      *
      * @return string the long name
      */
-    public function getLongName()
+    public function getLongName(): string
     {
         return $this->longname;
     }
@@ -417,7 +417,7 @@ class TimeZone
      *
      * @return string the short name
      */
-    public function getShortName()
+    public function getShortName(): string
     {
         return $this->shortname;
     }
@@ -432,7 +432,7 @@ class TimeZone
      *
      * @return string the daylight savings time long name
      */
-    public function getDSTLongName()
+    public function getDSTLongName(): string
     {
         return $this->dstlongname;
     }
@@ -447,7 +447,7 @@ class TimeZone
      *
      * @return string the daylight savings time short name
      */
-    public function getDSTShortName()
+    public function getDSTShortName(): string
     {
         return $this->dstshortname;
     }
@@ -462,7 +462,7 @@ class TimeZone
      *
      * @return int the offset, in milliseconds
      */
-    public function getRawOffset()
+    public function getRawOffset(): int
     {
         return $this->offset;
     }

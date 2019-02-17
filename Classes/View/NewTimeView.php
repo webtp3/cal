@@ -101,9 +101,9 @@ abstract class NewTimeView
                 }
             }
             $funcFromMarker = 'get' . str_replace(
-                    ' ',
-                    '',
-                    ucwords(str_replace('_', ' ', strtolower($marker)))
+                ' ',
+                '',
+                ucwords(str_replace('_', ' ', strtolower($marker)))
                 ) . 'Marker';
 
             if (method_exists($this, $funcFromMarker)) {
@@ -126,12 +126,12 @@ abstract class NewTimeView
                     break;
                 default:
                     if (preg_match('/.*_LABEL$/', $marker) || preg_match('/^L_.*/', $marker)) {
-                        continue;
+                        continue 2;
                     }
                     $funcFromMarker = 'get' . str_replace(
-                            ' ',
-                            '',
-                            ucwords(str_replace('_', ' ', strtolower($marker)))
+                        ' ',
+                        '',
+                        ucwords(str_replace('_', ' ', strtolower($marker)))
                         ) . 'Marker';
                     if (method_exists($this, $funcFromMarker)) {
                         $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
@@ -143,9 +143,9 @@ abstract class NewTimeView
 
                         // first, try to fill $current with a method of the model matching the markers name
                         $functionName = 'get' . str_replace(
-                                ' ',
-                                '',
-                                ucwords(str_replace('_', ' ', strtolower($marker)))
+                            ' ',
+                            '',
+                            ucwords(str_replace('_', ' ', strtolower($marker)))
                             );
                         if (method_exists($this, $functionName)) {
                             $tmp = $this->$functionName();

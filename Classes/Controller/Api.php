@@ -90,7 +90,6 @@ class Api
         $this->controller->initCaching();
         $this->controller->initConfigs();
 
-        Registry::init($this->controller);
         $this->rightsObj = &Registry::Registry('basic', 'rightscontroller');
         $this->rightsObj = GeneralUtility::makeInstanceService('cal_rights_model', 'rights');
         $this->rightsObj->setDefaultSaveToPage();
@@ -141,7 +140,6 @@ class Api
         }
 
         $GLOBALS ['TSFE']->fetch_the_id();
-        $GLOBALS ['TSFE']->getPageAndRootline();
         $GLOBALS ['TSFE']->initTemplate();
         $GLOBALS ['TSFE']->tmpl->getFileName_backPath = PATH_site;
         $GLOBALS ['TSFE']->forceTemplateParsing = 1;
@@ -539,7 +537,7 @@ class Api
             $tmplPath = explode('.', $tsObjPath);
             // Process TS object hierarchy
             $error = 0;
-            for ($i = 0; $i < count($tmplPath); $i++) {
+            for ($i = 0, $iMax = count($tmplPath); $i < $iMax; $i++) {
 
                 // Try to get content type
                 $cType = $tsObj [$tmplPath [$i]];

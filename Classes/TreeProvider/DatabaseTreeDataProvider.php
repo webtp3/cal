@@ -108,6 +108,10 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         }
     }
 
+    /**
+     * @param $level
+     * @param $parentChildNodes
+     */
     protected function appendGlobalCategories($level, $parentChildNodes)
     {
         $node = GeneralUtility::makeInstance(TreeNode::class);
@@ -124,12 +128,13 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $parentChildNodes->append($node);
     }
 
+    /**
+     * @param $level
+     * @param $childNodes
+     */
     protected function appendCalendarCategories($level, $childNodes)
     {
-        $calendarId = 0;
-        if (isset($this->currentValue['calendar_id'])) {
-            $calendarId = $this->currentValue['calendar_id'];
-        }
+        $calendarId = $this->currentValue['calendar_id'] ?? 0;
         if ($calendarId > 0) {
             $builder = $this->connectionPool->getQueryBuilderForTable('tx_cal_calendar');
             $calres = $builder->select('uid', 'title')->from('tx_cal_calendar')
@@ -154,6 +159,11 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         }
     }
 
+    /**
+     * @param $level
+     * @param $childNodes
+     * @param $where
+     */
     protected function appendCategories($level, $childNodes, $where)
     {
         $builder = $this->connectionPool->getQueryBuilderForTable('tx_cal_category');
@@ -181,7 +191,11 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         }
     }
 
-    protected function getCalendarWhere($calendarId)
+    /**
+     * @param $calendarId
+     * @return string
+     */
+    protected function getCalendarWhere($calendarId): string
     {
         $calWhere = 'l18n_parent = 0  AND tx_cal_calendar.uid = ' . $calendarId;
 
@@ -259,7 +273,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
                 if ($restriction || $this->isCategoryAllowed($child)) {
                     $returnedChild = $this->buildRepresentationForNode($child, $node, $level + 1, $restriction);
 
-                    if (!is_null($returnedChild)) {
+                    if ($returnedChild !== null) {
                         $foundSomeChild = true;
                         $childNodes->append($returnedChild);
                     } else {
@@ -284,7 +298,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
      * @param TreeNode $child
      * @return bool
      */
-    protected function isCategoryAllowed($child)
+    protected function isCategoryAllowed($child): bool
     {
         if ($this->calConfiguration['categoryService'] == 'sys_category') {
             $mounts = $this->backendUserAuthentication->getCategoryMountPoints();
@@ -349,7 +363,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     /**
      * @return bool
      */
-    protected function isSingleCategoryAclActivated()
+    protected function isSingleCategoryAclActivated(): bool
     {
         return false;
     }

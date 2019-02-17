@@ -19,17 +19,35 @@ use TYPO3\CMS\Cal\Model\ICalendar;
  */
 class standard extends ICalendar
 {
-    public function getType()
+    public function getType(): string
     {
         return 'standard';
     }
 
-    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    /**
+     * Parses a string containing vCalendar data.
+     *
+     * @param string $text
+     *            The data to parse.
+     * @param string $base
+     *            The type of the base object.
+     * @param string $charset
+     *            The encoding charset for $text. Defaults to
+     *            utf-8.
+     * @param bool $clear
+     *            If true clears the iCal object before parsing.
+     *
+     * @return bool True on successful import, false otherwise.
+     */
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true): bool
     {
         parent::parsevCalendar($data, 'STANDARD');
     }
 
-    public function exportvCalendar()
+    /**
+     * Export as vCalendar format.
+     */
+    public function exportvCalendar(): string
     {
         return parent::_exportvData('STANDARD');
     }

@@ -242,9 +242,9 @@ abstract class BaseService extends AbstractService
         );
         foreach ($fields as $field) {
             if (($isSave && $this->rightsObj->isAllowedTo(
-                        'create',
-                        $object,
-                        $field
+                'create',
+                $object,
+                $field
                     )) || (!$isSave && $this->rightsObj->isAllowedTo('edit', $object, $field))) {
                 if ($this->conf['view.'][$this->conf['view'] . '.']['additional_fields.'][$field . '_stdWrap.']) {
                     $insertFields[$field] = $this->cObj->stdWrap(
@@ -322,8 +322,8 @@ abstract class BaseService extends AbstractService
         $removeFiles = $this->controller->piVars['remove_' . $type] ?: [];
         if (!empty($removeFiles)) {
             $where = 'uid_foreign = ' . $uid . ' AND  tablenames=\'' . $objectType . '\' AND fieldname=\'' . $type . '\' AND uid in (' . implode(
-                    ',',
-                    array_values($removeFiles)
+                ',',
+                array_values($removeFiles)
                 ) . ')';
             $result = $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_file_reference', $where);
             if (false === $result) {
@@ -352,8 +352,8 @@ abstract class BaseService extends AbstractService
             $configuration = $tmpStorage->getConfiguration();
             $isLocalDriver = $storageRecord['driver'] === 'Local';
             $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
-                    $configuration['basePath'],
-                    $fileadminDirectory
+                $configuration['basePath'],
+                $fileadminDirectory
                 );
             if ($isLocalDriver && $isOnFileadmin) {
                 $storage = $tmpStorage;

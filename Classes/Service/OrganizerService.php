@@ -311,9 +311,9 @@ class OrganizerService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'organizer', 'fax') || $this->rightsObj->isAllowedTo(
-                'create',
-                'organizer',
-                'fax'
+            'create',
+            'organizer',
+            'fax'
             )) {
             $insertFields['fax'] = strip_tags($this->controller->piVars['fax']);
         }
@@ -323,25 +323,25 @@ class OrganizerService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'organizer', 'link') || $this->rightsObj->isAllowedTo(
-                'create',
-                'organizer',
-                'link'
+            'create',
+            'organizer',
+            'link'
             )) {
             $insertFields['link'] = strip_tags($this->controller->piVars['link']);
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'organizer', 'countryZone') || $this->rightsObj->isAllowedTo(
-                'create',
-                'organizer',
-                'countryZone'
+            'create',
+            'organizer',
+            'countryZone'
             )) {
             $insertFields['country_zone'] = strip_tags($this->controller->piVars['countryzone']);
         }
 
         if ($this->rightsObj->isAllowedTo('edit', 'organizer', 'country') || $this->rightsObj->isAllowedTo(
-                'create',
-                'organizer',
-                'country'
+            'create',
+            'organizer',
+            'country'
             )) {
             $insertFields['country'] = strip_tags($this->controller->piVars['country']);
         }

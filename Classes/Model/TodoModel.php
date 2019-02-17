@@ -141,9 +141,9 @@ class TodoModel extends EventModel
         $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
         if (!$page) {
             return 'could not find the >' . str_replace(
-                    '###',
-                    '',
-                    $subpartMarker
+                '###',
+                '',
+                $subpartMarker
                 ) . '< subpart-marker in ' . $resourcePath;
         }
         $rems = [];

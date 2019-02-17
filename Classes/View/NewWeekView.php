@@ -123,8 +123,8 @@ class NewWeekView extends NewTimeView
             }
 
             if (!($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) && $eventStart->year . sprintf(
-                    '%02d',
-                    $eventStart->getWeekOfYear()
+                '%02d',
+                $eventStart->getWeekOfYear()
                 ) < $this->getYear() . sprintf(
                     '%02d',
                     $this->week

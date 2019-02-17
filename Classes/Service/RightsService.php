@@ -1338,8 +1338,8 @@ class RightsService extends BaseService
     public function isAllowedToConfigure(): bool
     {
         return $this->isLoggedIn() && $this->isViewEnabled('admin') && ($this->isCalAdmin() || $this->isAllowedToCreateCalendar() || $this->isAllowedToEditCalendar() || $this->isAllowedToDeleteCalendar() || $this->isAllowedToCreateCategory() || $this->isAllowedToEditCategory() || $this->isAllowedToDeleteCategory() || $this->isAllowedTo(
-                    'create',
-                    'location'
+            'create',
+            'location'
                 ) || $this->isAllowedTo('edit', 'location') || $this->isAllowedTo(
                     'delete',
                     'location'
@@ -1415,8 +1415,8 @@ class RightsService extends BaseService
             return $view;
         } elseif ($view === 'subscription' && $this->conf['allowSubscribe'] && $this->isViewEnabled($view)) {
         } elseif ($view === 'translation' && $this->rightsObj->isAllowedTo(
-                'create',
-                'translation'
+            'create',
+            'translation'
             ) && $this->isViewEnabled($view)) {
         } elseif ($view === 'meeting' && $this->isViewEnabled($view)) {
         } elseif ($view === 'admin' && $this->rightsObj->isAllowedToConfigure()) {
@@ -1454,18 +1454,18 @@ class RightsService extends BaseService
                 $this->piVars['type'] = null;
             } elseif ($this->conf['view.']['allowedViews'][0] === 'event' && (($this->piVars['view'] === 'location' && !in_array(
                 'location',
-                            $this->conf['view.']['allowedViews'],
-                            true
+                $this->conf['view.']['allowedViews'],
+                true
             )) || ($this->piVars['view'] === 'organizer' && !in_array(
-                                'organizer',
-                            $this->conf['view.']['allowedViews'],
-                                true
+                'organizer',
+                $this->conf['view.']['allowedViews'],
+                true
                             )))) {
                 return;
             }
         } elseif (!($view === 'admin' && $this->rightsObj->isAllowedToConfigure()) && !in_array(
             $view,
-                $this->conf['view.']['allowedViews'],
+            $this->conf['view.']['allowedViews'],
             true
         )) {
             $view = $this->conf['view.']['allowedViews'][0];

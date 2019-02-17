@@ -89,4 +89,14 @@ class TreeHelperElement extends AbstractFormElement
     ) {
         return $this->renderWizards($itemKinds, $wizConf, $table, $row, $field, $PA, $itemName, $specConf, $RTE);
     }
+
+    /**
+     * Handler for single nodes
+     *
+     * @return array As defined in initializeResultArray() of AbstractNode
+     */
+    public function render()
+    {
+        // TODO: Implement render() method.
+    }
 }
