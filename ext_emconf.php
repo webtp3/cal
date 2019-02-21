@@ -14,6 +14,8 @@ $EM_CONF['cal'] = [
             'typo3' => '8.7.13 - 9.5.99',
             'static_info_tables' => '6.7.0 - 6.7.99'
         ],
-        'suggests' => []
+        'suggests' => [
+            'typo3db_legacy' => '1.1.0-1.1.99',
+        ],
     ]
 ];
