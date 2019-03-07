@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Backend\Modul;
 
 /**
@@ -94,7 +100,7 @@ class CalIndexer extends BaseScriptClass
     public function __construct()
     {
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->getLanguageService()->includeLLFile('EXT:cal/Resources/Private/Language/locallang_indexer.xml');
+        $this->getLanguageService()->includeLLFile('EXT:cal/Resources/Private/Language/locallang_indexer.xlf');
         $this->MCONF = [
             'name' => $this->moduleName,
         ];

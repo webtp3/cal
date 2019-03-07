@@ -1,14 +1,3 @@
-# IntelliJ project files
-.idea
-*.iml
-out
-gen
-
-# DEV-related files
-/.ddev
-/.Build
-/composer.lock
-
 /.project
 /.buildpath
 /.settings/

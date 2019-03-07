@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model\Pear\Date;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -36,9 +42,6 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
- * @author Monte Ohrt <monte@ispi.net>
- * @author Pierre-Alain Joye <pajoye@php.net>
- * @author Daniel Convissor <danielc@php.net>
  * @copyright 1999-2006 Monte Ohrt, Pierre-Alain Joye, Daniel Convissor
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -78,8 +81,6 @@ if (!defined('DATE_CALC_FORMAT')) {
  * It does not rely on 32-bit system time stamps, so it works dates
  * before 1970 and after 2038.
  *
- * @author Monte Ohrt <monte@ispi.net>
- * @author Daniel Convissor <danielc@php.net>
  * @copyright 1999-2006 Monte Ohrt, Pierre-Alain Joye, Daniel Convissor
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -524,8 +525,6 @@ class Calc
      *
      * @return float the julian date the season starts on
      *
-     * @author James Mark Hamilton <mhamilton@qwest.net>
-     * @author Robert Butler <rob@maxwellcreek.org>
      * @static
      */
     public static function dateSeason($season, $year = 0): float

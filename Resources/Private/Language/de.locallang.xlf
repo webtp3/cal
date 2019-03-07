@@ -1,0 +1,1778 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2019-03-07T11:49:25Z" product-name="cal">
+		<header/>
+		<body>
+			<trans-unit id="l_day" xml:space="preserve" approved="yes">
+				<source>Day</source>
+				<target>Tag</target>
+			</trans-unit>
+			<trans-unit id="l_week" xml:space="preserve" approved="yes">
+				<source>Week</source>
+				<target>Woche</target>
+			</trans-unit>
+			<trans-unit id="l_month" xml:space="preserve" approved="yes">
+				<source>Month</source>
+				<target>Monat</target>
+			</trans-unit>
+			<trans-unit id="l_year" xml:space="preserve" approved="yes">
+				<source>Year</source>
+				<target>Jahr</target>
+			</trans-unit>
+			<trans-unit id="l_list" xml:space="preserve" approved="yes">
+				<source>List</source>
+				<target>Liste</target>
+			</trans-unit>
+			<trans-unit id="l_calendar" xml:space="preserve" approved="yes">
+				<source>Calendar</source>
+				<target>Kalender</target>
+			</trans-unit>
+			<trans-unit id="l_create_calendar" xml:space="preserve" approved="yes">
+				<source>Create calendar</source>
+				<target>Kalender erstellen</target>
+			</trans-unit>
+			<trans-unit id="l_administration_view" xml:space="preserve" approved="yes">
+				<source>Calendar Administration</source>
+				<target>Kalender Administration</target>
+			</trans-unit>
+			<trans-unit id="l_edit_calendar" xml:space="preserve" approved="yes">
+				<source>Edit calendar</source>
+				<target>Kalender ändern</target>
+			</trans-unit>
+			<trans-unit id="l_confirm_calendar" xml:space="preserve" approved="yes">
+				<source>Confirm calendar</source>
+				<target>Kalender bestätigen</target>
+			</trans-unit>
+			<trans-unit id="l_delete_calendar" xml:space="preserve" approved="yes">
+				<source>Delete calendar</source>
+				<target>Kalender löschen</target>
+			</trans-unit>
+			<trans-unit id="l_create_exception" xml:space="preserve" approved="yes">
+				<source>Create exception</source>
+				<target>Ausnahme erstellen</target>
+			</trans-unit>
+			<trans-unit id="l_next_day" xml:space="preserve" approved="yes">
+				<source>Next Day</source>
+				<target>Folgender Tag</target>
+			</trans-unit>
+			<trans-unit id="l_next_month" xml:space="preserve" approved="yes">
+				<source>Next Month</source>
+				<target>Folgender Monat</target>
+			</trans-unit>
+			<trans-unit id="l_next_week" xml:space="preserve" approved="yes">
+				<source>Next Week</source>
+				<target>Folgende Woche</target>
+			</trans-unit>
+			<trans-unit id="l_next_year" xml:space="preserve" approved="yes">
+				<source>Next Year</source>
+				<target>Folgendes Jahr</target>
+			</trans-unit>
+			<trans-unit id="l_last_day" xml:space="preserve" approved="yes">
+				<source>Previous Day</source>
+				<target>Vorheriger Tag</target>
+			</trans-unit>
+			<trans-unit id="l_last_month" xml:space="preserve" approved="yes">
+				<source>Previous Month</source>
+				<target>Vorheriger Monat</target>
+			</trans-unit>
+			<trans-unit id="l_last_week" xml:space="preserve" approved="yes">
+				<source>Previous Week</source>
+				<target>Vorherige Woche</target>
+			</trans-unit>
+			<trans-unit id="l_last_year" xml:space="preserve" approved="yes">
+				<source>Previous Year</source>
+				<target>Vorheriges Jahr</target>
+			</trans-unit>
+			<trans-unit id="l_subscribe" xml:space="preserve" approved="yes">
+				<source>Subscribe</source>
+				<target>Abonieren</target>
+			</trans-unit>
+			<trans-unit id="l_download" xml:space="preserve" approved="yes">
+				<source>Download</source>
+				<target>Herunterladen</target>
+			</trans-unit>
+			<trans-unit id="l_powered_by" xml:space="preserve" approved="yes">
+				<source>Powered by</source>
+				<target>Powered by</target>
+			</trans-unit>
+			<trans-unit id="l_event" xml:space="preserve" approved="yes">
+				<source>Event</source>
+				<target>Eintrag</target>
+			</trans-unit>
+			<trans-unit id="l_events" xml:space="preserve" approved="yes">
+				<source>Events</source>
+				<target>Einträge</target>
+			</trans-unit>
+			<trans-unit id="l_no_events" xml:space="preserve" approved="yes">
+				<source>No events found.</source>
+				<target>Keine aktuellen Einträge vorhanden.</target>
+			</trans-unit>
+			<trans-unit id="l_event_start" xml:space="preserve" approved="yes">
+				<source>Start Time</source>
+				<target>Beginn</target>
+			</trans-unit>
+			<trans-unit id="l_event_end" xml:space="preserve" approved="yes">
+				<source>End Time</source>
+				<target>Ende</target>
+			</trans-unit>
+			<trans-unit id="l_this_months" xml:space="preserve" approved="yes">
+				<source>This Month's Events</source>
+				<target>Einträge in diesem Monat</target>
+			</trans-unit>
+			<trans-unit id="l_date" xml:space="preserve" approved="yes">
+				<source>Date</source>
+				<target>Datum</target>
+			</trans-unit>
+			<trans-unit id="l_summary" xml:space="preserve" approved="yes">
+				<source>Summary</source>
+				<target>Zusammenfassung</target>
+			</trans-unit>
+			<trans-unit id="l_all_day" xml:space="preserve" approved="yes">
+				<source>All day event</source>
+				<target>Tagesereignis</target>
+			</trans-unit>
+			<trans-unit id="l_notes" xml:space="preserve" approved="yes">
+				<source>Notes</source>
+				<target>Notiz</target>
+			</trans-unit>
+			<trans-unit id="l_this_years" xml:space="preserve" approved="yes">
+				<source>This Year's Events</source>
+				<target>Einträge für dieses Jahr</target>
+			</trans-unit>
+			<trans-unit id="l_today" xml:space="preserve" approved="yes">
+				<source>Today</source>
+				<target>Heute</target>
+			</trans-unit>
+			<trans-unit id="l_this_week" xml:space="preserve" approved="yes">
+				<source>This Week</source>
+				<target>Diese Woche</target>
+			</trans-unit>
+			<trans-unit id="l_this_month" xml:space="preserve" approved="yes">
+				<source>This Month</source>
+				<target>Diesen Monat</target>
+			</trans-unit>
+			<trans-unit id="l_jump" xml:space="preserve" approved="yes">
+				<source>Jump to</source>
+				<target>Gehe zu</target>
+			</trans-unit>
+			<trans-unit id="l_tomorrows" xml:space="preserve" approved="yes">
+				<source>Tomorrow's Events</source>
+				<target>Morgige Einträge</target>
+			</trans-unit>
+			<trans-unit id="l_goday" xml:space="preserve" approved="yes">
+				<source>Go to Today</source>
+				<target>Gehe zum heutigen Tag</target>
+			</trans-unit>
+			<trans-unit id="l_goweek" xml:space="preserve" approved="yes">
+				<source>Go to This Week</source>
+				<target>Gehe zur aktuellen Woche</target>
+			</trans-unit>
+			<trans-unit id="l_gomonth" xml:space="preserve" approved="yes">
+				<source>Go to This Month</source>
+				<target>Gehe zum aktuellen Monat</target>
+			</trans-unit>
+			<trans-unit id="l_goyear" xml:space="preserve" approved="yes">
+				<source>Go to This Year</source>
+				<target>Gehe zum aktuellen Jahr</target>
+			</trans-unit>
+			<trans-unit id="l_search" xml:space="preserve" approved="yes">
+				<source>Search</source>
+				<target>Suchen</target>
+			</trans-unit>
+			<trans-unit id="l_search_everything" xml:space="preserve" approved="yes">
+				<source>Search everything</source>
+				<target>Alles durchsuchen</target>
+			</trans-unit>
+			<trans-unit id="l_dosearch" xml:space="preserve" approved="yes">
+				<source>Search</source>
+				<target>suchen</target>
+			</trans-unit>
+			<trans-unit id="l_query_for" xml:space="preserve" approved="yes">
+				<source>Search for</source>
+				<target>Suche nach</target>
+			</trans-unit>
+			<trans-unit id="l_search_string" xml:space="preserve" approved="yes">
+				<source>Search string</source>
+				<target>Suchtext</target>
+			</trans-unit>
+			<trans-unit id="l_results" xml:space="preserve" approved="yes">
+				<source>Search Results</source>
+				<target>Suche Ergebnisse</target>
+			</trans-unit>
+			<trans-unit id="l_query" xml:space="preserve" approved="yes">
+				<source>Query</source>
+				<target>Suche</target>
+			</trans-unit>
+			<trans-unit id="l_no_results" xml:space="preserve" approved="yes">
+				<source>No events found.</source>
+				<target>Keine Einträge gefunden</target>
+			</trans-unit>
+			<trans-unit id="l_no_location_results" xml:space="preserve" approved="yes">
+				<source>No locations found.</source>
+				<target>Keine Orte gefunden</target>
+			</trans-unit>
+			<trans-unit id="l_no_organizer_results" xml:space="preserve" approved="yes">
+				<source>No organizers found.</source>
+				<target>Keine Veranstalter gefunden</target>
+			</trans-unit>
+			<trans-unit id="l_goprint" xml:space="preserve" approved="yes">
+				<source>Printer Friendly</source>
+				<target>Druckversion</target>
+			</trans-unit>
+			<trans-unit id="l_time" xml:space="preserve" approved="yes">
+				<source>Time</source>
+				<target>Zeit</target>
+			</trans-unit>
+			<trans-unit id="l_teaser" xml:space="preserve" approved="yes">
+				<source>Teaser</source>
+				<target>Vorschau</target>
+			</trans-unit>
+			<trans-unit id="l_description" xml:space="preserve" approved="yes">
+				<source>Description</source>
+				<target>Beschreibung</target>
+			</trans-unit>
+			<trans-unit id="l_no_title" xml:space="preserve" approved="yes">
+				<source>No title</source>
+				<target>Kein Titel</target>
+			</trans-unit>
+			<trans-unit id="l_this_site_is" xml:space="preserve" approved="yes">
+				<source>This site is</source>
+				<target>Diese Site ist</target>
+			</trans-unit>
+			<trans-unit id="l_no_events_day" xml:space="preserve" approved="yes">
+				<source>No events today.</source>
+				<target>Keine Einträge für heute.</target>
+			</trans-unit>
+			<trans-unit id="l_no_events_week" xml:space="preserve" approved="yes">
+				<source>No events this week.</source>
+				<target>Keine Einträge in dieser Woche.</target>
+			</trans-unit>
+			<trans-unit id="l_no_events_month" xml:space="preserve" approved="yes">
+				<source>No events this month.</source>
+				<target>Keine Einträge in diesem Monat.</target>
+			</trans-unit>
+			<trans-unit id="l_rss_day_date" xml:space="preserve" approved="yes">
+				<source>g:i A</source>
+				<target>H:i</target>
+			</trans-unit>
+			<trans-unit id="l_rss_week_date" xml:space="preserve" approved="yes">
+				<source>%b %e</source>
+				<target>%e. %b</target>
+			</trans-unit>
+			<trans-unit id="l_rss_month_date" xml:space="preserve" approved="yes">
+				<source>%b %e</source>
+				<target>%e. %b</target>
+			</trans-unit>
+			<trans-unit id="l_rss_language" xml:space="preserve" approved="yes">
+				<source>en-us</source>
+				<target>de-de</target>
+			</trans-unit>
+			<trans-unit id="l_search_took" xml:space="preserve" approved="yes">
+				<source>Search took %s seconds</source>
+				<target>Suche dauerte %s Sekunden</target>
+			</trans-unit>
+			<trans-unit id="l_recurring_event" xml:space="preserve" approved="yes">
+				<source>Recurring event</source>
+				<target>Wiederkehrender Eintrag</target>
+			</trans-unit>
+			<trans-unit id="l_exception" xml:space="preserve" approved="yes">
+				<source>Exception</source>
+				<target>Ausnahme</target>
+			</trans-unit>
+			<trans-unit id="l_no_query" xml:space="preserve" approved="yes">
+				<source>No query given</source>
+				<target>Kein Suchbegriff</target>
+			</trans-unit>
+			<trans-unit id="l_preferences" xml:space="preserve" approved="yes">
+				<source>Preferences</source>
+				<target>Einstellungen</target>
+			</trans-unit>
+			<trans-unit id="l_printer" xml:space="preserve" approved="yes">
+				<source>Printer</source>
+				<target>Drucker</target>
+			</trans-unit>
+			<trans-unit id="l_select_lang" xml:space="preserve" approved="yes">
+				<source>Select your default language:</source>
+				<target>Standardsprache wählen:</target>
+			</trans-unit>
+			<trans-unit id="l_select_cal" xml:space="preserve" approved="yes">
+				<source>Select your default calendar:</source>
+				<target>Standardkalender wählen:</target>
+			</trans-unit>
+			<trans-unit id="l_select_view" xml:space="preserve" approved="yes">
+				<source>Select your default view:</source>
+				<target>Standardansicht wählen:</target>
+			</trans-unit>
+			<trans-unit id="l_select_time" xml:space="preserve" approved="yes">
+				<source>Select your default start time:</source>
+				<target>Tag beginnt um:</target>
+			</trans-unit>
+			<trans-unit id="l_select_day" xml:space="preserve" approved="yes">
+				<source>Select your default start day of week:</source>
+				<target>Woche beginnt mit:</target>
+			</trans-unit>
+			<trans-unit id="l_select_style" xml:space="preserve" approved="yes">
+				<source>Select your default style:</source>
+				<target>Standardstil wählen:</target>
+			</trans-unit>
+			<trans-unit id="l_set_prefs" xml:space="preserve" approved="yes">
+				<source>Set preferences</source>
+				<target>Einstellungen speichern</target>
+			</trans-unit>
+			<trans-unit id="l_completed_date" xml:space="preserve" approved="yes">
+				<source>Completed on</source>
+				<target>Erledigt am</target>
+			</trans-unit>
+			<trans-unit id="l_completed" xml:space="preserve" approved="yes">
+				<source>Completed</source>
+				<target>Erledigt</target>
+			</trans-unit>
+			<trans-unit id="l_created" xml:space="preserve" approved="yes">
+				<source>Created</source>
+				<target>Erstellt</target>
+			</trans-unit>
+			<trans-unit id="l_create" xml:space="preserve" approved="yes">
+				<source>Create</source>
+				<target>Erstelle</target>
+			</trans-unit>
+			<trans-unit id="l_due" xml:space="preserve" approved="yes">
+				<source>Due</source>
+				<target>Fällig:</target>
+			</trans-unit>
+			<trans-unit id="l_priority" xml:space="preserve" approved="yes">
+				<source>Priority</source>
+				<target>Priorität:</target>
+			</trans-unit>
+			<trans-unit id="l_priority_high" xml:space="preserve" approved="yes">
+				<source>High</source>
+				<target>hoch</target>
+			</trans-unit>
+			<trans-unit id="l_priority_low" xml:space="preserve" approved="yes">
+				<source>Low</source>
+				<target>niedrig</target>
+			</trans-unit>
+			<trans-unit id="l_priority_medium" xml:space="preserve" approved="yes">
+				<source>Medium</source>
+				<target>mittel</target>
+			</trans-unit>
+			<trans-unit id="l_priority_none" xml:space="preserve" approved="yes">
+				<source>None</source>
+				<target>keine</target>
+			</trans-unit>
+			<trans-unit id="l_status" xml:space="preserve" approved="yes">
+				<source>Status</source>
+				<target>Status</target>
+			</trans-unit>
+			<trans-unit id="l_todo" xml:space="preserve" approved="yes">
+				<source>To do items</source>
+				<target>Aufgaben</target>
+			</trans-unit>
+			<trans-unit id="l_unfinished" xml:space="preserve" approved="yes">
+				<source>Unfinished</source>
+				<target>Andauernd</target>
+			</trans-unit>
+			<trans-unit id="l_prefs_set" xml:space="preserve" approved="yes">
+				<source>Your preferences have been set.</source>
+				<target>Einstellungen wurden gespeichert.</target>
+			</trans-unit>
+			<trans-unit id="l_prefs_unset" xml:space="preserve" approved="yes">
+				<source>Preferences unset. Changes will take place next
+                page load.
+            </source>
+				<target>Einstellungen gelöscht. Änderungen werden beim
+                Aufruf der nächsten Seite aktiv.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_unset_prefs" xml:space="preserve" approved="yes">
+				<source>Unset preferences:</source>
+				<target>Einstellungen löschen:</target>
+			</trans-unit>
+			<trans-unit id="l_organizer" xml:space="preserve" approved="yes">
+				<source>Organizer</source>
+				<target>Organisator</target>
+			</trans-unit>
+			<trans-unit id="l_edit_organizer" xml:space="preserve" approved="yes">
+				<source>Edit Organizer</source>
+				<target>Organisator bearbeiten</target>
+			</trans-unit>
+			<trans-unit id="l_delete_organizer" xml:space="preserve" approved="yes">
+				<source>Delete Organizer</source>
+				<target>Organisator löschen</target>
+			</trans-unit>
+			<trans-unit id="l_organizers" xml:space="preserve" approved="yes">
+				<source>Organizers</source>
+				<target>Organisatoren</target>
+			</trans-unit>
+			<trans-unit id="l_attendee" xml:space="preserve" approved="yes">
+				<source>Attendee</source>
+				<target>Teilnehmer</target>
+			</trans-unit>
+			<trans-unit id="l_location" xml:space="preserve" approved="yes">
+				<source>Location</source>
+				<target>Ort</target>
+			</trans-unit>
+			<trans-unit id="l_edit_location" xml:space="preserve" approved="yes">
+				<source>Edit Location</source>
+				<target>Ort bearbeiten</target>
+			</trans-unit>
+			<trans-unit id="l_delete_location" xml:space="preserve" approved="yes">
+				<source>Delete Location</source>
+				<target>Ort löschen</target>
+			</trans-unit>
+			<trans-unit id="l_locations" xml:space="preserve" approved="yes">
+				<source>Locations</source>
+				<target>Orte</target>
+			</trans-unit>
+			<trans-unit id="l_admin_header" xml:space="preserve" approved="yes">
+				<source>Calendar Administration</source>
+				<target>PHP iCalendar Administration</target>
+			</trans-unit>
+			<trans-unit id="l_username" xml:space="preserve" approved="yes">
+				<source>Username</source>
+				<target>Benutzername</target>
+			</trans-unit>
+			<trans-unit id="l_password" xml:space="preserve" approved="yes">
+				<source>Password</source>
+				<target>Passwort</target>
+			</trans-unit>
+			<trans-unit id="l_login" xml:space="preserve" approved="yes">
+				<source>Login</source>
+				<target>Anmelden</target>
+			</trans-unit>
+			<trans-unit id="l_invalid_login" xml:space="preserve" approved="yes">
+				<source>Wrong username or password.</source>
+				<target>Falscher Benutzername oder Passwort.</target>
+			</trans-unit>
+			<trans-unit id="l_addupdate_cal" xml:space="preserve" approved="yes">
+				<source>Add or Update a Calendar</source>
+				<target>Kalender aktualisieren oder hochladen</target>
+			</trans-unit>
+			<trans-unit id="l_addupdate_desc" xml:space="preserve" approved="yes">
+				<source>Add a calendar by uploading a new file. Update a
+                calendar by uploading a file of the same name.
+            </source>
+				<target>Um einen Kalendar hinzuzufügen, laden Sie ein
+                neues Kalender-Dokument hoch. Um einen Kalender zu aktualisieren,
+                laden Sie ein Kalender-Dokument mit dem selben Namen hoch.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_delete_cal" xml:space="preserve" approved="yes">
+				<source>Delete a Calendar</source>
+				<target>Einen Kalender löschen</target>
+			</trans-unit>
+			<trans-unit id="l_logout" xml:space="preserve" approved="yes">
+				<source>Logout</source>
+				<target>Abmelden</target>
+			</trans-unit>
+			<trans-unit id="l_cal_file" xml:space="preserve" approved="yes">
+				<source>Calendar File</source>
+				<target>Kalender-Dokument</target>
+			</trans-unit>
+			<trans-unit id="l_php_error" xml:space="preserve" approved="yes">
+				<source>PHP Error</source>
+				<target>PHP Fehler</target>
+			</trans-unit>
+			<trans-unit id="l_upload_error_type" xml:space="preserve" approved="yes">
+				<source>Only .ics files may be uploaded.</source>
+				<target>Nur Dokumente mit der Suffix .ics dürfen
+                hochgeladen werden.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_copy_error" xml:space="preserve" approved="yes">
+				<source>Failed to copy file</source>
+				<target>Kopieren des Dokuments nicht erfolgreich</target>
+			</trans-unit>
+			<trans-unit id="l_delete_confirm" xml:space="preserve" approved="yes">
+				<source>Do you really want to delete?</source>
+				<target>Wollen Sie wirklich löschen?</target>
+			</trans-unit>
+			<trans-unit id="l_delete_error" xml:space="preserve" approved="yes">
+				<source>Failed to delete file</source>
+				<target>Löschen des Dokuments nicht erfolgreich</target>
+			</trans-unit>
+			<trans-unit id="l_delete_success" xml:space="preserve" approved="yes">
+				<source>was deleted successfully.</source>
+				<target>wurde gelöscht.</target>
+			</trans-unit>
+			<trans-unit id="l_action_success" xml:space="preserve" approved="yes">
+				<source>Your action was successful.</source>
+				<target>Die Aktion war erfolgreich.</target>
+			</trans-unit>
+			<trans-unit id="l_submit" xml:space="preserve" approved="yes">
+				<source>Submit</source>
+				<target>Speichern</target>
+			</trans-unit>
+			<trans-unit id="l_edit" xml:space="preserve" approved="yes">
+				<source>Edit</source>
+				<target>Ändern</target>
+			</trans-unit>
+			<trans-unit id="l_delete" xml:space="preserve" approved="yes">
+				<source>Delete</source>
+				<target>Löschen</target>
+			</trans-unit>
+			<trans-unit id="l_refresh" xml:space="preserve" approved="yes">
+				<source>Refresh</source>
+				<target>Auffrischen / Erneuern</target>
+			</trans-unit>
+			<trans-unit id="l_all_cal_comb_lang" xml:space="preserve" approved="yes">
+				<source>All Combined</source>
+				<target>Alle Kalender zusammen</target>
+			</trans-unit>
+			<trans-unit id="l_legend" xml:space="preserve" approved="yes">
+				<source>Legend</source>
+				<target>Legende</target>
+			</trans-unit>
+			<trans-unit id="l_admin_subhead" xml:space="preserve" approved="yes">
+				<source>Manage your calendars from this page</source>
+				<target>Verwalten Sie Ihre Kalender mit dieser Seite</target>
+			</trans-unit>
+			<trans-unit id="l_prefs_subhead" xml:space="preserve" approved="yes">
+				<source>Sets a cookie for visiting this site</source>
+				<target>Setzt einen Cookie</target>
+			</trans-unit>
+			<trans-unit id="l_rss_info" xml:space="preserve" approved="yes">
+				<source>RSS Information</source>
+				<target>RSS Information</target>
+			</trans-unit>
+			<trans-unit id="l_rss_subhead" xml:space="preserve" approved="yes">
+				<source>Basic RSS feeds available for each calendar</source>
+				<target>Basic RSS feeds für jeden Kalender</target>
+			</trans-unit>
+			<trans-unit id="l_rss_notenabled" xml:space="preserve" approved="yes">
+				<source>RSS is not enabled on this site</source>
+				<target>RSS ist auf dieser Seite nicht aktiviert</target>
+			</trans-unit>
+			<trans-unit id="l_back" xml:space="preserve" approved="yes">
+				<source>Back</source>
+				<target>Zurück</target>
+			</trans-unit>
+			<trans-unit id="l_next" xml:space="preserve" approved="yes">
+				<source>Next</source>
+				<target>Nächste</target>
+			</trans-unit>
+			<trans-unit id="l_prev" xml:space="preserve" approved="yes">
+				<source>Prev</source>
+				<target>Vorherige</target>
+			</trans-unit>
+			<trans-unit id="l_day_view" xml:space="preserve" approved="yes">
+				<source>Day View</source>
+				<target>Tagesansicht</target>
+			</trans-unit>
+			<trans-unit id="l_week_view" xml:space="preserve" approved="yes">
+				<source>Week View</source>
+				<target>Wochenansicht</target>
+			</trans-unit>
+			<trans-unit id="l_month_view" xml:space="preserve" approved="yes">
+				<source>Month View</source>
+				<target>Monatsansicht</target>
+			</trans-unit>
+			<trans-unit id="l_year_view" xml:space="preserve" approved="yes">
+				<source>Year View</source>
+				<target>Jahresansicht</target>
+			</trans-unit>
+			<trans-unit id="l_event_view" xml:space="preserve" approved="yes">
+				<source>Event View</source>
+				<target>Ereignis-Ansicht</target>
+			</trans-unit>
+			<trans-unit id="l_search_view" xml:space="preserve" approved="yes">
+				<source>Search</source>
+				<target>Suche</target>
+			</trans-unit>
+			<trans-unit id="l_ics_view" xml:space="preserve" approved="yes">
+				<source>ICS</source>
+				<target>ICS</target>
+			</trans-unit>
+			<trans-unit id="l_icslist_title" xml:space="preserve" approved="yes">
+				<source>List of available ics-files to download</source>
+				<target>Liste der verfügbaren ICS-Dateien zum
+                Herunterladen
+            </target>
+			</trans-unit>
+			<trans-unit id="l_list_view" xml:space="preserve" approved="yes">
+				<source>List View</source>
+				<target>Listen-Ansicht</target>
+			</trans-unit>
+			<trans-unit id="format_recur_lang_delimiter" xml:space="preserve" approved="yes">
+				<source>,</source>
+				<target>,</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_yearly_single" xml:space="preserve" approved="yes">
+				<source>year</source>
+				<target>Jahr</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_yearly_multiple" xml:space="preserve" approved="yes">
+				<source>years</source>
+				<target>Jahre</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_monthly_single" xml:space="preserve" approved="yes">
+				<source>month</source>
+				<target>Monat</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_monthly_multiple" xml:space="preserve" approved="yes">
+				<source>months</source>
+				<target>Monate</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_weekly_single" xml:space="preserve" approved="yes">
+				<source>week</source>
+				<target>Woche</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_weekly_multiple" xml:space="preserve" approved="yes">
+				<source>weeks</source>
+				<target>Wochen</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_daily_single" xml:space="preserve" approved="yes">
+				<source>day</source>
+				<target>Tag</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_daily_multiple" xml:space="preserve" approved="yes">
+				<source>days</source>
+				<target>Tage</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_hourly_single" xml:space="preserve" approved="yes">
+				<source>hour</source>
+				<target>Stunde</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_hourly_multiple" xml:space="preserve" approved="yes">
+				<source>hours</source>
+				<target>Stunden</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_minutely_single" xml:space="preserve" approved="yes">
+				<source>minute</source>
+				<target>Minute</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_minutely_multiple" xml:space="preserve" approved="yes">
+				<source>minutes</source>
+				<target>Minuten</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_secondly_single" xml:space="preserve" approved="yes">
+				<source>second</source>
+				<target>Sekunde</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_secondly_multiple" xml:space="preserve" approved="yes">
+				<source>seconds</source>
+				<target>Sekunden</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_start" xml:space="preserve" approved="yes">
+				<source>Every %int% %freq% %for%</source>
+				<target>Jeden %int% %freq% %for%</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_until" xml:space="preserve" approved="yes">
+				<source>until %date%</source>
+				<target>bis %date%</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_count" xml:space="preserve" approved="yes">
+				<source>for a count of %int%</source>
+				<target>für %int% Mal</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_bymonth" xml:space="preserve" approved="yes">
+				<source>In months: %list%</source>
+				<target>In den Monaten: %list%</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_bymonthday" xml:space="preserve" approved="yes">
+				<source>On dates: %list%</source>
+				<target>An den Daten: %list%</target>
+			</trans-unit>
+			<trans-unit id="l_format_recur_lang_byday" xml:space="preserve" approved="yes">
+				<source>On days: %list%</source>
+				<target>An den Tagen: %list%</target>
+			</trans-unit>
+			<trans-unit id="l_daysofweek_all" xml:space="preserve" approved="yes">
+				<source>All Days</source>
+				<target>Alle Tage</target>
+			</trans-unit>
+			<trans-unit id="l_monthsofyear_all" xml:space="preserve" approved="yes">
+				<source>All Months</source>
+				<target>Alle Monate</target>
+			</trans-unit>
+			<trans-unit id="l_daysofweek_lang_sunday" xml:space="preserve" approved="yes">
+				<source>Sunday</source>
+				<target>Sonntag</target>
+			</trans-unit>
+			<trans-unit id="l_daysofweek_lang_monday" xml:space="preserve" approved="yes">
+				<source>Monday</source>
+				<target>Montag</target>
+			</trans-unit>
+			<trans-unit id="l_daysofweek_lang_tuesday" xml:space="preserve" approved="yes">
+				<source>Tuesday</source>
+				<target>Dienstag</target>
+			</trans-unit>
+			<trans-unit id="l_daysofweek_lang_wednesday" xml:space="preserve" approved="yes">
+				<source>Wednesday</source>
+				<target>Mittwoch</target>
+			</trans-unit>
+			<trans-unit id="l_daysofweek_lang_thursday" xml:space="preserve" approved="yes">
+				<source>Thursday</source>
+				<target>Donnerstag</target>
+			</trans-unit>
+			<trans-unit id="l_daysofweek_lang_friday" xml:space="preserve" approved="yes">
+				<source>Friday</source>
+				<target>Freitag</target>
+			</trans-unit>
+			<trans-unit id="l_daysofweek_lang_saturday" xml:space="preserve" approved="yes">
+				<source>Saturday</source>
+				<target>Samstag</target>
+			</trans-unit>
+			<trans-unit id="l_error_title" xml:space="preserve" approved="yes">
+				<source>Error!</source>
+				<target>Fehler!</target>
+			</trans-unit>
+			<trans-unit id="l_error_window" xml:space="preserve" approved="yes">
+				<source>There was an error!</source>
+				<target>Es ist ein Fehler aufgetreten!</target>
+			</trans-unit>
+			<trans-unit id="l_error_calendar" xml:space="preserve" approved="yes">
+				<source>The calendar &quot;%s&quot; was being processed
+                when this error occurred.
+            </source>
+				<target>Der Kalender &quot;%s&quot; wurde bearbeitet, als
+                dieser Fehler auftrat.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_error_path" xml:space="preserve" approved="yes">
+				<source>Unable to open the path: &quot;%s&quot;</source>
+				<target>Der Pfad &quot;%s&quot; kann nicht geöffnet
+                werden.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_error_back" xml:space="preserve" approved="yes">
+				<source>Please use the &quot;Back&quot; button to return.</source>
+				<target>Bitte klicken Sie die
+                &quot;Zurück&quot;-Schaltfläche des Browsers, um zurückzuspringen.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_error_remotecal" xml:space="preserve" approved="yes">
+				<source>This server blocks remote calendars which have not
+                been approved.
+            </source>
+				<target>Dieser Server blockiert entfernte Kalender, welche
+                nicht freigegeben wurden.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_error_restrictedcal" xml:space="preserve" approved="yes">
+				<source>You have tried to access a calendar that is
+                restricted on this server.
+            </source>
+				<target>Sie haben versucht, einen Kalender mit
+                eingeschränktem Zugriff auf diesem Server aufzurufen.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_error_invalidcal" xml:space="preserve" approved="yes">
+				<source>Invalid calendar file. Please try a different
+                calendar.
+            </source>
+				<target>Dieser Kalender enthält Fehler. Bitte wählen Sie
+                einen anderen aus.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_error_cantopen" xml:space="preserve" approved="yes">
+				<source>Unable to open calendar.</source>
+				<target>Konnte Kalender nicht öffnen</target>
+			</trans-unit>
+			<trans-unit id="l_error_cache" xml:space="preserve" approved="yes">
+				<source>Unable to write to cache directory. Please check
+                your config.
+            </source>
+				<target>Konnte nicht ins Cache-Verzeichnis schreiben.
+                Bitte Konfiguration überprüfen.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_error_noCategory" xml:space="preserve" approved="yes">
+				<source>You can not create an event without a category.
+                Please create a category first
+            </source>
+				<target>Es ist nicht möglich, ein Ereignis ohne eine
+                Kategorie zu erstellen. Bitte zuerst Kategorie wählen.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_not_logged_in" xml:space="preserve" approved="yes">
+				<source>&lt;br /&gt;&lt;br /&gt;</source>
+				<target>nicht angemeldet</target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_logged_in_nomonitoring" xml:space="preserve" approved="yes">
+				<source>Subscribe to this event?</source>
+				<target>Dieses Ereignis beobachten</target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_logged_in_monitoring" xml:space="preserve" approved="yes">
+				<source>Unsubscribe?</source>
+				<target>Beobachtung beenden</target>
+			</trans-unit>
+			<trans-unit id="l_monitor_login_in_for_monitoring" xml:space="preserve" approved="yes">
+				<source>Please log in to manage your subscriptions.</source>
+				<target>Bitte einloggen, um Abos verwalten zu können.</target>
+			</trans-unit>
+			<trans-unit id="l_manage_subscription" xml:space="preserve" approved="yes">
+				<source>Manage your subscriptions</source>
+				<target>Abonnement-Verwaltung</target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_unsubscribe_successful" xml:space="preserve" approved="yes">
+				<source>You have been unsubscribed from the event
+                &quot;%s&quot;. You will no longer receive notifications about this
+                event.
+            </source>
+				<target>Sie beobachten das Event &quot;%s&quot; nun nicht
+                mehr.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_unsubscribe_error" xml:space="preserve" approved="yes">
+				<source>There were problems unsubscribing you from the
+                event &quot;%s&quot;.
+            </source>
+				<target>Es gab Probleme, Sie als Beobachter vom Event
+                &quot;%s&quot; abzumelden.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_unsubscribe_noevent" xml:space="preserve" approved="yes">
+				<source>The event you are trying to unsubscribe does not
+                exist anymore.
+            </source>
+				<target>Sie können nicht als Beobachter abgemeldet werden,
+                da der Event nicht mehr existiert.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_subscribe_successful" xml:space="preserve" approved="yes">
+				<source>You have been subscribed to the event
+                &quot;%s&quot;. You will receive notifications when the event
+                approaches or if any important details are changed.
+            </source>
+				<target>Sie beobachten nun das Event &quot;%s&quot;. Sie
+                werden benachrichtigt, wenn sich etwas an dem Event verändert.
+                Außerdem erhalten Sie eine Erinnerung kurz vor dem Ereignis
+            </target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_subscribe_error" xml:space="preserve" approved="yes">
+				<source>There were problems subscribing you to the event
+                &quot;%s&quot;.
+            </source>
+				<target>Es gab Probleme, Sie als Beobachter zum Event
+                &quot;%s&quot; anzumelden
+            </target>
+			</trans-unit>
+			<trans-unit id="l_monitor_event_subscribe_noevent" xml:space="preserve" approved="yes">
+				<source>The event you are trying to subscribe does not
+                exist anymore.
+            </source>
+				<target>Sie können nicht als Beobachter angemeldet werden,
+                da der Event nicht mehr existiert.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_fe_user" xml:space="preserve" approved="yes">
+				<source>User</source>
+				<target>Benutzer</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_title" xml:space="preserve" approved="yes">
+				<source>Title</source>
+				<target>Titel</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_owner" xml:space="preserve" approved="yes">
+				<source>Owner</source>
+				<target>Besitzer</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_activate_freeandbusy" xml:space="preserve" approved="yes">
+				<source>Enable Free- and Busy view</source>
+				<target>Frei- und Besetztzeiten anzeigen</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_freeandbusyuser" xml:space="preserve" approved="yes">
+				<source>Free- and Busy user</source>
+				<target>Benutzer, die ausschließlich Frei- und
+                Besetztzeiten sehen dürfen
+            </target>
+			</trans-unit>
+			<trans-unit id="l_calendar_type" xml:space="preserve" approved="yes">
+				<source>Type</source>
+				<target>Typ</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_type0" xml:space="preserve" approved="yes">
+				<source>Normal</source>
+				<target>Normal</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_exturl" xml:space="preserve" approved="yes">
+				<source>External URL</source>
+				<target>Externe URL</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_icsfile" xml:space="preserve" approved="yes">
+				<source>Local ICS file</source>
+				<target>Lokale ICS-Datei</target>
+			</trans-unit>
+			<trans-unit id="l_ics_file_upload" xml:space="preserve" approved="yes">
+				<source>Upload ICS file</source>
+				<target>ICS-Datei hochladen</target>
+			</trans-unit>
+			<trans-unit id="l_delete_icsfile" xml:space="preserve" approved="yes">
+				<source>Delete current ICS file</source>
+				<target>Aktuelle ICS-Datei löschen</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_refresh" xml:space="preserve" approved="yes">
+				<source>Refresh interval in minutes</source>
+				<target>Aktualisierungsintervall</target>
+			</trans-unit>
+			<trans-unit id="l_category" xml:space="preserve" approved="yes">
+				<source>Category</source>
+				<target>Kategorie</target>
+			</trans-unit>
+			<trans-unit id="l_global_category" xml:space="preserve" approved="yes">
+				<source>General Category</source>
+				<target>Allgemeine Kategorie</target>
+			</trans-unit>
+			<trans-unit id="l_delete_category" xml:space="preserve" approved="yes">
+				<source>Delete Category</source>
+				<target>Kategorie löschen</target>
+			</trans-unit>
+			<trans-unit id="l_confirm_category" xml:space="preserve" approved="yes">
+				<source>Confirm Category</source>
+				<target>Kategorie bestätigen</target>
+			</trans-unit>
+			<trans-unit id="l_category_selector" xml:space="preserve" approved="yes">
+				<source>Select category</source>
+				<target>Kategorie auswählen</target>
+			</trans-unit>
+			<trans-unit id="l_category_title" xml:space="preserve" approved="yes">
+				<source>Title</source>
+				<target>Title</target>
+			</trans-unit>
+			<trans-unit id="l_category_headerstyle" xml:space="preserve" approved="yes">
+				<source>Header Style</source>
+				<target>Überschriften Style</target>
+			</trans-unit>
+			<trans-unit id="l_category_bodystyle" xml:space="preserve" approved="yes">
+				<source>Body Style</source>
+				<target>Textkörper Style</target>
+			</trans-unit>
+			<trans-unit id="l_category_calendar" xml:space="preserve" approved="yes">
+				<source>Calendar</source>
+				<target>Kalender</target>
+			</trans-unit>
+			<trans-unit id="l_category_parent_category" xml:space="preserve" approved="yes">
+				<source>Parent Category</source>
+				<target>Übergeordnete Kategorie</target>
+			</trans-unit>
+			<trans-unit id="l_category_shared_user_allowed" xml:space="preserve" approved="yes">
+				<source>Shared User Allowed</source>
+				<target>Kategorie mit anderen Benutzern teilen</target>
+			</trans-unit>
+			<trans-unit id="l_event_general" xml:space="preserve" approved="yes">
+				<source>General</source>
+				<target>Allgemein</target>
+			</trans-unit>
+			<trans-unit id="l_event_category" xml:space="preserve" approved="yes">
+				<source>Category</source>
+				<target>Kategorie</target>
+			</trans-unit>
+			<trans-unit id="l_event_category_selected" xml:space="preserve" approved="yes">
+				<source>Selected Category</source>
+				<target>Ausgewählte Kategorie</target>
+			</trans-unit>
+			<trans-unit id="l_event_user" xml:space="preserve" approved="yes">
+				<source>Creator, creator group</source>
+				<target>Ersteller, Erstellergruppe</target>
+			</trans-unit>
+			<trans-unit id="l_event_user_selected" xml:space="preserve" approved="yes">
+				<source>Selected creator, creator group</source>
+				<target>Ausgewählte Ersteller, Erstellergruppe</target>
+			</trans-unit>
+			<trans-unit id="l_event_title" xml:space="preserve" approved="yes">
+				<source>Title</source>
+				<target>Titel</target>
+			</trans-unit>
+			<trans-unit id="l_event_edit_startdate" xml:space="preserve" approved="yes">
+				<source>Start date</source>
+				<target>Startdatum</target>
+			</trans-unit>
+			<trans-unit id="l_event_edit_enddate" xml:space="preserve" approved="yes">
+				<source>End date</source>
+				<target>Enddatum</target>
+			</trans-unit>
+			<trans-unit id="l_event_edit_starttime" xml:space="preserve" approved="yes">
+				<source>Start time</source>
+				<target>Startzeit</target>
+			</trans-unit>
+			<trans-unit id="l_event_edit_endtime" xml:space="preserve" approved="yes">
+				<source>End time</source>
+				<target>Endzeit</target>
+			</trans-unit>
+			<trans-unit id="l_event_startdate" xml:space="preserve" approved="yes">
+				<source>Start date</source>
+				<target>Startdatum</target>
+			</trans-unit>
+			<trans-unit id="l_event_enddate" xml:space="preserve" approved="yes">
+				<source>End date</source>
+				<target>Enddatum</target>
+			</trans-unit>
+			<trans-unit id="l_event_starttime" xml:space="preserve" approved="yes">
+				<source>Start time</source>
+				<target>Startzeit</target>
+			</trans-unit>
+			<trans-unit id="l_event_endtime" xml:space="preserve" approved="yes">
+				<source>End time</source>
+				<target>Endzeit</target>
+			</trans-unit>
+			<trans-unit id="l_event_allday" xml:space="preserve" approved="yes">
+				<source>Allday</source>
+				<target>ganztägig</target>
+			</trans-unit>
+			<trans-unit id="l_event_organizer" xml:space="preserve" approved="yes">
+				<source>Organizer</source>
+				<target>Organisator</target>
+			</trans-unit>
+			<trans-unit id="l_event_location" xml:space="preserve" approved="yes">
+				<source>Location</source>
+				<target>Ort</target>
+			</trans-unit>
+			<trans-unit id="l_event_teaser" xml:space="preserve" approved="yes">
+				<source>Teaser</source>
+				<target>Vorschau</target>
+			</trans-unit>
+			<trans-unit id="l_event_description" xml:space="preserve" approved="yes">
+				<source>Description</source>
+				<target>Beschreibung</target>
+			</trans-unit>
+			<trans-unit id="l_event_cal_organizer" xml:space="preserve" approved="yes">
+				<source>Cal Organizer</source>
+				<target>Cal Organisator</target>
+			</trans-unit>
+			<trans-unit id="l_event_cal_location" xml:space="preserve" approved="yes">
+				<source>Cal Location</source>
+				<target>Ortauswahl</target>
+			</trans-unit>
+			<trans-unit id="l_event_frequency" xml:space="preserve" approved="yes">
+				<source>Frequency</source>
+				<target>Frequenz</target>
+			</trans-unit>
+			<trans-unit id="l_event_edit_byday" xml:space="preserve" approved="yes">
+				<source>By Day</source>
+				<target>Nach Wochentag (Eine Kombination von:
+                &quot;mo&quot;,&quot;tu&quot;,&quot;we&quot;,&quot;th&quot;,&quot;fr&quot;,&quot;sa&quot;
+                und &quot;su&quot;, oder &quot;all&quot; für alle)
+            </target>
+			</trans-unit>
+			<trans-unit id="l_event_edit_bymonthday" xml:space="preserve" approved="yes">
+				<source>By Monthday (e.g.: 1,2,30 or all)</source>
+				<target>Nach Monatstag (z.B.: 1,2,30 or all)</target>
+			</trans-unit>
+			<trans-unit id="l_event_edit_bymonth" xml:space="preserve" approved="yes">
+				<source>By Month (e.g.: 1,2,3,4,12 or all)</source>
+				<target>Nach Monat (z.B.: 1,2,3,4,12 or all)</target>
+			</trans-unit>
+			<trans-unit id="l_event_edit_until" xml:space="preserve" approved="yes">
+				<source>Until Date</source>
+				<target>Bis Datum (Format: yyyymmdd)</target>
+			</trans-unit>
+			<trans-unit id="l_event_byday" xml:space="preserve" approved="yes">
+				<source>By Day</source>
+				<target>Nach Tag</target>
+			</trans-unit>
+			<trans-unit id="l_event_bymonthday" xml:space="preserve" approved="yes">
+				<source>By Monthday</source>
+				<target>Nach Monatstag</target>
+			</trans-unit>
+			<trans-unit id="l_event_bymonth" xml:space="preserve" approved="yes">
+				<source>By Month</source>
+				<target>Nach Monat</target>
+			</trans-unit>
+			<trans-unit id="l_event_until" xml:space="preserve" approved="yes">
+				<source>Until Date</source>
+				<target>Bis Datum</target>
+			</trans-unit>
+			<trans-unit id="l_event_count" xml:space="preserve" approved="yes">
+				<source>Count</source>
+				<target>Anzahl</target>
+			</trans-unit>
+			<trans-unit id="l_event_interval" xml:space="preserve" approved="yes">
+				<source>Interval</source>
+				<target>Intervall</target>
+			</trans-unit>
+			<trans-unit id="l_event_exception" xml:space="preserve" approved="yes">
+				<source>Exception</source>
+				<target>Ausnahme</target>
+			</trans-unit>
+			<trans-unit id="l_event_exception_selected" xml:space="preserve" approved="yes">
+				<source>Selected exception</source>
+				<target>Ausgewählte Ausnahme</target>
+			</trans-unit>
+			<trans-unit id="l_event_fe_cruser" xml:space="preserve" approved="yes">
+				<source>Creator</source>
+				<target>Ersteller</target>
+			</trans-unit>
+			<trans-unit id="l_event_fe_crgroup" xml:space="preserve" approved="yes">
+				<source>Creator Group</source>
+				<target>Ersteller-Gruppe</target>
+			</trans-unit>
+			<trans-unit id="l_event_notify" xml:space="preserve" approved="yes">
+				<source>Notify and remind</source>
+				<target>Benachrichtigung bei Veränderung und Erinnerung</target>
+			</trans-unit>
+			<trans-unit id="l_event_shared" xml:space="preserve" approved="yes">
+				<source>Share with</source>
+				<target>...teilen mit</target>
+			</trans-unit>
+			<trans-unit id="l_event_icslink" xml:space="preserve" approved="yes">
+				<source>Get this event as *.ics calendar entry</source>
+				<target>Dieses Ereignis als *.ics Kalendereintrag erhalten</target>
+			</trans-unit>
+			<trans-unit id="l_event_image" xml:space="preserve" approved="yes">
+				<source>Image</source>
+				<target>Bild</target>
+			</trans-unit>
+			<trans-unit id="l_event_image_caption" xml:space="preserve" approved="yes">
+				<source>Caption</source>
+				<target>Beschreibung</target>
+			</trans-unit>
+			<trans-unit id="l_event_image_title" xml:space="preserve" approved="yes">
+				<source>Title text</source>
+				<target>Titel Text</target>
+			</trans-unit>
+			<trans-unit id="l_event_image_alt" xml:space="preserve" approved="yes">
+				<source>Alt text</source>
+				<target>Alternativer Text</target>
+			</trans-unit>
+			<trans-unit id="l_event_attachment" xml:space="preserve" approved="yes">
+				<source>Attachment</source>
+				<target>Dateien</target>
+			</trans-unit>
+			<trans-unit id="l_event_type" xml:space="preserve" approved="yes">
+				<source>Type</source>
+				<target>Typ</target>
+			</trans-unit>
+			<trans-unit id="l_event_type_0" xml:space="preserve" approved="yes">
+				<source>Event</source>
+				<target>Ereignis</target>
+			</trans-unit>
+			<trans-unit id="l_event_type_1" xml:space="preserve" approved="yes">
+				<source>Internal link</source>
+				<target>Interner Link</target>
+			</trans-unit>
+			<trans-unit id="l_event_type_2" xml:space="preserve" approved="yes">
+				<source>External link</source>
+				<target>Externer Link</target>
+			</trans-unit>
+			<trans-unit id="l_event_type_3" xml:space="preserve" approved="yes">
+				<source>Meeting</source>
+				<target>Treffen</target>
+			</trans-unit>
+			<trans-unit id="l_event_type_4" xml:space="preserve" approved="yes">
+				<source>Todo</source>
+				<target>Aufgabe</target>
+			</trans-unit>
+			<trans-unit id="l_event_attendee_0" xml:space="preserve" approved="yes">
+				<source>Status: Unknown</source>
+				<target>Status: unbekannt</target>
+			</trans-unit>
+			<trans-unit id="l_event_attendee_CHAIR" xml:space="preserve" approved="yes">
+				<source>Status: Chairman</source>
+				<target>Status: Vorsitz</target>
+			</trans-unit>
+			<trans-unit id="l_event_attendee_OPT-PARTICIPANT" xml:space="preserve" approved="yes">
+				<source>Status: Optional</source>
+				<target>Status: optional</target>
+			</trans-unit>
+			<trans-unit id="l_event_attendee_REQ-PARTICIPANT" xml:space="preserve" approved="yes">
+				<source>Status: Required</source>
+				<target>Status: erforderlich</target>
+			</trans-unit>
+			<trans-unit id="l_event_exturl" xml:space="preserve" approved="yes">
+				<source>Link</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_category_relatedevents" xml:space="preserve" approved="yes">
+				<source>Related event(s)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_todo_enddate" xml:space="preserve" approved="yes">
+				<source>Due date</source>
+				<target>Fälligkeitsdatum</target>
+			</trans-unit>
+			<trans-unit id="l_todo_endtime" xml:space="preserve" approved="yes">
+				<source>Due time</source>
+				<target>Fälligkeitszeit</target>
+			</trans-unit>
+			<trans-unit id="l_todo_status" xml:space="preserve" approved="yes">
+				<source>Status</source>
+				<target>Status</target>
+			</trans-unit>
+			<trans-unit id="l_todo_priority" xml:space="preserve" approved="yes">
+				<source>Priority</source>
+				<target>Priorität</target>
+			</trans-unit>
+			<trans-unit id="l_todo_completed" xml:space="preserve" approved="yes">
+				<source>Completed</source>
+				<target>Vollständig</target>
+			</trans-unit>
+			<trans-unit id="l_sendout_invitation" xml:space="preserve" approved="yes">
+				<source>Send out invitation</source>
+				<target>Einladung versenden</target>
+			</trans-unit>
+			<trans-unit id="l_attendee_external" xml:space="preserve" approved="yes">
+				<source>Guests</source>
+				<target>Gäste</target>
+			</trans-unit>
+			<trans-unit id="l_guest_info" xml:space="preserve" approved="yes">
+				<source>Insert comma separated email addresses</source>
+				<target>Liste von E-Mail-Adressen, mit Komma getrennt</target>
+			</trans-unit>
+			<trans-unit id="l_availability" xml:space="preserve" approved="yes">
+				<source>Check availability</source>
+				<target>Verfügbarkeit prüfen</target>
+			</trans-unit>
+			<trans-unit id="l_location_name" xml:space="preserve" approved="yes">
+				<source>Name</source>
+				<target>Name</target>
+			</trans-unit>
+			<trans-unit id="l_location_description" xml:space="preserve" approved="yes">
+				<source>Description</source>
+				<target>Beschreibung</target>
+			</trans-unit>
+			<trans-unit id="l_location_street" xml:space="preserve" approved="yes">
+				<source>Street</source>
+				<target>Straße</target>
+			</trans-unit>
+			<trans-unit id="l_location_zip" xml:space="preserve" approved="yes">
+				<source>Zip-code</source>
+				<target>PLZ</target>
+			</trans-unit>
+			<trans-unit id="l_location_city" xml:space="preserve" approved="yes">
+				<source>City</source>
+				<target>Stadt</target>
+			</trans-unit>
+			<trans-unit id="l_location_countryzone" xml:space="preserve" approved="yes">
+				<source>State/Province</source>
+				<target>Bundesland</target>
+			</trans-unit>
+			<trans-unit id="l_location_country" xml:space="preserve" approved="yes">
+				<source>Country</source>
+				<target>Staat</target>
+			</trans-unit>
+			<trans-unit id="l_location_phone" xml:space="preserve" approved="yes">
+				<source>Phone</source>
+				<target>Telefon</target>
+			</trans-unit>
+			<trans-unit id="l_location_mobilephone" xml:space="preserve" approved="yes">
+				<source>Mobile Phone</source>
+				<target>Mobiltelefon</target>
+			</trans-unit>
+			<trans-unit id="l_location_fax" xml:space="preserve" approved="yes">
+				<source>Fax</source>
+				<target>Fax</target>
+			</trans-unit>
+			<trans-unit id="l_location_email" xml:space="preserve" approved="yes">
+				<source>Email</source>
+				<target>E-Mail</target>
+			</trans-unit>
+			<trans-unit id="l_location_link" xml:space="preserve" approved="yes">
+				<source>Link</source>
+				<target>Link</target>
+			</trans-unit>
+			<trans-unit id="l_location_image" xml:space="preserve" approved="yes">
+				<source>Image</source>
+				<target>Bild</target>
+			</trans-unit>
+			<trans-unit id="l_location_relatedevents" xml:space="preserve" approved="yes">
+				<source>Related event(s)</source>
+				<target>In Bezug stehende Events</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_name" xml:space="preserve" approved="yes">
+				<source>Name</source>
+				<target>Name</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_description" xml:space="preserve" approved="yes">
+				<source>Description</source>
+				<target>Beschreibung</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_street" xml:space="preserve" approved="yes">
+				<source>Street</source>
+				<target>Straße</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_zip" xml:space="preserve" approved="yes">
+				<source>Zip-code</source>
+				<target>PLZ</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_city" xml:space="preserve" approved="yes">
+				<source>City</source>
+				<target>Stadt</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_countryzone" xml:space="preserve" approved="yes">
+				<source>State/Province</source>
+				<target>Bundesland</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_country" xml:space="preserve" approved="yes">
+				<source>Country</source>
+				<target>Staat</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_phone" xml:space="preserve" approved="yes">
+				<source>Phone</source>
+				<target>Telefon</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_mobilephone" xml:space="preserve" approved="yes">
+				<source>Mobile Phone</source>
+				<target>Mobiltelefon</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_fax" xml:space="preserve" approved="yes">
+				<source>Fax</source>
+				<target>Fax</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_email" xml:space="preserve" approved="yes">
+				<source>Email</source>
+				<target>E-Mail</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_link" xml:space="preserve" approved="yes">
+				<source>Link</source>
+				<target>Link</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_image" xml:space="preserve" approved="yes">
+				<source>Image</source>
+				<target>Bild</target>
+			</trans-unit>
+			<trans-unit id="l_organizer_relatedevents" xml:space="preserve" approved="yes">
+				<source>Related event(s)</source>
+				<target>In Bezug stehende Events</target>
+			</trans-unit>
+			<trans-unit id="l_select" xml:space="preserve" approved="yes">
+				<source>Please choose one</source>
+				<target>Bitte auswählen</target>
+			</trans-unit>
+			<trans-unit id="l_none" xml:space="preserve" approved="yes">
+				<source>None</source>
+				<target>Keins</target>
+			</trans-unit>
+			<trans-unit id="l_hidden" xml:space="preserve" approved="yes">
+				<source>Hide</source>
+				<target>Verstecken</target>
+			</trans-unit>
+			<trans-unit id="l_cancel" xml:space="preserve" approved="yes">
+				<source>Cancel</source>
+				<target>Abbrechen</target>
+			</trans-unit>
+			<trans-unit id="l_save" xml:space="preserve" approved="yes">
+				<source>Save</source>
+				<target>Speichern</target>
+			</trans-unit>
+			<trans-unit id="l_true" xml:space="preserve" approved="yes">
+				<source>True</source>
+				<target>wahr</target>
+			</trans-unit>
+			<trans-unit id="l_false" xml:space="preserve" approved="yes">
+				<source>False</source>
+				<target>falsch</target>
+			</trans-unit>
+			<trans-unit id="l_more" xml:space="preserve" approved="yes">
+				<source>[more]</source>
+				<target>[mehr]</target>
+			</trans-unit>
+			<trans-unit id="l_event_more" xml:space="preserve" approved="yes">
+				<source>[more]</source>
+				<target>[mehr]</target>
+			</trans-unit>
+			<trans-unit id="l_all_category" xml:space="preserve" approved="yes">
+				<source>All</source>
+				<target>alle</target>
+			</trans-unit>
+			<trans-unit id="l_all_location" xml:space="preserve" approved="yes">
+				<source>All</source>
+				<target>alle</target>
+			</trans-unit>
+			<trans-unit id="l_all_organizer" xml:space="preserve" approved="yes">
+				<source>All</source>
+				<target>alle</target>
+			</trans-unit>
+			<trans-unit id="l_global" xml:space="preserve" approved="yes">
+				<source>Global</source>
+				<target>Allgemein</target>
+			</trans-unit>
+			<trans-unit id="l_edit_event" xml:space="preserve" approved="yes">
+				<source>Edit event</source>
+				<target>Event bearbeiten</target>
+			</trans-unit>
+			<trans-unit id="l_create_event" xml:space="preserve" approved="yes">
+				<source>Create event</source>
+				<target>Event erstellen</target>
+			</trans-unit>
+			<trans-unit id="l_new_event" xml:space="preserve" approved="yes">
+				<source>New event</source>
+				<target>Neues Event</target>
+			</trans-unit>
+			<trans-unit id="l_create_location" xml:space="preserve" approved="yes">
+				<source>Create location</source>
+				<target>Ereignisort erstellen</target>
+			</trans-unit>
+			<trans-unit id="l_create_organizer" xml:space="preserve" approved="yes">
+				<source>Create organizer</source>
+				<target>Organisator erstellen</target>
+			</trans-unit>
+			<trans-unit id="l_create_category" xml:space="preserve" approved="yes">
+				<source>Create category</source>
+				<target>Kategorie erstellen</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_icslink" xml:space="preserve" approved="yes">
+				<source>Download *.ics file</source>
+				<target>*.ics Datei holen</target>
+			</trans-unit>
+			<trans-unit id="l_edit_event_atleastone_category" xml:space="preserve" approved="yes">
+				<source>You have to select at least one category</source>
+				<target>Sie müssen mindestens eine Kategorie wählen.</target>
+			</trans-unit>
+			<trans-unit id="l_confirm_event" xml:space="preserve" approved="yes">
+				<source>Confirm event</source>
+				<target>Eventveränderungen bestätigen</target>
+			</trans-unit>
+			<trans-unit id="l_confirm_location" xml:space="preserve" approved="yes">
+				<source>Confirm location</source>
+				<target>Ort bestätigen</target>
+			</trans-unit>
+			<trans-unit id="l_confirm_organizer" xml:space="preserve" approved="yes">
+				<source>Confirm organizer</source>
+				<target>Veranstalter bestätigen</target>
+			</trans-unit>
+			<trans-unit id="l_enter_email" xml:space="preserve" approved="yes">
+				<source>Enter email-address:</source>
+				<target>E-Mail-Addresse angeben:</target>
+			</trans-unit>
+			<trans-unit id="l_captcha_text" xml:space="preserve" approved="yes">
+				<source>Please insert the text you see in the picture:</source>
+				<target>Bitte geben Sie den Text ein, den Sie auf dem Bild
+                sehen
+            </target>
+			</trans-unit>
+			<trans-unit id="l_delete_event" xml:space="preserve" approved="yes">
+				<source>Delete Event</source>
+				<target>Event löschen</target>
+			</trans-unit>
+			<trans-unit id="l_event_has_been_delete" xml:space="preserve" approved="yes">
+				<source>The event has been deleted</source>
+				<target>Das Ereignis wurde gelöscht.</target>
+			</trans-unit>
+			<trans-unit id="l_event_has_been_restored" xml:space="preserve" approved="yes">
+				<source>The event has been restored</source>
+				<target>Das Ereignis wurde wiederhergestellt.</target>
+			</trans-unit>
+			<trans-unit id="l_event_has_been_hidden" xml:space="preserve" approved="yes">
+				<source>The event has been hidden and will not be shown in
+                the frontend
+            </source>
+				<target>Das Ereignis wurde versteckt und wird nicht auf
+                der Webseite angezeigt.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_event_has_been_unhidden" xml:space="preserve" approved="yes">
+				<source>The previouisly hidden event has now been unhidden
+                and will be shown in the frontend
+            </source>
+				<target>Das vorher versteckte Ereignis ist nun wieder
+                sichtbar und wird auf der Webseite angezeigt.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_wrong_split_symbol_msg" xml:space="preserve" approved="yes">
+				<source>Date split symbol is: \'###DATE_SPLIT_SYMBOL###\'
+                !\n
+            </source>
+				<target>Trennzeichen für die Datumseingabe ist:
+                \'###DATE_SPLIT_SYMBOL###\' !\n
+            </target>
+			</trans-unit>
+			<trans-unit id="l_wrong_date" xml:space="preserve" approved="yes">
+				<source>Wrong date!</source>
+				<target>Ungültiges Datum!</target>
+			</trans-unit>
+			<trans-unit id="l_wrong_time" xml:space="preserve" approved="yes">
+				<source>Wrong time!</source>
+				<target>Ungültige Uhrzeit!</target>
+			</trans-unit>
+			<trans-unit id="l_is_in_past" xml:space="preserve" approved="yes">
+				<source>is a past date!</source>
+				<target>Uhr liegt in der Vergangenheit!</target>
+			</trans-unit>
+			<trans-unit id="l_page" xml:space="preserve" approved="yes">
+				<source>Page</source>
+				<target>Seite</target>
+			</trans-unit>
+			<trans-unit id="l_page_of" xml:space="preserve" approved="yes">
+				<source>Page %s of %s</source>
+				<target>Seite %s von %s</target>
+			</trans-unit>
+			<trans-unit id="l_search_found" xml:space="preserve" approved="yes">
+				<source>entries found</source>
+				<target>Einträge gefunden</target>
+			</trans-unit>
+			<trans-unit id="l_monitor_start_thanks" xml:space="preserve" approved="yes">
+				<source>Thank you. An email has been sent to you. Please
+                confirm the monitoring by clicking on the confirm link inside the
+                email.
+            </source>
+				<target>Vielen Dank. Sie erhalten nun eine Email mit einem
+                Bestätigungslink.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_monitor_stop_thanks" xml:space="preserve" approved="yes">
+				<source>Thank you. An email has been sent to you. Please
+                confirm the monitoring stop by clicking on the confirm link inside
+                the email.
+            </source>
+				<target>Vielen Dank. Sie erhalten nun eine Email mit einem
+                Bestätigungslink.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_monitor_wrong_captcha" xml:space="preserve" approved="yes">
+				<source>Sorry, but you didn't type in the correct letters.
+                Please try again.
+            </source>
+				<target>Leider waren die Buchstaben nicht korrekt. Bitte
+                versuchen Sie es noch einmal.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_not_allowed_edit" xml:space="preserve" approved="yes">
+				<source>You are not allowed to edit this</source>
+				<target>Sie haben keine Berechtigung diesen Datensatz zu
+                editieren:
+            </target>
+			</trans-unit>
+			<trans-unit id="l_not_allowed_create" xml:space="preserve" approved="yes">
+				<source>You are not allowed to create a/an</source>
+				<target>Sie haben keine Berechtigung diesen Datensatz
+                anzulegen:
+            </target>
+			</trans-unit>
+			<trans-unit id="l_delete_image" xml:space="preserve" approved="yes">
+				<source>Delete image</source>
+				<target>Bild löschen</target>
+			</trans-unit>
+			<trans-unit id="l_image_upload" xml:space="preserve" approved="yes">
+				<source>Upload image</source>
+				<target>Bild hochladen</target>
+			</trans-unit>
+			<trans-unit id="l_delete_attachment" xml:space="preserve" approved="yes">
+				<source>Delete attachment</source>
+				<target>Anhang löschen</target>
+			</trans-unit>
+			<trans-unit id="l_attachment_upload" xml:space="preserve" approved="yes">
+				<source>Upload attachment</source>
+				<target>Anhang hochladen</target>
+			</trans-unit>
+			<trans-unit id="l_meeting_accept" xml:space="preserve" approved="yes">
+				<source>Accept</source>
+				<target>Annehmen</target>
+			</trans-unit>
+			<trans-unit id="l_meeting_decline" xml:space="preserve" approved="yes">
+				<source>Decline</source>
+				<target>Ablehnen</target>
+			</trans-unit>
+			<trans-unit id="l_meeting_accepted" xml:space="preserve" approved="yes">
+				<source>Your status for &quot;%s&quot; has been
+                successfully changed to &quot;ACCPETED&quot;.
+            </source>
+				<target>Ihr Status für &quot;%s&quot; wurde erfolgreich
+                auf &quot;angenommen&quot; geändert.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_meeting_declined" xml:space="preserve" approved="yes">
+				<source>Your status for &quot;%s&quot; has been
+                successfully changed to &quot;DECLINED&quot;.
+            </source>
+				<target>Ihr Status für &quot;%s&quot; wurde erfolgreich
+                auf &quot;abgelehnt&quot; geändert.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_meeting_update_error" xml:space="preserve" approved="yes">
+				<source>There were problems updating your participation
+                status to &quot;%s&quot;.
+            </source>
+				<target>Es gab Probleme, Ihren Status für &quot;%s&quot;
+                zu aktualisieren
+            </target>
+			</trans-unit>
+			<trans-unit id="l_meeting_error" xml:space="preserve" approved="yes">
+				<source>If you see this message, you probably have
+                received an invitation to a meeting and you have clicked on the
+                accept or decline link. But maybe not all of the parameters made it
+                to the url? Please make sure all parameters are there.
+            </source>
+				<target>Wenn Sie diese Nachricht sehen, haben Sie sehr
+                wahrscheinlich eine Einladung zu einer
+                Veranstaltung/Meeting/Konferenz erhalten und einen entsprechenden
+                Link ausgewählt. Leider wurden nicht alle Parameter übertragen.
+                Bitte stellen Sie sicher, dass alle Parameter vorhanden sind.
+            </target>
+			</trans-unit>
+			<trans-unit id="l_meeting_changestatus" xml:space="preserve" approved="yes">
+				<source>Change meeting status:</source>
+				<target>Status aktualisieren</target>
+			</trans-unit>
+			<trans-unit id="l_required" xml:space="preserve" approved="yes">
+				<source>(*) Required fields</source>
+				<target>(*) Pflichtfelder</target>
+			</trans-unit>
+			<trans-unit id="l_constrain_start_before_end" xml:space="preserve" approved="yes">
+				<source>Start has to be before end</source>
+				<target>Start muss vor dem Ende liegen</target>
+			</trans-unit>
+			<trans-unit id="l_constrain_end_after_start" xml:space="preserve" approved="yes">
+				<source>End has to be after start</source>
+				<target>Ende muss nach dem Start sein</target>
+			</trans-unit>
+			<trans-unit id="l_event_date_time" xml:space="preserve" approved="yes">
+				<source>Date/Time</source>
+				<target>Datum/Uhrzeit</target>
+			</trans-unit>
+			<trans-unit id="l_event_recurrence" xml:space="preserve" approved="yes">
+				<source>Recurrence</source>
+				<target>Wiederholung</target>
+			</trans-unit>
+			<trans-unit id="l_event_files" xml:space="preserve" approved="yes">
+				<source>Files</source>
+				<target>Dateien</target>
+			</trans-unit>
+			<trans-unit id="l_event_other" xml:space="preserve" approved="yes">
+				<source>Other</source>
+				<target>Sonstiges</target>
+			</trans-unit>
+			<trans-unit id="l_options" xml:space="preserve" approved="yes">
+				<source>Options</source>
+				<target>Optionen</target>
+			</trans-unit>
+			<trans-unit id="l_what" xml:space="preserve" approved="yes">
+				<source>What</source>
+				<target>Was</target>
+			</trans-unit>
+			<trans-unit id="l_when" xml:space="preserve" approved="yes">
+				<source>When</source>
+				<target>Wann</target>
+			</trans-unit>
+			<trans-unit id="l_to" xml:space="preserve" approved="yes">
+				<source>to</source>
+				<target>bis</target>
+			</trans-unit>
+			<trans-unit id="l_at" xml:space="preserve" approved="yes">
+				<source>at</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_where" xml:space="preserve" approved="yes">
+				<source>Where</source>
+				<target>Wo</target>
+			</trans-unit>
+			<trans-unit id="l_repeats" xml:space="preserve" approved="yes">
+				<source>Repeats</source>
+				<target>Wiederholung</target>
+			</trans-unit>
+			<trans-unit id="l_repeat_by" xml:space="preserve" approved="yes">
+				<source>Repeats</source>
+				<target>Wiederholung</target>
+			</trans-unit>
+			<trans-unit id="l_daily" xml:space="preserve" approved="yes">
+				<source>Daily</source>
+				<target>täglich</target>
+			</trans-unit>
+			<trans-unit id="l_weekly" xml:space="preserve" approved="yes">
+				<source>Weekly</source>
+				<target>wöchentlich</target>
+			</trans-unit>
+			<trans-unit id="l_monthly" xml:space="preserve" approved="yes">
+				<source>Monthly</source>
+				<target>monatlich</target>
+			</trans-unit>
+			<trans-unit id="l_yearly" xml:space="preserve" approved="yes">
+				<source>Yearly</source>
+				<target>jährlich</target>
+			</trans-unit>
+			<trans-unit id="l_every_weekday" xml:space="preserve" approved="yes">
+				<source>Every weekday (Mon-Fri)</source>
+				<target>wochentags (Mo. - Fr.)</target>
+			</trans-unit>
+			<trans-unit id="l_every_mo_we_fr" xml:space="preserve" approved="yes">
+				<source>Every Mon., Wed., and Fri.</source>
+				<target>jeden Mo., Mi. und Fr.</target>
+			</trans-unit>
+			<trans-unit id="l_every_tu_th" xml:space="preserve" approved="yes">
+				<source>Every Tues., and Thurs.</source>
+				<target>jedem Di. und Do.</target>
+			</trans-unit>
+			<trans-unit id="l_weekday" xml:space="preserve" approved="yes">
+				<source>Weekday</source>
+				<target>Wochentag</target>
+			</trans-unit>
+			<trans-unit id="l_until" xml:space="preserve" approved="yes">
+				<source>Until</source>
+				<target>Bis</target>
+			</trans-unit>
+			<trans-unit id="l_interval" xml:space="preserve" approved="yes">
+				<source>Repeat every</source>
+				<target>wiederholt sich jede(n/s)</target>
+			</trans-unit>
+			<trans-unit id="l_rdate_type" xml:space="preserve" approved="yes">
+				<source>Repeats per</source>
+				<target>wiederholt sich</target>
+			</trans-unit>
+			<trans-unit id="l_event_rdate" xml:space="preserve" approved="yes">
+				<source>on</source>
+				<target>am</target>
+			</trans-unit>
+			<trans-unit id="l_ends" xml:space="preserve" approved="yes">
+				<source>Ends</source>
+				<target>endet</target>
+			</trans-unit>
+			<trans-unit id="l_never" xml:space="preserve" approved="yes">
+				<source>Never</source>
+				<target>nie</target>
+			</trans-unit>
+			<trans-unit id="l_date_time" xml:space="preserve" approved="yes">
+				<source>Date time</source>
+				<target>Datum &amp; Uhrzeit</target>
+			</trans-unit>
+			<trans-unit id="l_period" xml:space="preserve" approved="yes">
+				<source>Period</source>
+				<target>Zeitraum</target>
+			</trans-unit>
+			<trans-unit id="l_duration" xml:space="preserve" approved="yes">
+				<source>Duration</source>
+				<target>Dauer</target>
+			</trans-unit>
+			<trans-unit id="l_no_action" xml:space="preserve" approved="yes">
+				<source>No action</source>
+				<target>keine Aktion</target>
+			</trans-unit>
+			<trans-unit id="l_needs_action" xml:space="preserve" approved="yes">
+				<source>Needs action</source>
+				<target>Eingriff erforderlich</target>
+			</trans-unit>
+			<trans-unit id="l_in_progress" xml:space="preserve" approved="yes">
+				<source>In progress</source>
+				<target>In Bearbeitung</target>
+			</trans-unit>
+			<trans-unit id="l_cancelled" xml:space="preserve" approved="yes">
+				<source>Cancelled</source>
+				<target>gestrichen</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_week" xml:space="preserve" approved="yes">
+				<source>calendar week</source>
+				<target>Kalenderwoche</target>
+			</trans-unit>
+			<trans-unit id="l_remind" xml:space="preserve" approved="yes">
+				<source>Here's a reminder...</source>
+				<target>Eine Erinnerung...</target>
+			</trans-unit>
+			<trans-unit id="l_remind_minutes_1" xml:space="preserve" approved="yes">
+				<source>&lt;span&gt; -&gt; And remind</source>
+				<target>&lt;span&gt; -&gt; Zur Erinnerung</target>
+			</trans-unit>
+			<trans-unit id="l_remind_minutes_2" xml:space="preserve" approved="yes">
+				<source>minutes before start&lt;/span&gt;</source>
+				<target>Minuten bevor es losgeht&lt;/span&gt;</target>
+			</trans-unit>
+			<trans-unit id="l_calendar_subscription" xml:space="preserve" approved="yes">
+				<source>Manage calendar subscription</source>
+				<target>Kalenderabonnements verwalten</target>
+			</trans-unit>
+			<trans-unit id="l_color" xml:space="preserve" approved="yes">
+				<source>Color</source>
+				<target>Farbe</target>
+			</trans-unit>
+			<trans-unit id="l_public_calendar" xml:space="preserve" approved="yes">
+				<source>Public calendar</source>
+				<target>Öffentlicher Kalender</target>
+			</trans-unit>
+			<trans-unit id="l_event_monitor" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Benachrichtigung bei Änderung</target>
+			</trans-unit>
+			<trans-unit id="l_event_monitor_selected" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Ausgewählt zur Benachrichtigung</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

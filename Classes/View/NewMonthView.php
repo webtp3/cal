@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 use TYPO3\CMS\Cal\Controller\Calendar;
@@ -47,11 +53,11 @@ class NewMonthView extends NewTimeView
      * @param $year
      * @return NewMonthView
      */
-    public static function getMonthView($month, $year): NewMonthView
+    public static function getMonthView($month, $year): self
     {
         $controller = &Registry::Registry('basic', 'controller');
         $controller->cache->get($month . '_' . $year);
-        return new NewMonthView($month, $year);
+        return new self($month, $year);
     }
 
     private function generateWeeks()

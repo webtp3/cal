@@ -14,7 +14,7 @@
     * Bug #80339		- Recurring not working in TYPO3 7.6.16
     * Bug #80340		- Constrain rule not working with equal strings
     * Bug #80344		- problem with php 7.1 - warning in list view
-    * Bug #79034		- Wrong locallang.xml path in flexform_cal.xml
+    * Bug #79034		- Wrong locallang.xlf path in flexform_cal.xlf
     * Bug #77747		- Shifted backend fields in TYPO3 CMS 7
     * Bug #80382		- error in ext/cal/Classes/Utility/Functions.php line 632
     * Bug #80410		- handle create and edit calendar_id the same way in RightsService

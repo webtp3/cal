@@ -7,9 +7,9 @@
         <sDEF>
             <ROOT>
                 <TCEforms>
-                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetGeneral
+                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetGeneral
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
@@ -17,92 +17,92 @@
                         <TCEforms>
                             <exclude>0</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.allowedViews
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.allowedViews
                             </label>
                             <config>
                                 <type>select</type>
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewMonth
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewMonth
                                         </numIndex>
                                         <numIndex index="1">month</numIndex>
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewYear
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewYear
                                         </numIndex>
                                         <numIndex index="1">year</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewWeek
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewWeek
                                         </numIndex>
                                         <numIndex index="1">week</numIndex>
                                     </numIndex>
                                     <numIndex index="3" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewDay
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewDay
                                         </numIndex>
                                         <numIndex index="1">day</numIndex>
                                     </numIndex>
                                     <numIndex index="4" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewSingle
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewSingle
                                         </numIndex>
                                         <numIndex index="1">event</numIndex>
                                     </numIndex>
                                     <numIndex index="5" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewList
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewList
                                         </numIndex>
                                         <numIndex index="1">list</numIndex>
                                     </numIndex>
                                     <numIndex index="6" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewAdmin
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewAdmin
                                         </numIndex>
                                         <numIndex index="1">admin</numIndex>
                                     </numIndex>
                                     <numIndex index="7" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewSearchEvent
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewSearchEvent
                                         </numIndex>
                                         <numIndex index="1">search_event</numIndex>
                                     </numIndex>
                                     <numIndex index="8" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewSearchLocation
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewSearchLocation
                                         </numIndex>
                                         <numIndex index="1">search_location</numIndex>
                                     </numIndex>
                                     <numIndex index="9" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewSearchOrganizer
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewSearchOrganizer
                                         </numIndex>
                                         <numIndex index="1">search_organizer</numIndex>
                                     </numIndex>
                                     <numIndex index="10" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewSearchAll
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewSearchAll
                                         </numIndex>
                                         <numIndex index="1">search_all</numIndex>
                                     </numIndex>
                                     <numIndex index="11" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewCreateEvent
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewCreateEvent
                                         </numIndex>
                                         <numIndex index="1">create_event~confirm_event~save_event</numIndex>
                                     </numIndex>
                                     <numIndex index="12" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewEditEvent
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewEditEvent
                                         </numIndex>
                                         <numIndex index="1">edit_event~confirm_event~save_event</numIndex>
                                     </numIndex>
                                     <numIndex index="13" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewDeleteEvent
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewDeleteEvent
                                         </numIndex>
                                         <numIndex index="1">
                                             delete_event~confirm_event~remove_event~save_exception_event
@@ -110,122 +110,122 @@
                                     </numIndex>
                                     <numIndex index="14" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewCreateCalendar
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewCreateCalendar
                                         </numIndex>
                                         <numIndex index="1">create_calendar~confirm_calendar~save_calendar</numIndex>
                                     </numIndex>
                                     <numIndex index="15" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewEditCalendar
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewEditCalendar
                                         </numIndex>
                                         <numIndex index="1">edit_calendar~confirm_calendar~save_calendar</numIndex>
                                     </numIndex>
                                     <numIndex index="16" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewDeleteCalendar
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewDeleteCalendar
                                         </numIndex>
                                         <numIndex index="1">delete_calendar~confirm_calendar~remove_calendar</numIndex>
                                     </numIndex>
                                     <numIndex index="17" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewCreateCategory
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewCreateCategory
                                         </numIndex>
                                         <numIndex index="1">create_category~confirm_category~save_category</numIndex>
                                     </numIndex>
                                     <numIndex index="18" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewEditCategory
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewEditCategory
                                         </numIndex>
                                         <numIndex index="1">edit_category~confirm_category~save_category</numIndex>
                                     </numIndex>
                                     <numIndex index="19" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewDeleteCategory
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewDeleteCategory
                                         </numIndex>
                                         <numIndex index="1">delete_category~confirm_category~remove_category</numIndex>
                                     </numIndex>
                                     <numIndex index="20" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewCreateLocation
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewCreateLocation
                                         </numIndex>
                                         <numIndex index="1">create_location~confirm_location~save_location</numIndex>
                                     </numIndex>
                                     <numIndex index="21" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewEditLocation
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewEditLocation
                                         </numIndex>
                                         <numIndex index="1">edit_location~confirm_location~save_location</numIndex>
                                     </numIndex>
                                     <numIndex index="22" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewDeleteLocation
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewDeleteLocation
                                         </numIndex>
                                         <numIndex index="1">delete_location~confirm_location~remove_location</numIndex>
                                     </numIndex>
                                     <numIndex index="23" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewCreateOrganizer
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewCreateOrganizer
                                         </numIndex>
                                         <numIndex index="1">create_organizer~confirm_organizer~save_organizer</numIndex>
                                     </numIndex>
                                     <numIndex index="24" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewEditOrganizer
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewEditOrganizer
                                         </numIndex>
                                         <numIndex index="1">edit_organizer~confirm_organizer~save_organizer</numIndex>
                                     </numIndex>
                                     <numIndex index="25" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewDeleteOrganizer
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewDeleteOrganizer
                                         </numIndex>
                                         <numIndex index="1">delete_organizer~confirm_organizer~remove_organizer
                                         </numIndex>
                                     </numIndex>
                                     <numIndex index="26" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewOrganizer
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewOrganizer
                                         </numIndex>
                                         <numIndex index="1">organizer</numIndex>
                                     </numIndex>
                                     <numIndex index="27" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewLocation
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewLocation
                                         </numIndex>
                                         <numIndex index="1">location</numIndex>
                                     </numIndex>
                                     <numIndex index="28" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewIcs
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewIcs
                                         </numIndex>
                                         <numIndex index="1">ics~icslist~single_ics</numIndex>
                                     </numIndex>
                                     <numIndex index="30" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewSubscriptionManager
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewSubscriptionManager
                                         </numIndex>
                                         <numIndex index="1">subscription</numIndex>
                                     </numIndex>
                                     <numIndex index="31" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewMeetingManager
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewMeetingManager
                                         </numIndex>
                                         <numIndex index="1">meeting</numIndex>
                                     </numIndex>
                                     <numIndex index="32" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewTranslation
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewTranslation
                                         </numIndex>
                                         <numIndex index="1">translation</numIndex>
                                     </numIndex>
                                     <numIndex index="33" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewTodo
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewTodo
                                         </numIndex>
                                         <numIndex index="1">todo</numIndex>
                                     </numIndex>
                                     <numIndex index="34" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.viewAjax
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.viewAjax
                                         </numIndex>
                                         <numIndex index="1">ajax</numIndex>
                                     </numIndex>
@@ -241,7 +241,7 @@
                     <calendarName>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.calendarName
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.calendarName
                             </label>
                             <config>
                                 <type>input</type>
@@ -255,26 +255,26 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.subscrition
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.subscrition
                             </label>
                             <config>
                                 <type>select</type>
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.noSubscription
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.noSubscription
                                         </numIndex>
                                         <numIndex index="1"></numIndex>
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.allowSubscribe
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.allowSubscribe
                                         </numIndex>
                                         <numIndex index="1">1</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.subscribeFeUser
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.subscribeFeUser
                                         </numIndex>
                                         <numIndex index="1">2</numIndex>
                                     </numIndex>
@@ -290,7 +290,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.subscribeWithCaptcha
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.subscribeWithCaptcha
                             </label>
                             <config>
                                 <type>check</type>
@@ -300,26 +300,26 @@
                     <weekStartDay>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.weekStartDay
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.weekStartDay
                             </label>
                             <config>
                                 <type>select</type>
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.default
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.default
                                         </numIndex>
                                         <numIndex index="1"></numIndex>
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/controller/locallang.xml:l_daysofweek_lang_monday
+                                            LLL:EXT:cal/controller/locallang.xlf:l_daysofweek_lang_monday
                                         </numIndex>
                                         <numIndex index="1">Monday</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/controller/locallang.xml:l_daysofweek_lang_sunday
+                                            LLL:EXT:cal/controller/locallang.xlf:l_daysofweek_lang_sunday
                                         </numIndex>
                                         <numIndex index="1">Sunday</numIndex>
                                     </numIndex>
@@ -333,7 +333,7 @@
                     <calendarDistance>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.calendarDistance
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.calendarDistance
                             </label>
                             <config>
                                 <type>input</type>
@@ -351,35 +351,35 @@
         <s_Cat>
             <ROOT>
                 <TCEforms>
-                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetCategory
+                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetCategory
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
                     <calendarMode>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.calendarMode
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.calendarMode
                             </label>
                             <config>
                                 <type>select</type>
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.calendarMode.showAll
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.calendarMode.showAll
                                         </numIndex>
                                         <numIndex index="1">0</numIndex>
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.calendarMode.showSelected
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.calendarMode.showSelected
                                         </numIndex>
                                         <numIndex index="1">1</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.calendarMode.excludeSelected
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.calendarMode.excludeSelected
                                         </numIndex>
                                         <numIndex index="1">2</numIndex>
                                     </numIndex>
@@ -393,7 +393,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.calendar_selection
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.calendar_selection
                             </label>
                             <config>
                                 <type>select</type>
@@ -410,38 +410,38 @@
                     <categoryMode>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.categoryMode
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.categoryMode
                             </label>
                             <config>
                                 <type>select</type>
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.categoryMode.showAll
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.categoryMode.showAll
                                         </numIndex>
                                         <numIndex index="1">0</numIndex>
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.categoryMode.showSelected
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.categoryMode.showSelected
                                         </numIndex>
                                         <numIndex index="1">1</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.categoryMode.excludeSelected
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.categoryMode.excludeSelected
                                         </numIndex>
                                         <numIndex index="1">2</numIndex>
                                     </numIndex>
                                     <numIndex index="3" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.categoryMode.showSelectedOr
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.categoryMode.showSelectedOr
                                         </numIndex>
                                         <numIndex index="1">3</numIndex>
                                     </numIndex>
                                     <numIndex index="4" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.categoryMode.showMinSelected
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.categoryMode.showMinSelected
                                         </numIndex>
                                         <numIndex index="1">4</numIndex>
                                     </numIndex>
@@ -454,7 +454,7 @@
                     <categorySelection>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.category_selection
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.category_selection
                             </label>
                             <config>
                                 <type>select</type>
@@ -484,9 +484,9 @@
         <s_Year_View>
             <ROOT>
                 <TCEforms>
-                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetYearView
+                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetYearView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
@@ -494,7 +494,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.yearViewPid
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.yearViewPid
                             </label>
                             <config>
                                 <type>group</type>
@@ -514,9 +514,9 @@
             <ROOT>
                 <TCEforms>
                     <sheetTitle>
-                        LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetMonthView
+                        LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetMonthView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
@@ -524,7 +524,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.monthViewPid
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.monthViewPid
                             </label>
                             <config>
                                 <type>group</type>
@@ -541,7 +541,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.monthShowListView
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.monthShowListView
                             </label>
                             <config>
                                 <type>check</type>
@@ -552,7 +552,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.monthMakeMiniCal
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.monthMakeMiniCal
                             </label>
                             <config>
                                 <type>check</type>
@@ -565,9 +565,9 @@
         <s_Week_View>
             <ROOT>
                 <TCEforms>
-                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetWeekView
+                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetWeekView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
@@ -575,7 +575,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.weekViewPid
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.weekViewPid
                             </label>
                             <config>
                                 <type>group</type>
@@ -594,16 +594,16 @@
         <s_Day_View>
             <ROOT>
                 <TCEforms>
-                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetDayView
+                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetDayView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
                     <dayViewPid>
                         <TCEforms>
                             <exclude>1</exclude>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.dayViewPid
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.dayViewPid
                             </label>
                             <config>
                                 <type>group</type>
@@ -618,7 +618,7 @@
                     </dayViewPid>
                     <dayStart>
                         <TCEforms>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.dayStart
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.dayStart
                             </label>
                             <config>
                                 <type>select</type>
@@ -637,7 +637,7 @@
                     </dayStart>
                     <dayEnd>
                         <TCEforms>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.dayEnd
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.dayEnd
                             </label>
                             <config>
                                 <type>select</type>
@@ -656,7 +656,7 @@
                     </dayEnd>
                     <gridLength>
                         <TCEforms>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.gridLength
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.gridLength
                             </label>
                             <config>
                                 <type>select</type>
@@ -711,9 +711,9 @@
         <s_List_View>
             <ROOT>
                 <TCEforms>
-                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetListView
+                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetListView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
@@ -721,7 +721,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listViewPid
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listViewPid
                             </label>
                             <config>
                                 <type>group</type>
@@ -736,56 +736,56 @@
                     </listViewPid>
                     <starttime>
                         <TCEforms>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.starttime
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.starttime
                             </label>
                             <config>
                                 <type>select</type>
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.default
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.default
                                         </numIndex>
                                         <numIndex index="1"></numIndex>
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.now
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.now
                                         </numIndex>
                                         <numIndex index="1">now</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.yesterday
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.yesterday
                                         </numIndex>
                                         <numIndex index="1">cal:yesterday</numIndex>
                                     </numIndex>
                                     <numIndex index="3" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.today
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.today
                                         </numIndex>
                                         <numIndex index="1">cal:today</numIndex>
                                     </numIndex>
                                     <numIndex index="4" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.weekStart
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.weekStart
                                         </numIndex>
                                         <numIndex index="1">cal:weekstart</numIndex>
                                     </numIndex>
                                     <numIndex index="5" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.monthStart
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.monthStart
                                         </numIndex>
                                         <numIndex index="1">cal:monthstart</numIndex>
                                     </numIndex>
                                     <numIndex index="6" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.quarterStart
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.quarterStart
                                         </numIndex>
                                         <numIndex index="1">cal:quarterstart</numIndex>
                                     </numIndex>
                                     <numIndex index="7" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.yearStart
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.yearStart
                                         </numIndex>
                                         <numIndex index="1">cal:yearstart</numIndex>
                                     </numIndex>
@@ -799,74 +799,74 @@
                     </starttime>
                     <endtime>
                         <TCEforms>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.endtime
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.endtime
                             </label>
                             <config>
                                 <type>select</type>
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.default
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.default
                                         </numIndex>
                                         <numIndex index="1"></numIndex>
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.now
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.now
                                         </numIndex>
                                         <numIndex index="1">now</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.today
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.today
                                         </numIndex>
                                         <numIndex index="1">cal:today</numIndex>
                                     </numIndex>
                                     <numIndex index="3" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.tomorrow
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.tomorrow
                                         </numIndex>
                                         <numIndex index="1">cal:tomorrow</numIndex>
                                     </numIndex>
                                     <numIndex index="4" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.weekEnd
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.weekEnd
                                         </numIndex>
                                         <numIndex index="1">cal:weekend</numIndex>
                                     </numIndex>
                                     <numIndex index="5" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.plusOneWeek
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.plusOneWeek
                                         </numIndex>
                                         <numIndex index="1">+1 week</numIndex>
                                     </numIndex>
                                     <numIndex index="6" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.monthEnd
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.monthEnd
                                         </numIndex>
                                         <numIndex index="1">cal:monthend</numIndex>
                                     </numIndex>
                                     <numIndex index="7" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.plusOneMonth
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.plusOneMonth
                                         </numIndex>
                                         <numIndex index="1">+1 month</numIndex>
                                     </numIndex>
                                     <numIndex index="8" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.quarterEnd
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.quarterEnd
                                         </numIndex>
                                         <numIndex index="1">cal:quarterend</numIndex>
                                     </numIndex>
                                     <numIndex index="9" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.yearEnd
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.yearEnd
                                         </numIndex>
                                         <numIndex index="1">cal:yearend</numIndex>
                                     </numIndex>
                                     <numIndex index="10" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.plusOneYear
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.plusOneYear
                                         </numIndex>
                                         <numIndex index="1">+1 year</numIndex>
                                     </numIndex>
@@ -880,7 +880,7 @@
                     </endtime>
                     <maxEvents>
                         <TCEforms>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.maxEvents
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.maxEvents
                             </label>
                             <config>
                                 <type>input</type>
@@ -893,7 +893,7 @@
                     <maxRecurringEvents>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.maxRecurringEvents
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.maxRecurringEvents
                             </label>
                             <config>
                                 <type>input</type>
@@ -906,26 +906,26 @@
                     <usePageBrowser>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.usePageBrowser
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.usePageBrowser
                             </label>
                             <config>
                                 <type>select</type>
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.default
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.default
                                         </numIndex>
                                         <numIndex index="1"></numIndex>
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.usePageBrowser.use
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.usePageBrowser.use
                                         </numIndex>
                                         <numIndex index="1">1</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">
-                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.usePageBrowser.dontUse
+                                            LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.usePageBrowser.dontUse
                                         </numIndex>
                                         <numIndex index="1">0</numIndex>
                                     </numIndex>
@@ -940,7 +940,7 @@
                     <recordsPerPage>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.recordsPerPage
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.recordsPerPage
                             </label>
                             <config>
                                 <type>input</type>
@@ -953,7 +953,7 @@
                     <pagesCount>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.listView.pagesCount
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.listView.pagesCount
                             </label>
                             <config>
                                 <type>input</type>
@@ -970,9 +970,9 @@
             <ROOT>
                 <TCEforms>
                     <sheetTitle>
-                        LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetEventView
+                        LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetEventView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
@@ -980,7 +980,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.eventViewPid
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.eventViewPid
                             </label>
                             <config>
                                 <type>group</type>
@@ -996,7 +996,7 @@
                     <isPreview>
                         <TCEforms>
                             <exclude>1</exclude>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.isPreview
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.isPreview
                             </label>
                             <config>
                                 <type>check</type>
@@ -1009,16 +1009,16 @@
         <s_Ics_View>
             <ROOT>
                 <TCEforms>
-                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetIcsView
+                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetIcsView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
                     <showIcsLinks>
                         <TCEforms>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.showIcsLinks
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.showIcsLinks
                             </label>
                             <config>
                                 <type>check</type>
@@ -1032,16 +1032,16 @@
             <ROOT>
                 <TCEforms>
                     <sheetTitle>
-                        LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetOtherView
+                        LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetOtherView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
                     <showLogin>
                         <TCEforms>
                             <exclude>1</exclude>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.showLogin
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.showLogin
                             </label>
                             <config>
                                 <type>check</type>
@@ -1051,7 +1051,7 @@
                     <showSearch>
                         <TCEforms>
                             <exclude>1</exclude>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.showSearch
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.showSearch
                             </label>
                             <config>
                                 <type>check</type>
@@ -1061,7 +1061,7 @@
                     <showJumps>
                         <TCEforms>
                             <exclude>1</exclude>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.showJumps
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.showJumps
                             </label>
                             <config>
                                 <type>check</type>
@@ -1072,7 +1072,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.showCalendarSelection
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.showCalendarSelection
                             </label>
                             <config>
                                 <type>check</type>
@@ -1083,7 +1083,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.showCategorySelection
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.showCategorySelection
                             </label>
                             <config>
                                 <type>check</type>
@@ -1094,7 +1094,7 @@
                         <TCEforms>
                             <exclude>1</exclude>
                             <label>
-                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.showTomorrowEvents
+                                LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.showTomorrowEvents
                             </label>
                             <config>
                                 <type>check</type>
@@ -1107,16 +1107,16 @@
         <s_TS_View>
             <ROOT>
                 <TCEforms>
-                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.sheetTSView
+                    <sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetTSView
                     </sheetTitle>
-                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
+                    <cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
                 </TCEforms>
                 <type>array</type>
                 <el>
                     <myTS>
                         <TCEforms>
                             <exclude>1</exclude>
-                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xml:cal.pi_flexform.tsconfig
+                            <label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.tsconfig
                             </label>
                             <config>
                                 <type>text</type>

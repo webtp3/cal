@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 use TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
@@ -7,7 +13,7 @@ if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
-$ll = 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:';
+$ll = 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:';
 
 /**
  * Add extra fields to the sys_category record

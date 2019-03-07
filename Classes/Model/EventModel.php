@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model;
 
 /**
@@ -641,7 +647,7 @@ class EventModel extends Model
     /**
      * @return EventModel
      */
-    public function cloneEvent(): EventModel
+    public function cloneEvent(): self
     {
         $thisClass = get_class($this);
         /** @var EventModel $event */

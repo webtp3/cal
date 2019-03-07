@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 use TYPO3\CMS\Cal\Backend\Form\FormDateDataProvider;
 use TYPO3\CMS\Cal\Backend\Form\RenderType\ByDayElement;
 use TYPO3\CMS\Cal\Backend\Form\RenderType\ByMonthDayElement;
@@ -1240,8 +1246,8 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'][MigrateCalCat
 ExtensionManagementUtility::addPageTSConfig('
 mod.wizards.newContentElement.wizardItems.plugins.elements.tx_cal {
     iconIdentifier = tx-cal-wizard
-    title = LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xml:pi1_title
-    description = LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xml:pi1_plus_wiz_description
+    title = LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xlf:pi1_title
+    description = LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xlf:pi1_plus_wiz_description
     tt_content_defValues {
         CType = list
         list_type = cal_controller

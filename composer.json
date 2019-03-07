@@ -1,7 +1,8 @@
 {
-	"name": "janhelke/cal",
+	"name": "web-tp3/cal",
 	"description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
 	"type": "typo3-cms-extension",
+	"version": "2.1.0",
 	"license": [
 		"GPL-2.0-or-later"
 	],
@@ -12,7 +13,7 @@
 			"homepage": "https://helke.de"
 		},
 		{
-			"name": "Mario Matzulla",
+			"name": ",Mario Matzulla",
 			"email": "mario@matzullas.de",
 			"homepage": "https://www.matzullas.de/"
 		}

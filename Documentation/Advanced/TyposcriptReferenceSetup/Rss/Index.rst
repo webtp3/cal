@@ -421,7 +421,7 @@ calRSS.10.view.rss
          Possible values are: 'rss091', 'rss2' 'rdf', 'atom1' and 'atom03'
    
    Default
-         {$plugin.tx\_cal\_controller.view.rss.xmlFormat}
+         {$plugin.tx\_cal\_controller.view.rss.xlfFormat}
 
 
 .. container:: table-row
@@ -437,7 +437,7 @@ calRSS.10.view.rss
          rss091, rss2, rdf and atom03)
    
    Default
-         {$plugin.tx\_cal\_controller.view.rss.xmlTitle}
+         {$plugin.tx\_cal\_controller.view.rss.xlfTitle}
 
 
 .. container:: table-row
@@ -453,7 +453,7 @@ calRSS.10.view.rss
          rss2, rdf and atom03)
    
    Default
-         {$plugin.tx\_cal\_controller.view.rss.xmlLink}
+         {$plugin.tx\_cal\_controller.view.rss.xlfLink}
 
 
 .. container:: table-row
@@ -469,7 +469,7 @@ calRSS.10.view.rss
          (required for rss091, rss2 and rdf. optional for atom03)
    
    Default
-         {$plugin.tx\_cal\_controller.view.rss.xmlDesc}
+         {$plugin.tx\_cal\_controller.view.rss.xlfDesc}
 
 
 .. container:: table-row
@@ -488,7 +488,7 @@ calRSS.10.view.rss
          atom03)
    
    Default
-         {$plugin.tx\_cal\_controller.view.rss.xmlLang}
+         {$plugin.tx\_cal\_controller.view.rss.xlfLang}
 
 
 .. container:: table-row
@@ -505,7 +505,7 @@ calRSS.10.view.rss
          optional for rss2 and rdf, not available for atom03)
    
    Default
-         {$plugin.tx\_cal\_controller.view.rss.xmlIcon}
+         {$plugin.tx\_cal\_controller.view.rss.xlfIcon}
 
 
 .. container:: table-row
@@ -520,7 +520,7 @@ calRSS.10.view.rss
          Event-Feed XML-Limit: max events items in RSS feeds.
    
    Default
-         {$plugin.tx\_cal\_controller.view.rss.xmlLimit}
+         {$plugin.tx\_cal\_controller.view.rss.xlfLimit}
 
 
 .. container:: table-row
@@ -535,7 +535,7 @@ calRSS.10.view.rss
          Event-Feed XML-Caching: Allow caching for the RSS feed
    
    Default
-         {$plugin.tx\_cal\_controller.view.rss.xmlCaching}
+         {$plugin.tx\_cal\_controller.view.rss.xlfCaching}
 
 
 .. container:: table-row
@@ -717,7 +717,7 @@ calRSS.10.view.rss.event
          cObj
    
    Description
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_location}:
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location}:
          \|</div><br/>
    
    Default
@@ -733,7 +733,7 @@ calRSS.10.view.rss.event
          cObj
    
    Description
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_category}:
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_category}:
          \|</div><br/>
    
    Default

@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
 // The following were shamelessly yoinked from Contact_Vcard_Build
@@ -35,7 +41,6 @@ define('VCARD_GEO_LON', 1);
  * See the enclosed file COPYING for license information (LGPL). If you
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
  *
- * @author Karsten Fourmont <karsten@horde.org>
  */
 class vcard extends ICalendar
 {

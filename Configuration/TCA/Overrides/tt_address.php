@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 defined('TYPO3_MODE') or die();
@@ -19,7 +25,7 @@ if (ExtensionManagementUtility::isLoaded('tt_address')) {
         $tempColumns = [
             'tx_cal_controller_islocation' => [
                 'exclude' => 1,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.islocation',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.islocation',
                 'config' => [
                     'type' => 'check',
                     'default' => 1
@@ -37,7 +43,7 @@ if (ExtensionManagementUtility::isLoaded('tt_address')) {
         $tempColumns = [
             'tx_cal_controller_isorganizer' => [
                 'exclude' => 1,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_organizer.isorganizer',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_organizer.isorganizer',
                 'config' => [
                     'type' => 'check',
                     'default' => 0

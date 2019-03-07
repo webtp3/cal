@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model\Pear\Date;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -33,8 +39,6 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
- * @author Leandro Lucarella <llucax@php.net>
- * @author Pierre-Alain Joye <pajoye@php.net>
  * @copyright 1997-2006 Leandro Lucarella, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -94,8 +98,6 @@ $GLOBALS['_DATE_SPAN_INPUT_FORMAT'] = DATE_SPAN_INPUT_FORMAT_NNSV;
 /**
  * Generic time span handling class for PEAR
  *
- * @author Leandro Lucarella <llucax@php.net>
- * @author Pierre-Alain Joye <pajoye@php.net>
  * @copyright 1997-2006 Leandro Lucarella, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -215,11 +217,11 @@ class Span
         if (!is_array($time)) {
             return false;
         }
-        $tmp1 = new Span();
+        $tmp1 = new self();
         if (!$tmp1->setFromSeconds(@array_pop($time))) {
             return false;
         }
-        $tmp2 = new Span();
+        $tmp2 = new self();
         if (!$tmp2->setFromMinutes(@array_pop($time))) {
             return false;
         }

@@ -1,6 +1,12 @@
 <?php
 declare(strict_types = 1);
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Backend\Form\RenderType;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -142,6 +148,6 @@ class ElementHelper
 
     public static function init()
     {
-        $GLOBALS['LANG']->includeLLFile(ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_db.xml');
+        $GLOBALS['LANG']->includeLLFile(ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Language/locallang_db.xlf');
     }
 }

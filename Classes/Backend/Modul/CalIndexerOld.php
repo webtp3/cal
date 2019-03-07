@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Backend\Modul;
 
 /**
@@ -116,9 +122,9 @@ class CalIndexerOld extends BaseScriptClass
                 $this->content .= $this->doc->spacer(20) . $this->doc->section(
                     '',
                     $this->doc->makeShortcutIcon(
-                            'id',
-                            implode(',', array_keys($this->MOD_MENU)),
-                            $this->MCONF['name']
+                        'id',
+                        implode(',', array_keys($this->MOD_MENU)),
+                        $this->MCONF['name']
                         )
                     );
             }

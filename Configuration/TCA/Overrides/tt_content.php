@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 if (!defined('TYPO3_MODE')) {
@@ -14,7 +20,7 @@ $pluginSignature = strtolower($extensionName) . '_controller';
  */
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(
     [
-        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tt_content.list_type',
+        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tt_content.list_type',
         'cal_controller'
     ],
     'list_type',
@@ -27,7 +33,7 @@ $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignat
 $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
     $pluginSignature,
-    'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal_sys_category.xml'
+    'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal_sys_category.xlf'
 );
 
 /***************

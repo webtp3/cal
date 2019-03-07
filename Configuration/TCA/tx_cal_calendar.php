@@ -1,11 +1,18 @@
 <?php
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 defined('TYPO3_MODE') or die();
 
 $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 
 $tx_cal_calendar = [
     'ctrl' => [
-        'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar',
+        'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar',
         'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -51,7 +58,7 @@ $tx_cal_calendar = [
         ],
         'title' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.title',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.title',
             'config' => [
                 'type' => 'input',
                 'size' => 30,
@@ -61,7 +68,7 @@ $tx_cal_calendar = [
         ],
         'owner' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.owner',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.owner',
             'config' => [
                 'type' => 'group',
                 'internal_type' => 'db',
@@ -75,7 +82,7 @@ $tx_cal_calendar = [
             ]
         ],
         'activate_fnb' => [
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.activate_fnb',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.activate_fnb',
             'onChange' => 'reload',
             'config' => [
                 'type' => 'check',
@@ -84,7 +91,7 @@ $tx_cal_calendar = [
         ],
         'fnb_user_cnt' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.fb_users_groups',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.fb_users_groups',
             'displayCond' => 'FIELD:activate_fnb:=:1',
             'config' => [
                 'type' => 'group',
@@ -99,22 +106,22 @@ $tx_cal_calendar = [
         ],
         'type' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.type',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.type',
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
                 'size' => 1,
                 'items' => [
                     [
-                        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.type.I.0',
+                        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.type.I.0',
                         0
                     ],
                     [
-                        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.type.I.1',
+                        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.type.I.1',
                         1
                     ],
                     [
-                        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.type.I.2',
+                        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.type.I.2',
                         2
                     ]
                 ],
@@ -123,7 +130,7 @@ $tx_cal_calendar = [
         ],
 
         'ext_url' => [
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.ext_url',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.ext_url',
             'config' => [
                 'type' => 'user',
                 'renderType' => 'calExtUrlElement',
@@ -132,7 +139,7 @@ $tx_cal_calendar = [
         ],
 
         'ext_url_notes' => [
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.ext_url_notes',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.ext_url_notes',
             'config' => [
                 'type' => 'text',
                 'default' => ''
@@ -141,7 +148,7 @@ $tx_cal_calendar = [
 
         'ics_file' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.ics_file',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.ics_file',
             'config' => [
                 'type' => 'group',
                 'internal_type' => 'file',
@@ -163,7 +170,7 @@ $tx_cal_calendar = [
 
         'refresh' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.refresh',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.refresh',
             'config' => [
                 'type' => 'input',
                 'size' => 6,
@@ -174,7 +181,7 @@ $tx_cal_calendar = [
         ],
         'schedulerId' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.schedulerId',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.schedulerId',
             'config' => [
                 'type' => 'input',
                 'size' => 5,
@@ -190,7 +197,7 @@ $tx_cal_calendar = [
         ],
         'headerstyle' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:sys_category.headerstyle',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:sys_category.headerstyle',
             'config' => [
                 'type' => 'user',
                 'renderType' => 'calStylesElement',
@@ -202,7 +209,7 @@ $tx_cal_calendar = [
         ],
         'bodystyle' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:sys_category.bodystyle',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:sys_category.bodystyle',
             'config' => [
                 'type' => 'user',
                 'renderType' => 'calStylesElement',

@@ -405,7 +405,7 @@ plugin.tx\_cal\_controller.view
          
          field = view
          
-         wrap = {LLL:EXT:cal/controller/locallang.xml:l\_\|\_view}
+         wrap = {LLL:EXT:cal/controller/locallang.xlf:l\_\|\_view}
          
          insertData = 1
          
@@ -796,7 +796,7 @@ plugin.tx\_cal\_controller.view.event.event
          moreLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_event\_more}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_event\_more}
          
          }
    
@@ -1063,7 +1063,7 @@ plugin.tx\_cal\_controller.view.event.event
          typolink.useCacheHash = 1
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_create\_event}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_create\_event}
          
          }
    
@@ -1086,7 +1086,7 @@ plugin.tx\_cal\_controller.view.event.event
          editLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_edit\_event}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_edit\_event}
          
          }
    
@@ -1109,7 +1109,7 @@ plugin.tx\_cal\_controller.view.event.event
          deleteLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_delete\_event}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_delete\_event}
          
          }
    
@@ -1227,7 +1227,7 @@ plugin.tx\_cal\_controller.view.event.event
          title {
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_event\_title}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_event\_title}:&nbsp;
          \|</div>
          
          }
@@ -1273,7 +1273,7 @@ plugin.tx\_cal\_controller.view.event.event
          startdate {
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_event\_startdate}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_event\_startdate}:&nbsp;
          \|</div>
          
          }
@@ -1300,7 +1300,7 @@ plugin.tx\_cal\_controller.view.event.event
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_event\_enddate}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_event\_enddate}:&nbsp;
          \|</div>
          
          }
@@ -1323,7 +1323,7 @@ plugin.tx\_cal\_controller.view.event.event
          starttime {
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_event\_starttime}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_event\_starttime}:&nbsp;
          \|</div>
          
          }
@@ -1346,7 +1346,7 @@ plugin.tx\_cal\_controller.view.event.event
          endtime {
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_event\_endtime}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_event\_endtime}:&nbsp;
          \|</div>
          
          }
@@ -1371,7 +1371,7 @@ plugin.tx\_cal\_controller.view.event.event
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_category}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_category}:&nbsp;
          \|</div>
          
          }
@@ -1396,7 +1396,7 @@ plugin.tx\_cal\_controller.view.event.event
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_category}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_category}:&nbsp;
          \|</div>
          
          }
@@ -1423,7 +1423,7 @@ plugin.tx\_cal\_controller.view.event.event
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_calendar}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_calendar}:&nbsp;
          \|</div>
          
          }
@@ -1464,7 +1464,7 @@ plugin.tx\_cal\_controller.view.event.event
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_organizer}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_organizer}:&nbsp;
          \|</div>
          
          }
@@ -1505,7 +1505,7 @@ plugin.tx\_cal\_controller.view.event.event
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_location}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location}:&nbsp;
          \|</div>
          
          }
@@ -1553,7 +1553,7 @@ plugin.tx\_cal\_controller.view.event.event
          }
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_event\_teaser}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_event\_teaser}:&nbsp;
          \|</div>
          
          }
@@ -1579,7 +1579,7 @@ plugin.tx\_cal\_controller.view.event.event
          
          required = 1
          
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_event\_descri
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_event\_descri
          ption}:&nbsp; \|</div>
          
          }
@@ -1626,7 +1626,7 @@ plugin.tx\_cal\_controller.view.event.event
          imgPath = {$plugin.tx\_cal\_controller.uploadPath.image}
          
          stdWrap.dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_event\_image} \|</div>
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_event\_image} \|</div>
          
          stdWrap.required = 1
          
@@ -1724,7 +1724,7 @@ plugin.tx\_cal\_controller.view.event.event
          
          20.stdWrap.if.isTrue.field = media
          
-         20.stdWrap.dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_ev
+         20.stdWrap.dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_ev
          ent\_attachment}:&nbsp;\|</div>
          
          }
@@ -1751,7 +1751,7 @@ plugin.tx\_cal\_controller.view.event.event
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_attendee}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_attendee}:&nbsp;
          \|</div>
          
          }
@@ -1820,7 +1820,7 @@ plugin.tx\_cal\_controller.view.event.event
          Content object for decline meeting attendance link
          
          declineMeetingLink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_meeting\_changestatus}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_meeting\_changestatus}
    
    d
          =< plugin.tx\_cal\_controller.view.defaultLinkSetup
@@ -1838,7 +1838,7 @@ plugin.tx\_cal\_controller.view.event.event
          Content object for accept meeting attendance link
          
          acceptMeetingLink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_meeting\_changestatus}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_meeting\_changestatus}
    
    d
          =< plugin.tx\_cal\_controller.view.defaultLinkSetup
@@ -1872,7 +1872,7 @@ plugin.tx\_cal\_controller.view.event.event
          additionalParams.field = additionalParams
          
          title.dataWrap =
-         \|{LLL:EXT:cal/controller/locallang.xml:l\_event\_icslink}
+         \|{LLL:EXT:cal/controller/locallang.xlf:l\_event\_icslink}
          
          }
          
@@ -1897,7 +1897,7 @@ plugin.tx\_cal\_controller.view.event.event
          
          noEventFound {
          
-         dataWrap = {LLL:EXT:cal/controller/locallang.xml:l\_no\_results}
+         dataWrap = {LLL:EXT:cal/controller/locallang.xlf:l\_no\_results}
          
          }
    
@@ -3010,7 +3010,7 @@ plugin.tx\_cal\_controller.view.location.location
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_name}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_name}:&nbsp;
          \|</div>
          
          }
@@ -3037,7 +3037,7 @@ plugin.tx\_cal\_controller.view.location.location
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_street}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_street}:&nbsp;
          \|</div>
          
          }
@@ -3064,7 +3064,7 @@ plugin.tx\_cal\_controller.view.location.location
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_city}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_city}:&nbsp;
          \|</div>
          
          }
@@ -3091,7 +3091,7 @@ plugin.tx\_cal\_controller.view.location.location
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_zip}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_zip}:&nbsp;
          \|</div>
          
          }
@@ -3118,7 +3118,7 @@ plugin.tx\_cal\_controller.view.location.location
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_phone}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_phone}:&nbsp;
          \|</div>
          
          }
@@ -3144,7 +3144,7 @@ plugin.tx\_cal\_controller.view.location.location
          
          required = 1
          
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_cou
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_cou
          ntryzone}:&nbsp; \|</div>
          
          }
@@ -3172,7 +3172,7 @@ plugin.tx\_cal\_controller.view.location.location
          
          ifEmpty.field = countryzone
          
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_cou
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_cou
          ntryzone}:&nbsp; \|</div>
          
          }
@@ -3198,7 +3198,7 @@ plugin.tx\_cal\_controller.view.location.location
          
          required = 1
          
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_cou
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_cou
          ntry}:&nbsp; \|</div>
          
          }
@@ -3226,7 +3226,7 @@ plugin.tx\_cal\_controller.view.location.location
          
          ifEmpty.field = countr
          
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_cou
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_cou
          ntry}:&nbsp; \|</div>
          
          }
@@ -3252,7 +3252,7 @@ plugin.tx\_cal\_controller.view.location.location
          
          required = 1
          
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_des
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_des
          cription}:&nbsp; \|</div>
          
          }
@@ -3281,7 +3281,7 @@ plugin.tx\_cal\_controller.view.location.location
          required = 1
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_email}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_email}:&nbsp;
          \|</div>
          
          }
@@ -3304,7 +3304,7 @@ plugin.tx\_cal\_controller.view.location.location
          link {
          
          dataWrap =
-         <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_link}:&nbsp;
+         <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_link}:&nbsp;
          \|</div>
          
          }
@@ -3358,7 +3358,7 @@ plugin.tx\_cal\_controller.view.location.location
          
          current = 1
          
-         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xml:l\_location\_rel
+         dataWrap = <div>{LLL:EXT:cal/controller/locallang.xlf:l\_location\_rel
          atedevents}:&nbsp; \|</div>
          
          }
@@ -3381,7 +3381,7 @@ plugin.tx\_cal\_controller.view.location.location
          noLocationFound {
          
          dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_no\_location\_results}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_no\_location\_results}
          
          }
    
@@ -3448,7 +3448,7 @@ plugin.tx\_cal\_controller.view.location.location
          addLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_create\_location}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_create\_location}
          
          }
    
@@ -3470,7 +3470,7 @@ plugin.tx\_cal\_controller.view.location.location
          editLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_edit\_location}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_edit\_location}
          
          }
    
@@ -3492,7 +3492,7 @@ plugin.tx\_cal\_controller.view.location.location
          deleteLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_delete\_location}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_delete\_location}
          
          }
    
@@ -3749,7 +3749,7 @@ plugin.tx\_cal\_controller.view.location.location
          noOrganizerFound {
          
          dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_no\_organizer\_results}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_no\_organizer\_results}
          
          }
    
@@ -3786,7 +3786,7 @@ plugin.tx\_cal\_controller.view.location.location
          addLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_create\_organizer}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_create\_organizer}
          
          }
    
@@ -3808,7 +3808,7 @@ plugin.tx\_cal\_controller.view.location.location
          editLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_edit\_organizer}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_edit\_organizer}
          
          }
    
@@ -3830,7 +3830,7 @@ plugin.tx\_cal\_controller.view.location.location
          deleteLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_delete\_organizer}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_delete\_organizer}
          
          }
    
@@ -4045,7 +4045,7 @@ plugin.tx\_cal\_controller.view.calendar.calendar
          addLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_create\_calendar}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_create\_calendar}
          
          }
    
@@ -4067,7 +4067,7 @@ plugin.tx\_cal\_controller.view.calendar.calendar
          editLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_edit\_calendar}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_edit\_calendar}
          
          }
    
@@ -4089,7 +4089,7 @@ plugin.tx\_cal\_controller.view.calendar.calendar
          deleteLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_delete\_calendar}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_delete\_calendar}
          
          }
    
@@ -4487,7 +4487,7 @@ plugin.tx\_cal\_controller.view.day
          nextDayLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_next\_day}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_next\_day}
          
          }
    
@@ -4539,7 +4539,7 @@ plugin.tx\_cal\_controller.view.day
          prevDayLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_last\_day}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_last\_day}
          
          }
    
@@ -5180,7 +5180,7 @@ plugin.tx\_cal\_controller.view.week
          nextWeekLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_next\_week}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_next\_week}
          
          }
    
@@ -5202,7 +5202,7 @@ plugin.tx\_cal\_controller.view.week
          prevWeekLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_last\_week}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_last\_week}
          
          }
    
@@ -6136,7 +6136,7 @@ plugin.tx\_cal\_controller.view.month
          nextMonthLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_next\_month}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_next\_month}
          
          }
    
@@ -6160,7 +6160,7 @@ plugin.tx\_cal\_controller.view.month
          prevMonthLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_last\_month}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_last\_month}
          
          }
    
@@ -6667,7 +6667,7 @@ plugin.tx\_cal\_controller.view.year
          nextYearLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_next\_year}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_next\_year}
          
          }
    
@@ -6691,7 +6691,7 @@ plugin.tx\_cal\_controller.view.year
          prevYearLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_last\_year}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_last\_year}
          
          }
    
@@ -7202,7 +7202,7 @@ plugin.tx\_cal\_controller.view.list
          found\_stdWrap {
          
          noTrimWrap = \|<p class="found">\|
-         {LLL:EXT:cal/controller/locallang.xml:l\_search\_found}</p>\|
+         {LLL:EXT:cal/controller/locallang.xlf:l\_search\_found}</p>\|
          
          insertData = 1
          
@@ -7771,7 +7771,7 @@ plugin.tx\_cal\_controller.view.list
          wrap = <span>\|</span>
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_page} {current:1}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_page} {current:1}
          
          }
    
@@ -7797,7 +7797,7 @@ plugin.tx\_cal\_controller.view.list
          value = &gt;&gt;
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_next}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_next}
          
          wrap = <span>\|</span>
          
@@ -7823,7 +7823,7 @@ plugin.tx\_cal\_controller.view.list
          value = &lt;&lt;
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_prev}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_prev}
          
          }
    
@@ -8467,7 +8467,7 @@ plugin.tx\_cal\_controller.view.ics
          
          }
          
-         dataWrap = \|{LLL:EXT:cal/controller/locallang.xml:l\_ics\_view}
+         dataWrap = \|{LLL:EXT:cal/controller/locallang.xlf:l\_ics\_view}
          
          }
          
@@ -8848,7 +8848,7 @@ plugin.tx\_cal\_controller.view.admin
          adminViewLink {
          
          typolink.title.override.override.dataWrap =
-         {LLL:EXT:cal/controller/locallang.xml:l\_administration\_view}
+         {LLL:EXT:cal/controller/locallang.xlf:l\_administration\_view}
          
          outerWrap.field = link\_wrap
          
@@ -9830,7 +9830,7 @@ plugin.tx\_cal\_controller.view.search
          See: plugin.tx\_cal\_controller.view.defaultLinkSetup
          
          searchAllLink.typolink.title.override.override.dataWrap =
-         \|{LLL:EXT:cal/controller/locallang.xml:l\_search}
+         \|{LLL:EXT:cal/controller/locallang.xlf:l\_search}
    
    Default
          =< plugin.tx\_cal\_controller.view.defaultLinkSetup
@@ -10303,7 +10303,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the calendar field
          
          dataWrap = <div><label for="calendar">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_calendar}:</label><select
+         g.xlf:l\_calendar}:</label><select
          name="tx\_cal\_controller[switch\_calendar]" size="1"
          onchange="submit();" id="calendar\_selector">\|</select></div>
    
@@ -10342,7 +10342,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the category field
          
          dataWrap = <div><label for="category">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_category}:</label>\|</div>
+         g.xlf:l\_category}:</label>\|</div>
    
    Default
          See Description
@@ -10379,7 +10379,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the startdate field
          
          dataWrap = <div><label for="startdate">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_event\_edit\_startdate}:</label><input type="text"
+         ng.xlf:l\_event\_edit\_startdate}:</label><input type="text"
          value="\|" name="tx\_cal\_controller[event\_start\_day]"
          id="event\_start\_day" /></div>
    
@@ -10399,7 +10399,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the enddate field
          
          dataWrap = <div><label for="enddate">{LLL:EXT:cal/controller/locallang
-         .xml:l\_event\_edit\_enddate}:</label><input type="text" value="\|"
+         .xlf:l\_event\_edit\_enddate}:</label><input type="text" value="\|"
          name="tx\_cal\_controller[event\_end\_day]" id="event\_end\_day"
          /></div>
    
@@ -10419,7 +10419,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the starthour field
          
          dataWrap = <div><label for="starttime">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_event\_edit\_starttime}:</label><select
+         ng.xlf:l\_event\_edit\_starttime}:</label><select
          name="tx\_cal\_controller[event\_start\_hour]" id="event\_start\_hour"
          size="1">\|</select>
    
@@ -10457,7 +10457,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the endhour field
          
          dataWrap = <div><label for="endtime">{LLL:EXT:cal/controller/locallang
-         .xml:l\_event\_edit\_endtime}:</label><select
+         .xlf:l\_event\_edit\_endtime}:</label><select
          name="tx\_cal\_controller[event\_end\_hour]" id="event\_end\_hour"
          size="1">\|</select>
    
@@ -10514,7 +10514,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the cal\_organizer field
          
          dataWrap = <div><label for="cal\_organizer">{LLL:EXT:cal/controller/lo
-         callang.xml:l\_event\_cal\_organizer}:</label><select
+         callang.xlf:l\_event\_cal\_organizer}:</label><select
          name="tx\_cal\_controller[cal\_organizer]" size="1">\|</select></div>
    
    Default
@@ -10533,7 +10533,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the organizer field
          
          dataWrap = <div><label for="organizer">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_organizer}:</label><input type="text" value="\|"
+         ng.xlf:l\_organizer}:</label><input type="text" value="\|"
          name="tx\_cal\_controller[organizer]" /></div>
    
    Default
@@ -10552,7 +10552,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the cal\_location field
          
          dataWrap = <div><label for="cal\_location">{LLL:EXT:cal/controller/loc
-         allang.xml:l\_location}:</label><select
+         allang.xlf:l\_location}:</label><select
          name="tx\_cal\_controller[cal\_location]" size="1">\|</select></div>
    
    Default
@@ -10571,7 +10571,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the location field
          
          dataWrap = <div><label for="location">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_location}:</label><input type="text" value="\|"
+         g.xlf:l\_location}:</label><input type="text" value="\|"
          name="tx\_cal\_controller[location]" /></div>
    
    Default
@@ -10608,7 +10608,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the description field
          
          dataWrap = <div><label for="description">{LLL:EXT:cal/controller/local
-         lang.xml:l\_event\_description}:</label>\|</div>
+         lang.xlf:l\_event\_description}:</label>\|</div>
    
    Default
          See Description
@@ -10670,7 +10670,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the frequency field
          
          dataWrap = <div><label for="frequency">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_event\_frequency}:</label><select
+         ng.xlf:l\_event\_frequency}:</label><select
          name="tx\_cal\_controller[frequency\_id]" size="1">\|</select></div>
    
    Default
@@ -10738,7 +10738,7 @@ plugin.tx\_cal\_controller.view.create\_event
          }
          
          dataWrap = <div><label for="bymonthday">{LLL:EXT:cal/controller/locall
-         ang.xml:l\_event\_edit\_byday}:</label>\|</div>
+         ang.xlf:l\_event\_edit\_byday}:</label>\|</div>
    
    Default
          See Description
@@ -10756,7 +10756,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the byMonthday field
          
          dataWrap = <div><label for="bymonthday">{LLL:EXT:cal/controller/locall
-         ang.xml:l\_event\_edit\_bymonthday}:</label><input type="text"
+         ang.xlf:l\_event\_edit\_bymonthday}:</label><input type="text"
          value="\|" name="tx\_cal\_controller[by\_monthday]" /></div>
    
    Default
@@ -10775,7 +10775,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the byMonth field
          
          dataWrap = <div><label for="bymonth">{LLL:EXT:cal/controller/locallang
-         .xml:l\_event\_edit\_bymonth}:</label><input type="text" value="\|"
+         .xlf:l\_event\_edit\_bymonth}:</label><input type="text" value="\|"
          name="tx\_cal\_controller[by\_month]" /></div>
    
    Default
@@ -10794,7 +10794,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the until field
          
          dataWrap = <span id="until"><label for="until">{LLL:EXT:cal/controller
-         /locallang.xml:l\_until}:</label><input type="text" value="\|"
+         /locallang.xlf:l\_until}:</label><input type="text" value="\|"
          id="until\_value" name="tx\_cal\_controller[until]"
          /></span>
    
@@ -10833,7 +10833,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the interval field
          
          dataWrap = <div><label for="interval">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_event\_interval}:</label><input type="text" value="\|"
+         g.xlf:l\_event\_interval}:</label><input type="text" value="\|"
          name="tx\_cal\_controller[interval]"/></div>
    
    Default
@@ -10870,7 +10870,7 @@ plugin.tx\_cal\_controller.view.create\_event
          Standard wrap for the exception field
          
          dataWrap = <div><label for="exception">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_event\_exception}:</label>\|</div>
+         ng.xlf:l\_event\_exception}:</label>\|</div>
    
    Default
          See Description
@@ -11296,7 +11296,7 @@ plugin.tx\_cal\_controller.view.create\_event
          dataWrap = <div><label for="image">{LLL:EXT:cal/controller/locallang.x
          ml:l\_location\_image}:</label><input type="hidden"
          value="###IMAGE\_VALUE###" name="tx\_cal\_controller[image][]" />###IM
-         AGE\_PREVIEW###<br/>{LLL:EXT:cal/controller/locallang.xml:l\_delete\_i
+         AGE\_PREVIEW###<br/>{LLL:EXT:cal/controller/locallang.xlf:l\_delete\_i
          mage}:<input type="checkbox" name="tx\_cal\_controller[removeImage][]"
          value="###IMAGE\_VALUE###"</div>
    
@@ -11360,7 +11360,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the calendar field
          
          dataWrap = <div><label for="calendar">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_calendar}:</label>\|<input type="hidden"
+         g.xlf:l\_calendar}:</label>\|<input type="hidden"
          name="tx\_cal\_controller[calendar\_id]"
          value="###CALENDAR\_VALUE###"></div>
    
@@ -11400,7 +11400,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the category field
          
          dataWrap = <div><label for="category">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_category}:</label>\|<input type="hidden"
+         g.xlf:l\_category}:</label>\|<input type="hidden"
          value="###CATEGORY\_VALUE###"
          name="tx\_cal\_controller[category\_ids]" /></div>
    
@@ -11440,7 +11440,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the startdate field
          
          dataWrap = <div><label for="startdate">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_event\_edit\_startdate}:</label>\|<input type="hidden"
+         ng.xlf:l\_event\_edit\_startdate}:</label>\|<input type="hidden"
          value="###STARTDATE\_VALUE###"
          name="tx\_cal\_controller[event\_start\_day]" /></div>
    
@@ -11460,7 +11460,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the enddate field
          
          dataWrap = <div><label for="enddate">{LLL:EXT:cal/controller/locallang
-         .xml:l\_event\_edit\_enddate}:</label>\|<input type="hidden"
+         .xlf:l\_event\_edit\_enddate}:</label>\|<input type="hidden"
          value="###ENDDATE\_VALUE###"
          name="tx\_cal\_controller[event\_end\_day]" /></div>
    
@@ -11480,7 +11480,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the starttime field
          
          dataWrap = <div><label for="startdate">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_event\_edit\_starttime}:</label>\|<input type="hidden"
+         ng.xlf:l\_event\_edit\_starttime}:</label>\|<input type="hidden"
          value="###STARTTIME\_VALUE###"
          name="tx\_cal\_controller[event\_start\_time]" /></div>
    
@@ -11500,7 +11500,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the endtime field
          
          dataWrap = <div><label for="enddate">{LLL:EXT:cal/controller/locallang
-         .xml:l\_event\_edit\_endtime}:</label>\|<input type="hidden"
+         .xlf:l\_event\_edit\_endtime}:</label>\|<input type="hidden"
          value="###ENDTIME\_VALUE###"
          name="tx\_cal\_controller[event\_end\_time]" /></div>
    
@@ -11539,7 +11539,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the cal\_organizer field
          
          dataWrap = <div><label for="cal\_organizer">{LLL:EXT:cal/controller/lo
-         callang.xml:l\_event\_cal\_organizer}:</label>\|<input type="hidden"
+         callang.xlf:l\_event\_cal\_organizer}:</label>\|<input type="hidden"
          value="###CAL\_ORGANIZER\_VALUE###"
          name="tx\_cal\_controller[cal\_organizer]" /></div>
    
@@ -11559,7 +11559,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the organizer field
          
          dataWrap = <div><label for="organizer">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_organizer}:</label>\|<input type="hidden"
+         ng.xlf:l\_organizer}:</label>\|<input type="hidden"
          value="###ORGANIZER\_VALUE###" name="tx\_cal\_controller[organizer]"
          /></div>
    
@@ -11579,7 +11579,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the cal\_location field
          
          dataWrap = <div><label for="cal\_location">{LLL:EXT:cal/controller/loc
-         allang.xml:l\_event\_cal\_location}:</label>\|<input type="hidden"
+         allang.xlf:l\_event\_cal\_location}:</label>\|<input type="hidden"
          value="###CAL\_LOCATION\_VALUE###"
          name="tx\_cal\_controller[cal\_location]" /></div>
    
@@ -11599,7 +11599,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the location field
          
          dataWrap = <div><label for="location">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_location}:</label>\|<input type="hidden"
+         g.xlf:l\_location}:</label>\|<input type="hidden"
          value="###LOCATION\_VALUE###" name="tx\_cal\_controller[location]"
          /></div>
    
@@ -11638,7 +11638,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the description field
          
          dataWrap = <div><label for="description">{LLL:EXT:cal/controller/local
-         lang.xml:l\_event\_description}:</label>\|<input type="hidden"
+         lang.xlf:l\_event\_description}:</label>\|<input type="hidden"
          value="###DESCRIPTION\_VALUE###"
          name="tx\_cal\_controller[description]"/></div>
    
@@ -11684,7 +11684,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the frequency field
          
          dataWrap = <div><label for="frequency">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_event\_frequency}:</label>\|<input type="hidden"
+         ng.xlf:l\_event\_frequency}:</label>\|<input type="hidden"
          value="###FREQUENCY\_VALUE###"
          name="tx\_cal\_controller[frequency\_id]" /></div>
    
@@ -11704,7 +11704,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the byDay field
          
          dataWrap = <div><label for="bymonthday">{LLL:EXT:cal/controller/locall
-         ang.xml:l\_event\_edit\_byday}:</label>\|<input type="hidden"
+         ang.xlf:l\_event\_edit\_byday}:</label>\|<input type="hidden"
          value="###BY\_DAY\_VALUE###" name="tx\_cal\_controller[by\_monthday]"
          /></div>
    
@@ -11724,7 +11724,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the byMonthday field
          
          dataWrap = <div><label for="bymonthday">{LLL:EXT:cal/controller/locall
-         ang.xml:l\_event\_edit\_bymonthday}:</label>\|<input type="hidden"
+         ang.xlf:l\_event\_edit\_bymonthday}:</label>\|<input type="hidden"
          value="###BY\_MONTHDAY\_VALUE###"
          name="tx\_cal\_controller[by\_monthday]" /></div>
    
@@ -11744,7 +11744,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the byMonth field
          
          dataWrap = <div><label for="bymonth">{LLL:EXT:cal/controller/locallang
-         .xml:l\_event\_edit\_bymonth}:</label>\|<input type="hidden"
+         .xlf:l\_event\_edit\_bymonth}:</label>\|<input type="hidden"
          value="###BY\_MONTH\_VALUE###" name="tx\_cal\_controller[by\_month]"
          /></div>
    
@@ -11803,7 +11803,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the interval field
          
          dataWrap = <div><label for="interval">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_event\_interval}:</label>\|<input type="hidden"
+         g.xlf:l\_event\_interval}:</label>\|<input type="hidden"
          value="###INTERVAL\_VALUE###"
          name="tx\_cal\_controller[interval]"/></div>
    
@@ -11843,7 +11843,7 @@ plugin.tx\_cal\_controller.view.confirm\_event
          Standard wrap for the exception field
          
          dataWrap = <div><label for="exception">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_event\_exception}:</label>\|<input type="hidden"
+         ng.xlf:l\_event\_exception}:</label>\|<input type="hidden"
          value="###EXCEPTION\_SINGLE\_VALUE###"
          name="tx\_cal\_controller[exception\_single\_ids]"/><input
          type="hidden" value="###EXCEPTION\_GROUP\_VALUE###"
@@ -12106,7 +12106,7 @@ plugin.tx\_cal\_controller.view.create\_calendar
          Standard wrap for the activateFreeAndBusy field
          
          dataWrap = <div><label for="activateFreeAndBusy">{LLL:EXT:cal/controll
-         er/locallang.xml:l\_calendar\_activateFreeAndBusy}:</label><input
+         er/locallang.xlf:l\_calendar\_activateFreeAndBusy}:</label><input
          type="checkbox" \| name="tx\_cal\_controller[activateFreeAndBusy]"
          /></div>
    
@@ -12126,7 +12126,7 @@ plugin.tx\_cal\_controller.view.create\_calendar
          Standard wrap for the freeAndBusyUser field
          
          dataWrap = <div><label for="freeAndBusyUser">{LLL:EXT:cal/controller/l
-         ocallang.xml:l\_calendar\_freeAndBusyUser}:</label>\|</div>
+         ocallang.xlf:l\_calendar\_freeAndBusyUser}:</label>\|</div>
    
    Default
          See Description
@@ -12144,7 +12144,7 @@ plugin.tx\_cal\_controller.view.create\_calendar
          Standard wrap for the calendarType field
          
          dataWrap = <div><label for="calendarType">{LLL:EXT:cal/controller/loca
-         llang.xml:l\_calendar\_type}:</label><select
+         llang.xlf:l\_calendar\_type}:</label><select
          name="tx\_cal\_controller[calendarType]" size="1"
          onchange="javascript: typeChanged(this);"
          id="calendarType">\|</select></div>
@@ -12165,7 +12165,7 @@ plugin.tx\_cal\_controller.view.create\_calendar
          Standard wrap for the exturl field
          
          dataWrap = <div id="exturl"><label for="exturl">{LLL:EXT:cal/controlle
-         r/locallang.xml:l\_calendar\_exturl}:</label><input type="text"
+         r/locallang.xlf:l\_calendar\_exturl}:</label><input type="text"
          value="\|" name="tx\_cal\_controller[exturl]" /></div>
    
    Default
@@ -12184,7 +12184,7 @@ plugin.tx\_cal\_controller.view.create\_calendar
          Standard wrap for the icsfile field
          
          dataWrap = <div id="icsfile"><label for="icsfile">{LLL:EXT:cal/control
-         ler/locallang.xml:l\_calendar\_icsfile}:</label><input type="file"
+         ler/locallang.xlf:l\_calendar\_icsfile}:</label><input type="file"
          value="\|" name="tx\_cal\_controller[icsfile]" /></div>
    
    Default
@@ -12203,7 +12203,7 @@ plugin.tx\_cal\_controller.view.create\_calendar
          Standard wrap for the refresh field
          
          dataWrap = <div id="refresh"><label for="refresh">{LLL:EXT:cal/control
-         ler/locallang.xml:l\_calendar\_refresh}:</label><input type="text"
+         ler/locallang.xlf:l\_calendar\_refresh}:</label><input type="text"
          value="\|" name="tx\_cal\_controller[refresh]" /></div>
    
    Default
@@ -12402,7 +12402,7 @@ plugin.tx\_cal\_controller.view.confirm\_calendar
          Standard wrap for the activateFreeAndBusy field
          
          dataWrap = <div><label for="activateFreeAndBusy">{LLL:EXT:cal/controll
-         er/locallang.xml:l\_calendar\_activateFreeAndBusy}:</label>\|<input
+         er/locallang.xlf:l\_calendar\_activateFreeAndBusy}:</label>\|<input
          type="hidden" value="###ACTIVATE\_FREEANDBUSY\_VALUE###"
          name="tx\_cal\_controller[activateFreeAndBusy]" /></div>
    
@@ -12422,7 +12422,7 @@ plugin.tx\_cal\_controller.view.confirm\_calendar
          Standard wrap for the freeAndBusyUser field
          
          dataWrap = <div><label for="freeAndBusyUser">{LLL:EXT:cal/controller/l
-         ocallang.xml:l\_calendar\_freeAndBusyUser}:</label>\|<input
+         ocallang.xlf:l\_calendar\_freeAndBusyUser}:</label>\|<input
          type="hidden" value="###FREEANDBUSYUSER\_SINGLE\_VALUE###"
          name="tx\_cal\_controller[freeAndBusyUser\_single]" /><input
          type="hidden" value="###FREEANDBUSYUSER\_GROUP\_VALUE###"
@@ -12444,7 +12444,7 @@ plugin.tx\_cal\_controller.view.confirm\_calendar
          Standard wrap for the calendarType field
          
          dataWrap = <div><label for="calendarType">{LLL:EXT:cal/controller/loca
-         llang.xml:l\_calendar\_type}:</label>\|<input type="hidden"
+         llang.xlf:l\_calendar\_type}:</label>\|<input type="hidden"
          value="###CALENDARTYPE\_VALUE###"
          name="tx\_cal\_controller[calendarType]" /></div>
    
@@ -12464,7 +12464,7 @@ plugin.tx\_cal\_controller.view.confirm\_calendar
          Standard wrap for the exturl field
          
          dataWrap = <div id="exturl"><label for="exturl">{LLL:EXT:cal/controlle
-         r/locallang.xml:l\_calendar\_exturl}:</label>>\|<input type="hidden"
+         r/locallang.xlf:l\_calendar\_exturl}:</label>>\|<input type="hidden"
          value="###EXTURL\_VALUE###" name="tx\_cal\_controller[exturl]"
          /></div>
    
@@ -12484,7 +12484,7 @@ plugin.tx\_cal\_controller.view.confirm\_calendar
          Standard wrap for the icsfile field
          
          dataWrap = <div id="icsfile"><label for="icsfile">{LLL:EXT:cal/control
-         ler/locallang.xml:l\_calendar\_icsfile}:</label>\|<input type="hidden"
+         ler/locallang.xlf:l\_calendar\_icsfile}:</label>\|<input type="hidden"
          value="###ICSFILE\_VALUE###" name="tx\_cal\_controller[icsfile]"
          /></div>
    
@@ -12504,7 +12504,7 @@ plugin.tx\_cal\_controller.view.confirm\_calendar
          Standard wrap for the refresh field
          
          dataWrap = <div id="refresh"><label for="refresh">{LLL:EXT:cal/control
-         ler/locallang.xml:l\_calendar\_refresh}:</label>\|<input type="hidden"
+         ler/locallang.xlf:l\_calendar\_refresh}:</label>\|<input type="hidden"
          value="###REFRESH\_VALUE###" name="tx\_cal\_controller[refresh]"
          /></div>
    
@@ -12745,7 +12745,7 @@ plugin.tx\_cal\_controller.view.create\_category
          Standard wrap for the calendar field
          
          dataWrap = <div><label for="calendar">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_category\_calendar}:</label><select
+         g.xlf:l\_category\_calendar}:</label><select
          name="tx\_cal\_controller[switch\_calendar]" size="1"
          onchange="submit();">\|</select></div>
    
@@ -12765,7 +12765,7 @@ plugin.tx\_cal\_controller.view.create\_category
          Standard wrap for the headerStyle field
          
          dataWrap = <div><label for="headerStyle">{LLL:EXT:cal/controller/local
-         lang.xml:l\_category\_headerstyle}:</label><select
+         lang.xlf:l\_category\_headerstyle}:</label><select
          name="tx\_cal\_controller[headerstyle]" size="1"
          onchange="getNewStyle(this);"
          id="tx\_cal\_controller\_headerstyle">\|</select></div>
@@ -12786,7 +12786,7 @@ plugin.tx\_cal\_controller.view.create\_category
          Standard wrap for the bodyStyle field
          
          dataWrap = <div><label for="bodyStyle">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_category\_bodystyle}:</label><select
+         ng.xlf:l\_category\_bodystyle}:</label><select
          name="tx\_cal\_controller[bodystyle]" size="1"
          onchange="getNewStyle(this);"
          id="tx\_cal\_controller\_bodystyle">\|</select></div>
@@ -12807,7 +12807,7 @@ plugin.tx\_cal\_controller.view.create\_category
          Standard wrap for the parentCategory field
          
          dataWrap = <div><label for="parentCategory">{LLL:EXT:cal/controller/lo
-         callang.xml:l\_category\_parent\_category}:</label>\|</div>
+         callang.xlf:l\_category\_parent\_category}:</label>\|</div>
    
    Default
          See Description
@@ -12825,7 +12825,7 @@ plugin.tx\_cal\_controller.view.create\_category
          Standard wrap for the sharedUserAllowed field
          
          dataWrap = <div><label for="sharedUserAllowed">{LLL:EXT:cal/controller
-         /locallang.xml:l\_category\_shared\_user\_allowed}:</label><input
+         /locallang.xlf:l\_category\_shared\_user\_allowed}:</label><input
          type="checkbox" \| name="tx\_cal\_controller[shared\_user\_allowed]"
          /></div>
    
@@ -13099,7 +13099,7 @@ plugin.tx\_cal\_controller.view.confirm\_category
          Standard wrap for the calendar field
          
          dataWrap = <div><label for="calendar">{LLL:EXT:cal/controller/locallan
-         g.xml:l\_category\_calendar}:</label>\|<input type="hidden"
+         g.xlf:l\_category\_calendar}:</label>\|<input type="hidden"
          value="###CALENDAR\_VALUE###"
          name="tx\_cal\_controller[switch\_calendar]" /></div>
    
@@ -13119,7 +13119,7 @@ plugin.tx\_cal\_controller.view.confirm\_category
          Standard wrap for the headerStyle field
          
          dataWrap = <div><label for="headerStyle">{LLL:EXT:cal/controller/local
-         lang.xml:l\_category\_headerstyle}:</label>\|<input type="hidden"
+         lang.xlf:l\_category\_headerstyle}:</label>\|<input type="hidden"
          value="###HEADERSTYLE\_VALUE###"
          name="tx\_cal\_controller[headerstyle]" /></div>
    
@@ -13139,7 +13139,7 @@ plugin.tx\_cal\_controller.view.confirm\_category
          Standard wrap for the bodyStyle field
          
          dataWrap = <div><label for="bodyStyle">{LLL:EXT:cal/controller/localla
-         ng.xml:l\_category\_bodystyle}:</label>\|<input type="hidden"
+         ng.xlf:l\_category\_bodystyle}:</label>\|<input type="hidden"
          value="###BODYSTYLE\_VALUE###" name="tx\_cal\_controller[bodystyle]"
          /></div>
    
@@ -13159,7 +13159,7 @@ plugin.tx\_cal\_controller.view.confirm\_category
          Standard wrap for the parentCategory field
          
          dataWrap = <div><label for="parentCategory">{LLL:EXT:cal/controller/lo
-         callang.xml:l\_category\_parent\_category}:</label>\|<input
+         callang.xlf:l\_category\_parent\_category}:</label>\|<input
          type="hidden" value="###PARENT\_CATEGORY\_VALUE###"
          name="tx\_cal\_controller[parent\_category]" /></div>
    
@@ -13179,7 +13179,7 @@ plugin.tx\_cal\_controller.view.confirm\_category
          Standard wrap for the sharedUserAllowed field
          
          dataWrap = <div><label for="sharedUserAllowed">{LLL:EXT:cal/controller
-         /locallang.xml:l\_category\_shared\_user\_allowed}:</label>\|<input
+         /locallang.xlf:l\_category\_shared\_user\_allowed}:</label>\|<input
          type="hidden" value="###SHARED\_USER\_ALLOWED\_VALUE###"
          name="tx\_cal\_controller[shared\_user\_allowed]" /></div>
    
@@ -13420,7 +13420,7 @@ plugin.tx\_cal\_controller.view.create\_location
          Standard wrap for the description field
          
          dataWrap = <div><label for="description">{LLL:EXT:cal/controller/local
-         lang.xml:l\_location\_description}:</label><input type="text"
+         lang.xlf:l\_location\_description}:</label><input type="text"
          value="\|" name="tx\_cal\_controller[description]" /></div>
    
    Default
@@ -13457,7 +13457,7 @@ plugin.tx\_cal\_controller.view.create\_location
    Description
          Standard wrap for the zip field
          
-         dataWrap = <div><label for="zip">{LLL:EXT:cal/controller/locallang.xml
+         dataWrap = <div><label for="zip">{LLL:EXT:cal/controller/locallang.xlf
          :l\_location\_zip}:</label><input type="text" value="\|"
          name="tx\_cal\_controller[zip]" /></div>
    
@@ -13576,7 +13576,7 @@ plugin.tx\_cal\_controller.view.create\_location
          Standard wrap for the country field
          
          dataWrap = <div><label for="country">{LLL:EXT:cal/controller/locallang
-         .xml:l\_location\_country}:</label><input type="text" value="\|"
+         .xlf:l\_location\_country}:</label><input type="text" value="\|"
          name="tx\_cal\_controller[country]" /></div>
    
    Default
@@ -13595,7 +13595,7 @@ plugin.tx\_cal\_controller.view.create\_location
          Standard wrap for the country\_static\_info field
          
          dataWrap = <div><label for="country">{LLL:EXT:cal/controller/locallang
-         .xml:l\_location\_country}:</label>\|</div>
+         .xlf:l\_location\_country}:</label>\|</div>
    
    Default
          See Description
@@ -13613,7 +13613,7 @@ plugin.tx\_cal\_controller.view.create\_location
          Standard wrap for the countryzone field
          
          dataWrap = <div><label for="countryzone">{LLL:EXT:cal/controller/local
-         lang.xml:l\_location\_countryzone}:</label><input type="text"
+         lang.xlf:l\_location\_countryzone}:</label><input type="text"
          value="\|" name="tx\_cal\_controller[countryzone]" /></div>
    
    Default
@@ -13632,7 +13632,7 @@ plugin.tx\_cal\_controller.view.create\_location
          Standard wrap for the countryzone\_static\_info field
          
          dataWrap = <div><label for="countryzone">{LLL:EXT:cal/controller/local
-         lang.xml:l\_location\_countryzone}:</label>\|</div>
+         lang.xlf:l\_location\_countryzone}:</label>\|</div>
    
    Default
          See Description
@@ -13746,7 +13746,7 @@ plugin.tx\_cal\_controller.view.create\_location
          dataWrap = <div><label for="image">{LLL:EXT:cal/controller/locallang.x
          ml:l\_location\_image}:</label><input type="hidden"
          value="###IMAGE\_VALUE###" name="tx\_cal\_controller[image][]" />###IM
-         AGE\_PREVIEW###<br/>{LLL:EXT:cal/controller/locallang.xml:l\_delete\_i
+         AGE\_PREVIEW###<br/>{LLL:EXT:cal/controller/locallang.xlf:l\_delete\_i
          mage}:<input type="checkbox" name="tx\_cal\_controller[removeImage][]"
          value="###IMAGE\_VALUE###"</div>
    
@@ -13848,7 +13848,7 @@ plugin.tx\_cal\_controller.view.confirm\_location
          Standard wrap for the description field
          
          dataWrap = <div><label for="description">{LLL:EXT:cal/controller/local
-         lang.xml:l\_location\_description}:</label>\|<input type="hidden"
+         lang.xlf:l\_location\_description}:</label>\|<input type="hidden"
          value="###DESCRIPTION\_VALUE###"
          name="tx\_cal\_controller[description]" /></div>
    
@@ -13887,7 +13887,7 @@ plugin.tx\_cal\_controller.view.confirm\_location
    Description
          Standard wrap for the zip field
          
-         dataWrap = <div><label for="zip">{LLL:EXT:cal/controller/locallang.xml
+         dataWrap = <div><label for="zip">{LLL:EXT:cal/controller/locallang.xlf
          :l\_location\_zip}:</label>\|<input type="hidden"
          value="###ZIP\_VALUE###" name="tx\_cal\_controller[zip]" /></div>
    
@@ -13988,7 +13988,7 @@ plugin.tx\_cal\_controller.view.confirm\_location
          Standard wrap for the imageUpload field
          
          dataWrap = <div><label for="country">{LLL:EXT:cal/controller/locallang
-         .xml:l\_location\_country}:</label>\|<input type="hidden"
+         .xlf:l\_location\_country}:</label>\|<input type="hidden"
          value="###COUNTRY\_VALUE###" name="tx\_cal\_controller[country]"
          /></div>
    
@@ -14008,7 +14008,7 @@ plugin.tx\_cal\_controller.view.confirm\_location
          Standard wrap for the country field
          
          dataWrap = <div><label for="country">{LLL:EXT:cal/controller/locallang
-         .xml:l\_location\_country}:</label>\|<input type="hidden"
+         .xlf:l\_location\_country}:</label>\|<input type="hidden"
          value="###COUNTRY\_VALUE###" name="tx\_cal\_controller[country]"
          /></div>
    
@@ -14028,7 +14028,7 @@ plugin.tx\_cal\_controller.view.confirm\_location
          Standard wrap for the country\_static\_info field
          
          dataWrap = <div><label for="country">{LLL:EXT:cal/controller/locallang
-         .xml:l\_location\_country}:</label>\|</div>
+         .xlf:l\_location\_country}:</label>\|</div>
    
    Default
          See Description
@@ -14046,7 +14046,7 @@ plugin.tx\_cal\_controller.view.confirm\_location
          Standard wrap for the countryzone field
          
          dataWrap = <div><label for="countryzone">{LLL:EXT:cal/controller/local
-         lang.xml:l\_location\_countryzone}:</label>\|<input type="hidden"
+         lang.xlf:l\_location\_countryzone}:</label>\|<input type="hidden"
          value="###COUNTRYZONE\_VALUE###"
          name="tx\_cal\_controller[countryzone]" /></div>
    
@@ -14066,7 +14066,7 @@ plugin.tx\_cal\_controller.view.confirm\_location
          Standard wrap for the countryzone\_static\_info field
          
          dataWrap = <div><label for="countryzone">{LLL:EXT:cal/controller/local
-         lang.xml:l\_location\_countryzone}:</label>\|</div>
+         lang.xlf:l\_location\_countryzone}:</label>\|</div>
    
    Default
          See Description
