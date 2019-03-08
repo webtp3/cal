@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2019-03-07T11:54:04Z" product-name="cal">
+		<header/>
+		<body>
+			<trans-unit id=".description" xml:space="preserve" approved="yes">
+				<source>An exception event group is a collection of
+                multiple exception events that can be applied to an event at one
+                time.
+            </source>
+				<target>Asunahmegruppe für Ereignisse des TYPO3-Kalender</target>
+			</trans-unit>
+			<trans-unit id=".details" xml:space="preserve" approved="yes">
+				<source>Exception event groups provide the ability to
+                group common exceptions, such as holidays, into one record and apply
+                that single record to an event. As an example, this allows you to
+                close the office for all holidays by adding one exception group to
+                the recurring event for office hours.
+            </source>
+				<target>Erstellt Ausnahme-Gruppen, in denen Ausnahmen für
+                Ereignisse des TYPO3-Kalender organisiert werden.
+            </target>
+			</trans-unit>
+			<trans-unit id="title.description" xml:space="preserve" approved="yes">
+				<source>Title of the exception event group.</source>
+				<target>Titel dieser Ausnahmegruppe</target>
+			</trans-unit>
+			<trans-unit id="hidden.description" xml:space="preserve" approved="yes">
+				<source>Use this to temporarily exclude this exception
+                event from display.
+            </source>
+				<target>Versteckt diese Ausnahmegruppe</target>
+			</trans-unit>
+			<trans-unit id="starttime.description" xml:space="preserve" approved="yes">
+				<source>The &quot;Start&quot; time determines the date
+                from which the record will be available online.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="endtime.description" xml:space="preserve" approved="yes">
+				<source>The &quot;End&quot; time determines the date from
+                which the db-record will NOT be available online anymore.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="exception_event_cnt.description" xml:space="preserve" approved="yes">
+				<source>Assigns exception event records to this group.</source>
+				<target>Gibt an, welche Ausnahme-Ereignisse dieser
+                Ausnahmegruppe zugeordnet sind.
+            </target>
+			</trans-unit>
+			<trans-unit id="ext_url.description" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Die URL des externen Kalenders.</target>
+			</trans-unit>
+			<trans-unit id="relation_cnt.description" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Diese Frontend-Benutzer sind dieser Kategorie
+                zugeordnet.
+            </target>
+			</trans-unit>
+			<trans-unit id="type.description" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Der Typ der Kategorie</target>
+			</trans-unit>
+			<trans-unit id="type.details" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Es gibt drei Typen:
+                &lt;b&gt;- Standard Kategorie&lt;/b&gt;: Eine normale Kategorie, welche in der
+                lokalen Datenbank gespeichert wird.
+                &lt;b&gt;- Einbinden einer ICS-Datei&lt;/b&gt;: Bindet eine ICS-Datei ein, in
+                der die Ereignisse gespeichert sind.
+                &lt;b&gt;- Externer Kalender&lt;/b&gt;: Bindet einen externen Kalender per URL
+                ein, aus welchem die Ereignisse übernommen werden sollen.
+            </target>
+			</trans-unit>
+			<trans-unit id="ics_file.description" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Die ICS-Datei, in der die Ereignisse gespeichert
+                sind.
+            </target>
+			</trans-unit>
+			<trans-unit id="ics_file.details" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Es muss eine ICS-Datei sein: icalendar-Standard.</target>
+			</trans-unit>
+			<trans-unit id="headerstyle.description" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Definiert den Style, der für alle
+                Ereignis-Überschriften dieser Kategorie verwendet wird.
+            </target>
+			</trans-unit>
+			<trans-unit id="bodystyle.description" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Definiert den Style, der für alle
+                Ereignis-body-texte dieser Kategorie verwendet wird.
+            </target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

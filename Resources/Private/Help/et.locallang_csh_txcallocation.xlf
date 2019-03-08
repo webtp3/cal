@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" target-language="et" datatype="plaintext" original="messages" date="2019-03-07T11:51:51Z" product-name="cal">
+		<header/>
+		<body>
+			<trans-unit id=".description" xml:space="preserve" approved="yes">
+				<source>Locations for Calendar Base event records.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id=".details" xml:space="preserve" approved="yes">
+				<source>The Location record facilitates the easy addition
+                of repetitious locations, addresses, and even maps for your events.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="hidden.description" xml:space="preserve" approved="yes">
+				<source>Use this to temporarily exclude this location from
+                display.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="name.description" xml:space="preserve" approved="yes">
+				<source>The name of this location such as Office or
+                Church.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="description.description" xml:space="preserve" approved="yes">
+				<source>A description of the location.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="street.description" xml:space="preserve" approved="yes">
+				<source>The street address.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="zip.description" xml:space="preserve" approved="yes">
+				<source>The ZIP code or postal code of the location.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="city.description" xml:space="preserve" approved="yes">
+				<source>The location's city.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="country.description" xml:space="preserve" approved="yes">
+				<source>The country of the location.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="country_zone.description" xml:space="preserve" approved="yes">
+				<source>The state of the location. The drop-down menu will
+                not be available until you have included the country information and
+                saved the form.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="phone.description" xml:space="preserve" approved="yes">
+				<source>The location's contact phone number.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="email.description" xml:space="preserve" approved="yes">
+				<source>The location's contact email address.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="image.description" xml:space="preserve" approved="yes">
+				<source>A picture of the location or its logo.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="link.description" xml:space="preserve" approved="yes">
+				<source>An alternative website for the location.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="imagealttext.description" xml:space="preserve" approved="yes">
+				<source>Alternate text shown if images are not found or
+                not supported.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="imagealttext.details" xml:space="preserve" approved="yes">
+				<source>If you have multiple images, alt text entries must
+                be listed on separate lines.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="imagetitletext.description" xml:space="preserve" approved="yes">
+				<source>Tooltip or hover text.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="imagetitletext.details" xml:space="preserve" approved="yes">
+				<source>If you have multiple images, title text entries
+                must be listed on separate lines.
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="imagecaption.description" xml:space="preserve" approved="yes">
+				<source>Adds a caption beneath each image.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="imagecaption.details" xml:space="preserve" approved="yes">
+				<source>If you have multiple images, captions must be
+                listed on separate lines.
+            </source>
+				<target></target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

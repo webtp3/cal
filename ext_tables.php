@@ -45,7 +45,7 @@ if (TYPO3_MODE == "BE") {
 					'access' => 'admin',
 					'name' => 'tools_txcalM1',
 					'icon' => 'EXT:cal/Classes/Backend/Modul/icon_tx_cal_indexer2.svg',
-					'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_indexer_mod.xml'
+					'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_indexer_mod.xlf'
 			]
 		);
 	}

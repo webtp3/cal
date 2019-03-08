@@ -5,7 +5,7 @@ $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'
 
 $tx_cal_calendar = array(
 	'ctrl' => array(
-			'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar',
+			'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar',
 			'label' => 'title',
 			'tstamp' => 'tstamp',
 			'crdate' => 'crdate',
@@ -49,7 +49,7 @@ $tx_cal_calendar = array(
 			),
 			'title' => array(
 					'exclude' => 0,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.title',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.title',
 					'config' => array(
 							'type' => 'input',
 							'size' => '30',
@@ -59,7 +59,7 @@ $tx_cal_calendar = array(
 			),
 			'owner' => array(
 					'exclude' => 1,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.owner',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.owner',
 					'config' => array(
 							'type' => 'group',
 							'internal_type' => 'db',
@@ -72,7 +72,7 @@ $tx_cal_calendar = array(
 					)
 			),
 			'activate_fnb' => array(
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.activate_fnb',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.activate_fnb',
 			        'onChange' => 'reload',
 					'config' => array(
 							'type' => 'check'
@@ -80,7 +80,7 @@ $tx_cal_calendar = array(
 			),
 			'fnb_user_cnt' => array(
 					'exclude' => 1,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.fb_users_groups',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.fb_users_groups',
 					'displayCond' => 'FIELD:activate_fnb:=:1',
 					'config' => array(
 							'type' => 'group',
@@ -93,29 +93,29 @@ $tx_cal_calendar = array(
 					)
 			),
 			'nearby' => array(
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.nearby',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.nearby',
 					'config' => array(
 							'type' => 'check'
 					)
 			),
 			'type' => array(
 					'exclude' => 1,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.type',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.type',
 					'config' => array(
                             'renderType' => 'selectSingle',
 							'type' => 'select',
 							'size' => 1,
 							'items' => array(
 									array(
-											'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.type.I.0',
+											'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.type.I.0',
 											0
 									),
 									array(
-											'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.type.I.1',
+											'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.type.I.1',
 											1
 									),
 									array(
-											'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.type.I.2',
+											'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.type.I.2',
 											2 
 									)
 							),
@@ -124,7 +124,7 @@ $tx_cal_calendar = array(
 			),
 			
 			'ext_url' => array(
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.ext_url',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.ext_url',
 					'config' => array(
 							'type' => 'user',
 							'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->extUrl'
@@ -132,7 +132,7 @@ $tx_cal_calendar = array(
 			),
 			
 			'ext_url_notes' => array(
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.ext_url_notes',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.ext_url_notes',
 					'config' => array(
 							'type' => 'text'
 					)
@@ -140,7 +140,7 @@ $tx_cal_calendar = array(
 			
 			'ics_file' => array(
 					'exclude' => 1,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.ics_file',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.ics_file',
 					'config' => array(
 					        'type' => 'group',
 							'internal_type' => 'file',
@@ -161,7 +161,7 @@ $tx_cal_calendar = array(
 			
 			'refresh' => array(
 					'exclude' => 1,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.refresh',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.refresh',
 					'config' => array(
 							'type' => 'input',
 							'size' => '6',
@@ -172,7 +172,7 @@ $tx_cal_calendar = array(
 			),
 			'schedulerId' => array(
 					'exclude' => 0,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.schedulerId',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.schedulerId',
 					'config' => array(
 							'type' => 'input',
 							'size' => '5',
@@ -187,7 +187,7 @@ $tx_cal_calendar = array(
 			),
 			'headerstyle' => array(
 					'exclude' => 1,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.headerstyle',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.headerstyle',
 					'config' => array(
 							'type' => 'user',
 							'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getHeaderStyles'
@@ -195,7 +195,7 @@ $tx_cal_calendar = array(
 			),
 			'bodystyle' => array(
 					'exclude' => 1,
-					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.bodystyle',
+					'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.bodystyle',
 					'config' => array(
 							'type' => 'user',
 							'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getBodyStyles'

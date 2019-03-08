@@ -1,0 +1,1146 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" target-language="ar" datatype="plaintext" original="messages" date="2019-03-07T11:48:53Z" product-name="cal">
+		<header/>
+		<body>
+			<trans-unit id="tx_cal_event" xml:space="preserve" approved="yes">
+				<source>Calendar Event</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event_label" xml:space="preserve" approved="yes">
+				<source>Start: Title</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.general_sheet" xml:space="preserve" approved="yes">
+				<source>General</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.recurrence_sheet" xml:space="preserve" approved="yes">
+				<source>Recurrence</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.location_sheet" xml:space="preserve" approved="yes">
+				<source>Location</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.organizer_sheet" xml:space="preserve" approved="yes">
+				<source>Organizer</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.files_sheet" xml:space="preserve" approved="yes">
+				<source>Files</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.other_sheet" xml:space="preserve" approved="yes">
+				<source>Other</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.attendance_sheet" xml:space="preserve" approved="yes">
+				<source>Attendance</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.todo_sheet" xml:space="preserve" approved="yes">
+				<source>Todo</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.category" xml:space="preserve" approved="yes">
+				<source>Category</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.calendar" xml:space="preserve" approved="yes">
+				<source>Calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.title" xml:space="preserve" approved="yes">
+				<source>Title</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.start" xml:space="preserve" approved="yes">
+				<source>Start</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.orig_start" xml:space="preserve" approved="yes">
+				<source>Start (original recurrence instance would occur)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.starttime" xml:space="preserve" approved="yes">
+				<source>Starttime</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.endtime" xml:space="preserve" approved="yes">
+				<source>Endtime</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.end" xml:space="preserve" approved="yes">
+				<source>End</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.due" xml:space="preserve" approved="yes">
+				<source>Due</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.start_date" xml:space="preserve" approved="yes">
+				<source>Event Start Day</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.orig_start_date" xml:space="preserve" approved="yes">
+				<source>Original recurrence instance start day</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.start_time" xml:space="preserve" approved="yes">
+				<source>Event Start Time</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.orig_start_time" xml:space="preserve" approved="yes">
+				<source>Original recurrence instance start time (leave
+                empty for allday)
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.end_date" xml:space="preserve" approved="yes">
+				<source>Event End Day</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.end_time" xml:space="preserve" approved="yes">
+				<source>Event End Time</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.allday" xml:space="preserve" approved="yes">
+				<source>All Day Event</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.timezone" xml:space="preserve" approved="yes">
+				<source>Timezone</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.organizer" xml:space="preserve" approved="yes">
+				<source>Organizer, or...</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.organizer_id" xml:space="preserve" approved="yes">
+				<source>Cal Organizer, or...</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.organizer_pid" xml:space="preserve" approved="yes">
+				<source>Page to link the organizer to</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.organizer_link" xml:space="preserve" approved="yes">
+				<source>External link to the organizer</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.location" xml:space="preserve" approved="yes">
+				<source>Location, or...</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.location_id" xml:space="preserve" approved="yes">
+				<source>Cal Location, or...</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.location_pid" xml:space="preserve" approved="yes">
+				<source>Page to link the location to</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.location_link" xml:space="preserve" approved="yes">
+				<source>External link to the location</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.freq" xml:space="preserve" approved="yes">
+				<source>Regular Frequency Rule</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.add_recurrence" xml:space="preserve" approved="yes">
+				<source>Add Recurrence</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.remove_recurrence" xml:space="preserve" approved="yes">
+				<source>Remove Recurrence</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.recurs_day" xml:space="preserve" approved="yes">
+				<source>Day</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.recurs_every_month" xml:space="preserve" approved="yes">
+				<source>of every month.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.recurs_selected_months" xml:space="preserve" approved="yes">
+				<source>of selected months.</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday" xml:space="preserve" approved="yes">
+				<source>By Day (a combination of:
+                &quot;mo&quot;,&quot;tu&quot;,&quot;we&quot;,&quot;th&quot;,&quot;fr&quot;,&quot;sa&quot;
+                und &quot;su&quot;, or &quot;all&quot;)
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_short" xml:space="preserve" approved="yes">
+				<source>By Day of the Week</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_all" xml:space="preserve" approved="yes">
+				<source>All Days</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_count_first" xml:space="preserve" approved="yes">
+				<source>First</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_count_second" xml:space="preserve" approved="yes">
+				<source>Second</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_count_third" xml:space="preserve" approved="yes">
+				<source>Third</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_count_fourth" xml:space="preserve" approved="yes">
+				<source>Fourth</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_count_fifth" xml:space="preserve" approved="yes">
+				<source>Fifth</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_count_thirdtolast" xml:space="preserve" approved="yes">
+				<source>Third to Last</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_count_secondtolast" xml:space="preserve" approved="yes">
+				<source>Second to Last</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_count_last" xml:space="preserve" approved="yes">
+				<source>Last</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_sunday" xml:space="preserve" approved="yes">
+				<source>Sunday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_monday" xml:space="preserve" approved="yes">
+				<source>Monday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_tuesday" xml:space="preserve" approved="yes">
+				<source>Tuesday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_wednesday" xml:space="preserve" approved="yes">
+				<source>Wednesday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_thursday" xml:space="preserve" approved="yes">
+				<source>Thursday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_friday" xml:space="preserve" approved="yes">
+				<source>Friday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.byday_saturday" xml:space="preserve" approved="yes">
+				<source>Saturday</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonthday" xml:space="preserve" approved="yes">
+				<source>By Monthday (e.g.: 1,2,30 or all)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonthday_short" xml:space="preserve" approved="yes">
+				<source>By Day of the Month</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth" xml:space="preserve" approved="yes">
+				<source>By Month (e.g.: 1,2,3,4,12 or all)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_short" xml:space="preserve" approved="yes">
+				<source>By Month</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_all" xml:space="preserve" approved="yes">
+				<source>All Months</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_january" xml:space="preserve" approved="yes">
+				<source>January</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_february" xml:space="preserve" approved="yes">
+				<source>February</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_march" xml:space="preserve" approved="yes">
+				<source>March</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_april" xml:space="preserve" approved="yes">
+				<source>April</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_may" xml:space="preserve" approved="yes">
+				<source>May</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_june" xml:space="preserve" approved="yes">
+				<source>June</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_july" xml:space="preserve" approved="yes">
+				<source>July</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_august" xml:space="preserve" approved="yes">
+				<source>August</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_september" xml:space="preserve" approved="yes">
+				<source>September</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_october" xml:space="preserve" approved="yes">
+				<source>October</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_november" xml:space="preserve" approved="yes">
+				<source>November</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.bymonth_december" xml:space="preserve" approved="yes">
+				<source>December</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.until" xml:space="preserve" approved="yes">
+				<source>Until Date</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.count" xml:space="preserve" approved="yes">
+				<source>Count</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.interval" xml:space="preserve" approved="yes">
+				<source>Interval</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.rdate" xml:space="preserve" approved="yes">
+				<source>Dates</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.rdate_type" xml:space="preserve" approved="yes">
+				<source>Recurrence by</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.deviation" xml:space="preserve" approved="yes">
+				<source>Deviation</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.teaser" xml:space="preserve" approved="yes">
+				<source>Teaser</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.description" xml:space="preserve" approved="yes">
+				<source>Description</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.exception" xml:space="preserve" approved="yes">
+				<source>Exceptions</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.fe_cruser_id" xml:space="preserve" approved="yes">
+				<source>Creator</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.shared_user" xml:space="preserve" approved="yes">
+				<source>Shared Users</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.fe_crgroup_id" xml:space="preserve" approved="yes">
+				<source>Creator Group</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.none" xml:space="preserve" approved="yes">
+				<source>None</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.type" xml:space="preserve" approved="yes">
+				<source>Event type</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.type.I.0" xml:space="preserve" approved="yes">
+				<source>Event with description</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.type.I.1" xml:space="preserve" approved="yes">
+				<source>Shortcut to page</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.type.I.2" xml:space="preserve" approved="yes">
+				<source>Link to external url</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.type.I.3" xml:space="preserve" approved="yes">
+				<source>Meeting</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.type.I.4" xml:space="preserve" approved="yes">
+				<source>Todo</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.external" xml:space="preserve" approved="yes">
+				<source>External URL</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.shortcut_page" xml:space="preserve" approved="yes">
+				<source>Shortcut to page</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.imagealttext" xml:space="preserve" approved="yes">
+				<source>alt-text</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.imagetitletext" xml:space="preserve" approved="yes">
+				<source>title-text</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.attendee" xml:space="preserve" approved="yes">
+				<source>Attendance</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.send_invitation" xml:space="preserve" approved="yes">
+				<source>Send out invitations</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.status.COMPLETED" xml:space="preserve" approved="yes">
+				<source>Completed</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.status.IN-PROGRESS" xml:space="preserve" approved="yes">
+				<source>In progress</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.status.CANCELLED" xml:space="preserve" approved="yes">
+				<source>Cancelled</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.priority" xml:space="preserve" approved="yes">
+				<source>Priority</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_event.completed" xml:space="preserve" approved="yes">
+				<source>Completed (%)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event" xml:space="preserve" approved="yes">
+				<source>Calendar Exception Event</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.title" xml:space="preserve" approved="yes">
+				<source>Title</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.starttime" xml:space="preserve" approved="yes">
+				<source>Starttime</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.endtime" xml:space="preserve" approved="yes">
+				<source>Endtime</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.start" xml:space="preserve" approved="yes">
+				<source>Start</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.start_date" xml:space="preserve" approved="yes">
+				<source>Exception Day</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.start_time" xml:space="preserve" approved="yes">
+				<source>Exception Start Time</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.end" xml:space="preserve" approved="yes">
+				<source>End</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.end_date" xml:space="preserve" approved="yes">
+				<source>Exception End Day</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.end_time" xml:space="preserve" approved="yes">
+				<source>Exception End Time</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.allday" xml:space="preserve" approved="yes">
+				<source>All Day Exception</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.freq" xml:space="preserve" approved="yes">
+				<source>Exception Frequency</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.byday" xml:space="preserve" approved="yes">
+				<source>By Day (a combination of:
+                &quot;mo&quot;,&quot;tu&quot;,&quot;we&quot;,&quot;th&quot;,&quot;fr&quot;,&quot;sa&quot;
+                und &quot;su&quot;, or &quot;all&quot;)
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.byday_short" xml:space="preserve" approved="yes">
+				<source>By Day of the Week</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.bymonthday" xml:space="preserve" approved="yes">
+				<source>By Monthday (e.g.: 1,2,30 or all)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.bymonthday_short" xml:space="preserve" approved="yes">
+				<source>By Day of the Month</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.bymonth" xml:space="preserve" approved="yes">
+				<source>By Month (e.g.: 1,2,3,4,12 or all)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.bymonth_short" xml:space="preserve" approved="yes">
+				<source>By Month</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.rdate" xml:space="preserve" approved="yes">
+				<source>Dates</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.rdate_type" xml:space="preserve" approved="yes">
+				<source>Recurrence by</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.until" xml:space="preserve" approved="yes">
+				<source>Until Date</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.count" xml:space="preserve" approved="yes">
+				<source>Count</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.interval" xml:space="preserve" approved="yes">
+				<source>Interval</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event.description" xml:space="preserve" approved="yes">
+				<source>Description</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event_group" xml:space="preserve" approved="yes">
+				<source>Calendar Exception Event Group</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event_group.title" xml:space="preserve" approved="yes">
+				<source>Title</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_exception_event_group.exception_event_cnt" xml:space="preserve" approved="yes">
+				<source>Exception Events</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_user_event" xml:space="preserve" approved="yes">
+				<source>Frontend User - Event Relation</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_user_event.fe_user" xml:space="preserve" approved="yes">
+				<source>User</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_user_event.event" xml:space="preserve" approved="yes">
+				<source>Event</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_group_event" xml:space="preserve" approved="yes">
+				<source>Frontend Group - Event Relation</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_group_event.fe_group" xml:space="preserve" approved="yes">
+				<source>Group</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_group_event.event" xml:space="preserve" approved="yes">
+				<source>Event</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_user_event.monitor" xml:space="preserve" approved="yes">
+				<source>Monitoring Users</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_user_event.offset" xml:space="preserve" approved="yes">
+				<source>Notification offset</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_fe_user_event.schedulerId" xml:space="preserve" approved="yes">
+				<source>Scheduler ID</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar" xml:space="preserve" approved="yes">
+				<source>Calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.title" xml:space="preserve" approved="yes">
+				<source>Calendar Title</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.type" xml:space="preserve" approved="yes">
+				<source>Calendar Type</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.type.I.0" xml:space="preserve" approved="yes">
+				<source>Standard Calendar (database)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.type.I.1" xml:space="preserve" approved="yes">
+				<source>External iCalendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.type.I.2" xml:space="preserve" approved="yes">
+				<source>Include iCalendar File</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.ext_url" xml:space="preserve" approved="yes">
+				<source>External iCalendar URL</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.ext_url_url" xml:space="preserve" approved="yes">
+				<source>URL</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.ext_url_note" xml:space="preserve" approved="yes">
+				<source>Note</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.ics_file" xml:space="preserve" approved="yes">
+				<source>ICS File</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.refresh" xml:space="preserve" approved="yes">
+				<source>Refresh Interval (Minutes) (scheduler needed)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.owner" xml:space="preserve" approved="yes">
+				<source>Owner</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.activate_fnb" xml:space="preserve" approved="yes">
+				<source>Enable free and busy view</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.fb_users_groups" xml:space="preserve" approved="yes">
+				<source>Limit the free and busy view to these users and/or
+                Groups (else public)
+            </source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.createNew" xml:space="preserve" approved="yes">
+				<source>create a new calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.edit" xml:space="preserve" approved="yes">
+				<source>edit selected calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar_private" xml:space="preserve" approved="yes">
+				<source>The users private calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar.schedulerId" xml:space="preserve" approved="yes">
+				<source>Scheduler ID (scheduler needed)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category" xml:space="preserve" approved="yes">
+				<source>Calendar Category</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.title" xml:space="preserve" approved="yes">
+				<source>Category title</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.headerstyle" xml:space="preserve" approved="yes">
+				<source>Header style</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.bodystyle" xml:space="preserve" approved="yes">
+				<source>Body style</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.headercolor" xml:space="preserve" approved="yes">
+				<source>Header Color (e.g. green or #15E337)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.bodycolor" xml:space="preserve" approved="yes">
+				<source>Body Color (e.g. green or #15E337)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.calendar" xml:space="preserve" approved="yes">
+				<source>Calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.none" xml:space="preserve" approved="yes">
+				<source>None</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.parent_category" xml:space="preserve" approved="yes">
+				<source>Parent category</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.shared_user_allowed" xml:space="preserve" approved="yes">
+				<source>Allow shared user to select this category</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.single_pid" xml:space="preserve" approved="yes">
+				<source>Event view page for events from this category</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.createNew" xml:space="preserve" approved="yes">
+				<source>create a new category</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.edit" xml:space="preserve" approved="yes">
+				<source>edit selected category</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.notification_emails" xml:space="preserve" approved="yes">
+				<source>Notification emails (comma separated)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.icon" xml:space="preserve" approved="yes">
+				<source>Icon</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category.global" xml:space="preserve" approved="yes">
+				<source>Global categories</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer" xml:space="preserve" approved="yes">
+				<source>Calendar Event Organizer</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.name" xml:space="preserve" approved="yes">
+				<source>Name</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.description" xml:space="preserve" approved="yes">
+				<source>Description</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.street" xml:space="preserve" approved="yes">
+				<source>Street</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.zip" xml:space="preserve" approved="yes">
+				<source>Zip</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.city" xml:space="preserve" approved="yes">
+				<source>City</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.country" xml:space="preserve" approved="yes">
+				<source>Country (static_info_tables needed)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.countryzone" xml:space="preserve" approved="yes">
+				<source>State/Province (static_info_tables needed)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.phone" xml:space="preserve" approved="yes">
+				<source>Phone</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.fax" xml:space="preserve" approved="yes">
+				<source>Facsimile</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.email" xml:space="preserve" approved="yes">
+				<source>E-mail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.image" xml:space="preserve" approved="yes">
+				<source>Logo/Image</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.imagealttext" xml:space="preserve" approved="yes">
+				<source>alt-text</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.imagetitletext" xml:space="preserve" approved="yes">
+				<source>title-text</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.link" xml:space="preserve" approved="yes">
+				<source>Homepage</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.isorganizer" xml:space="preserve" approved="yes">
+				<source>Is Cal Organizer</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.createNew" xml:space="preserve" approved="yes">
+				<source>create a new organizer</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_organizer.edit" xml:space="preserve" approved="yes">
+				<source>edit selected organizer</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location" xml:space="preserve" approved="yes">
+				<source>Calendar Event Location</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.location" xml:space="preserve" approved="yes">
+				<source>Location</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.description" xml:space="preserve" approved="yes">
+				<source>Description</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.name" xml:space="preserve" approved="yes">
+				<source>Name</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.street" xml:space="preserve" approved="yes">
+				<source>Street</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.zip" xml:space="preserve" approved="yes">
+				<source>Zip</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.city" xml:space="preserve" approved="yes">
+				<source>City</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.country" xml:space="preserve" approved="yes">
+				<source>Country (static_info_tables needed)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.countryzone" xml:space="preserve" approved="yes">
+				<source>State/Province (static_info_tables needed)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.phone" xml:space="preserve" approved="yes">
+				<source>Phone</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.fax" xml:space="preserve" approved="yes">
+				<source>Facsimile</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.email" xml:space="preserve" approved="yes">
+				<source>E-mail</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.image" xml:space="preserve" approved="yes">
+				<source>Logo/Image</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.imagealttext" xml:space="preserve" approved="yes">
+				<source>alt-text</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.imagetitletext" xml:space="preserve" approved="yes">
+				<source>title-text</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.link" xml:space="preserve" approved="yes">
+				<source>Homepage</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.islocation" xml:space="preserve" approved="yes">
+				<source>Is Cal Location</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.createNew" xml:space="preserve" approved="yes">
+				<source>create a new location</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.edit" xml:space="preserve" approved="yes">
+				<source>edit selected location</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.latitude" xml:space="preserve" approved="yes">
+				<source>Latitude</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_location.longitude" xml:space="preserve" approved="yes">
+				<source>Longitude</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_unknown_users" xml:space="preserve" approved="yes">
+				<source>Unregistered users monitoring events</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_unknown_users.email" xml:space="preserve" approved="yes">
+				<source>Email</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general" xml:space="preserve" approved="yes">
+				<source>[ General Settings ]</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode" xml:space="preserve" approved="yes">
+				<source>Plugin Mode:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.1" xml:space="preserve" approved="yes">
+				<source>search data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.11" xml:space="preserve" approved="yes">
+				<source>select data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.2" xml:space="preserve" approved="yes">
+				<source>list data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.3" xml:space="preserve" approved="yes">
+				<source>view/edit data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.4" xml:space="preserve" approved="yes">
+				<source>import data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.30" xml:space="preserve" approved="yes">
+				<source>search+list data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.31" xml:space="preserve" approved="yes">
+				<source>list+view/edit data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.32" xml:space="preserve" approved="yes">
+				<source>search+list+view/edit data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.33" xml:space="preserve" approved="yes">
+				<source>select+list data</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-mode2.99" xml:space="preserve" approved="yes">
+				<source>show info for plugin</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-debugmode" xml:space="preserve" approved="yes">
+				<source>Plugins Debug-Mode:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-debugmode.0" xml:space="preserve" approved="yes">
+				<source>Debug Off</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-debugmode.1" xml:space="preserve" approved="yes">
+				<source>Debug On</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-debugmode.2" xml:space="preserve" approved="yes">
+				<source>Debug Verbose</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-template" xml:space="preserve" approved="yes">
+				<source>Template:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-listpage" xml:space="preserve" approved="yes">
+				<source>PageID of Result ListPage:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-editpage" xml:space="preserve" approved="yes">
+				<source>PageID of EditPage:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-editpopup" xml:space="preserve" approved="yes">
+				<source>Edit in Popup-Window:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_general-backpage" xml:space="preserve" approved="yes">
+				<source>PageID for BackButton:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_more" xml:space="preserve" approved="yes">
+				<source>[ More Settings ]</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_statistics" xml:space="preserve" approved="yes">
+				<source>[ Template Settings ]</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_statistics-template" xml:space="preserve" approved="yes">
+				<source>Template:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_localconf" xml:space="preserve" approved="yes">
+				<source>[ Local Config ]</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_controller_flexform.sheet_localconf-data" xml:space="preserve" approved="yes">
+				<source>LocalConf (TS-Style)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tt_content.list_type" xml:space="preserve" approved="yes">
+				<source>TYPO3 Calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="frequency.none" xml:space="preserve" approved="yes">
+				<source>None</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="frequency.day" xml:space="preserve" approved="yes">
+				<source>Daily</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="frequency.week" xml:space="preserve" approved="yes">
+				<source>Weekly</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="frequency.month" xml:space="preserve" approved="yes">
+				<source>Monthly</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="frequency.year" xml:space="preserve" approved="yes">
+				<source>Yearly</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="rdate_type.none" xml:space="preserve" approved="yes">
+				<source>None</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="rdate_type.date_time" xml:space="preserve" approved="yes">
+				<source>Date and Time</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="rdate_type.date" xml:space="preserve" approved="yes">
+				<source>Date</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="rdate_type.period" xml:space="preserve" approved="yes">
+				<source>Period</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_enable_accesscontroll" xml:space="preserve" approved="yes">
+				<source>Enable Cal Access Control</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar_accesscontroll" xml:space="preserve" approved="yes">
+				<source>Select allowed Calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="sys_category_accesscontroll" xml:space="preserve" approved="yes">
+				<source>Select allowed Categories (attention)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee" xml:space="preserve" approved="yes">
+				<source>Event attendee</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.attendance.NON" xml:space="preserve" approved="yes">
+				<source>-</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.attendance.OPT-PARTICIPANT" xml:space="preserve" approved="yes">
+				<source>Optional</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.attendance.REQ-PARTICIPANT" xml:space="preserve" approved="yes">
+				<source>Required</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.attendance.CHAIR" xml:space="preserve" approved="yes">
+				<source>Chairman</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.status.0" xml:space="preserve" approved="yes">
+				<source>No action</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.status.NEEDS-ACTION" xml:space="preserve" approved="yes">
+				<source>Needs action</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.status.ACCEPTED" xml:space="preserve" approved="yes">
+				<source>Accepted</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.status.DECLINE" xml:space="preserve" approved="yes">
+				<source>Declined</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.status.TENTATIVE" xml:space="preserve" approved="yes">
+				<source>Tentative</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.status.DELEGATED" xml:space="preserve" approved="yes">
+				<source>Delegated</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.fe_user_id" xml:space="preserve" approved="yes">
+				<source>FE User or</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.fe_group_id" xml:space="preserve" approved="yes">
+				<source>FE Group or</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.email" xml:space="preserve" approved="yes">
+				<source>Email</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.attendance" xml:space="preserve" approved="yes">
+				<source>Attendance</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.status" xml:space="preserve" approved="yes">
+				<source>Status</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.createNew" xml:space="preserve" approved="yes">
+				<source>create a new attendee</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_attendee.edit" xml:space="preserve" approved="yes">
+				<source>edit selected attendee</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_day" xml:space="preserve" approved="yes">
+				<source>Day</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_week" xml:space="preserve" approved="yes">
+				<source>Week</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_month" xml:space="preserve" approved="yes">
+				<source>Month</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_year" xml:space="preserve" approved="yes">
+				<source>Year</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_hour" xml:space="preserve" approved="yes">
+				<source>Hour</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_minute" xml:space="preserve" approved="yes">
+				<source>Minute</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="l_duration" xml:space="preserve" approved="yes">
+				<source>Duration</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="tx_cal_calendar_subscription" xml:space="preserve" approved="yes">
+				<source>Deselected calendar subscription</source>
+				<target></target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

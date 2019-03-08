@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" target-language="nl" datatype="plaintext" original="messages" date="2019-03-07T11:47:05Z" product-name="cal">
+		<header/>
+		<body>
+			<trans-unit id="cal.pi_flexform.sheetGeneral" xml:space="preserve" approved="yes">
+				<source>General Settings</source>
+				<target>Algemene instellingen</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.allowedViews" xml:space="preserve" approved="yes">
+				<source>Allowed views</source>
+				<target>Toegestane weergaven</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewMonth" xml:space="preserve" approved="yes">
+				<source>Month</source>
+				<target>Maand</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewYear" xml:space="preserve" approved="yes">
+				<source>Year</source>
+				<target>Jaar</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewList" xml:space="preserve" approved="yes">
+				<source>List</source>
+				<target>Lijst</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewWeek" xml:space="preserve" approved="yes">
+				<source>Week</source>
+				<target>Week</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewDay" xml:space="preserve" approved="yes">
+				<source>Day</source>
+				<target>Dag</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewOrganizer" xml:space="preserve" approved="yes">
+				<source>Organizer</source>
+				<target>Organisator</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewLocation" xml:space="preserve" approved="yes">
+				<source>Location</source>
+				<target>Locatie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewSingle" xml:space="preserve" approved="yes">
+				<source>Single Event</source>
+				<target>Enkele gebeurtenis</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewIcs" xml:space="preserve" approved="yes">
+				<source>ICS</source>
+				<target>ICS</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewRss" xml:space="preserve" approved="yes">
+				<source>Rss</source>
+				<target>RSS</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewSearchEvent" xml:space="preserve" approved="yes">
+				<source>Search Event</source>
+				<target>Zoek gebeurtenis</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewSearchLocation" xml:space="preserve" approved="yes">
+				<source>Search Location</source>
+				<target>Zoek locatie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewSearchOrganizer" xml:space="preserve" approved="yes">
+				<source>Search Organizer</source>
+				<target>Zoek organisator</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewSearchAll" xml:space="preserve" approved="yes">
+				<source>Search All</source>
+				<target>Zoek alles</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewCreateEvent" xml:space="preserve" approved="yes">
+				<source>Create Event</source>
+				<target>Maak gebeurtenis</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewEditEvent" xml:space="preserve" approved="yes">
+				<source>Edit Event</source>
+				<target>Bewerk gebeurtenis</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewDeleteEvent" xml:space="preserve" approved="yes">
+				<source>Delete Event</source>
+				<target>Verwijder gebeurtenis</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewCreateCalendar" xml:space="preserve" approved="yes">
+				<source>Create Calendar</source>
+				<target>Maak kalender</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewEditCalendar" xml:space="preserve" approved="yes">
+				<source>Edit Calendar</source>
+				<target>Bewerk kalender</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewDeleteCalendar" xml:space="preserve" approved="yes">
+				<source>Delete Calendar</source>
+				<target>Verwijder kalender</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewCreateCategory" xml:space="preserve" approved="yes">
+				<source>Create Category</source>
+				<target>Maak categorie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewEditCategory" xml:space="preserve" approved="yes">
+				<source>Edit Category</source>
+				<target>Bewerk categorie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewDeleteCategory" xml:space="preserve" approved="yes">
+				<source>Delete Category</source>
+				<target>Verwijder categorie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewCreateLocation" xml:space="preserve" approved="yes">
+				<source>Create Location</source>
+				<target>Maak locatie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewEditLocation" xml:space="preserve" approved="yes">
+				<source>Edit Location</source>
+				<target>Bewerk locatie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewDeleteLocation" xml:space="preserve" approved="yes">
+				<source>Delete Location</source>
+				<target>Verwijder locatie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewCreateOrganizer" xml:space="preserve" approved="yes">
+				<source>Create Organizer</source>
+				<target>Maak organisator</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewEditOrganizer" xml:space="preserve" approved="yes">
+				<source>Edit Organizer</source>
+				<target>Bewerk organisator</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewDeleteOrganizer" xml:space="preserve" approved="yes">
+				<source>Delete Organizer</source>
+				<target>Verwijder organisator</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewSubscriptionManager" xml:space="preserve" approved="yes">
+				<source>Subscription Manager</source>
+				<target>Abonnementenbeheer</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewMeetingManager" xml:space="preserve" approved="yes">
+				<source>Meeting Manager</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewTranslation" xml:space="preserve" approved="yes">
+				<source>Translation Options</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewTodo" xml:space="preserve" approved="yes">
+				<source>Todo</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewAjax" xml:space="preserve" approved="yes">
+				<source>Ajax (requires ext:calajax)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.viewAdmin" xml:space="preserve" approved="yes">
+				<source>Administration Options</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.calendarName" xml:space="preserve" approved="yes">
+				<source>Calendar name</source>
+				<target>Kalendernaam</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.defaultCalendarUid" xml:space="preserve" approved="yes">
+				<source>Default calendar</source>
+				<target>Standaardkalender</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.subscrition" xml:space="preserve" approved="yes">
+				<source>Subscription</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.noSubscription" xml:space="preserve" approved="yes">
+				<source>Disabled</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.allowSubscribe" xml:space="preserve" approved="yes">
+				<source>Allow anyone to subscribe</source>
+				<target>Sta abonneren toe</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.subscribeFeUser" xml:space="preserve" approved="yes">
+				<source>Only allow frontend users to subscribe</source>
+				<target>Sta FE-gebruiker toe te abonneren</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.subscribeWithCaptcha" xml:space="preserve" approved="yes">
+				<source>Force captcha to subscribe (captcha needed)</source>
+				<target>Captcha afdwingen bij abonneren</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetCategory" xml:space="preserve" approved="yes">
+				<source>Filters</source>
+				<target>Filters</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.category_selection" xml:space="preserve" approved="yes">
+				<source>Category selection</source>
+				<target>Categorieselectie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.calendar_selection" xml:space="preserve" approved="yes">
+				<source>Calendar selection</source>
+				<target>Kalenderselectie</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.select_deselect_categories" xml:space="preserve" approved="yes">
+				<source>Category mode</source>
+				<target>Categoriemodus</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.itemsHeader" xml:space="preserve" approved="yes">
+				<source>Special options:</source>
+				<target>Speciale opties:</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.category_selection_notCategorized" xml:space="preserve" approved="yes">
+				<source>[not categorized]</source>
+				<target>Niet gecategoriseerd</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.calendarMode" xml:space="preserve" approved="yes">
+				<source>Calendar selection mode</source>
+				<target>Kalenderselectiemodus</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.calendarMode.showAll" xml:space="preserve" approved="yes">
+				<source>Show all calendars (don't care about selection
+                below)
+            </source>
+				<target>Toon alles (selectie hieronder negeren)</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.calendarMode.showSelected" xml:space="preserve" approved="yes">
+				<source>Show only selected calendars</source>
+				<target>Toon uitsluitend geselecteerde kalenders</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.calendarMode.excludeSelected" xml:space="preserve" approved="yes">
+				<source>Don't show selected calendars</source>
+				<target>Geselecteerde kalenders niet tonen</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.categoryMode" xml:space="preserve" approved="yes">
+				<source>Category selection mode</source>
+				<target>Categorieselectiemodus</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.categoryMode.showAll" xml:space="preserve" approved="yes">
+				<source>Show all categories (don't care about selection
+                below)
+            </source>
+				<target>Toon alles (selectie hieronder negeren)</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.categoryMode.showSelected" xml:space="preserve" approved="yes">
+				<source>Show only selected categories (exact match)</source>
+				<target>Toon uitsluitend geselecteerde categorieën</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.categoryMode.excludeSelected" xml:space="preserve" approved="yes">
+				<source>Don't show selected categories</source>
+				<target>Geselecteerde categorieën niet tonen</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.categoryMode.showSelectedOr" xml:space="preserve" approved="yes">
+				<source>Show only selected categories (any)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.categoryMode.showMinSelected" xml:space="preserve" approved="yes">
+				<source>Show selected categories (minimum match)</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetYearView" xml:space="preserve" approved="yes">
+				<source>Year View</source>
+				<target>Jaarweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.yearViewPid" xml:space="preserve" approved="yes">
+				<source>Year view page</source>
+				<target>Pagina voor jaarweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.yearTemplate" xml:space="preserve" approved="yes">
+				<source>Year template</source>
+				<target>Jaarsjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetMonthView" xml:space="preserve" approved="yes">
+				<source>Month View</source>
+				<target>Maandweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.monthViewPid" xml:space="preserve" approved="yes">
+				<source>Month view page</source>
+				<target>Pagina voor maandweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.monthShowListView" xml:space="preserve" approved="yes">
+				<source>Show list view (not applicable for mini calendar)</source>
+				<target>Lijstweergave tonen</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.monthTemplate" xml:space="preserve" approved="yes">
+				<source>Month template</source>
+				<target>Maandsjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.monthSmallTemplate" xml:space="preserve" approved="yes">
+				<source>Month small template</source>
+				<target>Maandsjabloon klein</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.monthMediumTemplate" xml:space="preserve" approved="yes">
+				<source>Month medium template</source>
+				<target>Maandsjabloon middel</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.monthLargeTemplate" xml:space="preserve" approved="yes">
+				<source>Month large template</source>
+				<target>Maandsjabloon groot</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.monthMakeMiniCal" xml:space="preserve" approved="yes">
+				<source>Display as a mini calendar</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showListInMonthView" xml:space="preserve" approved="yes">
+				<source>Show events of this month</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetWeekView" xml:space="preserve" approved="yes">
+				<source>Week View</source>
+				<target>Weekweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.weekViewPid" xml:space="preserve" approved="yes">
+				<source>Week view page</source>
+				<target>Pagina voor weekweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.weekTemplate" xml:space="preserve" approved="yes">
+				<source>Week template</source>
+				<target>Weeksjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.weekStartDay" xml:space="preserve" approved="yes">
+				<source>Week start day</source>
+				<target>Week begint op dag</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetDayView" xml:space="preserve" approved="yes">
+				<source>Day View</source>
+				<target>Dagweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.dayViewPid" xml:space="preserve" approved="yes">
+				<source>Day view page</source>
+				<target>Pagina voor dagweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.dayTemplate" xml:space="preserve" approved="yes">
+				<source>Day template</source>
+				<target>Dagsjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.dayStart" xml:space="preserve" approved="yes">
+				<source>Day start time</source>
+				<target>Dag begint om (hhmm)</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.dayEnd" xml:space="preserve" approved="yes">
+				<source>Day endtime</source>
+				<target>Dag eindigt om (hhmm)</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.gridLength" xml:space="preserve" approved="yes">
+				<source>Show divider every x minutes</source>
+				<target>Toon divider elke x minuten</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetListView" xml:space="preserve" approved="yes">
+				<source>List View</source>
+				<target>Lijstweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listViewPid" xml:space="preserve" approved="yes">
+				<source>List view page</source>
+				<target>Pagina voor lijstweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listTemplate" xml:space="preserve" approved="yes">
+				<source>List template</source>
+				<target>Lijstsjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.starttime" xml:space="preserve" approved="yes">
+				<source>Start time</source>
+				<target>Starttijd</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.endtime" xml:space="preserve" approved="yes">
+				<source>End time</source>
+				<target>Stoptijd</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.default" xml:space="preserve" approved="yes">
+				<source>Use Typoscript Default</source>
+				<target>Gebruik Typoscript default</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.now" xml:space="preserve" approved="yes">
+				<source>Now</source>
+				<target>Nu</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.yesterday" xml:space="preserve" approved="yes">
+				<source>Yesterday</source>
+				<target>Gisteren</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.today" xml:space="preserve" approved="yes">
+				<source>Today</source>
+				<target>Vandaag</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.tomorrow" xml:space="preserve" approved="yes">
+				<source>Tomorrow</source>
+				<target>Morgen</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.weekStart" xml:space="preserve" approved="yes">
+				<source>Beginning Of This Week</source>
+				<target>Begin van deze week</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.weekEnd" xml:space="preserve" approved="yes">
+				<source>End Of This Week</source>
+				<target>Einde van deze week</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.plusOneWeek" xml:space="preserve" approved="yes">
+				<source>1 Week From Now</source>
+				<target>1 week na nu</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.monthStart" xml:space="preserve" approved="yes">
+				<source>Beginning Of This Month</source>
+				<target>Begin van deze maand</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.monthEnd" xml:space="preserve" approved="yes">
+				<source>End Of This Month</source>
+				<target>Einde van deze maand</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.plusOneMonth" xml:space="preserve" approved="yes">
+				<source>1 Month From Now</source>
+				<target>1 maand na nu</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.yearStart" xml:space="preserve" approved="yes">
+				<source>Beginning Of This Year</source>
+				<target>Begin van dit jaar</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.yearEnd" xml:space="preserve" approved="yes">
+				<source>End Of This Year</source>
+				<target>Einde van dit jaar</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.quarterStart" xml:space="preserve" approved="yes">
+				<source>Beginning Of This Quarter</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.quarterEnd" xml:space="preserve" approved="yes">
+				<source>End Of This Quarter</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.plusOneYear" xml:space="preserve" approved="yes">
+				<source>1 Year From Now</source>
+				<target>1 jaar na nu</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.usePageBrowser" xml:space="preserve" approved="yes">
+				<source>Page browser options</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.usePageBrowser.use" xml:space="preserve" approved="yes">
+				<source>Enable the page browser</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.usePageBrowser.dontUse" xml:space="preserve" approved="yes">
+				<source>Disable the page browser</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.recordsPerPage" xml:space="preserve" approved="yes">
+				<source>Events per page</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.listView.pagesCount" xml:space="preserve" approved="yes">
+				<source>Max pages</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.maxEvents" xml:space="preserve" approved="yes">
+				<source>Max events</source>
+				<target>Max. gebeurtenissen</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.maxRecurringEvents" xml:space="preserve" approved="yes">
+				<source>Max instances of the same recurring event</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetEventView" xml:space="preserve" approved="yes">
+				<source>Event View</source>
+				<target>Gebeurtenisweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.eventViewPid" xml:space="preserve" approved="yes">
+				<source>Event view page</source>
+				<target>Pagina voor gebeurtenisweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.eventTemplate" xml:space="preserve" approved="yes">
+				<source>Event template</source>
+				<target>Gebeurtenissjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.isPreview" xml:space="preserve" approved="yes">
+				<source>Show preview</source>
+				<target>Toon voorvertoning</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.createEventTemplate" xml:space="preserve" approved="yes">
+				<source>Create event template</source>
+				<target>Maak gebeurtenissjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.confirmEventTemplate" xml:space="preserve" approved="yes">
+				<source>Confirm event template</source>
+				<target>Bevestig gebeurtenissjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.deleteEventTemplate" xml:space="preserve" approved="yes">
+				<source>Delete event template</source>
+				<target>Verwijder gebeurtenissjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetLocationView" xml:space="preserve" approved="yes">
+				<source>Location View</source>
+				<target>Locatieweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.locationViewPid" xml:space="preserve" approved="yes">
+				<source>Location view page</source>
+				<target>Pagina voor locatieweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.locationTemplate" xml:space="preserve" approved="yes">
+				<source>Location template</source>
+				<target>Locatiesjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.createLocationTemplate" xml:space="preserve" approved="yes">
+				<source>Create location template</source>
+				<target>Maak locatiesjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.confirmLocationTemplate" xml:space="preserve" approved="yes">
+				<source>Confirm location template</source>
+				<target>Bevestig locatiesjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetOrganizerView" xml:space="preserve" approved="yes">
+				<source>Organizer View</source>
+				<target>Organisatorweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.organizerViewPid" xml:space="preserve" approved="yes">
+				<source>Organizer view page</source>
+				<target>Pagina voor organisatorweergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.organizerTemplate" xml:space="preserve" approved="yes">
+				<source>Organizer template</source>
+				<target>Organisatorsjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetIcsView" xml:space="preserve" approved="yes">
+				<source>Ics View</source>
+				<target>ICS-weergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.icsViewPid" xml:space="preserve" approved="yes">
+				<source>Ics view page</source>
+				<target>Pagina voor ICS-weergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.icsTemplate" xml:space="preserve" approved="yes">
+				<source>Ics template</source>
+				<target>ICS-sjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.calUid" xml:space="preserve" approved="yes">
+				<source>Calendar id</source>
+				<target>Kalender-id</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showIcsLinks" xml:space="preserve" approved="yes">
+				<source>Show ics links</source>
+				<target>Toon ICS-links</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetOtherView" xml:space="preserve" approved="yes">
+				<source>Other View</source>
+				<target>Andere weergave</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sidebarTemplate" xml:space="preserve" approved="yes">
+				<source>Sidebar template</source>
+				<target>Sjabloon voor sidebar</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.searchBoxTemplate" xml:space="preserve" approved="yes">
+				<source>Searchbox template</source>
+				<target>Zoekbox sjabloon</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showLogin" xml:space="preserve" approved="yes">
+				<source>Show login</source>
+				<target>Toon login</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showSearch" xml:space="preserve" approved="yes">
+				<source>Show search</source>
+				<target>Toon zoek</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showJumps" xml:space="preserve" approved="yes">
+				<source>Show jumps</source>
+				<target>Toon jumps</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showGoto" xml:space="preserve" approved="yes">
+				<source>Show goto</source>
+				<target>Toon goto</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showCalendarSelection" xml:space="preserve" approved="yes">
+				<source>Show calendar selector</source>
+				<target>Toon kalenderkiezer</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showCategorySelection" xml:space="preserve" approved="yes">
+				<source>Show category selector</source>
+				<target>Toon categoriekiezer</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.showTomorrowEvents" xml:space="preserve" approved="yes">
+				<source>Show tomorrows events</source>
+				<target>Toon gebeurtenissen van morgen</target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.sheetTSView" xml:space="preserve" approved="yes">
+				<source>Typoscript</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.tsconfig" xml:space="preserve" approved="yes">
+				<source>plugin.tx_cal_controller:</source>
+				<target></target>
+			</trans-unit>
+			<trans-unit id="cal.pi_flexform.thisMonthsEvents" xml:space="preserve" approved="yes">
+				<source></source>
+				<target>Toon gebeurtenissen van deze maand</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

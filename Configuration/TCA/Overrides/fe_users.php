@@ -7,7 +7,7 @@ $sPid = '###CURRENT_PID###'; // storage pid????
 $tempColumns = array(
 	'tx_cal_calendar' => array(
 		'exclude' => 1,
-		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar_private',
+		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar_private',
 		'config' => array(
 			'type' => 'group',
 			'internal_type' => 'db',
@@ -21,7 +21,7 @@ $tempColumns = array(
 		                'pid' => $sPid,
 		                'setValue' => 'set',
 		                'table' => 'tx_cal_calendar',
-		                'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.createNew',
+		                'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.createNew',
 		            )
 		        )
 		    ),
@@ -33,7 +33,7 @@ $tempColumns = array(
 	),
 	'tx_cal_calendar_subscription' => array(
 		'exclude' => 1,
-		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar_subscription',
+		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar_subscription',
 		'config' => array(
 			'type' => 'group',
 			'internal_type' => 'db',
@@ -47,7 +47,7 @@ $tempColumns = array(
 		                'pid' => $sPid,
 		                'setValue' => 'set',
 		                'table' => 'tx_cal_calendar',
-		                'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar.createNew',
+		                'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.createNew',
 		            )
 		        )
 		    ),

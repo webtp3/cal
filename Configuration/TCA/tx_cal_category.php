@@ -3,7 +3,7 @@ defined('TYPO3_MODE') or die();
 
 $tx_cal_category = array(
 	'ctrl' => array(
-		'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category',
+		'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category',
 		'label' => 'title',
 		'tstamp' => 'tstamp',
 		'crdate' => 'crdate',
@@ -42,7 +42,7 @@ $tx_cal_category = array(
 		),
 		'title' => array(
 				'exclude' => 0,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.title',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.title',
 				'config' => array(
 						'type' => 'input',
 						'size' => '30',
@@ -52,7 +52,7 @@ $tx_cal_category = array(
 		),
 		'headerstyle' => array(
 				'exclude' => 1,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.headerstyle',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.headerstyle',
 				'config' => array(
 						'type' => 'user',
 						'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getHeaderStyles'
@@ -60,7 +60,7 @@ $tx_cal_category = array(
 		),
 		'bodystyle' => array(
 				'exclude' => 1,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.bodystyle',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.bodystyle',
 				'config' => array(
 						'type' => 'user',
 						'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getBodyStyles'
@@ -68,7 +68,7 @@ $tx_cal_category = array(
 		),
 		'calendar_id' => array(
 				'exclude' => 1,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.calendar',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.calendar',
 		        'onChange' => 'reload',
 				'config' => array(
                         'renderType' => 'selectSingle',
@@ -80,7 +80,7 @@ $tx_cal_category = array(
 						),
 						'items' => array(
 								array(
-										'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.none',
+										'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.none',
 										0
 								)
 						),
@@ -92,7 +92,7 @@ $tx_cal_category = array(
 		),
 		'parent_category' => array(
 				'exclude' => 1,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.parent_category',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.parent_category',
 				'config' => array(
 						'type' => 'select',
 						'renderType' => 'selectTree',
@@ -123,14 +123,14 @@ $tx_cal_category = array(
 				)
 		),
 		'shared_user_allowed' => array(
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.shared_user_allowed',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.shared_user_allowed',
 				'config' => array(
 						'type' => 'check'
 				)
 		),
 		'single_pid' => array(
 				'exclude' => 1,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.single_pid',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.single_pid',
 				'config' => array(
 				        'type' => 'group',
 						'internal_type' => 'db',
@@ -142,7 +142,7 @@ $tx_cal_category = array(
 		),
 		'notification_emails' => array(
 				'exclude' => 0,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.notification_emails',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.notification_emails',
 				'config' => array(
 						'type' => 'input',
 						'size' => '30'
@@ -150,7 +150,7 @@ $tx_cal_category = array(
 		),
 		'icon' => array(
 				'exclude' => 0,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.icon',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.icon',
 				'config' => array(
 						'type' => 'input',
 						'size' => '30',

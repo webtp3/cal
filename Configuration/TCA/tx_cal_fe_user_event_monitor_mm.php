@@ -4,7 +4,7 @@ defined('TYPO3_MODE') or die();
 $tx_cal_fe_user_event_monitor_mm = array(
 	'ctrl' => array(
 		'requestUpdate' => '',
-		'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.monitor',
+		'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_fe_user_event.monitor',
 		'label' => 'tablenames',
 		'label_alt' => 'tablenames,offset',
 		'label_alt_force' => 1,
@@ -20,7 +20,7 @@ $tx_cal_fe_user_event_monitor_mm = array(
 	'columns' => array(
 		'uid_foreign' => array(
 			'exclude' => 1,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.monitor',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_fe_user_event.monitor',
 			'config' => array(
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -32,7 +32,7 @@ $tx_cal_fe_user_event_monitor_mm = array(
 		),
 		'uid_local' => array(
 			'exclude' => 1,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event',
 			'config' => array(
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -52,7 +52,7 @@ $tx_cal_fe_user_event_monitor_mm = array(
 		),
 		'offset' => array(
 			'exclude' => 1,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.offset',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_fe_user_event.offset',
 			'config' => array(
 				'type' => 'input',
 				'size' => '6',
@@ -63,7 +63,7 @@ $tx_cal_fe_user_event_monitor_mm = array(
 		),
 		'schedulerId' => array(
 			'exclude' => 1,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.schedulerId',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_fe_user_event.schedulerId',
 			'config' => array(
 				'type' => 'input',
 				'size' => '5',

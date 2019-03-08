@@ -56,7 +56,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
 		$fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->eventFolder . '"/>';
 		$fieldConfiguration = array(
 			'code' => $fieldHtml,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:tableHeader1',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:tableHeader1',
 			'cshKey' => '',
 			'cshLabel' => $fieldId
 		);
@@ -77,7 +77,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
 		$fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->typoscriptPage . '" />';
 		$fieldConfiguration = array(
 				'code' => $fieldHtml,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:tableHeader2',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:tableHeader2',
 				'cshKey' => '',
 				'cshLabel' => $fieldId
 		);
@@ -98,7 +98,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
 		$fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->starttime . '" />';
 		$fieldConfiguration = array(
 				'code' => $fieldHtml,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:indexStart',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexStart',
 				'cshKey' => '',
 				'cshLabel' => $fieldId
 		);
@@ -119,7 +119,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
 		$fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->endtime . '" />';
 		$fieldConfiguration = array(
 				'code' => $fieldHtml,
-				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:indexEnd',
+				'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexEnd',
 				'cshKey' => '',
 				'cshLabel' => $fieldId
 		);

@@ -3,7 +3,7 @@ defined('TYPO3_MODE') or die();
 
 $tx_cal_exception_event = array(
 		'ctrl' => array(
-				'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event',
+				'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event',
 				'label' => 'title',
 				'tstamp' => 'tstamp',
 				'crdate' => 'crdate',
@@ -36,7 +36,7 @@ $tx_cal_exception_event = array(
 				),
 				'title' => array(
 						'exclude' => 1,
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.title',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event.title',
 						'config' => array(
 								'type' => 'input',
 								'size' => '30',
@@ -70,7 +70,7 @@ $tx_cal_exception_event = array(
 				),
 				'start_date' => array(
 						'exclude' => 1,
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.start_date',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event.start_date',
 						'config' => array(
 								'type' => 'input',
 						        'renderType' => 'inputDateTime',
@@ -87,7 +87,7 @@ $tx_cal_exception_event = array(
 				
 				'freq' => array(
 						'exclude' => 1,
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.freq',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event.freq',
 				        'onChange' => 'reload',
 						'config' => array(
                                 'renderType' => 'selectSingle',
@@ -95,23 +95,23 @@ $tx_cal_exception_event = array(
 								'size' => '1',
 								'items' => array(
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:frequency.none',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:frequency.none',
 												'none'
 										),
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:frequency.day',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:frequency.day',
 												'day'
 										),
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:frequency.week',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:frequency.week',
 												'week'
 										),
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:frequency.month',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:frequency.month',
 												'month'
 										),
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:frequency.year',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:frequency.year',
 												'year'
 										)
 								)
@@ -121,7 +121,7 @@ $tx_cal_exception_event = array(
 				'byday' => array(
 						'exclude' => 1,
 						'displayCond' => 'FIELD:freq:IN:week,month,year',
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.byday_short',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.byday_short',
 						'config' => array(
 								'type' => 'user',
 								'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byDay'
@@ -131,7 +131,7 @@ $tx_cal_exception_event = array(
 				'bymonthday' => array(
 						'exclude' => 1,
 						'displayCond' => 'FIELD:freq:IN:month,year',
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.bymonthday_short',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.bymonthday_short',
 						'config' => array(
 								'type' => 'user',
 								'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byMonthDay'
@@ -141,7 +141,7 @@ $tx_cal_exception_event = array(
 				'bymonth' => array(
 						'exclude' => 1,
 						'displayCond' => 'FIELD:freq:IN:year',
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.bymonth_short',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.bymonth_short',
 						'config' => array(
 								'type' => 'user',
 								'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->byMonth'
@@ -150,7 +150,7 @@ $tx_cal_exception_event = array(
 				
 				'rdate_type' => array(
 						'exclude' => 1,
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.rdate_type',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event.rdate_type',
 				        'onChange' => 'reload',
 						'config' => array(
                                 'renderType' => 'selectSingle',
@@ -158,19 +158,19 @@ $tx_cal_exception_event = array(
 								'size' => 1,
 								'items' => array(
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:rdate_type.none',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:rdate_type.none',
 												'none'
 										),
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:rdate_type.date',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:rdate_type.date',
 												'date'
 										),
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:rdate_type.date_time',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:rdate_type.date_time',
 												'date_time'
 										),
 										array(
-												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:rdate_type.period',
+												'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:rdate_type.period',
 												'period'
 										)
 								),
@@ -180,7 +180,7 @@ $tx_cal_exception_event = array(
 				
 				'rdate' => array(
 						'exclude' => 1,
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.rdate',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event.rdate',
 						'displayCond' => 'FIELD:rdate_type:IN:date_time,date,period',
 						'config' => array(
 								'type' => 'user',
@@ -190,7 +190,7 @@ $tx_cal_exception_event = array(
 				
 				'until' => array(
 						'exclude' => 1,
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.until',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event.until',
 						'displayCond' => 'FIELD:freq:IN:day,week,month,year',
 						'config' => array(
 								'type' => 'input',
@@ -202,7 +202,7 @@ $tx_cal_exception_event = array(
 				
 				'cnt' => array(
 						'exclude' => 1,
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.count',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event.count',
 						'displayCond' => 'FIELD:freq:IN:day,week,month,year',
 						'config' => array(
 								'type' => 'input',
@@ -214,7 +214,7 @@ $tx_cal_exception_event = array(
 				
 				'intrval' => array(
 						'exclude' => 1,
-						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_exception_event.interval',
+						'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_exception_event.interval',
 						'displayCond' => 'FIELD:freq:IN:day,week,month,year',
 						'config' => array(
 								'type' => 'input',

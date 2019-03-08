@@ -22,5 +22,5 @@ $MCONF ["access"] = "admin";
 $MCONF ["script"] = "_DISPATCH";
 
 $MLANG ["default"] ["tabs_images"] ["tab"] = "icon_tx_cal_indexer.gif";
-$MLANG ["default"] ["ll_ref"] = "LLL:EXT:cal/Resources/Private/Language/locallang_indexer_mod.xml";
+$MLANG ["default"] ["ll_ref"] = "LLL:EXT:cal/Resources/Private/Language/locallang_indexer_mod.xlf";
 ?>

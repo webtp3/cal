@@ -3,7 +3,7 @@ defined('TYPO3_MODE') or die();
 
 $tx_cal_location = array(
 	'ctrl' => array(
-		'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location',
+		'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location',
 		'label' => 'name',
 		'tstamp' => 'tstamp',
 		'crdate' => 'crdate',
@@ -39,7 +39,7 @@ $tx_cal_location = array(
 		),
 		'name' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.name',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.name',
 			'config' => array(
 				'type' => 'input',
 				'size' => '30',
@@ -48,7 +48,7 @@ $tx_cal_location = array(
 		),
 		'description' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.description',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.description',
 			'config' => array(
 				'type' => 'text',
 				'cols' => '30',
@@ -69,7 +69,7 @@ $tx_cal_location = array(
 		),
 		'street' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.street',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.street',
 			'config' => array(
 				'type' => 'input',
 				'size' => '30',
@@ -78,7 +78,7 @@ $tx_cal_location = array(
 		),
 		'zip' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.zip',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.zip',
 			'config' => array(
 				'type' => 'input',
 				'size' => '15',
@@ -87,7 +87,7 @@ $tx_cal_location = array(
 		),
 		'city' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.city',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.city',
 			'config' => array(
 				'type' => 'input',
 				'size' => '30',
@@ -96,7 +96,7 @@ $tx_cal_location = array(
 		),
 		'phone' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.phone',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.phone',
 			'config' => array(
 				'type' => 'input',
 				'size' => '15',
@@ -105,7 +105,7 @@ $tx_cal_location = array(
 		),
 		'fax' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.fax',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.fax',
 			'config' => array(
 				'type' => 'input',
 				'size' => '15',
@@ -114,7 +114,7 @@ $tx_cal_location = array(
 		),
 		'email' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.email',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.email',
 			'config' => array(
 				'type' => 'input',
 				'size' => '30',
@@ -124,7 +124,7 @@ $tx_cal_location = array(
 		),
 		'image' => array(
 			'exclude' => 1,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.image',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.image',
 			'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('image', array(
 				'maxitems' => 5,
 				// Use the imageoverlayPalette instead of the basicoverlayPalette
@@ -144,7 +144,7 @@ $tx_cal_location = array(
 		),
 		'link' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.link',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.link',
 			'config' => array(
 				'type' => 'input',
 				'size' => '25',
@@ -159,7 +159,7 @@ $tx_cal_location = array(
 		),
 		'shared_user_cnt' => array(
 			'exclude' => 1,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.shared_user',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.shared_user',
 			'config' => array(
 				'type' => 'group',
 				'internal_type' => 'db',
@@ -172,7 +172,7 @@ $tx_cal_location = array(
 		),
 		'latitude' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.latitude',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.latitude',
 			'config' => array(
 				'type' => 'input',
 				'readOnly' => 1
@@ -180,7 +180,7 @@ $tx_cal_location = array(
 		),
 		'longitude' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.longitude',
+			'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.longitude',
 			'config' => array(
 				'type' => 'input',
 				'readOnly' => 1
@@ -263,7 +263,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')){
 	);
 	$tx_cal_location['columns']['tx_wecmap_geocode'] = array(
 		'exclude' => 1,
-		'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xml:berecord_geocodelabel',
+		'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xlf:berecord_geocodelabel',
 		'config' => array(
 			'type' => 'user',
 			'userFunc' => 'JBartels\\WecMap\\Utility\\Backend->checkGeocodeStatus'
@@ -274,7 +274,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')){
 	
 	$tx_cal_location['columns']['tx_wecmap_map'] = array(
 		'exclude' => 1,
-		'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xml:berecord_maplabel',
+		'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xlf:berecord_maplabel',
 		'config' => array(
 			'type' => 'user',
 			'userFunc' => 'JBartels\\WecMap\\Utility\\Backend->drawMap'
@@ -287,7 +287,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')){
 if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')){
     $tx_cal_location['columns']['country_zone'] = array (
         'exclude' => 1,
-        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.countryzone',
+        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.countryzone',
     	'config' => array(
     		'type' => 'select',
     	    'renderType' => 'selectSingle',
@@ -307,7 +307,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
 	);
 	$tx_cal_location['columns']['country'] = array (
 	    'exclude' => 1,
-	    'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.country',
+	    'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.country',
 	    'config' => array(
     		'type' => 'select',
 	        'renderType' => 'selectSingle',

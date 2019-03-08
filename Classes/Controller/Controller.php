@@ -27,7 +27,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 	var $prefixId = 'tx_cal_controller'; // Same as class name
 	var $scriptRelPath = 'Classes/Controller/Controller.php'; // Path to this script relative to the extension dir.
-	var $locallangPath = 'Resources/Private/Language/locallang.xml';
+	var $locallangPath = 'Resources/Private/Language/locallang.xlf';
 	var $extKey = 'cal'; // The extension key.
 	var $pi_checkCHash = FALSE;
 	var $dayStart;

@@ -5,7 +5,7 @@ defined('TYPO3_MODE') or die();
 $tempColumns = array(
 	'tx_cal_enable_accesscontroll' => array(
 		'exclude' => 1,
-		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_enable_accesscontroll',
+		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_enable_accesscontroll',
 	    'onChange' => 'reload',
 		'config' => array(
 			'type' => 'check',
@@ -14,7 +14,7 @@ $tempColumns = array(
 	),
 	'tx_cal_calendar' => array(
 		'exclude' => 1,
-		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_calendar_accesscontroll',
+		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar_accesscontroll',
 		'displayCond' => 'FIELD:tx_cal_enable_accesscontroll:REQ:true',
 		'config' => array(
             'renderType' => 'selectMultipleSideBySide',
@@ -29,7 +29,7 @@ $tempColumns = array(
 	),
 	'tx_cal_category' => array(
 		'exclude' => 1,
-		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category_accesscontroll',
+		'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category_accesscontroll',
 		'displayCond' => 'FIELD:tx_cal_enable_accesscontroll:REQ:true',
 		'config' => array(
             'renderType' => 'selectMultipleSideBySide',

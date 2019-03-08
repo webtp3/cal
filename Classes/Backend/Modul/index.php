@@ -25,10 +25,10 @@ $MCONF ["access"] = "admin";
 $MCONF ["script"] = "_DISPATCH";
 
 $MLANG ["default"] ["tabs_images"] ["tab"] = "icon_tx_cal_indexer.gif";
-$MLANG ["default"] ["ll_ref"] = "LLL:EXT:cal/Resources/Private/Language/locallang_indexer_mod.xml";
+$MLANG ["default"] ["ll_ref"] = "LLL:EXT:cal/Resources/Private/Language/locallang_indexer_mod.xlf";
 
 
-$GLOBALS ['LANG']->includeLLFile ('EXT:cal/Resources/Private/Language/locallang_indexer.xml');
+$GLOBALS ['LANG']->includeLLFile ('EXT:cal/Resources/Private/Language/locallang_indexer.xlf');
 
 $GLOBALS ['BE_USER']->modAccess ($MCONF, 1); // This checks permissions and exits if the users has no permission for entry.
                                // DEFAULT initialization of a module [END]

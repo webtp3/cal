@@ -35,7 +35,7 @@ class CustomTca {
 	var $rdateValues;
 	
 	public function init($PA, $fobj) {
-		$GLOBALS['LANG']->includeLLFile (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath ('cal') . 'Resources/Private/Language/locallang_db.xml');
+		$GLOBALS['LANG']->includeLLFile (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath ('cal') . 'Resources/Private/Language/locallang_db.xlf');
 		
 		$this->frequency = $PA ['row'] ['freq'];
 		if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger (TYPO3_version) >= 7005000) {
