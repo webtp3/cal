@@ -1,6 +1,6 @@
 # TYPO3 Extension ``cal``
 [![Latest Stable Version](https://poser.pugx.org/web-tp3/cal/v/stable)](https://packagist.org/packages/web-tp3/cal)
-[![Latest Unstable Version](https://poser.pugx.org/web-tp3/cal/v/unstable)](https://packagist.org/packages/web-tp3/cal)
+[![Latest Unstable Version](https://poser.pugx.org/web-tp3/cal/v/unstable)](https://packagist.org/packages/web-tp3/cal/src/develop)
 [![Daily Downloads](https://poser.pugx.org/web-tp3/cal/d/daily)](https://packagist.org/packages/web-tp3/cal)
 [![Total Downloads](https://poser.pugx.org/web-tp3/cal/downloads)](https://packagist.org/packages/web-tp3/cal)
 [![License](https://poser.pugx.org/web-tp3/cal/license)](https://packagist.org/packages/web-tp3/cal)
