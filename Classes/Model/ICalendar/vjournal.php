@@ -1,5 +1,13 @@
 <?php
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vJournals.
  *
@@ -10,19 +18,20 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  * See the enclosed file COPYING for license information (LGPL). If you
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
  *
- * @author Mike Cochrane <mike@graftonhall.co.nz>
  * @since Horde 3.0
- * @package Horde_iCalendar
  */
-class vjournal extends \TYPO3\CMS\Cal\Model\ICalendar {
-	function getType() {
-		return 'vJournal';
-	}
-	function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true) {
-		parent::parsevCalendar ($data, 'VJOURNAL');
-	}
-	function exportvCalendar() {
-		return parent::_exportvData ('VJOURNAL');
-	}
+class vjournal extends \TYPO3\CMS\Cal\Model\ICalendar
+{
+    public function getType()
+    {
+        return 'vJournal';
+    }
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    {
+        parent::parsevCalendar($data, 'VJOURNAL');
+    }
+    public function exportvCalendar()
+    {
+        return parent::_exportvData('VJOURNAL');
+    }
 }
-?>

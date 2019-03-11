@@ -1,5 +1,13 @@
 <?php
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View\Module;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -15,11 +23,11 @@ namespace TYPO3\CMS\Cal\View\Module;
 
 /**
  *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
-class Example extends \TYPO3\CMS\Cal\View\BaseView {
-	public function start(&$moduleCaller) {
-		return 'text from another module';
-	}
+class Example extends \TYPO3\CMS\Cal\View\BaseView
+{
+    public function start(&$moduleCaller)
+    {
+        return 'text from another module';
+    }
 }
-?>

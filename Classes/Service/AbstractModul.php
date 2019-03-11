@@ -1,5 +1,13 @@
 <?php
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -15,13 +23,12 @@ namespace TYPO3\CMS\Cal\Service;
 
 /**
  *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
-abstract class AbstractModul extends \TYPO3\CMS\Cal\Service\BaseService {
-	
-	/**
-	 * @param Object $moduleCaller 	Instance of the caller
-	 */
-	public abstract function start(&$moduleCaller) ;
+abstract class AbstractModul extends \TYPO3\CMS\Cal\Service\BaseService
+{
+
+    /**
+     * @param Object $moduleCaller 	Instance of the caller
+     */
+    abstract public function start(&$moduleCaller);
 }
-?>

@@ -1,5 +1,13 @@
 <?php
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Utility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -12,29 +20,29 @@ namespace TYPO3\CMS\Cal\Utility;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-class Registry {
-	
-	/**
-	 * Usage:
-	 * $myfoo = & Registry('MySpace', 'Foo');
-	 * $myfoo = 'something';
-	 *
-	 * $mybar = & Registry('MySpace', 'Bar');
-	 * $mybar = new Something();
-	 *
-	 * @param string $namespace
-	 *        	A namespace to prevent clashes
-	 * @param string $var
-	 *        	The variable to retrieve.
-	 * @return mixed A reference to the variable. If not set it will be null.
-	 */
-	public static function &Registry($namespace, $var) {
-		static $instances = Array ();
-		// remove to get case-insensitive namespace
-		$namespace = strtolower ($namespace);
-		$var = strtolower ($var);
-		return $instances [$namespace] [$var];
-	}
-}
+class Registry
+{
 
-?>
+    /**
+     * Usage:
+     * $myfoo = & Registry('MySpace', 'Foo');
+     * $myfoo = 'something';
+     *
+     * $mybar = & Registry('MySpace', 'Bar');
+     * $mybar = new Something();
+     *
+     * @param string $namespace
+     *        	A namespace to prevent clashes
+     * @param string $var
+     *        	The variable to retrieve.
+     * @return mixed A reference to the variable. If not set it will be null.
+     */
+    public static function &Registry($namespace, $var)
+    {
+        static $instances = [];
+        // remove to get case-insensitive namespace
+        $namespace = strtolower($namespace);
+        $var = strtolower($var);
+        return $instances [$namespace] [$var];
+    }
+}

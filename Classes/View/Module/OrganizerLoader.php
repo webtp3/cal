@@ -1,5 +1,13 @@
 <?php
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View\Module;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -12,47 +20,46 @@ namespace TYPO3\CMS\Cal\View\Module;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 use TYPO3\CMS\Cal\Service\AbstractModul;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
  *
- * @author Mario Matzulla <mario(at)matzullas.de>
  */
-class OrganizerLoader extends AbstractModul {
-	
-	/**
-	 * The function adds organizer markers into the event template
-	 *
-	 * @param Object $moduleCaller
-	 *        	Instance of the event model (phpicalendar_model)
-	 */
-	public function start(&$moduleCaller, $onlyMarker = FALSE) {
-		if ($moduleCaller->getOrganizerId () > 0) {
-			$this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry ( 'basic', 'modelcontroller' );
-			$this->cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry ( 'basic', 'cobj' );
-			
-			$moduleCaller->confArr = unserialize ( $GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal'] );
-			$useOrganizerStructure = ($moduleCaller->confArr ['useOrganizerStructure'] ? $moduleCaller->confArr ['useOrganizerStructure'] : 'tx_cal_organizer');
-			$organizer = $this->modelObj->findOrganizer ( $moduleCaller->getOrganizerId (), $useOrganizerStructure );
-			
-			if (is_object ( $organizer )) {
-				$page = Functions::getContent ( $moduleCaller->conf ['module.'] ['organizerloader.'] ['template'] );
-				if ($page == '') {
-					return '<h3>module organizerloader: no template file found:</h3>' . $moduleCaller->conf ['module.'] ['organizerloader.'] ['template'];
-				}
-				$sims = Array ();
-				$rems = Array ();
-				$wrapped = Array ();
-				$organizer->getMarker ( $page, $sims, $rems, $wrapped );
-				if($onlyMarker) {
-					return $sims;
-				}
-				return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached ( $page, $sims, $rems, Array () );
-			}
-		}
-		return '';
-	}
+class OrganizerLoader extends AbstractModul
+{
+
+    /**
+     * The function adds organizer markers into the event template
+     *
+     * @param Object $moduleCaller
+     *        	Instance of the event model (phpicalendar_model)
+     */
+    public function start(&$moduleCaller, $onlyMarker = false)
+    {
+        if ($moduleCaller->getOrganizerId() > 0) {
+            $this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
+            $this->cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+
+            $moduleCaller->confArr = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
+            $useOrganizerStructure = ($moduleCaller->confArr ['useOrganizerStructure'] ? $moduleCaller->confArr ['useOrganizerStructure'] : 'tx_cal_organizer');
+            $organizer = $this->modelObj->findOrganizer($moduleCaller->getOrganizerId(), $useOrganizerStructure);
+
+            if (is_object($organizer)) {
+                $page = Functions::getContent($moduleCaller->conf ['module.'] ['organizerloader.'] ['template']);
+                if ($page == '') {
+                    return '<h3>module organizerloader: no template file found:</h3>' . $moduleCaller->conf ['module.'] ['organizerloader.'] ['template'];
+                }
+                $sims = [];
+                $rems = [];
+                $wrapped = [];
+                $organizer->getMarker($page, $sims, $rems, $wrapped);
+                if ($onlyMarker) {
+                    return $sims;
+                }
+                return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, []);
+            }
+        }
+        return '';
+    }
 }
-?>
