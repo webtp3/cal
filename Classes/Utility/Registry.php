@@ -32,9 +32,7 @@ class Registry
      * $mybar = new Something();
      *
      * @param string $namespace
-     *        	A namespace to prevent clashes
      * @param string $var
-     *        	The variable to retrieve.
      * @return mixed A reference to the variable. If not set it will be null.
      */
     public static function &Registry($namespace, $var)
@@ -43,6 +41,6 @@ class Registry
         // remove to get case-insensitive namespace
         $namespace = strtolower($namespace);
         $var = strtolower($var);
-        return $instances [$namespace] [$var];
+        return $instances[$namespace][$var];
     }
 }

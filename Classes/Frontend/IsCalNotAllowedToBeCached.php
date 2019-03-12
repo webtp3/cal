@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Frontend;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -33,72 +35,72 @@ namespace TYPO3\CMS\Cal\Frontend;
  */
 function IsCalNotAllowedToBeCached()
 {
-    $postVars = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('tx_cal_controller');
-    $view = $postVars ['view'];
+    $postVars = GeneralUtility::_GP('tx_cal_controller');
+    $view = $postVars['view'];
 
     /* FRONTEND EDITING */
     $frontendEditingViews = [
-            'admin',
+        'admin',
 
         /* Event */
         'create_event',
-            'edit_event',
-            'confirm_event',
-            'save_event',
-            'save_exception_event',
-            'delete_event',
-            'delete_event_confirm',
-            'remove_event',
+        'edit_event',
+        'confirm_event',
+        'save_event',
+        'save_exception_event',
+        'delete_event',
+        'delete_event_confirm',
+        'remove_event',
 
         /* Calendar */
         'create_calendar',
-            'edit_calendar',
-            'confirm_calendar',
-            'save_calendar',
-            'delete_calendar',
-            'remove_calendar',
+        'edit_calendar',
+        'confirm_calendar',
+        'save_calendar',
+        'delete_calendar',
+        'remove_calendar',
 
         /* Category */
         'create_category',
-            'edit_category',
-            'confirm_category',
-            'save_category',
-            'delete_category',
-            'remove_category',
+        'edit_category',
+        'confirm_category',
+        'save_category',
+        'delete_category',
+        'remove_category',
 
         /* Location */
         'create_location',
-            'edit_location',
-            'confirm_location',
-            'save_location',
-            'delete_location',
-            'remove_location',
+        'edit_location',
+        'confirm_location',
+        'save_location',
+        'delete_location',
+        'remove_location',
 
         /* Organizer */
         'create_organizer',
-            'edit_organizer',
-            'confirm_organizer',
-            'save_organizer',
-            'delete_organizer',
-            'remove_organizer'
+        'edit_organizer',
+        'confirm_organizer',
+        'save_organizer',
+        'delete_organizer',
+        'remove_organizer'
     ];
 
-    if (in_array($view, $frontendEditingViews)) {
+    if (in_array($view, $frontendEditingViews, true)) {
         return true;
     }
 
     /* SEARCH */
     $searchViews = [
-            'search_all',
-            'search_event',
-            'search_organizer',
-            'search_location'
+        'search_all',
+        'search_event',
+        'search_organizer',
+        'search_location'
     ];
-    if (in_array($view, $searchViews)) {
+    if (in_array($view, $searchViews, true)) {
         return true;
     }
 
-    if ($postVars ['submit'] || $postVars ['query'] || $postVars ['category'] || $postVars ['calendar']) {
+    if ($postVars['submit'] || $postVars['query'] || $postVars['category'] || $postVars['calendar']) {
         return true;
     }
     return false;

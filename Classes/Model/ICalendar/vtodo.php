@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vTodos.
  *
@@ -20,16 +22,18 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  *
  * @since Horde 3.0
  */
-class vtodo extends \TYPO3\CMS\Cal\Model\ICalendar
+class vtodo extends ICalendar
 {
     public function getType()
     {
         return 'vTodo';
     }
+
     public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
     {
         parent::parsevCalendar($data, 'VTODO');
     }
+
     public function exportvCalendar()
     {
         return parent::_exportvData('VTODO');
@@ -46,22 +50,22 @@ class vtodo extends \TYPO3\CMS\Cal\Model\ICalendar
         $todo = [];
 
         $name = $this->getAttribute('SUMMARY');
-        if (! is_array($name) && ! is_a($name, 'PEAR_Error')) {
-            $todo ['name'] = $name;
+        if (!is_array($name) && !is_a($name, 'PEAR_Error')) {
+            $todo['name'] = $name;
         }
         $desc = $this->getAttribute('DESCRIPTION');
-        if (! is_array($desc) && ! is_a($desc, 'PEAR_Error')) {
-            $todo ['desc'] = $desc;
+        if (!is_array($desc) && !is_a($desc, 'PEAR_Error')) {
+            $todo['desc'] = $desc;
         }
 
         $priority = $this->getAttribute('PRIORITY');
-        if (! is_array($priority) && ! is_a($priority, 'PEAR_Error')) {
-            $todo ['priority'] = $priority;
+        if (!is_array($priority) && !is_a($priority, 'PEAR_Error')) {
+            $todo['priority'] = $priority;
         }
 
         $due = $this->getAttribute('DTSTAMP');
-        if (! is_array($due) && ! is_a($due, 'PEAR_Error')) {
-            $todo ['due'] = $due;
+        if (!is_array($due) && !is_a($due, 'PEAR_Error')) {
+            $todo['due'] = $due;
         }
 
         return $todo;
@@ -71,24 +75,24 @@ class vtodo extends \TYPO3\CMS\Cal\Model\ICalendar
      * Set the attributes for this todo item from an array.
      *
      * @param array $todo
-     *        	Array containing the details of the todo in
-     *        	the same format that toArray() exports.
+     *            Array containing the details of the todo in
+     *            the same format that toArray() exports.
      */
     public function fromArray($todo)
     {
-        if (isset($todo ['name'])) {
-            $this->setAttribute('SUMMARY', $todo ['name']);
+        if (isset($todo['name'])) {
+            $this->setAttribute('SUMMARY', $todo['name']);
         }
-        if (isset($todo ['desc'])) {
-            $this->setAttribute('DESCRIPTION', $todo ['desc']);
-        }
-
-        if (isset($todo ['priority'])) {
-            $this->setAttribute('PRIORITY', $todo ['priority']);
+        if (isset($todo['desc'])) {
+            $this->setAttribute('DESCRIPTION', $todo['desc']);
         }
 
-        if (isset($todo ['due'])) {
-            $this->setAttribute('DTSTAMP', $todo ['due']);
+        if (isset($todo['priority'])) {
+            $this->setAttribute('PRIORITY', $todo['priority']);
+        }
+
+        if (isset($todo['due'])) {
+            $this->setAttribute('DTSTAMP', $todo['due']);
         }
     }
 }

@@ -8,6 +8,11 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -23,15 +28,22 @@ namespace TYPO3\CMS\Cal\Service;
 
 /**
  * A concrete model for the calendar.
- *
  */
-class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
+class FnbEventService extends EventService
 {
     protected $fnbCalendarSearchString;
     protected $calendarIds;
     protected $calendarOwner;
 
-    public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '0,1,2,3', $additionalWhere = '')
+    /**
+     * @param $start_date
+     * @param $end_date
+     * @param $pidList
+     * @param string $eventType
+     * @param string $additionalWhere
+     * @return array
+     */
+    public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '0,1,2,3', $additionalWhere = ''): array
     {
 
         // How to get the events
@@ -40,15 +52,15 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
         // 3rd get all related events
         // make an array out of the list, so we can handle it better
         $includeRecurring = true;
-        if ($this->conf ['view'] == 'ics' || $this->conf ['view'] == 'single_ics') {
+        if ($this->conf['view'] === 'ics' || $this->conf['view'] === 'single_ics') {
             $includeRecurring = false;
         }
 
         $this->setStartAndEndPoint($start_date, $end_date);
-        $dontShowOldEvents = (integer) $this->conf ['view.'] [$this->conf ['view'] . '.'] ['dontShowOldEvents'];
+        $dontShowOldEvents = (int)$this->conf['view.'][$this->conf['view'] . '.']['dontShowOldEvents'];
         if ($dontShowOldEvents > 0) {
-            $now = new \TYPO3\CMS\Cal\Model\CalDate();
-            if ($dontShowOldEvents == 2) {
+            $now = new CalDate();
+            if ($dontShowOldEvents === 2) {
                 $now->setHour(0);
                 $now->setMinute(0);
                 $now->setSecond(0);
@@ -66,10 +78,13 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
         }
         $formattedStarttime = $this->starttime->format('%Y%m%d');
         $formattedEndtime = $this->endtime->format('%Y%m%d');
-        $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = &$this->modelObj->getServiceObjByKey('cal_category_model', 'category', $this->extConf ['categoryService']);
+        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
 
-        $calendarSearchString = $this->getFreeAndBusyCalendarSearchString($pidList, true, $this->conf ['calendar'] ? $this->conf ['calendar'] : '');
+        $calendarSearchString = $this->getFreeAndBusyCalendarSearchString(
+            $pidList,
+            true,
+            $this->conf['calendar'] ?: ''
+        );
 
         $recurringClause = '';
         // only include the recurring clause if we don't use the new recurring model or a view not needing recurring events.
@@ -79,13 +94,13 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
             $table = 'tx_cal_index';
             $where = 'start_datetime >= ' . $this->starttime->format('%Y%m%d%H%M%S') . ' AND start_datetime <= ' . $this->endtime->format('%Y%m%d%H%M%S');
             $group = 'event_uid';
-            $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $group);
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $group);
             $tmpUids = [];
             if ($result) {
-                while ($tmp = $GLOBALS ['TYPO3_DB']->sql_fetch_row($result)) {
-                    $tmpUids [] = $tmp [0];
+                while ($tmp = $GLOBALS['TYPO3_DB']->sql_fetch_row($result)) {
+                    $tmpUids[] = $tmp[0];
                 }
-                $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+                $GLOBALS['TYPO3_DB']->sql_free_result($result);
             }
             if (count($tmpUids)) {
                 $recurringClause = ' OR (tx_cal_event.uid IN (' . implode(',', $tmpUids) . ')) ';
@@ -105,20 +120,31 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
         $categoryService->getCategoryArray($pidList, $categories);
 
         // creating events
-        return $this->getEventsFromTable($categories [0] [0], $includeRecurring, $additionalWhere, $this->getServiceKey(), true, false, $eventType);
+        return $this->getEventsFromTable(
+            $categories[0][0],
+            $includeRecurring,
+            $additionalWhere,
+            $this->getServiceKey(),
+            true,
+            false,
+            $eventType
+        );
     }
-    public function getFreeAndBusyCalendarSearchString($pidList, $includePublic, $linkIds)
+
+    /**
+     * @param $pidList
+     * @param $includePublic
+     * @param $linkIds
+     * @return string
+     */
+    public function getFreeAndBusyCalendarSearchString($pidList, $includePublic, $linkIds): string
     {
         $hash = md5($pidList . ' ' . $includePublic . ' ' . $linkIds);
-        if ($this->fnbCalendarSearchStringCache [$hash]) {
-            return $this->fnbCalendarSearchStringCache [$hash];
+        if ($this->fnbCalendarSearchStringCache[$hash]) {
+            return $this->fnbCalendarSearchStringCache[$hash];
         }
 
-        $calendarSearchString = '';
-        $freeNBusyCalendar = [];
-        $calendarOwner = [];
         $ids = [];
-        $excludeIds = [];
         $idArray = $this->getIdsFromTable($linkIds, $pidList, $includePublic);
 
         $excludeIds = array_keys($this->getCalendarOwner());
@@ -126,33 +152,36 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
         if ($this->rightsObj->isLoggedIn()) {
             $groups = $this->rightsObj->getUserGroups();
             $userId = $this->rightsObj->getUserId();
-            $where = '(tablenames = "fe_users" AND uid_foreign = ' . $userId . ') OR (tablenames = "fe_groups" AND uid_foreign in (' . implode(',', $groups) . '))';
-            $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('*', 'tx_cal_calendar_fnb_user_group_mm', $where);
+            $where = '(tablenames = "fe_users" AND uid_foreign = ' . $userId . ') OR (tablenames = "fe_groups" AND uid_foreign in (' . implode(
+                ',',
+                $groups
+                ) . '))';
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_cal_calendar_fnb_user_group_mm', $where);
             if ($result) {
-                while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    $ids [] = $row ['uid_local'];
-                    $this->calendarOwner [$row ['uid_local']] [$row ['tablenames']] [] = $row ['uid_foreign'];
+                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                    $ids[] = $row['uid_local'];
+                    $this->calendarOwner[$row['uid_local']][$row['tablenames']][] = $row['uid_foreign'];
                 }
-                $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+                $GLOBALS['TYPO3_DB']->sql_free_result($result);
             }
         }
 
         $where = 'tx_cal_calendar.activate_fnb = 1';
-        if (! empty($excludeIds)) {
+        if (!empty($excludeIds)) {
             $where .= ' AND uid not in (' . implode(',', $excludeIds) . ')';
         }
 
-        $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('*', 'tx_cal_calendar', $where);
+        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_cal_calendar', $where);
         if ($result) {
-            while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $ids [] = $row ['uid'];
+            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                $ids[] = $row['uid'];
             }
-            $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
 
         $calendarSearchString = ' AND tx_cal_calendar.activate_fnb = 1';
         // $idString = implode(',',$ids);
-        if (! empty($idArray)) {
+        if (!empty($idArray)) {
             // compare the allowed ids with the ids available and retrieve the intersects
             $calendarIds = array_intersect($idArray, $ids);
             if (empty($calendarIds)) {
@@ -165,7 +194,7 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
             }
         }
 
-        $this->fnbCalendarSearchStringCache [$hash] = $calendarSearchString;
+        $this->fnbCalendarSearchStringCache[$hash] = $calendarSearchString;
 
         return $calendarSearchString;
     }
@@ -173,67 +202,66 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
     /**
      * Call this after you have called getCalendarSearchString or getFreeAndBusyCalendarSearchString
      */
-    public function getCalendarOwner()
+    public function getCalendarOwner(): array
     {
-        if ($this->calendarOwner == null) {
+        if (empty($this->calendarOwner)) {
             $this->calendarOwner = [];
             $table = 'tx_cal_calendar_fnb_user_group_mm';
-            $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('*', $table, '');
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, '');
             if ($result) {
-                while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    $ids [] = $row ['uid_local'];
-                    $this->calendarOwner [$row ['uid_local']] [$row ['tablenames']] [] = $row ['uid_foreign'];
+                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                    $ids[] = $row['uid_local'];
+                    $this->calendarOwner[$row['uid_local']][$row['tablenames']][] = $row['uid_foreign'];
                 }
-                $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+                $GLOBALS['TYPO3_DB']->sql_free_result($result);
             }
         }
         return $this->calendarOwner;
     }
-    public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false)
+
+    /**
+     * @param $list
+     * @param $pidList
+     * @param $includePublic
+     * @param bool $includeData
+     * @param bool $onlyPublic
+     * @return array
+     */
+    public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false): array
     {
         $this->calendarIds = [];
         $collectedIds = [];
 
-        // Logged in? Show public & private calendar
-
-        // calendar ids specified? show these calendar only - if allowed - else show public calendar
-
         $limitationList = '';
-        if ($list != '') {
+        if ($list !== '') {
             $limitationList = $list;
-        }
-
-        // Lets see if the user is logged in
-        if ($this->rightsObj->isLoggedIn() && ! $onlyPublic) {
-            $userId = $this->rightsObj->getUserId();
-            $groupIds = implode(',', $this->rightsObj->getUserGroups());
         }
 
         $ids = [];
 
-        if ($includeData) {
-            $select = 'tx_cal_calendar.*';
-        } else {
-            $select = 'tx_cal_calendar.uid';
-        }
-
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('tx_cal_calendar');
-        $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('tx_cal_calendar_fnb_user_group_mm.uid_local', 'tx_cal_calendar_fnb_user_group_mm LEFT JOIN tx_cal_calendar ON tx_cal_calendar.uid=tx_cal_calendar_fnb_user_group_mm.uid_local', '1=1 ' . $this->cObj->enableFields('tx_cal_calendar'), '', $orderBy);
+        $orderBy = Functions::getOrderBy('tx_cal_calendar');
+        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+            'tx_cal_calendar_fnb_user_group_mm.uid_local',
+            'tx_cal_calendar_fnb_user_group_mm LEFT JOIN tx_cal_calendar ON tx_cal_calendar.uid=tx_cal_calendar_fnb_user_group_mm.uid_local',
+            '1=1 ' . $this->cObj->enableFields('tx_cal_calendar'),
+            '',
+            $orderBy
+        );
         if ($result) {
-            while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $ids [] = $row ['uid_local'];
+            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                $ids[] = $row['uid_local'];
             }
-            $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
 
         $ids = array_unique($ids);
         if ($includePublic) {
             $where = '';
-            if (! empty($ids)) {
+            if (!empty($ids)) {
                 $where .= 'uid NOT IN (' . implode(',', $ids) . ') AND ';
             }
             $where .= 'tx_cal_calendar.activate_fnb = 1 ' . $this->cObj->enableFields('tx_cal_calendar');
-            if ($pidList != '') {
+            if ($pidList !== '') {
                 $where .= ' AND pid IN (' . $pidList . ')';
             }
 
@@ -244,32 +272,38 @@ class FnbEventService extends \TYPO3\CMS\Cal\Service\EventService
             }
             $table = 'tx_cal_calendar';
 
-            $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select, $table, $where, '', $orderBy);
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, '', $orderBy);
             if ($result) {
-                while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-                    if (! in_array($row ['uid'], $collectedIds)) {
+                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                    if (!in_array($row['uid'], $collectedIds, true)) {
                         if ($includeData) {
-                            $this->calendarIds [] = $row;
+                            $this->calendarIds[] = $row;
                         } else {
-                            $this->calendarIds [] = $row ['uid'];
+                            $this->calendarIds[] = $row['uid'];
                         }
-                        $collectedIds [] = $row ['uid'];
+                        $collectedIds[] = $row['uid'];
                     }
                 }
-                $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+                $GLOBALS['TYPO3_DB']->sql_free_result($result);
             }
         }
 
-        if ($limitationList != '' && ! empty($this->calendarIds)) {
+        if ($limitationList !== '' && !empty($this->calendarIds)) {
             $limitationArray = explode(',', $limitationList);
             $this->calendarIds = array_intersect($this->calendarIds, $limitationArray);
         }
         return $this->calendarIds;
     }
-    public function createEvent($row, $isException)
+
+    /**
+     * @param $row
+     * @param $isException
+     * @return EventModel
+     */
+    public function createEvent($row, $isException): EventModel
     {
-        $event = new \TYPO3\CMS\Cal\Model\EventModel($row, $isException, $this->getServiceKey());
-        $event->row ['isFreeAndBusyEvent'] = 1;
+        $event = new EventModel($row, $isException, $this->getServiceKey());
+        $event->row['isFreeAndBusyEvent'] = 1;
         return $event;
     }
 }

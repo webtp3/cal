@@ -23,77 +23,129 @@ namespace TYPO3\CMS\Cal\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
- * A concrete model for the calendar.
- *
+ * Class TodoRecModel
  */
-class TodoRecModel extends \TYPO3\CMS\Cal\Model\EventRecModel
+class TodoRecModel extends EventRecModel
 {
+    /**
+     * TodoRecModel constructor.
+     * @param $todo
+     * @param $start
+     * @param $end
+     */
     public function __construct($todo, $start, $end)
     {
         parent::__construct($todo, $start, $end);
-        $this->setEventType(\TYPO3\CMS\Cal\Model\Model::EVENT_TYPE_TODO);
+        $this->setEventType(Model::EVENT_TYPE_TODO);
     }
 
-    public function renderEvent()
+    /**
+     * @return string
+     */
+    public function renderEvent(): string
     {
         return $this->fillTemplate('###TEMPLATE_TODO###');
     }
 
-    public function renderEventFor($viewType)
+    /**
+     * @param $viewType
+     * @param string $subpartSuffix
+     * @return string
+     */
+    public function renderEventFor($viewType, $subpartSuffix = ''): string
     {
-        if ($this->parentEvent->conf ['view.'] ['freeAndBusy.'] ['enable'] == 1) {
+        if ((int)$this->parentEvent->conf['view.']['freeAndBusy.']['enable'] === 1) {
             $viewType .= '_FNB';
         }
         // Need to check if _ALLDAY is already in viewType since handling changed from classic to new standard rendering
-        if (($this->isAllday()) && (strpos($viewType, '_ALLDAY') < 1)) {
+        if ($this->isAllDay() && (strpos($viewType, '_ALLDAY') < 1)) {
             $viewType .= '_ALLDAY';
         }
         return $this->fillTemplate('###TEMPLATE_TODO_' . strtoupper($viewType) . '###');
     }
 
-    public function renderEventPreview()
+    /**
+     * @return string
+     */
+    public function renderEventPreview(): string
     {
         $this->parentEvent->isPreview = true;
         return $this->fillTemplate('###TEMPLATE_TODO_PREVIEW###');
     }
 
-    public function renderTomorrowsEvent()
+    /**
+     * @return string
+     */
+    public function renderTomorrowsEvent(): string
     {
         $this->parentEvent->isTomorrow = true;
         return $this->fillTemplate('###TEMPLATE_TODO_TOMORROW###');
     }
 
-    public function fillTemplate($subpartMarker)
+    /**
+     * @param $subpartMarker
+     * @return string
+     */
+    public function fillTemplate($subpartMarker): string
     {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
-        $confArr = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
-        $modelTemplate = $confArr ['todoSubtype'] == 'event' ? 'todoInlineModelTemplate' : 'todoSeparateModelTemplate';
+        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $modelTemplate = $confArr['todoSubtype'] === 'event' ? 'todoInlineModelTemplate' : 'todoSeparateModelTemplate';
 
-        $page = Functions::getContent($this->parentEvent->conf ['view.'] ['todo.'] [$modelTemplate]);
-        if ($page == '') {
-            return '<h3>calendar: no todo model template file found:</h3>' . $this->parentEvent->conf ['view.'] ['todo.'] [$modelTemplate];
+        $page = Functions::getContent($this->parentEvent->conf['view.']['todo.'][$modelTemplate]);
+        if ($page === '') {
+            return '<h3>calendar: no todo model template file found:</h3>' . $this->parentEvent->conf['view.']['todo.'][$modelTemplate];
         }
-        $page = $cObj->getSubpart($page, $subpartMarker);
-        if (! $page) {
-            return 'could not find the >' . str_replace('###', '', $subpartMarker) . '< subpart-marker in ' . $this->parentEvent->conf ['view.'] ['todo.'] ['todoModelTemplate'];
+        $page = $this->markerBasedTemplateService->getSubpart($page, $subpartMarker);
+        if (!$page) {
+            return 'could not find the >' . str_replace(
+                '###',
+                '',
+                $subpartMarker
+                ) . '< subpart-marker in ' . $this->parentEvent->conf['view.']['todo.']['todoModelTemplate'];
         }
         $rems = [];
         $sims = [];
         $wrapped = [];
-        $this->getMarker($page, $sims, $rems, $wrapped, $this->parentEvent->conf ['view']);
-        return $this->parentEvent->finish(\TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped));
+        $this->getMarker($page, $sims, $rems, $wrapped, $this->parentEvent->conf['view']);
+        return $this->parentEvent->finish(Functions::substituteMarkerArrayNotCached(
+            $page,
+            $sims,
+            $rems,
+            $wrapped
+        ));
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getStatusMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getStatusMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getPriorityMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getPriorityMarker($template, $sims, $rems, $wrapped, $view);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getCompletedMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $this->parentEvent->getCompletedMarker($template, $sims, $rems, $wrapped, $view);

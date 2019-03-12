@@ -20,40 +20,31 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\LocationModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
  * A service which renders a form to create / edit a location or organizer.
- *
  */
-class DeleteLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class DeleteLocationOrganizerView extends FeEditingBaseView
 {
     public $isLocation = true;
     public $objectString = 'location';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Draws a delete form for a location or an organizer.
      *
-     * @param
-     *        	boolean True if a location should be deleted
-     * @param
-     *        	object		The object to be deleted
-     * @param
-     *        	object		The cObject of the mother-class.
-     * @param
-     *        	object		The rights object.
+     * @param bool True if a location should be deleted
+     * @param LocationModel        The object to be deleted
+     * @param object        The cObject of the mother-class.
+     * @param object        The rights object.
      * @return string HTML output.
      */
-    public function drawDeleteLocationOrOrganizer($isLocation = true, &$object)
+    public function drawDeleteLocationOrOrganizer($isLocation, &$object): string
     {
-        $page = Functions::getContent($this->conf ['view.'] ['delete_location.'] ['template']);
-        if ($page == '') {
-            return '<h3>category: no delete location template file found:</h3>' . $this->conf ['view.'] ['delete_location.'] ['template'];
+        $page = Functions::getContent($this->conf['view.']['delete_location.']['template']);
+        if ($page === '') {
+            return '<h3>category: no delete location template file found:</h3>' . $this->conf['view.']['delete_location.']['template'];
         }
 
         $this->isLocation = $isLocation;
@@ -68,24 +59,24 @@ class DeleteLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $sims = [];
         $wrapped = [];
 
-        $sims ['###UID###'] = $this->conf ['uid'];
-        $sims ['###TYPE###'] = $this->conf ['type'];
-        $sims ['###VIEW###'] = 'remove_' . $this->objectString;
-        $sims ['###LASTVIEW###'] = $this->controller->extendLastView();
-        $sims ['###L_DELETE_LOCATION###'] = $this->controller->pi_getLL('l_delete_' . $this->objectString);
-        $sims ['###L_DELETE###'] = $this->controller->pi_getLL('l_delete');
-        $sims ['###L_CANCEL###'] = $this->controller->pi_getLL('l_cancel');
-        $sims ['###ACTION_URL###'] = htmlspecialchars($this->controller->pi_linkTP_keepPIvars_url([
-                'view' => 'remove_' . $this->objectString
+        $sims['###UID###'] = $this->conf['uid'];
+        $sims['###TYPE###'] = $this->conf['type'];
+        $sims['###VIEW###'] = 'remove_' . $this->objectString;
+        $sims['###LASTVIEW###'] = $this->controller->extendLastView();
+        $sims['###L_DELETE_LOCATION###'] = $this->controller->pi_getLL('l_delete_' . $this->objectString);
+        $sims['###L_DELETE###'] = $this->controller->pi_getLL('l_delete');
+        $sims['###L_CANCEL###'] = $this->controller->pi_getLL('l_cancel');
+        $sims['###ACTION_URL###'] = htmlspecialchars($this->controller->pi_linkTP_keepPIvars_url([
+            'view' => 'remove_' . $this->objectString
         ]));
         $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, []);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $sims = [];
         $rems = [];
         $wrapped = [];
         $this->object->getMarker($page, $sims, $rems, $wrapped);
 
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
+        return Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
     }
 }

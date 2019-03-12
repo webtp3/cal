@@ -22,19 +22,25 @@ namespace TYPO3\CMS\Cal\Backend\Modul;
  */
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Module\BaseScriptClass;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\DateParser;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Module 'Indexer' for the 'cal' extension.
- *
  */
-class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
+class CalIndexer extends BaseScriptClass
 {
 
     /**
@@ -63,7 +69,7 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
     protected $backendTemplatePath = '';
 
     /**
-     * @var \TYPO3\CMS\Fluid\View\StandaloneView
+     * @var StandaloneView
      */
     protected $view;
 
@@ -89,18 +95,18 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
     public $pageinfo;
 
     /**
-     * @return \TYPO3\CMS\Cal\Backend\Modul\CalIndexer
+     * @throws InvalidExtensionNameException
      */
     public function __construct()
     {
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
         $this->getLanguageService()->includeLLFile('EXT:cal/Resources/Private/Language/locallang_indexer.xlf');
         $this->MCONF = [
-                'name' => $this->moduleName,
+            'name' => $this->moduleName,
         ];
         $this->cshKey = '_MOD_' . $this->moduleName;
         $this->backendTemplatePath = ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Templates/Backend/IndexerModule/';
-        $this->view = GeneralUtility::makeInstance(\TYPO3\CMS\Fluid\View\StandaloneView::class);
+        $this->view = GeneralUtility::makeInstance(StandaloneView::class);
         $this->view->getRequest()->setControllerExtensionName('cal');
         $this->view->setPartialRootPaths([ExtensionManagementUtility::extPath('cal') . 'Resources/Private/Templates/Backend/IndexerModule/Partials/']);
         $this->moduleUri = BackendUtility::getModuleUrl($this->moduleName);
@@ -117,10 +123,10 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
     public function menuConfig()
     {
         $this->MOD_MENU = [
-                'function' => [
-                        '1' => $this->getLanguageService()->getLL('function1'),
-                        '2' => $this->getLanguageService()->getLL('function2')
-                ]
+            'function' => [
+                '1' => $this->getLanguageService()->getLL('function1'),
+                '2' => $this->getLanguageService()->getLL('function2')
+            ]
         ];
         parent::menuConfig();
     }
@@ -133,7 +139,7 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
      * @param ResponseInterface $response
      * @return ResponseInterface the response with the content
      */
-    public function mainAction(ServerRequestInterface $request, ResponseInterface $response)
+    public function mainAction(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $GLOBALS['SOBE'] = $this;
         $this->init();
@@ -154,17 +160,17 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 
         foreach ($this->MOD_MENU['function'] as $controller => $title) {
             $item = $menu
-            ->makeMenuItem()
-            ->setHref(
-                BackendUtility::getModuleUrl(
-                    $this->moduleName,
-                    [
-                                'id' => $this->id,
-                                'SET' => [
-                                        'function' => $controller
-                                ]
+                ->makeMenuItem()
+                ->setHref(
+                    BackendUtility::getModuleUrl(
+                        $this->moduleName,
+                        [
+                            'id' => $this->id,
+                            'SET' => [
+                                'function' => $controller
+                            ]
                         ]
-                        )
+                    )
                 )
                 ->setTitle($title);
 
@@ -177,6 +183,7 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
     }
 
     // If you chose 'web' as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
+
     /**
      * Main function of the module.
      * Write the content to $this->content
@@ -197,7 +204,7 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         } else {
             // If no access, only display the module's title
             $this->content = '<h1>' . $this->getLanguageService()->getLL('title.') . '</h1>';
-            $this->content .='<div style="padding-top: 5px;"></div>';
+            $this->content .= '<div style="padding-top: 5px;"></div>';
         }
 
         $this->getModuleMenu();
@@ -206,9 +213,9 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
     /**
      * Generates the module content
      */
-    protected function getModuleContent()
+    protected function getModuleContent(): string
     {
-        switch (intval($this->MOD_SETTINGS ['function'])) {
+        switch (intval($this->MOD_SETTINGS['function'])) {
             case 2:
                 $postVarArray = GeneralUtility::_POST();
                 $pageIds = [];
@@ -216,7 +223,7 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
                     foreach ($postVarArray['pageIds'] as $id => $pageId) {
                         $tsPage = intval($postVarArray['tsPage'][$id]);
                         if ($tsPage > 0) {
-                            $pageIds [intval($pageId)] = $tsPage;
+                            $pageIds[intval($pageId)] = $tsPage;
                         }
                     }
                 }
@@ -235,8 +242,13 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 
                 if (count($pageIds) > 0 && is_int($starttime) && is_int($endtime)) {
                     $content = $this->getLanguageService()->getLL('indexing') . '<br/>';
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                    $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator', 0, $starttime, $endtime);
+                    /** @var RecurrenceGenerator $rgc */
+                    $rgc = GeneralUtility::makeInstance(
+                        RecurrenceGenerator::class,
+                        0,
+                        $starttime,
+                        $endtime
+                    );
                     foreach ($pageIds as $eventPage => $pluginPage) {
                         $content .= sprintf($this->getLanguageService()->getLL('droppingTable'), $eventPage);
                         $content .= $rgc->cleanIndexTable($eventPage);
@@ -251,10 +263,10 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
                         $content .= $rgc->getInfo();
                     }
                 } else {
-                    $extConf = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
+                    $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 
-                    /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */
-                    $rgc = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Utility\\RecurrenceGenerator');
+                    /** @var RecurrenceGenerator $rgc */
+                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
                     $pages = $rgc->getRecurringEventPages();
                     $selectFieldIds = [];
                     // Load necessary JavaScript
@@ -267,29 +279,29 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
 
                         $table[] =
                             '<div class="form-group col-sm-6" id="pageIds_col">'
-                                . $label1 . '</div>';
+                            . $label1 . '</div>';
                         $table[] =
                             '<div class="form-group col-sm-6" id="pageIds_colId">'
-                                . $label2 . '</div>';
+                            . $label2 . '</div>';
 
                         foreach ($pages as $pageId => $pageTitle) {
                             $table[] =
-                            '<div class="form-group col-sm-6" id="pageIds_col' . $pageId . '">'
-                                    . '<div class="form-control-wrap">'
-                                            . '<div class="input-group" id="tceforms-pageIds_col' . $pageId . '_row-wrapper">'
-                                                    . $pageTitle . ' [' . $pageId . '] '
-                                                       . '<input name="pageIds[]" value="' . $pageId . '" data-date-offset="0" type="hidden" id="tceforms-pageIds_colId' . $pageId . '_row">'
-                                                            . '</div>'
-                                                                    . '</div>'
-                                                                            . '</div>';
+                                '<div class="form-group col-sm-6" id="pageIds_col' . $pageId . '">'
+                                . '<div class="form-control-wrap">'
+                                . '<div class="input-group" id="tceforms-pageIds_col' . $pageId . '_row-wrapper">'
+                                . $pageTitle . '[' . $pageId . '] '
+                                . '<input name="pageIds[]" value="' . $pageId . '" data-date-offset="0" type="hidden" id="tceforms-pageIds_colId' . $pageId . '_row">'
+                                . '</div>'
+                                . '</div>'
+                                . '</div>';
                             $table[] =
-                            '<div class="form-group col-sm-6" id="tsPage_colId' . $pageId . '">'
-                                    . '<div class="form-control-wrap">'
-                                            . '<div class="input-group" id="tsPage_colId' . $pageId . '_row-wrapper">'
-                                                    . '<input name="tsPage[]" value="" class="form-control  t3js-clearable" data-date-type="date" data-date-offset="0" type="text" id="tceforms-tsPage_colId' . $pageId . '_row">'
-                                                            . '</div>'
-                                                                    . '</div>'
-                                                                            . '</div>';
+                                '<div class="form-group col-sm-6" id="tsPage_colId' . $pageId . '">'
+                                . '<div class="form-control-wrap">'
+                                . '<div class="input-group" id="tsPage_colId' . $pageId . '_row-wrapper">'
+                                . '<input name="tsPage[]" value="" class="form-control  t3js-clearable" data-date-type="date" data-date-offset="0" type="text" id="tceforms-tsPage_colId' . $pageId . '_row">'
+                                . '</div>'
+                                . '</div>'
+                                . '</div>';
                         }
 
                         $selectFields = '';
@@ -301,42 +313,43 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
                         $content .= $this->getLanguageService()->getLL('selectPage');
                         $content .= '<br /><br />';
 
-                        $dateFormat = $GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] ? '%H:%M %m-%d-%Y' : '%H:%M %d-%m-%Y';
-
                         $label = '<label>' . $this->getLanguageService()->getLL('indexStart') . '</label>';
-                        $value = $extConf ['recurrenceStart'];
+                        $value = $extConf['recurrenceStart'];
                         $table[] =
-                        '<div class="form-section"><div class="row"><div class="form-group col-sm-6" id="index_start_col">'
-                                . $label
-                                . '<div class="form-control-wrap">'
-                                        . '<div class="input-group" id="tceforms-datetimefield-starttime_row-wrapper">'
-                                                . '<input name="starttime" value="' . $value . '" class="form-control t3js-clearable" data-date-type="date" data-date-offset="0" type="text" id="tceforms-datetimefield-starttime_row">'
-                                                                        . '</div>'
-                                                                                . '</div>'
-                                                                                        . '</div>';
+                            '<div class="form-section"><div class="row"><div class="form-group col-sm-6" id="index_start_col">'
+                            . $label
+                            . '<div class="form-control-wrap">'
+                            . '<div class="input-group" id="tceforms-datetimefield-starttime_row-wrapper">'
+                            . '<input name="starttime" value="' . $value . '" class="form-control t3js-clearable" data-date-type="date" data-date-offset="0" type="text" id="tceforms-datetimefield-starttime_row">'
+                            . '</div>'
+                            . '</div>'
+                            . '</div>';
 
                         // End date/time field
                         // NOTE: datetime fields need a special id naming scheme
-                        $value = $extConf ['recurrenceEnd'];
+                        $value = $extConf['recurrenceEnd'];
                         $label = '<label>' . $this->getLanguageService()->getLL('indexEnd') . '</label>';
                         $table[] =
-                        '<div class="form-group col-sm-6" id="index_end_col">'
-                                . $label
-                                . '<div class="form-control-wrap">'
-                                        . '<div class="input-group" id="tceforms-datetimefield-endtime_row-wrapper">'
-                                                . '<input name="endtime" value="' . $value . '" class="form-control  t3js-clearable" data-date-type="date" data-date-offset="0" type="text" id="tceforms-datetimefield-endtime_row">'
-                                                                        . '</div>'
-                                                                                . '</div>'
-                                                                                        . '</div></div></div>';
+                            '<div class="form-group col-sm-6" id="index_end_col">'
+                            . $label
+                            . '<div class="form-control-wrap">'
+                            . '<div class="input-group" id="tceforms-datetimefield-endtime_row-wrapper">'
+                            . '<input name="endtime" value="' . $value . '" class="form-control  t3js-clearable" data-date-type="date" data-date-offset="0" type="text" id="tceforms-datetimefield-endtime_row">'
+                            . '</div>'
+                            . '</div>'
+                            . '</div></div></div>';
                         $content .= implode(LF, $table);
                         //$content .= $this->getLanguageService()->getLL ('indexStart');
-                        //$content .= '<input name="starttime" type="text" value="' . $extConf ['recurrenceStart'] . '" size="8" maxlength="8">';
+                        //$content .= '<input name="starttime" type="text" value="' . $extConf['recurrenceStart'] . '" size="8" maxlength="8">';
                         //$content .= '<br />';
                         //$content .= $this->getLanguageService()->getLL ('indexEnd');
-                        //$content .= '<input name="endtime" type="text" value="' . $extConf ['recurrenceEnd'] . '" size="8" maxlength="8">';
+                        //$content .= '<input name="endtime" type="text" value="' . $extConf['recurrenceEnd'] . '" size="8" maxlength="8">';
                         $content .= '<br /><br /><input type="submit" value="' . $this->getLanguageService()->getLL('startIndexing') . '" onclick="return markSelections();"/>';
                     } else {
-                        $content .= self::getMessage($this->getLanguageService()->getLL('nothingToDo'), FlashMessage::INFO);
+                        $content .= self::getMessage(
+                            $this->getLanguageService()->getLL('nothingToDo'),
+                            FlashMessage::INFO
+                        );
                     }
                 }
                 break;
@@ -350,25 +363,35 @@ class CalIndexer extends \TYPO3\CMS\Backend\Module\BaseScriptClass
         return $content;
     }
 
-    private function getTimeParsed($timeString)
+    /**
+     * @param $timeString
+     * @return CalDate
+     */
+    private function getTimeParsed($timeString): CalDate
     {
-        $dp = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\DateParser');
+        $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }
 
-    public static function getMessage($message, $type)
+    /**
+     * @param $message
+     * @param $type
+     * @return string
+     * @throws Exception
+     */
+    public static function getMessage($message, $type): string
     {
         /** @var $flashMessage FlashMessage */
         $flashMessage = GeneralUtility::makeInstance(
-            'TYPO3\\CMS\\Core\\Messaging\\FlashMessage',
+            FlashMessage::class,
             htmlspecialchars($message),
             '',
             $type,
             true
         );
-        /** @var $flashMessageService \TYPO3\CMS\Core\Messaging\FlashMessageService */
-        $flashMessageService = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessageService');
+        /** @var $flashMessageService FlashMessageService */
+        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
         return $defaultFlashMessageQueue->renderFlashMessages();

@@ -20,38 +20,45 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use BackendUtilityReplacementUtility;
 use OutOfBoundsException;
+use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Cron\ReminderScheduler;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Scheduler\Execution;
+use TYPO3\CMS\Scheduler\Scheduler;
 
 /**
- *
+ * Class ReminderView
  */
-class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
+class ReminderView extends NotificationView
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
+
+    /**
+     * @param $event
+     * @param $eventMonitor
+     */
     public function remind(&$event, $eventMonitor)
     {
         $this->startMailer();
 
-        switch ($eventMonitor ['tablenames']) {
+        switch ($eventMonitor['tablenames']) {
             case 'fe_users':
-                $feUserRec = BackendUtility::getRecord('fe_users', $eventMonitor ['uid_foreign']);
-                $this->process($event, $feUserRec ['email'], $eventMonitor ['tablenames'] . '_' . $feUserRec ['uid']);
+                $feUserRec = BackendUtility::getRecord('fe_users', $eventMonitor['uid_foreign']);
+                $this->process($event, $feUserRec['email'], $eventMonitor['tablenames'] . '_' . $feUserRec['uid']);
                 break;
             case 'fe_groups':
                 $subType = 'getGroupsFE';
                 $groups = [];
-                $serviceObj = null;
                 $serviceObj = GeneralUtility::makeInstanceService('auth', $subType);
-                if ($serviceObj == null) {
+                if ($serviceObj === null) {
                     return;
                 }
 
-                $serviceObj->getSubGroups($eventMonitor ['uid_foreign'], '', $groups);
+                $serviceObj->getSubGroups($eventMonitor['uid_foreign'], '', $groups);
 
                 $select = 'DISTINCT fe_users.email';
                 $table = 'fe_groups, fe_users';
@@ -62,34 +69,42 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
 						AND fe_groups.hidden = 0 
 						AND fe_users.disable = 0
 						AND fe_users.deleted = 0';
-                $result2 = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-                while ($row2 = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result2)) {
-                    $this->process($event, $row2 ['email'], $eventMonitor ['tablenames'] . '_' . $row2 ['uid']);
+                $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
+                while ($row2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2)) {
+                    $this->process($event, $row2['email'], $eventMonitor['tablenames'] . '_' . $row2['uid']);
                 }
-                $GLOBALS ['TYPO3_DB']->sql_free_result($result2);
+                $GLOBALS['TYPO3_DB']->sql_free_result($result2);
                 break;
             case 'tx_cal_unknown_users':
-                $feUserRec = BackendUtility::getRecord('tx_cal_unknown_users', $eventMonitor ['uid_foreign']);
-                $this->process($event, $feUserRec ['email'], $eventMonitor ['tablenames'] . '_' . $feUserRec ['uid']);
+                $feUserRec = BackendUtility::getRecord('tx_cal_unknown_users', $eventMonitor['uid_foreign']);
+                $this->process($event, $feUserRec['email'], $eventMonitor['tablenames'] . '_' . $feUserRec['uid']);
                 break;
         }
     }
+
+    /**
+     * @param $event
+     * @param $email
+     * @param $userId
+     */
     public function process(&$event, $email, $userId)
     {
-        if ($email != '' && GeneralUtility::validEmail($email)) {
-            $template = $this->conf ['view.'] ['event.'] ['remind.'] [$userId . '.'] ['template'];
-            if (! $template) {
-                $template = $this->conf ['view.'] ['event.'] ['remind.'] ['all.'] ['template'];
+        if ($email !== '' && GeneralUtility::validEmail($email)) {
+            $template = $this->conf['view.']['event.']['remind.'][$userId . '.']['template'];
+            if (!$template) {
+                $template = $this->conf['view.']['event.']['remind.']['all.']['template'];
             }
-            $titleText = $this->conf ['view.'] ['event.'] ['remind.'] [$userId . '.'] ['emailTitle'];
-            if (! $titleText) {
-                $titleText = $this->conf ['view.'] ['event.'] ['remind.'] ['all.'] ['emailTitle'];
+            $titleText = $this->conf['view.']['event.']['remind.'][$userId . '.']['emailTitle'];
+            if (!$titleText) {
+                $titleText = $this->conf['view.']['event.']['remind.']['all.']['emailTitle'];
             }
             $this->sendNotification($event, $email, $template, $titleText, '');
         }
     }
 
-    /* @todo	Figure out where this should live */
+    /* @todo    Figure out where this should live
+     * @param int $calEventUID
+     */
     public function scheduleReminder($calEventUID)
     {
 
@@ -98,61 +113,56 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
 
         // get the related monitoring records
         $taskId = null;
-        $offset = 0;
 
-        $select = '*';
-        $table = 'tx_cal_fe_user_event_monitor_mm';
-        $where = 'uid_local = ' . $calEventUID;
-
-        $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-        while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-            $taskId = $row ['schedulerId'];
-            $offset = $row ['offset'];
+        $events = $this->subscriptionRepository->findByEventUid($calEventUID);
+        foreach ($events as $event) {
+            $taskId = $event['schedulerId'];
+            $offset = $event['offset'];
 
             // maybe there is a recurring instance
             // get the uids of recurring events from index
-            $now = new  \TYPO3\CMS\Cal\Model\CalDate();
-            $now->setTZbyId('UTC');
+            $now = new  CalDate();
+            $now->setTZbyID('UTC');
             $now->addSeconds($offset * 60);
-            $startDateTimeObject = new  \TYPO3\CMS\Cal\Model\CalDate($eventRecord ['start_date'] . '000000');
-            $startDateTimeObject->setTZbyId('UTC');
-            $startDateTimeObject->addSeconds($eventRecord ['start_time']);
+            $startDateTimeObject = new  CalDate($eventRecord['start_date'] . '000000');
+            $startDateTimeObject->setTZbyID('UTC');
+            $startDateTimeObject->addSeconds($eventRecord['start_time']);
             $start_datetime = $startDateTimeObject->format('%Y%m%d%H%M%S');
             $select2 = '*';
             $table2 = 'tx_cal_index';
             $where2 = 'start_datetime >= ' . $now->format('%Y%m%d%H%M%S') . ' AND event_uid = ' . $calEventUID;
             $orderby2 = 'start_datetime asc';
-            $result2 = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select2, $table2, $where2, $orderby2);
+            $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select2, $table2, $where2, $orderby2);
             if ($result) {
-                $tmp = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result2);
+                $tmp = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2);
                 if (is_array($tmp)) {
-                    $start_datetime = $tmp ['start_datetime'];
-                    $nextOccuranceTime = new  \TYPO3\CMS\Cal\Model\CalDate($tmp ['start_datetime']);
-                    $nextOccuranceTime->setTZbyId('UTC');
-                    $nextOccuranceEndTime = new  \TYPO3\CMS\Cal\Model\CalDate($tmp ['end_datetime']);
-                    $nextOccuranceEndTime->setTZbyId('UTC');
-                    $eventRecord ['start_date'] = $nextOccuranceTime->format('%Y%m%d');
-                    $eventRecord ['start_time'] = $nextOccuranceTime->getHour() * 3600 + $nextOccuranceTime->getMinute() * 60 + $nextOccuranceTime->getSecond();
-                    $eventRecord ['end_date'] = $nextOccuranceEndTime->format('%Y%m%d');
-                    $eventRecord ['end_time'] = $nextOccuranceEndTime->getHour() * 3600 + $nextOccuranceEndTime->getMinute() * 60 + $nextOccuranceEndTime->getSecond();
+                    $start_datetime = $tmp['start_datetime'];
+                    $nextOccuranceTime = new  CalDate($tmp['start_datetime']);
+                    $nextOccuranceTime->setTZbyID('UTC');
+                    $nextOccuranceEndTime = new  CalDate($tmp['end_datetime']);
+                    $nextOccuranceEndTime->setTZbyID('UTC');
+                    $eventRecord['start_date'] = $nextOccuranceTime->format('%Y%m%d');
+                    $eventRecord['start_time'] = $nextOccuranceTime->getHour() * 3600 + $nextOccuranceTime->getMinute() * 60 + $nextOccuranceTime->getSecond();
+                    $eventRecord['end_date'] = $nextOccuranceEndTime->format('%Y%m%d');
+                    $eventRecord['end_time'] = $nextOccuranceEndTime->getHour() * 3600 + $nextOccuranceEndTime->getMinute() * 60 + $nextOccuranceEndTime->getSecond();
                 }
-                $GLOBALS ['TYPO3_DB']->sql_free_result($result2);
+                $GLOBALS['TYPO3_DB']->sql_free_result($result2);
             }
 
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('scheduler')) {
-                $scheduler = new \TYPO3\CMS\Scheduler\Scheduler();
-                $date = new  \TYPO3\CMS\Cal\Model\CalDate($start_datetime);
-                $date->setTZbyId('UTC');
+            if (ExtensionManagementUtility::isLoaded('scheduler')) {
+                $scheduler = new Scheduler();
+                $date = new  CalDate($start_datetime);
+                $date->setTZbyID('UTC');
                 $timestamp = $date->getTime();
-                $offsetTime = new  \TYPO3\CMS\Cal\Model\CalDate();
+                $offsetTime = new  CalDate();
                 $offsetTime->copy($date);
-                $offsetTime->setTZbyId('UTC');
-                $offsetTime->addSeconds(- 1 * $offset * 60);
+                $offsetTime->setTZbyID('UTC');
+                $offsetTime->addSeconds(-1 * $offset * 60);
                 if ($taskId > 0) {
                     if ($offsetTime->isFuture()) {
                         try {
                             $task = $scheduler->fetchTask($taskId);
-                            $execution = new \TYPO3\CMS\Scheduler\Execution();
+                            $execution = new Execution();
                             $execution->setStart($timestamp - ($offset * 60));
                             $execution->setIsNewSingleExecution(true);
                             $execution->setMultiple(false);
@@ -161,86 +171,102 @@ class ReminderView extends \TYPO3\CMS\Cal\View\NotificationView
                             $task->setDisabled(false);
                             $scheduler->saveTask($task);
                         } catch (OutOfBoundsException $e) {
-                            $this->createSchedulerTask($scheduler, $date, $calEventUID, $timestamp, $offset, $row ['uid']);
+                            $this->createSchedulerTask(
+                                $scheduler,
+                                $date,
+                                $calEventUID,
+                                $timestamp,
+                                $offset,
+                                $event['uid']
+                            );
                         }
                     } else {
                         $this->deleteReminder($calEventUID);
                     }
                 } else {
-                    // taskId == 0 -> schedule task
-                    $this->createSchedulerTask($scheduler, $date, $calEventUID, $timestamp, $offset, $row ['uid']);
+                    $this->createSchedulerTask($scheduler, $date, $calEventUID, $timestamp, $offset, $event['uid']);
                 }
             }
         }
     }
+
+    /**
+     * @param $scheduler
+     * @param CalDate $date
+     * @param $calEventUID
+     * @param $timestamp
+     * @param $offset
+     * @param $uid
+     */
     public function createSchedulerTask(&$scheduler, $date, $calEventUID, $timestamp, $offset, $uid)
     {
         if ($date->isFuture()) {
             /* Set up the scheduler event */
-            $task = new \TYPO3\CMS\Cal\Cron\ReminderScheduler();
+            $task = new ReminderScheduler();
             $task->setUID($calEventUID);
-            $taskGroup = BackendUtility::getRecordRaw('tx_scheduler_task_group', 'groupName="cal"');
+            $taskGroup = BackendUtilityReplacementUtility::getRawRecord('tx_scheduler_task_group', 'groupName="cal"');
             if ($taskGroup['uid']) {
                 $task->setTaskGroup($taskGroup['uid']);
             } else {
                 $crdate = time();
                 $insertFields = [];
-                $insertFields ['pid'] = 0;
-                $insertFields ['tstamp'] = $crdate;
-                $insertFields ['crdate'] = $crdate;
-                $insertFields ['cruser_id'] = 0;
-                $insertFields ['groupName'] = 'cal';
-                $insertFields ['description'] = 'Calendar Base';
+                $insertFields['pid'] = 0;
+                $insertFields['tstamp'] = $crdate;
+                $insertFields['crdate'] = $crdate;
+                $insertFields['cruser_id'] = 0;
+                $insertFields['groupName'] = 'cal';
+                $insertFields['description'] = 'Calendar Base';
                 $table = 'tx_scheduler_task_group';
-                $result = $GLOBALS ['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
+                $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
                 if (false === $result) {
-                    throw new \RuntimeException('Could not write ' . $table . ' record to database: ' . $GLOBALS ['TYPO3_DB']->sql_error(), 1431458160);
+                    throw new RuntimeException(
+                        'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                        1431458160
+                    );
                 }
-                $uid = $GLOBALS ['TYPO3_DB']->sql_insert_id();
+                $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
                 $task->setTaskGroup($uid);
             }
             $task->setDescription('Reminder of a calendar event (id=' . $calEventUID . ')');
             /* Schedule the event */
-            $execution = new \TYPO3\CMS\Scheduler\Execution();
+            $execution = new Execution();
             $execution->setStart($timestamp - ($offset * 60));
             $execution->setIsNewSingleExecution(true);
             $execution->setMultiple(false);
             $execution->setEnd(time() - 1);
             $task->setExecution($execution);
             $scheduler->addTask($task);
-            $GLOBALS ['TYPO3_DB']->exec_UPDATEquery('tx_cal_fe_user_event_monitor_mm', 'uid=' . $uid, [
-                    'schedulerId' => $task->getTaskUid()
-            ]);
-        } else {
+            $this->subscriptionRepository->updateByUid($uid, ['schedulerId' => $task->getTaskUid()]);
         }
     }
 
-    /* @todo	Figure out where this should live */
+    /* @todo    Figure out where this should live
+     * @param int $eventUid
+     */
     public function deleteReminder($eventUid)
     {
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('scheduler')) {
-            $eventRow = BackendUtility::getRecordRaw('tx_cal_fe_user_event_monitor_mm', 'uid_local=' . $eventUid);
-            $taskId = $eventRow ['schedulerId'];
+        if (ExtensionManagementUtility::isLoaded('scheduler')) {
+            $events = $this->subscriptionRepository->findByEventUid($eventUid);
+            $taskId = $events[0]['schedulerId'];
             if ($taskId > 0) {
-                $scheduler = new \TYPO3\CMS\Scheduler\Scheduler();
+                $scheduler = new Scheduler();
                 try {
                     $task = $scheduler->fetchTask($taskId);
                     $scheduler->removeTask($task);
                 } catch (OutOfBoundsException $e) {
                 }
             }
-        } elseif (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('gabriel')) {
-            $monitoringUID = 'tx_cal_fe_user_event_monitor_mm:' . $eventUid;
-            $GLOBALS ['TYPO3_DB']->exec_DELETEquery('tx_gabriel', ' crid="' . $eventUid . '"');
         }
     }
+
+    /**
+     * @param $eventUid
+     */
     public function deleteReminderForEvent($eventUid)
     {
-        // get the related monitoring records
-        $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('uid_local', 'tx_cal_fe_user_event_monitor_mm', 'uid_local = ' . $eventUid);
-        while ($monitorRow = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-            /* Check for existing gabriel events and remove them */
-            $this->deleteReminder($monitorRow ['uid_local']);
+        $events = $this->subscriptionRepository->findByEventUid($eventUid);
+        foreach ($events as $event) {
+            $this->deleteReminder($event['uid_local']);
         }
     }
 }

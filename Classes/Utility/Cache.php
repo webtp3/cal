@@ -8,6 +8,14 @@
 
 namespace TYPO3\CMS\Cal\Utility;
 
+use Memcache;
+use PDO;
+use RuntimeException;
+use TYPO3\CMS\Core\Cache\Exception\DuplicateIdentifierException;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -23,13 +31,6 @@ namespace TYPO3\CMS\Cal\Utility;
 
 /**
  * class.tx_cal_cache.php
- *
- */
-
-/**
- * [ Add description ]
- *
- *
  */
 class Cache
 {
@@ -38,12 +39,16 @@ class Cache
     public $lifetime = 0;
     public $ACCESS_TIME = 0;
 
+    /** @var ConnectionPool $connectionPool */
+    public $connectionPool;
+
     /**
-     * [Describe function...]
+     * Constructor.
+     * Takes the name of the caching backend as parameter.
      *
-     * @return [type]
+     * @param $cachingEngine string
      */
-    public function Cache($cachingEngine)
+    public function __construct($cachingEngine)
     {
         $this->cachingEngine = $cachingEngine;
         switch ($this->cachingEngine) {
@@ -57,63 +62,88 @@ class Cache
 
             // default = internal
         }
+
+        $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
     }
+
     public function initMemcached()
     {
         $this->tx_cal_cache = new Memcache();
         $this->tx_cal_cache->connect('localhost', 11211);
     }
+
     public function initCachingFramework()
     {
         try {
-            $GLOBALS ['typo3CacheFactory']->create('tx_cal_cache', 'TYPO3\\CMS\\Core\\Cache\\Frontend\\StringFrontend', $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['backend'], $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['options']);
-        } catch (\TYPO3\CMS\Core\Cache\Exception\DuplicateIdentifierException $e) {
+            $GLOBALS ['typo3CacheFactory']->create(
+                'tx_cal_cache',
+                VariableFrontend::class,
+                $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['backend'],
+                $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['caching'] ['cacheConfigurations'] ['tx_cal_cache'] ['options']
+            );
+        } catch (DuplicateIdentifierException $e) {
             // do nothing, a cal_cache cache already exists
         }
 
         $this->tx_cal_cache = $GLOBALS ['typo3CacheManager']->getCache('tx_cal_cache');
     }
+
+    /**
+     * @param $hash
+     * @param $content
+     * @param $ident
+     * @param int $lifetime
+     */
     public function set($hash, $content, $ident, $lifetime = 0)
     {
-        if ($lifetime == 0) {
+        if ($lifetime === 0) {
             $lifetime = $this->lifetime;
         }
-        if ($this->cachingEngine == 'cachingFramework') {
+        if ($this->cachingEngine === 'cachingFramework') {
             $this->tx_cal_cache->set($hash, $content, [
-                    'ident_' . $ident
+                'ident_' . $ident
             ], $lifetime);
-        } elseif ($this->cachingEngine == 'memcached') {
+        } elseif ($this->cachingEngine === 'memcached') {
             $this->tx_cal_cache->set($hash, $content, false, $lifetime);
         } else {
             $table = 'tx_cal_cache';
             $fields_values = [
-                    'identifier' => $hash,
-                    'content' => $content,
-                    'crdate' => $GLOBALS ['EXEC_TIME'],
-                    'lifetime' => $lifetime
+                'identifier' => $hash,
+                'content'    => $content,
+                'crdate'     => $GLOBALS ['EXEC_TIME'],
+                'lifetime'   => $lifetime
             ];
-            $GLOBALS ['TYPO3_DB']->exec_DELETEquery($table, 'identifier=' . $GLOBALS ['TYPO3_DB']->fullQuoteStr($hash, $table));
-            $result = $GLOBALS ['TYPO3_DB']->exec_INSERTquery($table, $fields_values);
-            if (false === $result) {
-                throw new \RuntimeException('Could not write cache record to database: ' . $GLOBALS ['TYPO3_DB']->sql_error(), 1431458130);
+            $connection = $this->connectionPool->getConnectionForTable($table);
+            $connection->delete($table, ['identifier' => $hash]);
+            $result = $connection->insert($table, $fields_values);
+            if ($result !== 1) {
+                throw new RuntimeException('Could not write cache record to database: ' . $connection->errorCode(), 1431458130);
             }
         }
     }
+
     public function get($hash)
     {
         $cacheEntry = false;
-        if ($this->cachingEngine == 'cachingFramework' || $this->cachingEngine == 'memcached') {
+        if ($this->cachingEngine === 'cachingFramework' || $this->cachingEngine === 'memcached') {
             $cacheEntry = $this->tx_cal_cache->get($hash);
         } else {
             $select_fields = 'content';
             $from_table = 'tx_cal_cache';
-            $where_clause = 'identifier=' . $GLOBALS ['TYPO3_DB']->fullQuoteStr($hash, $from_table);
 
-            // if ($period > 0) {
-            $where_clause .= ' AND (crdate+lifetime>' . $this->ACCESS_TIME . ' OR lifetime=0)';
-            // }
+            $builder = $this->connectionPool->getQueryBuilderForTable($from_table);
 
-            $cRec = $GLOBALS ['TYPO3_DB']->exec_SELECTgetRows($select_fields, $from_table, $where_clause);
+            $cRec = $builder
+                ->select($select_fields)
+                ->from($from_table)
+                ->where($builder->expr()->eq('identifier', '?'))
+                ->andWhere($builder->expr()->orX(
+                    'lifetime = 0',
+                    'crdate + lifetime > ?'
+                ))
+                ->setParameters([$hash, $this->ACCESS_TIME])
+                ->execute()
+                ->fetchAll(PDO::FETCH_ASSOC);
 
             if (is_array($cRec [0]) && $cRec [0] ['content'] != '') {
                 $cacheEntry = $cRec [0] ['content'];

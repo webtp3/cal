@@ -8,6 +8,11 @@
 
 namespace TYPO3\CMS\Cal\View;
 
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -23,9 +28,8 @@ namespace TYPO3\CMS\Cal\View;
 
 /**
  * Base model for the day.
- *
  */
-class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
+class NewWeekView extends NewTimeView
 {
     protected $week;
     protected $days;
@@ -37,25 +41,28 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
     protected $content = false;
     protected $weekHasEvent = false;
     protected $dayHasEvent = [
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
     ];
     protected $currentDayIndex = 9;
     protected $initialized = false;
 
     /**
      * Constructor.
+     * @param $week
+     * @param $year
+     * @param int $parentMonth
      */
     public function __construct($week, $year, $parentMonth = -1)
     {
         parent::__construct();
         $this->setMySubpart('WEEK_SUBPART');
-        if (DATE_CALC_BEGIN_WEEKDAY == 0) {
+        if (DATE_CALC_BEGIN_WEEKDAY === 0) {
             $this->setMySubpart('SUNDAY_WEEK_SUBPART');
         }
         $this->week = intval($week);
@@ -63,9 +70,14 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
         $this->setParentMonth($parentMonth);
         $this->generateDays();
     }
+
     private function generateDays()
     {
-        $weekStart = new \TYPO3\CMS\Cal\Model\CalDate(\TYPO3\CMS\Cal\Utility\Functions::getDayByWeek($this->getYear(), $this->week, DATE_CALC_BEGIN_WEEKDAY));
+        $weekStart = new CalDate(Functions::getDayByWeek(
+            $this->getYear(),
+            $this->week,
+            DATE_CALC_BEGIN_WEEKDAY
+        ));
 
         $this->weekStart = $weekStart->format('%Y%m%d');
         $this->setMonth($weekStart->getMonth());
@@ -77,111 +89,141 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
         $this->days = [];
         $this->alldays = [];
         $this->dayNums = [];
-        for ($i = 0; $i < 7; $i ++) {
-            $this->dayNums [$i] = $weekStart->day;
+        for ($i = 0; $i < 7; $i++) {
+            $this->dayNums[$i] = $weekStart->day;
             $weekStartFormated = $weekStart->format('%Y%m%d');
-            $this->days [$weekStartFormated] = new \TYPO3\CMS\Cal\View\NewDayView($weekStart->day, $weekStart->month, $weekStart->year, $this->getParentMonth());
-            $this->alldays [$weekStartFormated] = [];
+            $this->days[$weekStartFormated] = new NewDayView(
+                $weekStart->day,
+                $weekStart->month,
+                $weekStart->year,
+                $this->getParentMonth()
+            );
+            $this->alldays[$weekStartFormated] = [];
             $weekStart->addSeconds(86400);
         }
         $this->weekEnd = $weekStart->format('%Y%m%d');
     }
+
+    /**
+     * @param EventModel $event
+     * @return mixed|void
+     */
     public function addEvent(&$event)
     {
-        $eventStart = new \TYPO3\CMS\Cal\Model\CalDate();
+        $eventStart = new CalDate();
         $eventStart->copy($event->getStart());
         $eventStartFormatted = $eventStart->format('%Y%m%d');
         $eventStartYear = $eventStart->year;
         $eventEndFormatted = $event->getEnd()->format('%Y%m%d');
-        $eventEndYear = $event->getEnd()->year;
         $eventStartWeek = $event->getStart()->getWeekOfYear();
-        $eventEndWeek = $event->getEnd()->getWeekOfYear();
-        if (($eventStartWeek == 52 || $eventStartWeek == 53) && $event->getStart()->month == 1) {
-            $eventStartYear --;
+        if (($eventStartWeek === 52 || $eventStartWeek === 53) && $event->getStart()->month === 1) {
+            $eventStartYear--;
         }
-        if (($eventEndWeek == 52 || $eventEndWeek == 53) && $event->getEnd()->month == 1) {
-            $eventEndYear --;
+        if ($eventStartWeek === 1 && $event->getStart()->month === 12) {
+            $eventStartYear++;
         }
-        if ($eventStartWeek == 1 && $event->getStart()->month == 12) {
-            $eventStartYear ++;
-        }
-        if ($eventEndWeek == 1 && $event->getEnd()->month == 12) {
-            $eventEndYear ++;
-        }
-        if ($event->isAllday() || $eventStartFormatted != $eventEndFormatted) {
+        if ($eventStartFormatted !== $eventEndFormatted || $event->isAllDay()) {
             $eventYearEnd = $event->getEnd()->year;
-            if ($event->getEnd()->month == 12 && $event->getEnd()->getWeekOfYear() == 1) {
-                $eventYearEnd ++;
+            if ($event->getEnd()->month === 12 && $event->getEnd()->getWeekOfYear() === 1) {
+                $eventYearEnd++;
             }
 
-            if (! ($eventStartYear == $this->getYear() && $eventStart->getWeekOfYear() == $this->week) && $eventStart->year . sprintf('%02d', $eventStart->getWeekOfYear()) < $this->getYear() . sprintf('%02d', $this->week) && $eventYearEnd . sprintf('%02d', $event->getEnd()->getWeekOfYear()) >= $this->getYear() . sprintf('%02d', $this->week)) {
+            if (!($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) && $eventStart->year . sprintf(
+                '%02d',
+                $eventStart->getWeekOfYear()
+                ) < $this->getYear() . sprintf(
+                    '%02d',
+                    $this->week
+                ) && $eventYearEnd . sprintf(
+                    '%02d',
+                    $event->getEnd()->getWeekOfYear()
+                ) >= $this->getYear() . sprintf('%02d', $this->week)) {
                 do {
                     $eventStart->addSeconds(86400);
                     $eventStartYear = $eventStart->year;
                     $eventWeek = $eventStart->getWeekOfYear();
-                    if ($eventStart->month == 1 && $eventWeek > 50) {
-                        $eventStartYear --;
+                    if ($eventStart->month === 1 && $eventWeek > 50) {
+                        $eventStartYear--;
                     }
-                } while ($eventStartYear . sprintf('%02d', $eventWeek) < $this->getYear() . sprintf('%02d', $this->week));
+                } while ($eventStartYear . sprintf('%02d', $eventWeek) < $this->getYear() . sprintf(
+                    '%02d',
+                    $this->week
+                ));
                 $eventStartFormatted = $eventStart->format('%Y%m%d');
             }
-            if ($eventStartYear == $this->getYear() && $eventStart->getWeekOfYear() == $this->week) {
-                $this->alldays [$eventStartFormatted] [] = $event;
+            if ($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) {
+                $this->alldays[$eventStartFormatted][] = $event;
                 $this->weekHasEvent = true;
                 $first = true;
                 do {
-                    $this->dayHasEvent [$eventStart->getDayOfWeek()] = true;
-                    if (is_object($this->days [$eventStart->format('%Y%m%d')])) {
-                        $this->days [$eventStart->format('%Y%m%d')]->setHasAlldayEvents(true);
+                    $this->dayHasEvent[$eventStart->getDayOfWeek()] = true;
+                    if (is_object($this->days[$eventStart->format('%Y%m%d')])) {
+                        $this->days[$eventStart->format('%Y%m%d')]->setHasAlldayEvents(true);
                         if ($first) {
-                            $this->days [$eventStart->format('%Y%m%d')]->addEvent($event);
+                            $this->days[$eventStart->format('%Y%m%d')]->addEvent($event);
                             $first = false;
                         }
                     }
                     $eventStart->addSeconds(86400);
                     $eventStartYear = $eventStart->year;
                     $eventWeek = $eventStart->getWeekOfYear();
-                    if ($eventStart->month == 1 && $eventWeek > 50) {
-                        $eventStartYear --;
+                    if ($eventStart->month === 1 && $eventWeek > 50) {
+                        $eventStartYear--;
                     }
-                } while ($eventStart->format('%Y%m%d') <= $eventEndFormatted && $eventStartYear . sprintf('%02d', $eventStart->getWeekOfYear()) <= $this->getYear() . sprintf('%02d', $this->week));
+                } while ($eventStart->format('%Y%m%d') <= $eventEndFormatted && $eventStartYear . sprintf(
+                    '%02d',
+                    $eventStart->getWeekOfYear()
+                ) <= $this->getYear() . sprintf('%02d', $this->week));
             }
         } else {
             do {
-                if ($eventStartYear == $this->getYear() && $eventStartWeek == $this->week) {
-                    $this->dayHasEvent [$eventStart->getDayOfWeek()] = true;
-                    if (is_object($this->days [$eventStart->format('%Y%m%d')])) {
-                        $this->days [$eventStart->format('%Y%m%d')]->addEvent($event);
+                if ($eventStartWeek === $this->week || $eventStartYear === $this->getYear()) {
+                    $this->dayHasEvent[$eventStart->getDayOfWeek()] = true;
+                    if (is_object($this->days[$eventStart->format('%Y%m%d')])) {
+                        $this->days[$eventStart->format('%Y%m%d')]->addEvent($event);
                     }
                     $this->weekHasEvent = true;
                 }
                 $eventStart->addSeconds(86400);
                 $eventStartYear = $eventStart->year;
-                if ($eventStart->month == 1 && $eventWeek > 50) {
-                    $eventStartYear --;
+                if ($eventStart->month === 1 && $eventWeek > 50) {
+                    $eventStartYear--;
                 }
                 $eventStartWeek = $eventStart->getWeekOfYear();
             } while ($eventStart->format('%Y%m%d') <= $eventEndFormatted && $eventStartWeek <= $this->week);
         }
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getRowspanMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if ($this->rowspan === false) {
-            if ($view == 'month') {
+            if ($view === 'month') {
                 $this->getEventsMarker($template, $sims, $rems, $wrapped, $view);
             } else {
                 $this->getAlldaysMarker($template, $sims, $rems, $wrapped, $view);
             }
         }
-        $sims ['###ROWSPAN###'] = $this->rowspan + 1;
+        $sims['###ROWSPAN###'] = $this->rowspan + 1;
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAlldaysMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if ($this->content === false) {
             $this->content = '';
-
-            $cobj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
-            $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
 
             // 1. find out the start and length of each event in relation to this week
             // 2. sort by length
@@ -194,9 +236,9 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
             $alldaysKeys = array_keys($this->alldays);
 
             foreach ($alldaysKeys as $alldaysKey) {
-                $entryKeys = array_keys($this->alldays [$alldaysKey]);
+                $entryKeys = array_keys($this->alldays[$alldaysKey]);
                 foreach ($entryKeys as $entryKey) {
-                    $event = &$this->alldays [$alldaysKey] [$entryKey];
+                    $event = &$this->alldays[$alldaysKey][$entryKey];
                     $this->fillLengthArray($lengthArray, $event);
                 }
             }
@@ -204,15 +246,20 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
             $this->renderLengthArray($lengthArray, $view);
         }
 
-        $sims ['###ALLDAYS###'] = $this->content;
+        $sims['###ALLDAYS###'] = $this->content;
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         if ($this->content === false) {
             $this->content = '';
-
-            $cobj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
-            $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
 
             // 1. find out the start and length of each event in relation to this week
             // 2. sort by length
@@ -224,16 +271,14 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
             $lengthArray = [];
 
             $dayKeys = array_keys($this->days);
-            $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
-            $currentMonth = $controller->getDateTimeObject->getMonth();
 
-            for ($i = 0; $i < 7; $i ++) {
-                $timeKeys = array_keys($this->days [$dayKeys [$i]]->getEvents());
+            for ($i = 0; $i < 7; $i++) {
+                $timeKeys = array_keys($this->days[$dayKeys[$i]]->getEvents());
 
                 foreach ($timeKeys as $timeKey) {
-                    $entryKeys = array_keys($this->days [$dayKeys [$i]]->getEvents() [$timeKey]);
+                    $entryKeys = array_keys($this->days[$dayKeys[$i]]->getEvents()[$timeKey]);
                     foreach ($entryKeys as $entryKey) {
-                        $event = &$this->days [$dayKeys [$i]]->getEvents() [$timeKey] [$entryKey];
+                        $event = &$this->days[$dayKeys[$i]]->getEvents()[$timeKey][$entryKey];
                         $this->fillLengthArray($lengthArray, $event);
                     }
                 }
@@ -242,8 +287,13 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
             $this->renderLengthArray($lengthArray, $view);
         }
 
-        $sims ['###EVENTS###'] = $this->content;
+        $sims['###EVENTS###'] = $this->content;
     }
+
+    /**
+     * @param $lengthArray
+     * @param EventModel $event
+     */
     private function fillLengthArray(&$lengthArray, &$event)
     {
         $eventStart = $event->getStart()->format('%Y%m%d');
@@ -255,8 +305,8 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
                 $start = 0;
             } else {
                 $length = intval($event->getEnd()->getDayOfWeek());
-                if ($length == 0) {
-                    if (DATE_CALC_BEGIN_WEEKDAY == 1) {
+                if ($length === 0) {
+                    if (DATE_CALC_BEGIN_WEEKDAY === 1) {
                         $length = 7;
                     } else {
                         $length = 1;
@@ -266,9 +316,9 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
             }
         } else {
             $start = intval($event->getStart()->getDayOfWeek());
-            if (DATE_CALC_BEGIN_WEEKDAY == 1) {
-                $start --;
-                if ($start == - 1) {
+            if (DATE_CALC_BEGIN_WEEKDAY === 1) {
+                $start--;
+                if ($start === -1) {
                     $start = 6;
                 }
             }
@@ -276,48 +326,52 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
                 $length = 7 - $start;
             } else {
                 $weekEnd = intval($event->getEnd()->getDayOfWeek());
-                if (DATE_CALC_BEGIN_WEEKDAY == 1) {
-                    $weekEnd --;
-                    if ($weekEnd == - 1) {
+                if (DATE_CALC_BEGIN_WEEKDAY === 1) {
+                    $weekEnd--;
+                    if ($weekEnd === -1) {
                         $weekEnd = 6;
                     }
                 }
                 $length = ($weekEnd - $start) + 1;
             }
         }
-        $lengthArray [$length . '_' . $start] [] = &$event;
+        $lengthArray[$length . '_' . $start][] = &$event;
     }
+
+    /**
+     * @param array $lengthArray
+     * @param $view
+     */
     private function renderLengthArray(&$lengthArray, $view)
     {
         krsort($lengthArray);
 
         $theMatrix = [];
-        $resultMatrix = [];
         $lengthArrayKeys = array_keys($lengthArray);
         $this->rowspan = 1;
 
         foreach ($lengthArrayKeys as $lengthArrayKey) {
             $values = explode('_', $lengthArrayKey);
 
-            $eventArrayKeys = array_keys($lengthArray [$lengthArrayKey]);
+            $eventArrayKeys = array_keys($lengthArray[$lengthArrayKey]);
             foreach ($eventArrayKeys as $eventArrayKey) {
                 $done = false;
-                for ($i = $values [1]; $i < 7 && ! $done; $i ++) {
-                    for ($j = 0; $j < 1000 && ! $done; $j ++) {
-                        if (! $theMatrix [$i] [$j] && $values [0] + $i < 8) {
+                for ($i = $values[1]; $i < 7 && !$done; $i++) {
+                    for ($j = 0; $j < 1000 && !$done; $j++) {
+                        if ($values[0] + $i < 8 && !$theMatrix[$i][$j]) {
                             // Found an empty start spot
                             $empty = true;
-                            for ($k = $i; $k < $values [0] + $i && $empty; $k ++) {
-                                if ($theMatrix [$k] [$j]) {
+                            for ($k = $i; $k < $values[0] + $i && $empty; $k++) {
+                                if ($theMatrix[$k][$j]) {
                                     $empty = false;
                                 }
                             }
                             if ($empty) {
-                                $theMatrix [$i] [$j] = &$lengthArray [$lengthArrayKey] [$eventArrayKey];
-                                $theMatrix [$i] [$j]->matrixValue = $values [0];
+                                $theMatrix[$i][$j] = &$lengthArray[$lengthArrayKey][$eventArrayKey];
+                                $theMatrix[$i][$j]->matrixValue = $values[0];
                                 // fill it
-                                for ($k = $i + 1; $k < $values [0] + $i && $empty; $k ++) {
-                                    $theMatrix [$k] [$j] = true;
+                                for ($k = $i + 1; $k < $values[0] + $i && $empty; $k++) {
+                                    $theMatrix[$k][$j] = true;
                                 }
                                 $done = true;
                             }
@@ -338,72 +392,92 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
                 break;
         }
     }
+
+    /**
+     * @param $theMatrix
+     */
     private function renderAlldaysForWeek(&$theMatrix)
     {
         $classes = $this->getWeekClasses();
         $daysKeys = array_keys($this->days);
 
-        for ($j = 0; $j < $this->rowspan; $j ++) {
+        for ($j = 0; $j < $this->rowspan; $j++) {
             $this->content .= '<tr class="alldays ' . $classes . '">';
-            for ($i = 0; $i < 7; $i ++) {
-                $currentDayClass = ' weekday' . $this->days [$daysKeys [$i]]->weekdayNumber;
-                if ($this->currentDayIndex == $i) {
+            for ($i = 0; $i < 7; $i++) {
+                $currentDayClass = ' weekday' . $this->days[$daysKeys[$i]]->weekdayNumber;
+                if ($this->currentDayIndex === $i) {
                     $currentDayClass .= ' currentDay';
                 }
-                if ($theMatrix [$i] [$j] == false) {
+                if (empty($theMatrix[$i][$j])) {
                     $this->content .= '<td class="' . $classes . $currentDayClass . '">&nbsp;</td>';
-                } elseif (is_object($theMatrix [$i] [$j])) {
-                    $this->content .= '<td class="' . $classes . $currentDayClass . '" colspan="' . ($theMatrix [$i] [$j]->matrixValue) . '">' . $theMatrix [$i] [$j]->renderEventFor('week') . '</td>';
-                    $this->days [$daysKeys [$i]]->setHasAlldayEvents(true);
+                } elseif (is_object($theMatrix[$i][$j])) {
+                    $this->content .= '<td class="' . $classes . $currentDayClass . '" colspan="' . $theMatrix[$i][$j]->matrixValue . '">' . $theMatrix[$i][$j]->renderEventFor('week') . '</td>';
+                    $this->days[$daysKeys[$i]]->setHasAlldayEvents(true);
                 }
             }
             $this->content .= '</tr>';
         }
     }
+
+    /**
+     * @param $theMatrix
+     */
     private function renderAlldaysForMonth(&$theMatrix)
     {
         $classes = $this->getWeekClasses();
         $daysKeys = array_keys($this->days);
-        $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $controller = &Registry::Registry('basic', 'controller');
         $currentMonth = $controller->getDateTimeObject->getMonth();
 
         $sims = $rems = $wrapped = [];
         $template = '';
 
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        for ($j = 0; $j < $this->rowspan; $j ++) {
+        $conf = &Registry::Registry('basic', 'conf');
+        for ($j = 0; $j < $this->rowspan; $j++) {
             $this->content .= '<tr class="' . $classes . '">';
-            for ($i = 0; $i < 7; $i ++) {
-                $currentDayClass = ' weekday' . $this->days [$daysKeys [$i]]->weekdayNumber;
-                if ($this->currentDayIndex == $i) {
+            for ($i = 0; $i < 7; $i++) {
+                $currentDayClass = ' weekday' . $this->days[$daysKeys[$i]]->weekdayNumber;
+                if ($this->currentDayIndex === $i) {
                     $currentDayClass = ' currentDay';
                 }
-                if ($currentMonth != $this->days [$daysKeys [$i]]->month) {
+                if ($currentMonth !== $this->days[$daysKeys[$i]]->month) {
                     $currentDayClass .= ' monthOff';
                 }
-                if ($theMatrix [$i] [$j] == false) {
+                if (empty($theMatrix[$i][$j])) {
                     $this->content .= '<td class="empty ' . $classes . $currentDayClass . '">';
-                } elseif (is_object($theMatrix [$i] [$j])) {
-                    $this->content .= '<td class="event ' . $classes . $currentDayClass . '" colspan="' . ($theMatrix [$i] [$j]->matrixValue) . '">' . $theMatrix [$i] [$j]->renderEventFor('month');
-                    $this->days [$daysKeys [$i]]->setHasAlldayEvents(true);
+                } elseif (is_object($theMatrix[$i][$j])) {
+                    $this->content .= '<td class="event ' . $classes . $currentDayClass . '" colspan="' . $theMatrix[$i][$j]->matrixValue . '">' . $theMatrix[$i][$j]->renderEventFor('month');
+                    $this->days[$daysKeys[$i]]->setHasAlldayEvents(true);
                 }
                 $this->content .= '</td>';
             }
             $this->content .= '</tr>';
         }
         $this->content .= '<tr class="create">';
-        for ($i = 0; $i < 7; $i ++) {
-            $this->days [$daysKeys [$i]]->getCreateEventLinkMarker($template, $sims, $rems, $wrapped, $conf ['view']);
-            $this->content .= '<td>' . $sims ['###CREATE_EVENT_LINK###'] . '</td>';
+        for ($i = 0; $i < 7; $i++) {
+            $this->days[$daysKeys[$i]]->getCreateEventLinkMarker($template, $sims, $rems, $wrapped, $conf['view']);
+            $this->content .= '<td>' . $sims['###CREATE_EVENT_LINK###'] . '</td>';
         }
         $this->content .= '</tr>';
-        $this->rowspan ++;
+        $this->rowspan++;
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getWeekClassesMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###WEEK_CLASSES###'] = $this->getWeekClasses();
+        $sims['###WEEK_CLASSES###'] = $this->getWeekClasses();
     }
-    private function getWeekClasses()
+
+    /**
+     * @return string
+     */
+    private function getWeekClasses(): string
     {
         $classes = '';
         if ($this->current) {
@@ -420,125 +494,271 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
         }
         return trim($classes);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getWeekLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        $weekLinkViewTarget = $conf ['view.'] ['weekLinkTarget'];
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $conf = &Registry::Registry('basic', 'conf');
+        $weekLinkViewTarget = $conf['view.']['weekLinkTarget'];
 
         $local_cObj = &$this->getLocalCObject();
         $local_cObj->setCurrentVal($this->week);
-        $local_cObj->data ['view'] = $weekLinkViewTarget;
-        $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $local_cObj->data['view'] = $weekLinkViewTarget;
+        $controller = &Registry::Registry('basic', 'controller');
 
-        if (($rightsObj->isViewEnabled($weekLinkViewTarget) || $conf ['view.'] [$weekLinkViewTarget . '.'] [$weekLinkViewTarget . 'ViewPid']) && $this->weekHasEvent) {
-            $controller->getParametersForTyposcriptLink($local_cObj->data, [
+        if ($this->weekHasEvent && ($rightsObj->isViewEnabled($weekLinkViewTarget) || $conf['view.'][$weekLinkViewTarget . '.'][$weekLinkViewTarget . 'ViewPid'])) {
+            $controller->getParametersForTyposcriptLink(
+                $local_cObj->data,
+                [
                     'getdate' => $this->weekStart,
                     'view' => $weekLinkViewTarget,
                     $controller->getPointerName() => null
-            ], $conf ['cache'], $conf ['clear_anyway'], $conf ['view.'] [$weekLinkViewTarget . '.'] [$weekLinkViewTarget . 'ViewPid']);
+                ],
+                $conf['cache'],
+                $conf['clear_anyway'],
+                $conf['view.'][$weekLinkViewTarget . '.'][$weekLinkViewTarget . 'ViewPid']
+            );
         }
-        $sims ['###WEEK_LINK###'] = $local_cObj->cObjGetSingle($conf ['view.'] [$view . '.'] [$weekLinkViewTarget . 'ViewLink'], $conf ['view.'] [$view . '.'] [$weekLinkViewTarget . 'ViewLink.']);
+        $sims['###WEEK_LINK###'] = $local_cObj->cObjGetSingle(
+            $conf['view.'][$view . '.'][$weekLinkViewTarget . 'ViewLink'],
+            $conf['view.'][$view . '.'][$weekLinkViewTarget . 'ViewLink.']
+        );
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDaysMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $content = '';
         foreach ($this->days as $day) {
             $content .= $day->render($this->getTemplate());
         }
-        $sims ['###DAYS###'] = $content;
+        $sims['###DAYS###'] = $content;
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDaynum0Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAYNUM0###'] = $this->getDayLink(0);
+        $sims['###DAYNUM0###'] = $this->getDayLink(0);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDaynum1Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAYNUM1###'] = $this->getDayLink(1);
+        $sims['###DAYNUM1###'] = $this->getDayLink(1);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDaynum2Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAYNUM2###'] = $this->getDayLink(2);
+        $sims['###DAYNUM2###'] = $this->getDayLink(2);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDaynum3Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAYNUM3###'] = $this->getDayLink(3);
+        $sims['###DAYNUM3###'] = $this->getDayLink(3);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDaynum4Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAYNUM4###'] = $this->getDayLink(4);
+        $sims['###DAYNUM4###'] = $this->getDayLink(4);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDaynum5Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAYNUM5###'] = $this->getDayLink(5);
+        $sims['###DAYNUM5###'] = $this->getDayLink(5);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDaynum6Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAYNUM6###'] = $this->getDayLink(6);
+        $sims['###DAYNUM6###'] = $this->getDayLink(6);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getClasses0Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###CLASSES0###'] = $this->getDayClasses(0);
+        $sims['###CLASSES0###'] = $this->getDayClasses(0);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getClasses1Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###CLASSES1###'] = $this->getDayClasses(1);
+        $sims['###CLASSES1###'] = $this->getDayClasses(1);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getClasses2Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###CLASSES2###'] = $this->getDayClasses(2);
+        $sims['###CLASSES2###'] = $this->getDayClasses(2);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getClasses3Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###CLASSES3###'] = $this->getDayClasses(3);
+        $sims['###CLASSES3###'] = $this->getDayClasses(3);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getClasses4Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###CLASSES4###'] = $this->getDayClasses(4);
+        $sims['###CLASSES4###'] = $this->getDayClasses(4);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getClasses5Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###CLASSES5###'] = $this->getDayClasses(5);
+        $sims['###CLASSES5###'] = $this->getDayClasses(5);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getClasses6Marker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###CLASSES6###'] = $this->getDayClasses(6);
+        $sims['###CLASSES6###'] = $this->getDayClasses(6);
     }
-    private function getDayClasses($weekdayIndex)
+
+    /**
+     * @param $weekdayIndex
+     * @return string
+     */
+    private function getDayClasses($weekdayIndex): string
     {
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         if ($this->initialized === false) {
             $template = '';
             $sims = [];
             $rems = [];
             $wrapped = [];
-            $this->getAlldaysMarker($template, $sims, $rems, $wrapped, $conf ['view']);
+            $this->getAlldaysMarker($template, $sims, $rems, $wrapped, $conf['view']);
             $this->initialized = true;
         }
         $classes = '';
-        if ($this->dayHasEvent [$weekdayIndex] == 1) {
+        if ($this->dayHasEvent[$weekdayIndex] === 1) {
             $classes .= ' ' . $conf['view.']['month.']['eventDayStyle'];
         }
 
         $localDayIndex = $this->currentDayIndex + DATE_CALC_BEGIN_WEEKDAY;
-        if ($localDayIndex == 7) {
+        if ($localDayIndex === 7) {
             $localDayIndex = 0;
         }
 
-        if ($localDayIndex == $weekdayIndex) {
+        if ($localDayIndex === $weekdayIndex) {
             $classes .= ' ' . $conf['view.']['month.']['monthTodayStyle'];
         }
 
         $localDayIndex = $weekdayIndex - DATE_CALC_BEGIN_WEEKDAY;
-        if ($localDayIndex == - 1) {
+        if ($localDayIndex === -1) {
             $localDayIndex = 6;
         }
         $daysKeys = array_keys($this->days);
-        if (intval($this->getParentMonth()) != intval($this->days [$daysKeys [$localDayIndex]]->month)) {
+        if (intval($this->getParentMonth()) !== intval($this->days[$daysKeys[$localDayIndex]]->month)) {
             $classes .= ' ' . $conf['view.']['month.']['monthOffStyle'];
         }
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray('NewWeekView', 'postDayClassesViewMarker', 'view');
+        $hookObjectsArr = Functions::getHookObjectsArray(
+            'NewWeekView',
+            'postDayClassesViewMarker',
+            'view'
+        );
         // Hook: postDayClassesViewMarker
         foreach ($hookObjectsArr as $hookObj) {
             if (method_exists($hookObj, 'postDayClassesViewMarker')) {
@@ -548,43 +768,62 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
 
         return $classes;
     }
+
+    /**
+     * @param $weekdayIndex
+     * @return mixed
+     */
     private function getDayLink($weekdayIndex)
     {
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
+        $conf = &Registry::Registry('basic', 'conf');
         if ($this->initialized === false) {
             $template = '';
             $sims = [];
             $rems = [];
             $wrapped = [];
-            $this->getAlldaysMarker($template, $sims, $rems, $wrapped, $conf ['view']);
+            $this->getAlldaysMarker($template, $sims, $rems, $wrapped, $conf['view']);
             $this->initialized = true;
         }
 
         $daysKeys = array_keys($this->days);
-        return $this->days [$daysKeys [$weekdayIndex]]->getDayLink($conf ['view'], $this->days [$daysKeys [$weekdayIndex]]->getTime(), $this->dayHasEvent [$this->days [$daysKeys [$weekdayIndex]]->weekdayNumber]);
+        return $this->days[$daysKeys[$weekdayIndex]]->getDayLink(
+            $conf['view'],
+            $this->days[$daysKeys[$weekdayIndex]]->getTime(),
+            $this->dayHasEvent[$this->days[$daysKeys[$weekdayIndex]]->weekdayNumber]
+        );
     }
+
+    /**
+     * @param CalDate $dateObject
+     * @return mixed|void
+     */
     public function setSelected(&$dateObject)
     {
-        if ($dateObject->getWeekOfYear() == $this->week && $dateObject->year == $this->getYear()) {
+        if ($dateObject->getWeekOfYear() === $this->week && $dateObject->year === $this->getYear()) {
             $this->selected = true;
 
-            $day = $this->days [$dateObject->format('%Y%m%d')];
+            $day = $this->days[$dateObject->format('%Y%m%d')];
             if (is_object($day)) {
                 $day->setSelected($dateObject);
             }
         }
     }
+
+    /**
+     * @param CalDate $dateObject
+     * @return mixed|void
+     */
     public function setCurrent(&$dateObject)
     {
-        if ($dateObject->getWeekOfYear() == $this->week && $dateObject->year == $this->getYear()) {
+        if ($dateObject->getWeekOfYear() === $this->week && $dateObject->year === $this->getYear()) {
             $this->current = true;
 
-            $day = $this->days [$dateObject->format('%Y%m%d')];
+            $day = $this->days[$dateObject->format('%Y%m%d')];
             if (is_object($day)) {
                 $this->currentDayIndex = $dateObject->getDayOfWeek();
-                if (DATE_CALC_BEGIN_WEEKDAY == 1) {
-                    $this->currentDayIndex --;
-                    if ($this->currentDayIndex == - 1) {
+                if (DATE_CALC_BEGIN_WEEKDAY === 1) {
+                    $this->currentDayIndex--;
+                    if ($this->currentDayIndex === -1) {
                         $this->currentDayIndex = 6;
                     }
                 }
@@ -593,7 +832,10 @@ class NewWeekView extends \TYPO3\CMS\Cal\View\NewTimeView
         }
     }
 
-    public function hasEvents()
+    /**
+     * @return bool
+     */
+    public function hasEvents(): bool
     {
         return $this->weekHasEvent;
     }

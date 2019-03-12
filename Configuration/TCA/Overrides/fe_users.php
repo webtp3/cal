@@ -31,10 +31,6 @@ $tempColumns = [
                         'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.createNew',
                     ]
                 ]
-            ],
-            'wizards' => [
-                '_PADDING' => 2,
-                '_VERTICAL' => 1,
             ]
         ]
     ],
@@ -57,10 +53,6 @@ $tempColumns = [
                         'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_calendar.createNew',
                     ]
                 ]
-            ],
-            'wizards' => [
-                '_PADDING' => 2,
-                '_VERTICAL' => 1,
             ]
         ]
     ]
@@ -68,4 +60,7 @@ $tempColumns = [
 
 // Add the calendar selector for backend users.
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('fe_users', $tempColumns);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('fe_users', 'tx_cal_calendar,tx_cal_calendar_subscription');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+    'fe_users',
+    'tx_cal_calendar,tx_cal_calendar_subscription'
+);

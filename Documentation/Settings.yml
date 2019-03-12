@@ -1,13 +1,13 @@
 conf.py:
-  copyright: 2005-2015
+  copyright: 2005-2019
   project: Calendar Base
-  version: 1.10
-  release: 1.11.0
+  version: latest (2-dev)
+  release: latest (2-dev)
   latex_documents:
   - - Index
     - cal.tex
     - Calendar Base
-    - Mario Matzulla
+    - Jan Helke
     - manual
   latex_elements:
     papersize: a4paper

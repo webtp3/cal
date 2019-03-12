@@ -20,7 +20,14 @@ namespace TYPO3\CMS\Cal\TreeProvider;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use PDO;
+use TYPO3\CMS\Backend\Tree\SortedTreeNodeCollection;
+use TYPO3\CMS\Backend\Tree\TreeNode;
+use TYPO3\CMS\Backend\Tree\TreeNodeCollection;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -46,6 +53,9 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
 
     protected $calConfiguration;
 
+    /** @var ConnectionPool $connectionPool */
+    protected $connectionPool;
+
     const CALENDAR_PREFIX = 'calendar_';
     const GLOBAL_PREFIX = 'global';
 
@@ -62,13 +72,13 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $this->currentValue = $currentValue;
         $this->backendUserAuthentication = $GLOBALS['BE_USER'];
         $this->calConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
     }
 
     /**
      * Sets the list for selected nodes
      *
      * @param string $selectedList
-     * @return void
      */
     public function setSelectedList($selectedList)
     {
@@ -82,8 +92,6 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
 
     /**
      * Loads the tree data (all possible children)
-     *
-     * @return void
      */
     protected function loadTreeData()
     {
@@ -96,7 +104,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $level = 1;
 
         if ($this->levelMaximum >= $level) {
-            $childNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+            $childNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
             $this->appendGlobalCategories($level, $childNodes);
             $this->appendCalendarCategories($level, $childNodes);
@@ -107,12 +115,16 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         }
     }
 
+    /**
+     * @param $level
+     * @param $parentChildNodes
+     */
     protected function appendGlobalCategories($level, $parentChildNodes)
     {
-        $node = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
-        $node->setId(GLOBAL_PREFIX);
+        $node = GeneralUtility::makeInstance(TreeNode::class);
+        $node->setId(self::GLOBAL_PREFIX);
 
-        $childNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+        $childNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
         $where = 'l18n_parent = 0 and deleted = 0 and parent_category = 0 and calendar_id = 0';
         $this->appendCategories($level, $childNodes, $where);
@@ -123,28 +135,25 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $parentChildNodes->append($node);
     }
 
+    /**
+     * @param $level
+     * @param $childNodes
+     */
     protected function appendCalendarCategories($level, $childNodes)
     {
-        $calendarId = 0;
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) > 8000000) {
-            if (isset($this->currentValue['calendar_id'])) {
-                $calendarId = $this->currentValue['calendar_id'];
-            }
-        } else {
-            if (isset($this->parentRow['calendar_id'][0])) {
-                $calendarId = $this->parentRow['calendar_id'][0];
-            }
-        }
+        $calendarId = $this->currentValue['calendar_id'] ?? 0;
         if ($calendarId > 0) {
-            $calres = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('tx_cal_calendar.uid, tx_cal_calendar.title', 'tx_cal_calendar', $this->getCalendarWhere($calendarId));
+            $builder = $this->connectionPool->getQueryBuilderForTable('tx_cal_calendar');
+            $calres = $builder->select('uid', 'title')->from('tx_cal_calendar')
+                ->where($this->getCalendarWhere($calendarId))->execute();
             if ($calres) {
-                while ($calrow = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($calres)) {
-                    $node = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
-                    $node->setId(CALENDAR_PREFIX . $calrow['uid']);
+                while ($calrow = $calres->fetch(PDO::FETCH_ASSOC)) {
+                    $node = GeneralUtility::makeInstance(TreeNode::class);
+                    $node->setId(self::CALENDAR_PREFIX . $calrow['uid']);
 
                     if ($level < $this->levelMaximum) {
                         $where = 'l18n_parent = 0 and tx_cal_category.deleted = 0 and tx_cal_category.calendar_id = ' . $calrow['uid'];
-                        $calendarChildNodes = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNodeCollection::class);
+                        $calendarChildNodes = GeneralUtility::makeInstance(TreeNodeCollection::class);
 
                         $this->appendCategories($level + 1, $calendarChildNodes, $where);
                         if ($calendarChildNodes !== null) {
@@ -153,18 +162,24 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
                     }
                     $childNodes->append($node);
                 }
-                $GLOBALS ['TYPO3_DB']->sql_free_result($calres);
             }
         }
     }
 
+    /**
+     * @param $level
+     * @param $childNodes
+     * @param $where
+     */
     protected function appendCategories($level, $childNodes, $where)
     {
-        $categoryResult = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('tx_cal_category.uid, tx_cal_category.title', 'tx_cal_category', $where);
+        $builder = $this->connectionPool->getQueryBuilderForTable('tx_cal_category');
+        $categoryResult = $builder->select('uid', 'title')->from('tx_cal_category')
+            ->where($where)->execute();
         $usedCategories = [];
         if ($categoryResult) {
-            while ($categoryRow = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($categoryResult)) {
-                $categoryNode = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Tree\TreeNode::class);
+            while (($categoryRow = $categoryResult->fetch(PDO::FETCH_ASSOC))) {
+                $categoryNode = GeneralUtility::makeInstance(TreeNode::class);
                 $categoryNode->setId($categoryRow['uid']);
                 if ($level < $this->levelMaximum) {
                     $children = $this->getChildrenOf($categoryNode, $level + 1);
@@ -180,11 +195,14 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
                     $childNodes->append($categoryNode);
                 }
             }
-            $GLOBALS ['TYPO3_DB']->sql_free_result($categoryResult);
         }
     }
 
-    protected function getCalendarWhere($calendarId)
+    /**
+     * @param $calendarId
+     * @return string
+     */
+    protected function getCalendarWhere($calendarId): string
     {
         $calWhere = 'l18n_parent = 0  AND tx_cal_calendar.uid = ' . $calendarId;
 
@@ -197,30 +215,32 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     /**
      * Builds a complete node including children
      *
-     * @param \TYPO3\CMS\Backend\Tree\TreeNode|\TYPO3\CMS\Backend\Tree\TreeNode $basicNode
-     * @param NULL|\TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode $parent
+     * @param TreeNode|TreeNode $basicNode
+     * @param DatabaseTreeNode|null $parent
      * @param int $level
      * @param bool $restriction
-     * @return \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode node
+     * @return DatabaseTreeNode $node
      */
-    protected function buildRepresentationForNode(\TYPO3\CMS\Backend\Tree\TreeNode $basicNode, \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode $parent = null, $level = 0, $restriction = false)
+    protected function buildRepresentationForNode(TreeNode $basicNode, DatabaseTreeNode $parent = null, $level = 0, $restriction = false)
     {
-        /**@param $node \TYPO3\CMS\Core\Tree\TableConfiguration\DatabaseTreeNode */
-        $node = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Tree\\TableConfiguration\\DatabaseTreeNode');
+        /** @var $node DatabaseTreeNode */
+        $node = GeneralUtility::makeInstance(DatabaseTreeNode::class);
         $row = [];
         $node->setSelected(false);
         $node->setExpanded(true);
         $node->setSelectable(false);
 
-        if (strrpos($basicNode->getId(), CALENDAR_PREFIX, -strlen($basicNode->getId())) !== false) {
-            $id = intval(substr($basicNode->getId(), strlen(CALENDAR_PREFIX)));
+        /** @var IconFactory $iconFactory */
+        $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+
+        if (strrpos($basicNode->getId(), self::CALENDAR_PREFIX, -strlen($basicNode->getId())) !== false) {
+            $id = intval(substr($basicNode->getId(), strlen(self::CALENDAR_PREFIX)));
             $row = BackendUtility::getRecordWSOL('tx_cal_calendar', $id, '*', '', false);
-            $iconFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Imaging\\IconFactory');
             $icon = $iconFactory->getIconForRecord('tx_cal_calendar', $row, \TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL);
             $node->setIcon($icon);
             $node->setLabel($row['title']);
             $node->setSortValue($id);
-        } elseif ($basicNode->getId() === GLOBAL_PREFIX) {
+        } elseif ($basicNode->getId() === self::GLOBAL_PREFIX) {
             $node->setLabel($GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.global'));
             $node->setSortValue(0);
         } elseif ($basicNode->getId() == 0) {
@@ -236,7 +256,6 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
             $node->setSelected(GeneralUtility::inList($this->getSelectedList(), $basicNode->getId()));
             $node->setExpanded($this->isExpanded($basicNode));
             $node->setLabel($node->getLabel());
-            $iconFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Imaging\\IconFactory');
             $icon = $iconFactory->getIconForRecord($this->tableName, $row, \TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL);
             $node->setIcon($icon);
             $node->setSelectable(!GeneralUtility::inList($this->getNonSelectableLevelList(), $level) && !in_array($basicNode->getId(), $this->getItemUnselectableList()));
@@ -253,15 +272,15 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
         $node->setParentNode($parent);
         if ($basicNode->hasChildNodes()) {
 
-            /** @var \TYPO3\CMS\Backend\Tree\SortedTreeNodeCollection $childNodes */
-            $childNodes = GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\Tree\\SortedTreeNodeCollection');
+            /** @var SortedTreeNodeCollection $childNodes */
+            $childNodes = GeneralUtility::makeInstance(SortedTreeNodeCollection::class);
             $foundSomeChild = false;
             foreach ($basicNode->getChildNodes() as $child) {
                 // Change in custom TreeDataProvider by adding the if clause
                 if ($restriction || $this->isCategoryAllowed($child)) {
                     $returnedChild = $this->buildRepresentationForNode($child, $node, $level + 1, $restriction);
 
-                    if (!is_null($returnedChild)) {
+                    if ($returnedChild !== null) {
                         $foundSomeChild = true;
                         $childNodes->append($returnedChild);
                     } else {
@@ -283,10 +302,10 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
     /**
      * Check if given category is allowed by the access rights
      *
-     * @param \TYPO3\CMS\Backend\Tree\TreeNode $child
+     * @param TreeNode $child
      * @return bool
      */
-    protected function isCategoryAllowed($child)
+    protected function isCategoryAllowed($child): bool
     {
         if ($this->calConfiguration['categoryService'] == 'sys_category') {
             $mounts = $this->backendUserAuthentication->getCategoryMountPoints();
@@ -295,65 +314,63 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
             }
 
             return in_array($child->getId(), $mounts);
+        }
+        if ($child->getId() === self::GLOBAL_PREFIX) {
+            return true;
+        }
+
+        if ($GLOBALS ['BE_USER']->user ['admin']) {
+            return true;
+        }
+
+        $be_userCategories = [];
+        $be_userCalendars = [];
+
+        if ($GLOBALS ['BE_USER']->user ['tx_cal_enable_accesscontroll']) {
+            $be_userCategories = GeneralUtility::trimExplode(',', $GLOBALS ['BE_USER']->user ['tx_cal_category'], 1);
+            $be_userCalendars = GeneralUtility::trimExplode(',', $GLOBALS ['BE_USER']->user ['tx_cal_calendar'], 1);
         } else {
-            if ($child->getId() === GLOBAL_PREFIX) {
-                return true;
-            }
-
-            if ($GLOBALS ['BE_USER']->user ['admin']) {
-                return true;
-            }
-
-            $be_userCategories = [];
-            $be_userCalendars = [];
-
-            if ($GLOBALS ['BE_USER']->user ['tx_cal_enable_accesscontroll']) {
-                $be_userCategories = GeneralUtility::trimExplode(',', $GLOBALS ['BE_USER']->user ['tx_cal_category'], 1);
-                $be_userCalendars = GeneralUtility::trimExplode(',', $GLOBALS ['BE_USER']->user ['tx_cal_calendar'], 1);
-            } else {
-                $allGroupsHaveEnableFalse = true;
-                if (is_array($GLOBALS ['BE_USER']->userGroups)) {
-                    foreach ($GLOBALS ['BE_USER']->userGroups as $gid => $group) {
-                        if ($group ['tx_cal_enable_accesscontroll']) {
-                            $allGroupsHaveEnableFalse = false;
-                            break;
-                        }
-                    }
-                }
-                if ($allGroupsHaveEnableFalse) {
-                    return true;
-                }
-            }
+            $allGroupsHaveEnableFalse = true;
             if (is_array($GLOBALS ['BE_USER']->userGroups)) {
                 foreach ($GLOBALS ['BE_USER']->userGroups as $gid => $group) {
                     if ($group ['tx_cal_enable_accesscontroll']) {
-                        if ($group ['tx_cal_category']) {
-                            $groupCategories = GeneralUtility::trimExplode(',', $group ['tx_cal_category'], 1);
-                            $be_userCategories = array_merge($be_userCategories, $groupCategories);
-                        }
-                        if ($group ['tx_cal_calendar']) {
-                            $groupCalendars = GeneralUtility::trimExplode(',', $group ['tx_cal_calendar'], 1);
-                            $be_userCalendars = array_merge($be_userCalendars, $groupCalendars);
-                        }
+                        $allGroupsHaveEnableFalse = false;
+                        break;
                     }
                 }
             }
-
-            if (strrpos($child->getId(), CALENDAR_PREFIX, -strlen($child->getId())) !== false) {
-                $allow = in_array(substr($child->getId(), strlen(CALENDAR_PREFIX)), $be_userCalendars);
-            } else {
-                $allow = in_array($child->getId(), $be_userCategories);
+            if ($allGroupsHaveEnableFalse) {
+                return true;
             }
-
-            return $allow;
         }
+        if (is_array($GLOBALS ['BE_USER']->userGroups)) {
+            foreach ($GLOBALS ['BE_USER']->userGroups as $gid => $group) {
+                if ($group ['tx_cal_enable_accesscontroll']) {
+                    if ($group ['tx_cal_category']) {
+                        $groupCategories = GeneralUtility::trimExplode(',', $group ['tx_cal_category'], 1);
+                        $be_userCategories = array_merge($be_userCategories, $groupCategories);
+                    }
+                    if ($group ['tx_cal_calendar']) {
+                        $groupCalendars = GeneralUtility::trimExplode(',', $group ['tx_cal_calendar'], 1);
+                        $be_userCalendars = array_merge($be_userCalendars, $groupCalendars);
+                    }
+                }
+            }
+        }
+
+        if (strrpos($child->getId(), self::CALENDAR_PREFIX, -strlen($child->getId())) !== false) {
+            $allow = in_array(substr($child->getId(), strlen(self::CALENDAR_PREFIX)), $be_userCalendars);
+        } else {
+            $allow = in_array($child->getId(), $be_userCategories);
+        }
+
+        return $allow;
     }
 
     /**
-     *
      * @return bool
      */
-    protected function isSingleCategoryAclActivated()
+    protected function isSingleCategoryAclActivated(): bool
     {
         return false;
     }

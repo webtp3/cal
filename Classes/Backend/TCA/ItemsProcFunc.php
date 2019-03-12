@@ -20,24 +20,29 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use PDO;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\QueryGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * Class ItemsProcFunc
+ */
 class ItemsProcFunc
 {
 
     /**
      * Gets the items array of all available translations.
      *
-     * @param
-     *        	array		The current config array.
+     * @param  array    The current config array.
      * @return array
      *
      * @todo Localize translation names. Probably not too critical since
      *       they're mostly English anyway but its easy to do.
-     *
      */
-    public function getDayTimes($config)
+    public function getDayTimes($config): array
     {
         $interval = 60 * 30;
         $dayLength = 60 * 60 * 24;
@@ -46,8 +51,8 @@ class ItemsProcFunc
             $label = gmdate($GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['hhmm'], $time);
             $value = gmdate('Hi', $time);
             $config ['items'] [] = [
-                    $label,
-                    $value
+                $label,
+                $value
             ];
         }
 
@@ -55,8 +60,8 @@ class ItemsProcFunc
         $label = gmdate($GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['hhmm'], $dayLength - 1);
         $value = 2400;
         $config ['items'] [] = [
-                $label,
-                $value
+            $label,
+            $value
         ];
 
         return $config;
@@ -65,48 +70,49 @@ class ItemsProcFunc
     /**
      * Gets the listing of users and groups.
      *
-     * @param
-     *        	array		The current config array.
+     * @param  array    The current config array.
      * @return array
      */
-    public function getUsersAndGroups($config)
+    public function getUsersAndGroups($config): array
     {
         /* Add frontend groups */
+
+        /** @var ConnectionPool $connectionPool */
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+
         $table = 'fe_groups';
-        $where = '1=1 ' . BackendUtility::BEenableFields($table) . BackendUtility::deleteClause($table);
-        $res = $GLOBALS ['TYPO3_DB']->exec_selectQuery('*', $table, $where, '', 'title');
-        if ($res) {
-            while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($res)) {
-                $label = BackendUtility::getRecordTitle($table, $row);
-                $value = - 1 * intval($row ['uid']);
-                $config ['items'] [] = [
-                        $label,
-                        $value
-                ];
-            }
-            $GLOBALS ['TYPO3_DB']->sql_free_result($res);
+
+        $builder = $connectionPool->getQueryBuilderForTable($table);
+
+        $res = $builder->select('*')->from($table)->orderBy('title')->execute();
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
+            $label = BackendUtility::getRecordTitle($table, $row);
+            $value = -1 * intval($row ['uid']);
+            $config ['items'] [] = [
+                $label,
+                $value
+            ];
         }
 
         /* Add a divider */
         $config ['items'] [] = [
-                '------',
-                '--div--'
+            '------',
+            '--div--'
         ];
 
         /* Add frontend users */
         $table = 'fe_users';
-        $where = '1=1 ' . BackendUtility::BEenableFields($table) . BackendUtility::deleteClause($table);
-        $res = $GLOBALS ['TYPO3_DB']->exec_selectQuery('*', $table, $where, '', 'name');
-        if ($res) {
-            while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($res)) {
-                $label = BackendUtility::getRecordTitle($table, $row);
-                $value = $row ['uid'];
-                $config ['items'] [] = [
-                        $label,
-                        $value
-                ];
-            }
-            $GLOBALS ['TYPO3_DB']->sql_free_result($res);
+
+        $builder = $connectionPool->getQueryBuilderForTable($table);
+
+        $res = $builder->select('*')->from($table)->orderBy('name')->execute();
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
+            $label = BackendUtility::getRecordTitle($table, $row);
+            $value = $row ['uid'];
+            $config ['items'] [] = [
+                $label,
+                $value
+            ];
         }
         return $config;
     }
@@ -116,9 +122,7 @@ class ItemsProcFunc
      * settings and User TSConfig options.
      * Records are added to then added to the items array.
      *
-     * @param
-     *        	array		Associate array with keys 'items', 'config', 'TSconfig', 'table', 'row', and 'field'.
-     * @return none
+     * @param   array        Associate array with keys 'items', 'config', 'TSconfig', 'table', 'row', and 'field'.
      */
     public function getRecords(&$params)
     {
@@ -132,12 +136,12 @@ class ItemsProcFunc
         $res = self::getSQLResource($table, $where, $groupBy, $orderBy, $limit, $params ['row'] ['pid']);
 
         /* Loop over all records, adding them to the items array */
-        while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($res)) {
+        while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
             $label = BackendUtility::getRecordTitle($table, $row);
             $value = $row ['uid'];
             $params ['items'] [] = [
-                    $label,
-                    $value
+                $label,
+                $value
             ];
         }
     }
@@ -148,37 +152,36 @@ class ItemsProcFunc
      * A SQL resource is returned.
      * exec_SELECTquery($select_fields,$from_table,$where_clause,$groupBy='',$orderBy='',$limit='')
      *
-     * @param
-     *        	string		Name of the table.
-     * @param
-     *        	string		Custom WHERE clause.
-     * @param
-     *        	string		GROUP BY options.
-     * @param
-     *        	string ORDER BY options.
-     * @param
-     *        	string		LIMIT options.
+     * @param $table
+     * @param string $where
+     * @param string $groupBy
+     * @param string $orderBy
+     * @param string $limit
+     * @param string $pid
      * @return object resource.
      */
     public static function getSQLResource($table, $where = '', $groupBy = '', $orderBy = '', $limit = '', $pid = '')
     {
         /* Initialize the variables and config options */
         $be_userCategories = [
-                0
+            0
         ];
         $be_userCalendars = [
-                0
+            0
         ];
         $enableAccessControl = false;
-        $accessControlWhere = '';
-        $languageWhere = '';
-        $limitViewOnlyToPidsWhere = '';
+
+        /** @var ConnectionPool $connectionPool */
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+
+        /** @var Connection $connection */
+        $builder = $connectionPool->getQueryBuilderForTable($table);
 
         /* If we're grabbing calendar or category records, check access control settings */
-        if ($table == 'tx_cal_calendar' or $table == 'tx_cal_category') {
+        if ($table === 'tx_cal_calendar' || $table === 'tx_cal_category') {
 
             /* If we have a non-admin backend user, check access control settings */
-            if (is_object($GLOBALS ['BE_USER']) && ! $GLOBALS ['BE_USER']->user ['admin']) {
+            if (is_object($GLOBALS ['BE_USER']) && !$GLOBALS ['BE_USER']->user ['admin']) {
 
                 /* Get access control settings for the user */
                 if ($GLOBALS ['BE_USER']->user ['tx_cal_enable_accesscontroll']) {
@@ -206,33 +209,28 @@ class ItemsProcFunc
 
                 /* If access control was enabled for the user or groups, add a WHERE clause */
                 if ($enableAccessControl) {
-                    $accessControlWhere = ' AND tx_cal_calendar.uid IN (' . implode(',', $be_userCalendars) . ')';
+                    $builder->andWhere($builder->expr()->in('tx_cal_calendar.uid', $be_userCalendars));
                 }
             }
         }
 
         // Load cache from BE User data
         $cache = $GLOBALS ['BE_USER']->getSessionData('cal_itemsProcFunc');
-        if (! $cache) {
+        if (!$cache) {
             $cache = [];
         }
 
-        if (! $GLOBALS ['BE_USER']->user ['admin']) {
+        if (!$GLOBALS ['BE_USER']->user ['admin']) {
             // Check if we can return something from cache
             if (is_array($cache [$GLOBALS ['BE_USER']->user ['uid']]) && $cache [$GLOBALS ['BE_USER']->user ['uid']] ['pidlist']) {
                 $pidlist = $cache [$GLOBALS ['BE_USER']->user ['uid']] ['pidlist'];
             } else {
-                $mounts = [];
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7001000) {
-                    $mounts = $GLOBALS ['BE_USER']->returnWebmounts();
-                } else {
-                    $mounts = $GLOBALS ['WEBMOUNTS'];
-                }
-                $qG = new \TYPO3\CMS\Core\Database\QueryGenerator();
+                $mounts = $GLOBALS ['BE_USER']->returnWebmounts();
+                $qG = new QueryGenerator();
                 $pidlist = '';
                 foreach ($mounts as $idx => $uid) {
                     $list = $qG->getTreeList($uid, 99, 0, $GLOBALS ['BE_USER']->getPagePermsClause(1));
-                    $pidlist .= ($pidlist == '' ? '' : ',') . $list;
+                    $pidlist .= ($pidlist === '' ? '' : ',') . $list;
                 }
                 $cache [$GLOBALS ['BE_USER']->user ['uid']] ['pidlist'] = $pidlist;
                 $GLOBALS ['BE_USER']->setAndSaveSessionData('cal_itemsProcFunc', $cache);
@@ -241,23 +239,34 @@ class ItemsProcFunc
 
         // Orders items from the current page first
         if ($pid) {
-            $orderBy = $table . '.pid=' . $pid . ' DESC' . ($orderBy ? ',' . $orderBy : '');
+            $builder->orderBy($table . '.pid', 'DESC');
+            if (!empty($orderBy)) {
+                $builder->addOrderBy($orderBy);
+            }
         }
 
         if ($pidlist != '') {
-            $limitViewOnlyToPidsWhere .= ' AND ' . $table . '.pid IN (' . $pidlist . ')';
+            $builder->expr()->in($table . '.pid', $pidlist);
         }
 
         /* If a languageField is available for the table, use it */
-        if (array_key_exists('languageField', (array) $GLOBALS ['TCA'] [$table] ['ctrl'])) {
+        if (array_key_exists('languageField', (array)$GLOBALS ['TCA'] [$table] ['ctrl'])) {
             $languageField = $GLOBALS ['TCA'] [$table] ['ctrl'] ['languageField'];
-            $languageWhere = ' AND ' . $table . '.' . $languageField . ' IN (-1,0)';
+            $builder->expr()->in($table . '.' . $languageField, [-1, 0]);
         }
 
-        /* Construct the query */
-        $where = '1=1 ' . BackendUtility::BEenableFields($table) . BackendUtility::deleteClause($table) . $limitViewOnlyToPidsWhere . $accessControlWhere . $languageWhere . $where;
-        $res = $GLOBALS ['TYPO3_DB']->exec_selectQuery('*', $table, $where, $groupBy, $orderBy, $limit);
+        if (!empty($groupBy)) {
+            $builder->groupBy($groupBy);
+        }
 
-        return $res;
+        if (!empty($limit)) {
+            $builder->setMaxResults(intval($limit));
+        }
+
+        $builder->select('*')
+            ->from($table)
+            ->where('1=1 ' . $where);
+
+        return $builder->execute();
     }
 }

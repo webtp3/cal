@@ -37,25 +37,25 @@ value = HelloWorld<br/>
 <h3>TEMPLATE_PHPICALENDAR_EVENT</h3>
 <em>This is the template for the standard calendar event.</em>
 <br />
-
+###HEADING###
 <!--###TEMPLATE_PHPICALENDAR_EVENT### begin -->
 <!--phpicalendar_event.tmpl-->
-<h1>###HEADING###</h1>
+<div itemscope itemtype="http://schema.org/Event">
+    <div class="image" itemprop="image" >###IMAGE###</div>
+    <meta itemprop="startDate" content="###MICROFORMAT_START###">
+    <h2 itemprop="name">###TITLE###</h2>
 ###EDIT_LINK###
 
-###TITLE###
 ###STARTDATE###
 ###ENDDATE###
 ###STARTTIME###
 ###ENDTIME###
 ###STATUS### ###PRIORITY### ###COMPLETED###
-###ORGANIZER###
-###LOCATION###
-###DESCRIPTION###
-###EXT_URL###
-###IMAGE###
+    <span class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">###ORGANIZER###</span>
+    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">###LOCATION###</span>
+    <div class="description"  itemprop="description" >###DESCRIPTION###</div>
 ###ATTACHMENT###
-###ATTENDEE###
+    <div itemprop="attendee" itemscope itemtype="http://schema.org/Person">###ATTENDEE###</div>
 <!-- ###ICS_LINK### start --><img src="###IMG_PATH###/ics.gif" border="0"/><!-- ###ICS_LINK### end -->
 ###MORE_LINK###
 
@@ -101,7 +101,7 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
 
 </div>
 <!-- ###SUBSCRIPTION### end -->
-
+</div>
 <!--/phpicalendar_event.tmpl-->
 <!--###TEMPLATE_PHPICALENDAR_EVENT### end -->
 
@@ -136,8 +136,9 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
 	                    </span>
 	                    <dd>
 	                      <span class="summary">###TITLE###</span>
-	                      ###LOCATION###
-	                    </dd>
+  <span class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">###ORGANIZER###</span>
+    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">###LOCATION###</span>
+    	                    </dd>
 	                  </dl>
 	                <!-- ###EVENT_LINK### end -->
                 </div>
@@ -152,8 +153,9 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
     	              </span>
                     <dd>
                       <span class="summary">###TITLE###</span>
-					  ###LOCATION###
-                    </dd>
+  <span class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">###ORGANIZER###</span>
+    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">###LOCATION###</span>
+                        </dd>
                   </dl>
                   <!-- ###EVENT_LINK### end -->
                 </div>
@@ -218,16 +220,19 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
 <!--###TEMPLATE_PHPICALENDAR_EVENT_YEAR_ALLDAY### end -->
 
 <!--###TEMPLATE_PHPICALENDAR_EVENT_PREVIEW### begin -->
-<h1>###HEADING###</h1>
+<div itemscope itemtype="http://schema.org/Event">
+    <div itemprop="image" >###IMAGE###</div>
+    <meta itemprop="startDate" content="###MICROFORMAT_START###">
+    <h2 itemprop="name">###TITLE###</h2>
 ###EDIT_LINK###
 
-###TITLE###
 ###STARTDATE###
 ###ENDDATE###
 ###STARTTIME###
 ###ENDTIME###
-###DESCRIPTION###
-###MORE_LINK###
+   <div class="description"  itemprop="description" >###DESCRIPTION###</div>###MORE_LINK###
+  <span class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">###ORGANIZER###</span>
+    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">###LOCATION###</span>
 
 <!--###TEMPLATE_PHPICALENDAR_EVENT_PREVIEW### end -->
 

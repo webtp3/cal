@@ -6,12 +6,14 @@
  * LICENSE file that was distributed with this source code.
  */
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+
 /**
  * This class is a temporary store view helper for the Fluid templating engine.
  *
  * @version
  */
-class Tx_Cal_ViewHelpers_TempStoreViewHelper extends Tx_Fluid_Core_ViewHelper_AbstractViewHelper
+class Tx_Cal_ViewHelpers_TempStoreViewHelper extends AbstractViewHelper
 {
 
     /**

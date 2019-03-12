@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vNotes.
  *
@@ -19,16 +21,18 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
  *
  */
-class vnote extends \TYPO3\CMS\Cal\Model\ICalendar
+class vnote extends ICalendar
 {
     public function __construct($version = '1.1')
     {
         return parent::__construct($version);
     }
+
     public function getType()
     {
         return 'vNote';
     }
+
     public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
     {
         return parent::parsevCalendar($data, 'VNOTE');
@@ -42,8 +46,8 @@ class vnote extends \TYPO3\CMS\Cal\Model\ICalendar
     public function exportvCalendar()
     {
         $requiredAttributes = [];
-        $requiredAttributes ['BODY'] = '';
-        $requiredAttributes ['VERSION'] = '1.1';
+        $requiredAttributes['BODY'] = '';
+        $requiredAttributes['VERSION'] = '1.1';
 
         foreach ($requiredAttributes as $name => $default_value) {
             if (is_a($this->getattribute($name), 'PEAR_Error')) {

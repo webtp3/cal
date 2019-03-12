@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Updates;
 
+use TYPO3\CMS\Install\Updates\AbstractUpdate;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -22,10 +24,10 @@ namespace TYPO3\CMS\Cal\Updates;
  */
 
 /**
- * Update wizzard after move of typoscript templates from EXT:cal/static/ to EXT:cal/Configuration/TypoScript/
- *
+ * Update wizard after move of typoscript templates from EXT:cal/static/ to EXT:cal/Configuration/TypoScript/
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
-class TypoScriptUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate
+class TypoScriptUpdateWizard extends AbstractUpdate
 {
 
     /**
@@ -50,6 +52,8 @@ class TypoScriptUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate
      */
     public function checkForUpdate(&$description)
     {
+        trigger_error('As \TYPO3\CMS\Install\Updates\AbstractUpdate will be removed in TYPO3 v10.0, this wizard will go as well with v3.0 of ext:cal. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $updateNeeded = false;
         // Fetch records where the field media does not contain a plain integer value
         // * check whether media field is not empty
@@ -82,8 +86,10 @@ class TypoScriptUpdateWizard extends \TYPO3\CMS\Install\Updates\AbstractUpdate
      */
     public function performUpdate(array &$dbQueries, &$customMessages)
     {
+        trigger_error('As \TYPO3\CMS\Install\Updates\AbstractUpdate will be removed in TYPO3 v10.0, this wizard will go as well with v3.0 of ext:cal. Affected class: ' . get_class($this), E_USER_DEPRECATED);
+
         $sql = 'UPDATE sys_template	SET include_static_file = replace(include_static_file,\'XT:cal/static/\',\'XT:cal/Configuration/TypoScript/\') WHERE include_static_file like \'%XT:cal/static/%\'';
-        $resultSet = $GLOBALS['TYPO3_DB']->sql_query($sql);
+        $GLOBALS['TYPO3_DB']->sql_query($sql);
         return true;
     }
 }

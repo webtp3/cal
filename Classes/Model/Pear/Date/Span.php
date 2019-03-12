@@ -83,14 +83,14 @@ define('DATE_SPAN_INPUT_FORMAT_NNSV', 1);
  *
  * @global string
  */
-$GLOBALS ['_DATE_SPAN_FORMAT'] = '%C';
+$GLOBALS['_DATE_SPAN_FORMAT'] = '%C';
 
 /**
  * Default time format when converting from a string.
  *
  * @global mixed
  */
-$GLOBALS ['_DATE_SPAN_INPUT_FORMAT'] = DATE_SPAN_INPUT_FORMAT_NNSV;
+$GLOBALS['_DATE_SPAN_INPUT_FORMAT'] = DATE_SPAN_INPUT_FORMAT_NNSV;
 
 // }}}
 // {{{ Class: Span
@@ -110,25 +110,21 @@ class Span
     // {{{ Properties
 
     /**
-     *
      * @var int
      */
     public $day;
 
     /**
-     *
      * @var int
      */
     public $hour;
 
     /**
-     *
      * @var int
      */
     public $minute;
 
     /**
-     *
      * @var int
      */
     public $second;
@@ -142,13 +138,12 @@ class Span
      * Creates the time span object calling the set() method.
      *
      * @param mixed $time
-     *        	Time span expression.
+     *            Time span expression.
      * @param mixed $format
-     *        	Format string to set it from a string or the
-     *        	second date set it from a date diff.
+     *            Format string to set it from a string or the
+     *            second date set it from a date diff.
      *
      * @see set()
-     * @access public
      */
     public function __construct($time = 0, $format = null)
     {
@@ -165,10 +160,10 @@ class Span
      * to the appropriate setFromXxx() method.
      *
      * @param mixed $time
-     *        	Time span expression.
+     *            Time span expression.
      * @param mixed $format
-     *        	Format string to set it from a string or the
-     *        	second date set it from a date diff.
+     *            Format string to set it from a string or the
+     *            second date set it from a date diff.
      *
      * @return bool true on success.
      *
@@ -177,23 +172,25 @@ class Span
      * @see setFromString()
      * @see setFromSeconds()
      * @see setFromDateDiff()
-     * @access public
      */
-    public function set($time = 0, $format = null)
+    public function set($time = 0, $format = null): bool
     {
         if (is_a($time, 'date_span')) {
             return $this->copy($time);
-        } elseif (is_a($time, 'date') and is_a($format, 'date')) {
-            return $this->setFromDateDiff($time, $format);
-        } elseif (is_array($time)) {
-            return $this->setFromArray($time);
-        } elseif (is_string($time)) {
-            return $this->setFromString($time, $format);
-        } elseif (is_int($time)) {
-            return $this->setFromSeconds($time);
-        } else {
-            return $this->setFromSeconds(0);
         }
+        if (is_a($time, 'date') and is_a($format, 'date')) {
+            return $this->setFromDateDiff($time, $format);
+        }
+        if (is_array($time)) {
+            return $this->setFromArray($time);
+        }
+        if (is_string($time)) {
+            return $this->setFromString($time, $format);
+        }
+        if (is_int($time)) {
+            return $this->setFromSeconds($time);
+        }
+        return $this->setFromSeconds(0);
     }
 
     // }}}
@@ -207,35 +204,33 @@ class Span
      * interpreted as 23 hours, .5*60 + 20 = 50 minutes and 0 seconds.
      *
      * @param array $time
-     *        	Items are counted from right to left. First
-     *        	item is for seconds, second for minutes, third
-     *        	for hours and fourth for days. If there are
-     *        	less items than 4, zero (0) is assumed for the
-     *        	absent values.
+     *            Items are counted from right to left. First
+     *            item is for seconds, second for minutes, third
+     *            for hours and fourth for days. If there are
+     *            less items than 4, zero (0) is assumed for the
+     *            absent values.
      *
      * @return bool True on success.
-     *
-     * @access public
      */
-    public function setFromArray($time)
+    public function setFromArray($time): bool
     {
-        if (! is_array($time)) {
+        if (!is_array($time)) {
             return false;
         }
         $tmp1 = new self();
-        if (! $tmp1->setFromSeconds(@array_pop($time))) {
+        if (!$tmp1->setFromSeconds(@array_pop($time))) {
             return false;
         }
         $tmp2 = new self();
-        if (! $tmp2->setFromMinutes(@array_pop($time))) {
+        if (!$tmp2->setFromMinutes(@array_pop($time))) {
             return false;
         }
         $tmp1->add($tmp2);
-        if (! $tmp2->setFromHours(@array_pop($time))) {
+        if (!$tmp2->setFromHours(@array_pop($time))) {
             return false;
         }
         $tmp1->add($tmp2);
-        if (! $tmp2->setFromDays(@array_pop($time))) {
+        if (!$tmp2->setFromDays(@array_pop($time))) {
             return false;
         }
         $tmp1->add($tmp2);
@@ -288,19 +283,17 @@ class Span
      * <code>%%</code> Literal '%'.<br>
      *
      * @param string $time
-     *        	String from where to get the time span
-     *        	information.
+     *            String from where to get the time span
+     *            information.
      * @param string $format
-     *        	Format string.
+     *            Format string.
      *
      * @return bool True on success.
-     *
-     * @access public
      */
-    public function setFromString($time, $format = null)
+    public function setFromString($time, $format = null): bool
     {
-        if (is_null($format)) {
-            $format = $GLOBALS ['_DATE_SPAN_INPUT_FORMAT'];
+        if ($format === null) {
+            $format = $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
         }
         // If format is a string, it parses the string format.
         if (is_string($format)) {
@@ -308,10 +301,10 @@ class Span
             $vars = [];
             $pm = 'am';
             $day = $hour = $minute = $second = 0;
-            for ($i = 0; $i < strlen($format); $i ++) {
-                $char = $format {$i};
-                if ($char == '%') {
-                    $nextchar = $format {++ $i};
+            for ($i = 0, $iMax = strlen($format); $i < $iMax; $i++) {
+                $char = $format{$i};
+                if ($char === '%') {
+                    $nextchar = $format{++$i};
                     switch ($nextchar) {
                         case 'c':
                             $str .= '%d, %d:%d:%d';
@@ -323,46 +316,46 @@ class Span
                             break;
                         case 'd':
                             $str .= '%f';
-                            array_push($vars, 'day');
+                            $vars[] = 'day';
                             break;
                         case 'D':
                             $str .= '%d';
-                            array_push($vars, 'day');
+                            $vars[] = 'day';
                             break;
                         case 'e':
                             $str .= '%f';
-                            array_push($vars, 'hour');
+                            $vars[] = 'hour';
                             break;
                         case 'f':
                             $str .= '%f';
-                            array_push($vars, 'minute');
+                            $vars[] = 'minute';
                             break;
                         case 'g':
                             $str .= '%f';
-                            array_push($vars, 'second');
+                            $vars[] = 'second';
                             break;
                         case 'h':
                             $str .= '%d';
-                            array_push($vars, 'hour');
+                            $vars[] = 'hour';
                             break;
                         case 'H':
                             $str .= '%2d';
-                            array_push($vars, 'hour');
+                            $vars[] = 'hour';
                             break;
                         case 'm':
                             $str .= '%d';
-                            array_push($vars, 'minute');
+                            $vars[] = 'minute';
                             break;
                         case 'M':
                             $str .= '%2d';
-                            array_push($vars, 'minute');
+                            $vars[] = 'minute';
                             break;
                         case 'n':
                             $str .= "\n";
                             break;
                         case 'p':
                             $str .= '%2s';
-                            array_push($vars, 'pm');
+                            $vars[] = 'pm';
                             break;
                         case 'r':
                             $str .= '%2d:%2d:%2d %2s';
@@ -374,11 +367,11 @@ class Span
                             break;
                         case 's':
                             $str .= '%d';
-                            array_push($vars, 'second');
+                            $vars[] = 'second';
                             break;
                         case 'S':
                             $str .= '%2d';
-                            array_push($vars, 'second');
+                            $vars[] = 'second';
                             break;
                         case 't':
                             $str .= "\t";
@@ -399,10 +392,10 @@ class Span
             }
             $vals = sscanf($time, $str);
             foreach ($vals as $i => $val) {
-                if (is_null($val)) {
+                if ($val === null) {
                     return false;
                 }
-                $$vars [$i] = $val;
+                $$vars[$i] = $val;
             }
             if (strcasecmp($pm, 'pm') == 0) {
                 $hour += 12;
@@ -410,10 +403,10 @@ class Span
                 return false;
             }
             $this->setFromArray([
-                    $day,
-                    $hour,
-                    $minute,
-                    $second
+                $day,
+                $hour,
+                $minute,
+                $second
             ]);
         // If format is a integer, it uses a predefined format
             // detection method.
@@ -424,31 +417,31 @@ class Span
                     switch (count($time)) {
                         case 0:
                             return $this->setFromArray([
-                                    0,
-                                    0,
-                                    0,
-                                    0
+                                0,
+                                0,
+                                0,
+                                0
                             ]);
                         case 1:
                             return $this->setFromArray([
-                                    0,
-                                    $time [0],
-                                    0,
-                                    0
+                                0,
+                                $time[0],
+                                0,
+                                0
                             ]);
                         case 2:
                             return $this->setFromArray([
-                                    0,
-                                    $time [0],
-                                    $time [1],
-                                    0
+                                0,
+                                $time[0],
+                                $time[1],
+                                0
                             ]);
                         case 3:
                             return $this->setFromArray([
-                                    0,
-                                    $time [0],
-                                    $time [1],
-                                    $time [2]
+                                0,
+                                $time[0],
+                                $time[1],
+                                $time[2]
                             ]);
                         default:
                             return $this->setFromArray($time);
@@ -466,13 +459,11 @@ class Span
      * Set the time span from a total number of seconds.
      *
      * @param int $seconds
-     *        	Total number of seconds.
+     *            Total number of seconds.
      *
      * @return bool True on success.
-     *
-     * @access public
      */
-    public function setFromSeconds($seconds)
+    public function setFromSeconds($seconds): bool
     {
         if ($seconds < 0) {
             return false;
@@ -495,13 +486,11 @@ class Span
      * Set the time span from a total number of minutes.
      *
      * @param float $minutes
-     *        	Total number of minutes.
+     *            Total number of minutes.
      *
      * @return bool True on success.
-     *
-     * @access public
      */
-    public function setFromMinutes($minutes)
+    public function setFromMinutes($minutes): bool
     {
         return $this->setFromSeconds(round($minutes * 60));
     }
@@ -513,13 +502,11 @@ class Span
      * Set the time span from a total number of hours.
      *
      * @param float $hours
-     *        	Total number of hours.
+     *            Total number of hours.
      *
      * @return bool True on success.
-     *
-     * @access public
      */
-    public function setFromHours($hours)
+    public function setFromHours($hours): bool
     {
         return $this->setFromSeconds(round($hours * 3600));
     }
@@ -531,13 +518,11 @@ class Span
      * Set the time span from a total number of days.
      *
      * @param float $days
-     *        	Total number of days.
+     *            Total number of days.
      *
      * @return bool True on success.
-     *
-     * @access public
      */
-    public function setFromDays($days)
+    public function setFromDays($days): bool
     {
         return $this->setFromSeconds(round($days * 86400));
     }
@@ -552,28 +537,33 @@ class Span
      * is allways positive, so the date's order is not important.
      *
      * @param
-     *        	object Date $date1 First Date.
+     *            object Date $date1 First Date.
      * @param
-     *        	object Date $date2 Second Date.
+     *            object Date $date2 Second Date.
      *
      * @return bool True on success.
-     *
-     * @access public
      */
-    public function setFromDateDiff($date1, $date2)
+    public function setFromDateDiff($date1, $date2): bool
     {
-        if (! is_a($date1, 'date') or ! is_a($date2, 'date')) {
+        if (!is_a($date1, 'date') or !is_a($date2, 'date')) {
             return false;
         }
         $date1->toUTC();
         $date2->toUTC();
         if ($date1->after($date2)) {
             list($date1, $date2) = [
-                    $date2,
-                    $date1
+                $date2,
+                $date1
             ];
         }
-        $days = Calc::dateDiff($date1->getDay(), $date1->getMonth(), $date1->getYear(), $date2->getDay(), $date2->getMonth(), $date2->getYear());
+        $days = Calc::dateDiff(
+            $date1->getDay(),
+            $date1->getMonth(),
+            $date1->getYear(),
+            $date2->getDay(),
+            $date2->getMonth(),
+            $date2->getYear()
+        );
         $hours = $date2->getHour() - $date1->getHour();
         $mins = $date2->getMinute() - $date1->getMinute();
         $secs = $date2->getSecond() - $date1->getSecond();
@@ -588,13 +578,11 @@ class Span
      * Set the time span from another time object.
      *
      * @param
-     *        	object Span $time Source time span object.
+     *            object Span $time Source time span object.
      *
      * @return bool True on success.
-     *
-     * @access public
      */
-    public function copy($time)
+    public function copy($time): bool
     {
         if (is_a($time, 'date_span')) {
             $this->second = $time->second;
@@ -602,9 +590,8 @@ class Span
             $this->hour = $time->hour;
             $this->day = $time->day;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     // }}}
@@ -651,22 +638,20 @@ class Span
      * <code>%%</code> Literal '%'.<br>
      *
      * @param string $format
-     *        	The format string for returned time span.
+     *            The format string for returned time span.
      *
      * @return string The time span in specified format.
-     *
-     * @access public
      */
-    public function format($format = null)
+    public function format($format = null): string
     {
-        if (is_null($format)) {
-            $format = $GLOBALS ['_DATE_SPAN_FORMAT'];
+        if ($format === null) {
+            $format = $GLOBALS['_DATE_SPAN_FORMAT'];
         }
         $output = '';
-        for ($i = 0; $i < strlen($format); $i ++) {
-            $char = $format {$i};
-            if ($char == '%') {
-                $nextchar = $format {++ $i};
+        for ($i = 0, $iMax = strlen($format); $i < $iMax; $i++) {
+            $char = $format{$i};
+            if ($char === '%') {
+                $nextchar = $format{++$i};
                 switch ($nextchar) {
                     case 'C':
                         $output .= sprintf('%d, %02d:%02d:%02d', $this->day, $this->hour, $this->minute, $this->second);
@@ -723,7 +708,13 @@ class Span
                         break;
                     case 'r':
                         $hour = ($this->hour + 1) > 12 ? $this->hour - 12 : $this->hour;
-                        $output .= sprintf('%02d:%02d:%02d %s', $hour == 0 ? 12 : $hour, $this->minute, $this->second, $this->hour >= 12 ? 'pm' : 'am');
+                        $output .= sprintf(
+                            '%02d:%02d:%02d %s',
+                            $hour == 0 ? 12 : $hour,
+                            $this->minute,
+                            $this->second,
+                            $this->hour >= 12 ? 'pm' : 'am'
+                        );
                         break;
                     case 'R':
                         $output .= sprintf('%02d:%02d', $this->hour, $this->minute);
@@ -760,10 +751,8 @@ class Span
      * Convert time span to seconds.
      *
      * @return int Time span as an integer number of seconds.
-     *
-     * @access public
      */
-    public function toSeconds()
+    public function toSeconds(): int
     {
         return $this->day * 86400 + $this->hour * 3600 + $this->minute * 60 + $this->second;
     }
@@ -775,10 +764,8 @@ class Span
      * Convert time span to minutes.
      *
      * @return float Time span as a decimal number of minutes.
-     *
-     * @access public
      */
-    public function toMinutes()
+    public function toMinutes(): float
     {
         return $this->day * 1440 + $this->hour * 60 + $this->minute + $this->second / 60;
     }
@@ -790,10 +777,8 @@ class Span
      * Convert time span to hours.
      *
      * @return float Time span as a decimal number of hours.
-     *
-     * @access public
      */
-    public function toHours()
+    public function toHours(): float
     {
         return $this->day * 24 + $this->hour + $this->minute / 60 + $this->second / 3600;
     }
@@ -805,10 +790,8 @@ class Span
      * Convert time span to days.
      *
      * @return float Time span as a decimal number of days.
-     *
-     * @access public
      */
-    public function toDays()
+    public function toDays(): float
     {
         return $this->day + $this->hour / 24 + $this->minute / 1440 + $this->second / 86400;
     }
@@ -820,11 +803,9 @@ class Span
      * Adds a time span.
      *
      * @param
-     *        	object Span $time Time span to add.
-     *
-     * @access public
+     *            object Span $time Time span to add.
      */
-    public function add($time)
+    public function add($time): bool
     {
         return $this->setFromSeconds($this->toSeconds() + $time->toSeconds());
     }
@@ -840,9 +821,7 @@ class Span
      * negative time spans).
      *
      * @param
-     *        	object Span $time Time span to subtract.
-     *
-     * @access public
+     *            object Span $time Time span to subtract.
      */
     public function subtract($time)
     {
@@ -861,13 +840,11 @@ class Span
      * Tells if time span is equal to $time.
      *
      * @param
-     *        	object Span $time Time span to compare to.
+     *            object Span $time Time span to compare to.
      *
      * @return bool True if the time spans are equal.
-     *
-     * @access public
      */
-    public function equal($time)
+    public function equal($time): bool
     {
         return $this->toSeconds() == $time->toSeconds();
     }
@@ -879,13 +856,11 @@ class Span
      * Tells if this time span is greater or equal than $time.
      *
      * @param
-     *        	object Span $time Time span to compare to.
+     *            object Span $time Time span to compare to.
      *
      * @return bool True if this time span is greater or equal than $time.
-     *
-     * @access public
      */
-    public function greaterEqual($time)
+    public function greaterEqual($time): bool
     {
         return $this->toSeconds() >= $time->toSeconds();
     }
@@ -897,13 +872,11 @@ class Span
      * Tells if this time span is lower or equal than $time.
      *
      * @param
-     *        	object Span $time Time span to compare to.
+     *            object Span $time Time span to compare to.
      *
      * @return bool True if this time span is lower or equal than $time.
-     *
-     * @access public
      */
-    public function lowerEqual($time)
+    public function lowerEqual($time): bool
     {
         return $this->toSeconds() <= $time->toSeconds();
     }
@@ -915,13 +888,11 @@ class Span
      * Tells if this time span is greater than $time.
      *
      * @param
-     *        	object Span $time Time span to compare to.
+     *            object Span $time Time span to compare to.
      *
      * @return bool True if this time span is greater than $time.
-     *
-     * @access public
      */
-    public function greater($time)
+    public function greater($time): bool
     {
         return $this->toSeconds() > $time->toSeconds();
     }
@@ -933,13 +904,11 @@ class Span
      * Tells if this time span is lower than $time.
      *
      * @param
-     *        	object Span $time Time span to compare to.
+     *            object Span $time Time span to compare to.
      *
      * @return bool True if this time span is lower than $time.
-     *
-     * @access public
      */
-    public function lower($time)
+    public function lower($time): bool
     {
         return $this->toSeconds() < $time->toSeconds();
     }
@@ -953,26 +922,24 @@ class Span
      * Compares two time spans. Suitable for use in sorting functions.
      *
      * @param
-     *        	object Span $time1 The first time span.
+     *            object Span $time1 The first time span.
      * @param
-     *        	object Span $time2 The second time span.
+     *            object Span $time2 The second time span.
      *
      * @return int 0 if the time spans are equal, -1 if time1 is lower
      *         than time2, 1 if time1 is greater than time2.
      *
      * @static
-     *
-     * @access public
      */
-    public function compare($time1, $time2)
+    public function compare($time1, $time2): int
     {
         if ($time1->equal($time2)) {
             return 0;
-        } elseif ($time1->lower($time2)) {
-            return - 1;
-        } else {
-            return 1;
         }
+        if ($time1->lower($time2)) {
+            return -1;
+        }
+        return 1;
     }
 
     // }}}
@@ -983,9 +950,9 @@ class Span
      *
      * @return bool True is it's empty.
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
-        return ! $this->day && ! $this->hour && ! $this->minute && ! $this->second;
+        return !$this->day && !$this->hour && !$this->minute && !$this->second;
     }
 
     // }}}
@@ -995,17 +962,16 @@ class Span
      * Set the default input format.
      *
      * @param mixed $format
-     *        	New default input format.
+     *            New default input format.
      *
      * @return mixed Previous default input format.
      *
      * @static
-     *
      */
     public function setDefaultInputFormat($format)
     {
-        $old = $GLOBALS ['_DATE_SPAN_INPUT_FORMAT'];
-        $GLOBALS ['_DATE_SPAN_INPUT_FORMAT'] = $format;
+        $old = $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
+        $GLOBALS['_DATE_SPAN_INPUT_FORMAT'] = $format;
         return $old;
     }
 
@@ -1018,11 +984,10 @@ class Span
      * @return mixed Default input format.
      *
      * @static
-     *
      */
     public function getDefaultInputFormat()
     {
-        return $GLOBALS ['_DATE_SPAN_INPUT_FORMAT'];
+        return $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
     }
 
     // }}}
@@ -1032,17 +997,16 @@ class Span
      * Set the default format.
      *
      * @param mixed $format
-     *        	New default format.
+     *            New default format.
      *
      * @return mixed Previous default format.
      *
      * @static
-     *
      */
     public function setDefaultFormat($format)
     {
-        $old = $GLOBALS ['_DATE_SPAN_FORMAT'];
-        $GLOBALS ['_DATE_SPAN_FORMAT'] = $format;
+        $old = $GLOBALS['_DATE_SPAN_FORMAT'];
+        $GLOBALS['_DATE_SPAN_FORMAT'] = $format;
         return $old;
     }
 
@@ -1055,11 +1019,10 @@ class Span
      * @return mixed Default format.
      *
      * @static
-     *
      */
     public function getDefaultFormat()
     {
-        return $GLOBALS ['_DATE_SPAN_FORMAT'];
+        return $GLOBALS['_DATE_SPAN_FORMAT'];
     }
 
     // }}}

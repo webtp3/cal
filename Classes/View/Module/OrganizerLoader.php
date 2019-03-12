@@ -22,9 +22,10 @@ namespace TYPO3\CMS\Cal\View\Module;
  */
 use TYPO3\CMS\Cal\Service\AbstractModul;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
- *
+ * Class OrganizerLoader
  */
 class OrganizerLoader extends AbstractModul
 {
@@ -32,23 +33,24 @@ class OrganizerLoader extends AbstractModul
     /**
      * The function adds organizer markers into the event template
      *
-     * @param Object $moduleCaller
-     *        	Instance of the event model (phpicalendar_model)
+     * @param object $moduleCaller Instance of the event model (phpicalendar_model)
+     * @param bool $onlyMarker
+     * @return array|mixed|string
      */
     public function start(&$moduleCaller, $onlyMarker = false)
     {
         if ($moduleCaller->getOrganizerId() > 0) {
-            $this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
-            $this->cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+            $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
+            $this->cObj = &Registry::Registry('basic', 'cobj');
 
-            $moduleCaller->confArr = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
-            $useOrganizerStructure = ($moduleCaller->confArr ['useOrganizerStructure'] ? $moduleCaller->confArr ['useOrganizerStructure'] : 'tx_cal_organizer');
+            $moduleCaller->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            $useOrganizerStructure = ($moduleCaller->confArr['useOrganizerStructure'] ?: 'tx_cal_organizer');
             $organizer = $this->modelObj->findOrganizer($moduleCaller->getOrganizerId(), $useOrganizerStructure);
 
             if (is_object($organizer)) {
-                $page = Functions::getContent($moduleCaller->conf ['module.'] ['organizerloader.'] ['template']);
-                if ($page == '') {
-                    return '<h3>module organizerloader: no template file found:</h3>' . $moduleCaller->conf ['module.'] ['organizerloader.'] ['template'];
+                $page = Functions::getContent($moduleCaller->conf['module.']['organizerloader.']['template']);
+                if ($page === '') {
+                    return '<h3>module organizerloader: no template file found:</h3>' . $moduleCaller->conf['module.']['organizerloader.']['template'];
                 }
                 $sims = [];
                 $rems = [];
@@ -57,7 +59,7 @@ class OrganizerLoader extends AbstractModul
                 if ($onlyMarker) {
                     return $sims;
                 }
-                return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, []);
+                return Functions::substituteMarkerArrayNotCached($page, $sims, $rems, []);
             }
         }
         return '';

@@ -13,13 +13,14 @@ use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Controller\DateParser;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Service\EventService;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 
 /**
- *
+ * Class RecurrenceGenerator
  */
 class RecurrenceGenerator
 {
@@ -30,85 +31,81 @@ class RecurrenceGenerator
     const INDEX_TABLE = 'tx_cal_index';
 
     /**
-     *
      * @var string
      */
     public $info = '';
 
     /**
-     *
      * @var null
      */
     public $pageIDForPlugin;
 
     /**
-     *
-     * @var null|string
+     * @var string|null
      */
     public $starttime;
 
     /**
-     *
-     * @var null|string
+     * @var string|null
      */
     public $endtime;
 
     /**
-     *
      * @var array
      */
     public $extConf;
 
     /**
-     *
      * @param null $pageIDForPlugin
      * @param null $starttime
      * @param null $endtime
      */
     public function __construct($pageIDForPlugin = null, $starttime = null, $endtime = null)
     {
-        $this->extConf = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
+        $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->pageIDForPlugin = $pageIDForPlugin;
         if ($starttime == null) {
-            $starttime = $this->getTimeParsed($this->extConf ['recurrenceStart'])->format('%Y%m%d');
+            $starttime = $this->getTimeParsed($this->extConf['recurrenceStart'])->format('%Y%m%d');
         }
         $this->starttime = $starttime;
         if ($endtime == null) {
-            $endtime = $this->getTimeParsed($this->extConf ['recurrenceEnd'])->format('%Y%m%d');
+            $endtime = $this->getTimeParsed($this->extConf['recurrenceEnd'])->format('%Y%m%d');
         }
         $this->endtime = $endtime;
     }
 
     /**
-     *
      * @return string
      */
-    public function getInfo()
+    public function getInfo(): string
     {
         return $this->info;
     }
 
     /**
-     *
      * @param int $pageId
      */
     public function cleanIndexTable($pageId)
     {
-        $this->getDatabaseConnection()->exec_DELETEquery(self::INDEX_TABLE, 'event_uid in (select uid from tx_cal_event where pid = ' . intval($pageId) . ')');
+        $this->getDatabaseConnection()->exec_DELETEquery(
+            self::INDEX_TABLE,
+            'event_uid in (select uid from tx_cal_event where pid = ' . intval($pageId) . ')'
+        );
     }
 
     /**
-     *
      * @param int $uid
      * @param string $table
      */
     public function cleanIndexTableOfUid($uid, $table)
     {
-        $this->getDatabaseConnection()->exec_DELETEquery(self::INDEX_TABLE, 'event_uid = ' . $uid . ' AND tablename = "' . $table . '"');
+        $this->getDatabaseConnection()->exec_DELETEquery(
+            self::INDEX_TABLE,
+            'event_uid = ' . $uid . ' AND tablename = "' . $table . '"'
+        );
     }
 
     /**
-     *
      * @param int $uid
      */
     public function cleanIndexTableOfCalendarUid($uid)
@@ -118,12 +115,14 @@ class RecurrenceGenerator
         $table = 'tx_cal_event';
         $where = 'deleted = 0 AND calendar_id = ' . $uid;
         $uids = array_keys($databaseConnection->exec_SELECTgetRows($select, $table, $where, '', '', '', 'uid'));
-        $uids [] = 0;
-        $databaseConnection->exec_DELETEquery(self::INDEX_TABLE, 'event_uid IN (' . implode($uids) . ')' . ' AND tablename="' . $table . '"');
+        $uids[] = 0;
+        $databaseConnection->exec_DELETEquery(
+            self::INDEX_TABLE,
+            'event_uid IN (' . implode($uids) . ')' . ' AND tablename="' . $table . '"'
+        );
     }
 
     /**
-     *
      * @param int $uid
      */
     public function cleanIndexTableOfExceptionGroupUid($uid)
@@ -131,26 +130,34 @@ class RecurrenceGenerator
         $databaseConnection = $this->getDatabaseConnection();
         $cObj = &Registry::Registry('basic', 'cobj');
         $uids = [
-                0
+            0
         ];
         $where = 'AND tx_cal_exception_event_group.uid = ' . $uid . $cObj->enableFields('tx_cal_exception_event') . $cObj->enableFields('tx_cal_exception_event_group');
-        $results = $databaseConnection->exec_SELECT_mm_query('tx_cal_exception_event_group.*', 'tx_cal_exception_event', 'tx_cal_exception_event_mm', 'tx_cal_exception_event_group', $where);
+        $results = $databaseConnection->exec_SELECT_mm_query(
+            'tx_cal_exception_event_group.*',
+            'tx_cal_exception_event',
+            'tx_cal_exception_event_mm',
+            'tx_cal_exception_event_group',
+            $where
+        );
         if ($results) {
             while ($row = $databaseConnection->sql_fetch_assoc($results)) {
-                $uids [] = $row ['uid'];
+                $uids[] = $row['uid'];
             }
             $databaseConnection->sql_free_result($results);
         }
-        $databaseConnection->exec_DELETEquery(self::INDEX_TABLE, 'event_uid IN (' . implode($uids) . ')' . ' AND tablename = "tx_cal_exception_event"');
+        $databaseConnection->exec_DELETEquery(
+            self::INDEX_TABLE,
+            'event_uid IN (' . implode($uids) . ')' . ' AND tablename = "tx_cal_exception_event"'
+        );
     }
 
     /**
-     *
      * @param int $eventPage
      *
      * @return int
      */
-    public function countRecurringEvents($eventPage = 0)
+    public function countRecurringEvents($eventPage = 0): int
     {
         $databaseConnection = $this->getDatabaseConnection();
         $count = 0;
@@ -163,7 +170,7 @@ class RecurrenceGenerator
         $results = $databaseConnection->exec_SELECTquery($select, $table, $where);
         if ($results) {
             while ($row = $databaseConnection->sql_fetch_assoc($results)) {
-                $count = $row ['count(*)'];
+                $count = $row['count(*)'];
             }
             $databaseConnection->sql_free_result($results);
         }
@@ -172,7 +179,7 @@ class RecurrenceGenerator
         $results = $databaseConnection->exec_SELECTquery($select, $table, $where);
         if ($results) {
             while ($row = $databaseConnection->sql_fetch_assoc($results)) {
-                $count += $row ['count(*)'];
+                $count += $row['count(*)'];
             }
             $databaseConnection->sql_free_result($results);
         }
@@ -180,10 +187,9 @@ class RecurrenceGenerator
     }
 
     /**
-     *
      * @return array
      */
-    public function getRecurringEventPages()
+    public function getRecurringEventPages(): array
     {
         $pages = [];
         $table = 'tx_cal_event';
@@ -196,7 +202,6 @@ class RecurrenceGenerator
     }
 
     /**
-     *
      * @param string $table
      * @param array $pages
      */
@@ -210,17 +215,17 @@ class RecurrenceGenerator
         $results = $databaseConnection->exec_SELECTquery($select, $table, $where, $groupBy);
         if ($results) {
             while ($row = $databaseConnection->sql_fetch_assoc($results)) {
-                $pids [] = $row ['pid'];
+                $pids[] = $row['pid'];
             }
             $databaseConnection->sql_free_result($results);
         }
-        if (! empty($pids)) {
+        if (!empty($pids)) {
             $select = 'title,uid';
             $where = 'deleted = 0 and uid in (' . implode(',', $pids) . ')';
             $results = $databaseConnection->exec_SELECTquery($select, 'pages', $where);
             if ($results) {
                 while ($row = $databaseConnection->sql_fetch_assoc($results)) {
-                    $pages [$row ['uid']] = $row ['title'];
+                    $pages[$row['uid']] = $row['title'];
                 }
                 $databaseConnection->sql_free_result($results);
             }
@@ -231,11 +236,12 @@ class RecurrenceGenerator
      * Generate index
      *
      * @param int $eventPage
+     * @throws Exception
      */
     public function generateIndex($eventPage = 0)
     {
         $eventService = $this->getEventService();
-        if (! is_object($eventService)) {
+        if (!is_object($eventService)) {
             return;
         }
         $eventService->starttime = new CalDate($this->starttime);
@@ -253,10 +259,10 @@ class RecurrenceGenerator
         if ($results) {
             while ($row = $databaseConnection->sql_fetch_assoc($results)) {
                 // make sure that rdate is empty in case that something went wrong during event creation (e.g. by copying)
-                if ($row ['rdate_type'] == 'none' || $row ['rdate_type'] == '' || $row ['rdate_type'] == '0') {
-                    $row ['rdate'] = '';
+                if ($row['rdate_type'] === 'none' || $row['rdate_type'] === '' || $row['rdate_type'] === '0') {
+                    $row['rdate'] = '';
                 }
-                $this->info .= '<li>' . $row ['title'] . '</li>';
+                $this->info .= '<li>' . $row['title'] . '</li>';
                 $event = $eventService->createEvent($row, false);
                 $eventService->recurringEvent($event);
             }
@@ -268,7 +274,7 @@ class RecurrenceGenerator
         $results = $databaseConnection->exec_SELECTquery($select, $table, $where);
         if ($results) {
             while ($row = $databaseConnection->sql_fetch_assoc($results)) {
-                $this->info .= '<li>' . $row ['title'] . '</li>';
+                $this->info .= '<li>' . $row['title'] . '</li>';
                 $event = $eventService->createEvent($row, true);
                 $eventService->recurringEvent($event);
             }
@@ -276,7 +282,10 @@ class RecurrenceGenerator
         }
         $this->info .= '</ul>';
         $this->info .= 'Done.';
-        $this->info .= '<br/><br/><a href="javascript:history.back();">' . LocalizationUtility::translate('l_back', 'cal') . '</a><br/><br/>';
+        $this->info .= '<br/><br/><a href="javascript:history.back();">' . LocalizationUtility::translate(
+            'l_back',
+            'cal'
+            ) . '</a><br/><br/>';
     }
 
     /**
@@ -284,11 +293,12 @@ class RecurrenceGenerator
      *
      * @param int $uid
      * @param string $table
+     * @throws Exception
      */
     public function generateIndexForUid($uid, $table)
     {
         $eventService = $this->getEventService();
-        if (! is_object($eventService)) {
+        if (!is_object($eventService)) {
             return;
         }
         $eventService->starttime = new CalDate($this->starttime);
@@ -298,10 +308,10 @@ class RecurrenceGenerator
         $databaseConnection = $this->getDatabaseConnection();
 
         $select = '*';
-        $where = 'uid = ' . ( int ) $uid;
+        $where = 'uid = ' . (int)$uid;
         $rows = $databaseConnection->exec_SELECTgetRows($select, $table, $where);
         foreach ($rows as $row) {
-            $event = $eventService->createEvent($row, $table == 'tx_cal_exception_event');
+            $event = $eventService->createEvent($row, $table === 'tx_cal_exception_event');
             $eventService->recurringEvent($event);
         }
         $this->info = 'Done.';
@@ -311,11 +321,12 @@ class RecurrenceGenerator
      * Generate index for the given calendar
      *
      * @param int $uid
+     * @throws Exception
      */
     public function generateIndexForCalendarUid($uid)
     {
         $eventService = $this->getEventService();
-        if (! is_object($eventService)) {
+        if (!is_object($eventService)) {
             return;
         }
         $eventService->starttime = new CalDate($this->starttime);
@@ -339,11 +350,12 @@ class RecurrenceGenerator
      * Generate the index for the given exception group id
      *
      * @param int $uid
+     * @throws Exception
      */
     public function generateIndexForExceptionGroupUid($uid)
     {
         $eventService = $this->getEventService();
-        if (! is_object($eventService)) {
+        if (!is_object($eventService)) {
             return;
         }
         $eventService->starttime = new CalDate($this->starttime);
@@ -354,7 +366,13 @@ class RecurrenceGenerator
 
         $cObj = &Registry::Registry('basic', 'cobj');
         $where = 'tx_cal_exception_event_group.id = ' . $uid . $cObj->enableFields('tx_cal_exception_event') . $cObj->enableFields('tx_cal_exception_event_group');
-        $results = $databaseConnection->exec_SELECT_mm_query('tx_cal_exception_event_group.*', 'tx_cal_exception_event', 'tx_cal_exception_event_mm', 'tx_cal_exception_event_group', $where);
+        $results = $databaseConnection->exec_SELECT_mm_query(
+            'tx_cal_exception_event_group.*',
+            'tx_cal_exception_event',
+            'tx_cal_exception_event_mm',
+            'tx_cal_exception_event_group',
+            $where
+        );
         if ($results) {
             while ($row = $databaseConnection->sql_fetch_assoc($results)) {
                 $event = $eventService->createEvent($row, false);
@@ -369,8 +387,9 @@ class RecurrenceGenerator
      * Get the event service
      *
      * @return EventService
+     * @throws Exception
      */
-    public function getEventService()
+    public function getEventService(): EventService
     {
         static $eventService = null;
         if (is_object($eventService)) {
@@ -378,9 +397,9 @@ class RecurrenceGenerator
         }
         try {
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
-            if (! $modelObj) {
+            if (!$modelObj) {
                 /** @var Api $calAPI */
-                $calAPI = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\Api');
+                $calAPI = GeneralUtility::makeInstance(Api::class);
                 $calAPI = &$calAPI->tx_cal_api_without($this->pageIDForPlugin);
                 $modelObj = $calAPI->modelObj;
             }
@@ -388,8 +407,12 @@ class RecurrenceGenerator
         } catch (\Exception $e) {
             $this->info = CalIndexer::getMessage($e, FlashMessage::ERROR);
         }
-        if (! is_object($eventService)) {
-            $this->info = CalIndexer::getMessage('Could not fetch the event service! Please make sure the page id is correct!', FlashMessage::ERROR);
+
+        if (!is_object($eventService)) {
+            $this->info = CalIndexer::getMessage(
+                'Could not fetch the event service! Please make sure the page id is correct!',
+                FlashMessage::ERROR
+            );
         }
         return $eventService;
     }
@@ -401,10 +424,10 @@ class RecurrenceGenerator
      *
      * @return CalDate
      */
-    protected function getTimeParsed($timeString)
+    protected function getTimeParsed($timeString): CalDate
     {
         /** @var DateParser $dp */
-        $dp = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\DateParser');
+        $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }
@@ -414,8 +437,8 @@ class RecurrenceGenerator
      *
      * @return DatabaseConnection
      */
-    protected function getDatabaseConnection()
+    protected function getDatabaseConnection(): DatabaseConnection
     {
-        return $GLOBALS ['TYPO3_DB'];
+        return $GLOBALS['TYPO3_DB'];
     }
 }

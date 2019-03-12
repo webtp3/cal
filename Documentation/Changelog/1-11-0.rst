@@ -1,4 +1,3 @@
-
 1.11.0 - TYPO3 LTS 6.2, 7, LTS 8
 --------------------------------
 
@@ -34,7 +33,7 @@
     * Task #75381       - Remove deprecated tca settings (7LTS)
     * Task #75383       - Switch backend module to 'routeTarget' (7LTS)
     * Task			    - ContentObjectRenderer function fileResource is deprecated since TYPO3 v8, will be removed in TYPO3 v9, use Functions::getContent() directly
-    * Suggestion #75727 - translation in locallang.xml missing
+    * Suggestion #75727 - translation in locallang.xlf missing
     * Suggestion #79169 - ts setup blub = 1
     * Core-Task #79221 	- Use $ instead of TYPO3.jQuery
     * Core-Task #78953	- Custom FormDataProvider breaks with date related changes

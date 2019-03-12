@@ -20,14 +20,14 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\Pear\Date;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
  * Extends the PEAR date class and adds a compareTo method.
- *
  */
-class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
+class CalDate extends Date
 {
     /**
      * define the default monthname abbreviation length
@@ -39,15 +39,20 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     private $conf;
 
     // @override constructor
+
+    /**
+     * CalDate constructor.
+     * @param null $date
+     */
     public function __construct($date = null)
     {
-        if (class_exists('TYPO3\\CMS\\Cal\\Utility\\Registry')) {
-            if (is_object($GLOBALS ['TSFE'])) {
-                if (! is_array($GLOBALS ['TSFE']->register ['cal_shared_conf'])) {
-                    $GLOBALS ['TSFE']->register ['cal_shared_conf'] = &Registry::Registry('basic', 'conf');
+        if (class_exists(Registry::class)) {
+            if (is_object($GLOBALS['TSFE'])) {
+                if (!is_array($GLOBALS['TSFE']->register['cal_shared_conf'])) {
+                    $GLOBALS['TSFE']->register['cal_shared_conf'] = &Registry::Registry('basic', 'conf');
                 }
-                $this->conf = &$GLOBALS ['TSFE']->register ['cal_shared_conf'];
-                $this->cObj = &$GLOBALS ['TSFE']->cObj;
+                $this->conf = &$GLOBALS['TSFE']->register['cal_shared_conf'];
+                $this->cObj = &$GLOBALS['TSFE']->cObj;
             } else {
                 $this->conf = &Registry::Registry('basic', 'conf');
                 $this->cObj = &Registry::Registry('basic', 'cobj');
@@ -59,18 +64,24 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     /**
      * Compare function.
      *
+     * @param $object
      * @return int => less, equals, greater
      */
-    public function compareTo($object)
+    public function compareTo($object): int
     {
-        if (is_subclass_of($object, 'TYPO3\CMS\Cal\Model\Pear\Date')) {
+        if (is_subclass_of($object, Date::class)) {
             return $this->compare($this, $object);
         }
-        return - 1;
+        return -1;
     }
 
     // @override
-    public function equals($compareDate)
+
+    /**
+     * @param $compareDate
+     * @return bool
+     */
+    public function equals($compareDate): bool
     {
         $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
         $b = floatval($this->format('%Y%m%d%H%M%S'));
@@ -81,7 +92,12 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     }
 
     // @override
-    public function before($compareDate)
+
+    /**
+     * @param $compareDate
+     * @return bool
+     */
+    public function before($compareDate): bool
     {
         $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
         $b = floatval($this->format('%Y%m%d%H%M%S'));
@@ -92,7 +108,12 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     }
 
     // @override
-    public function after($compareDate)
+
+    /**
+     * @param $compareDate
+     * @return bool
+     */
+    public function after($compareDate): bool
     {
         $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
         $b = floatval($this->format('%Y%m%d%H%M%S'));
@@ -103,7 +124,13 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     }
 
     // @override
-    public function compare($compareDateA, $compareDateB)
+
+    /**
+     * @param $compareDateA
+     * @param $compareDateB
+     * @return int
+     */
+    public function compare($compareDateA, $compareDateB): int
     {
         $a = floatval($compareDateA->format('%Y%m%d%H%M%S'));
         $b = floatval($compareDateB->format('%Y%m%d%H%M%S'));
@@ -111,12 +138,16 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
             return 0;
         }
         if ($a < $b) {
-            return - 1;
+            return -1;
         }
         return 1;
     }
 
     // @override
+
+    /**
+     * @param int $seconds
+     */
     public function subtractSeconds($seconds = 0)
     {
         if ($seconds != 0) {
@@ -125,6 +156,10 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     }
 
     // @override
+
+    /**
+     * @param int $seconds
+     */
     public function addSeconds($seconds = 0)
     {
         if ($seconds != 0) {
@@ -217,13 +252,11 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
      * the week is counted as the last of the previous year.
      * <code>%W</code>
      *
-     * @param string $format
-     *        	the format string for returned date/time
+     * @param string $format the format string for returned date/time
      *
      * @return string date/time in given format
-     * @access public
      */
-    public function format($format)
+    public function format($format): string
     {
         $output = '';
 
@@ -231,28 +264,36 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
         $hn_isoweek = null;
         $hn_isoday = null;
 
-        if ($format == '%Y%m%d') {
+        if ($format === '%Y%m%d') {
             return $this->year . sprintf('%02d%02d', $this->month, $this->day);
-        } elseif ($format == '%Y%m%d%H%M%S') {
-            return $this->year . sprintf('%02d%02d%02d%02d%02d', $this->month, $this->day, $this->hour, $this->minute, $this->second);
+        }
+        if ($format === '%Y%m%d%H%M%S') {
+            return $this->year . sprintf(
+                '%02d%02d%02d%02d%02d',
+                $this->month,
+                $this->day,
+                $this->hour,
+                $this->minute,
+                $this->second
+                );
         }
 
-        for ($strpos = 0; $strpos < strlen($format); $strpos ++) {
-            $char = substr($format, $strpos, 1);
-            if ($char == '%') {
-                $nextchar = substr($format, $strpos + 1, 1);
+        for ($strpos = 0, $strposMax = strlen($format); $strpos < $strposMax; $strpos++) {
+            $char = $format[$strpos];
+            if ($char === '%') {
+                $nextchar = $format[$strpos + 1];
                 switch ($nextchar) {
                     case 'a':
-                        $output .= self::getDayName(true);
+                        $output .= $this->getDayName(true);
                         break;
                     case 'A':
-                        $output .= self::getDayName();
+                        $output .= $this->getDayName();
                         break;
                     case 'b':
-                        $output .= self::getMonthName(true);
+                        $output .= $this->getMonthName(true);
                         break;
                     case 'B':
-                        $output .= self::getMonthName();
+                        $output .= $this->getMonthName();
                         break;
                     case 'C':
                         $output .= sprintf('%02d', intval($this->year / 100));
@@ -270,15 +311,23 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
                         $output .= Calc::dateToDays($this->day, $this->month, $this->year);
                         break;
                     case 'g':
-                        if (is_null($hn_isoyear)) {
-                            list($hn_isoyear, $hn_isoweek, $hn_isoday) = Calc::isoWeekDate($this->day, $this->month, $this->year);
+                        if ($hn_isoyear === null) {
+                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
+                                $this->day,
+                                $this->month,
+                                $this->year
+                            );
                         }
 
                         $output .= sprintf('%02d', $hn_isoyear % 100);
                         break;
                     case 'G':
-                        if (is_null($hn_isoyear)) {
-                            list($hn_isoyear, $hn_isoweek, $hn_isoday) = Calc::isoWeekDate($this->day, $this->month, $this->year);
+                        if ($hn_isoyear === null) {
+                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
+                                $this->day,
+                                $this->month,
+                                $this->year
+                            );
                         }
 
                         $output .= sprintf('%04d', $hn_isoyear);
@@ -301,7 +350,7 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
                             return $this->_getErrorInvalidTime();
                         }
                         $hour = $this->hour + 1 > 12 ? $this->hour - 12 : $this->hour;
-                        $output .= $hour == 0 ? 12 : ($nextchar == 'i' ? $hour : sprintf('%02d', $hour));
+                        $output .= $hour == 0 ? 12 : ($nextchar === 'i' ? $hour : sprintf('%02d', $hour));
                         break;
                     case 'j':
                         $output .= sprintf('%03d', Calc::dayOfYear($this->day, $this->month, $this->year));
@@ -356,7 +405,13 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
                             return $this->_getErrorInvalidTime();
                         }
                         $hour = $this->hour + 1 > 12 ? $this->hour - 12 : $this->hour;
-                        $output .= sprintf('%02d:%02d:%02d %s', $hour == 0 ? 12 : $hour, $this->minute, $this->second, $this->hour >= 12 ? 'PM' : 'AM');
+                        $output .= sprintf(
+                            '%02d:%02d:%02d %s',
+                            $hour == 0 ? 12 : $hour,
+                            $this->minute,
+                            $this->second,
+                            $this->hour >= 12 ? 'PM' : 'AM'
+                        );
                         break;
                     case 'R':
                         if ($this->ob_invalidtime) {
@@ -365,7 +420,11 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
                         $output .= sprintf('%02d:%02d', $this->hour, $this->minute);
                         break;
                     case 's':
-                        $output .= str_replace(',', '.', sprintf('%09f', (float) ((float) $this->second + $this->partsecond)));
+                        $output .= str_replace(
+                            ',',
+                            '.',
+                            sprintf('%09f', (float)((float)$this->second + $this->partsecond))
+                        );
                         break;
                     case 'S':
                         $output .= sprintf('%02d', $this->second);
@@ -387,8 +446,12 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
                         $output .= Calc::weekOfYear($this->day, $this->month, $this->year);
                         break;
                     case 'V':
-                        if (is_null($hn_isoyear)) {
-                            list($hn_isoyear, $hn_isoweek, $hn_isoday) = Calc::isoWeekDate($this->day, $this->month, $this->year);
+                        if ($hn_isoyear === null) {
+                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
+                                $this->day,
+                                $this->month,
+                                $this->year
+                            );
                         }
 
                         $output .= $hn_isoweek;
@@ -425,7 +488,7 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
                     default:
                         $output .= $char . $nextchar;
                 }
-                $strpos ++;
+                $strpos++;
             } else {
                 $output .= $char;
             }
@@ -434,27 +497,39 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     }
 
     // @override
-    public function getDayName($abbr = false, $length = false)
+
+    /**
+     * @param bool $abbr
+     * @param bool $length
+     * @return string
+     */
+    public function getDayName($abbr = false, $length = false): string
     {
         $dayName = parent::getDayName();
         if ($abbr) {
             if ($length === false) {
                 $length = $this->getWeekdayAbbreviationLength();
             }
-            $dayName = self::crop($dayName, $length);
+            $dayName = $this->crop($dayName, $length);
         }
         return $this->applyStdWrap($dayName);
     }
 
     // @override
-    public function getMonthName($abbr = false, $length = false)
+
+    /**
+     * @param bool $abbr
+     * @param bool $length
+     * @return string
+     */
+    public function getMonthName($abbr = false, $length = false): string
     {
         $monthName = Calc::getMonthFullname($this->month);
         if ($abbr) {
             if ($length === false) {
                 $length = $this->getMonthAbbreviationLength();
             }
-            $monthName = self::crop($monthName, $length);
+            $monthName = $this->crop($monthName, $length);
         }
         return $this->applyStdWrap($monthName);
     }
@@ -462,13 +537,12 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     /**
      * Returns the length that should be used for month name abbreviation
      *
-     * @access public
      * @return int
      */
-    public function getMonthAbbreviationLength()
+    public function getMonthAbbreviationLength(): int
     {
-        if ($this->conf ['dateConfig.'] ['monthAbbreviationLength']) {
-            return intval($this->conf ['dateConfig.'] ['monthAbbreviationLength']);
+        if ($this->conf['dateConfig.']['monthAbbreviationLength']) {
+            return intval($this->conf['dateConfig.']['monthAbbreviationLength']);
         }
         return intval($this->getMonthAbbrnameLength);
     }
@@ -476,13 +550,12 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     /**
      * Returns the length that should be used for month name abbreviation
      *
-     * @access public
      * @return int
      */
-    public function getWeekdayAbbreviationLength()
+    public function getWeekdayAbbreviationLength(): int
     {
-        if ($this->conf ['dateConfig.'] ['weekdayAbbreviationLength']) {
-            return intval($this->conf ['dateConfig.'] ['weekdayAbbreviationLength']);
+        if ($this->conf['dateConfig.']['weekdayAbbreviationLength']) {
+            return intval($this->conf['dateConfig.']['weekdayAbbreviationLength']);
         }
         return intval($this->getWeekdayAbbrnameLength);
     }
@@ -490,23 +563,24 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     /**
      * Applys the default date_stdWrap to the given string.
      *
-     * @access public
-     * @param string $value
-     *        	string that should be processed
-     * @return processed string
+     * @param string $value string that should be processed
+     * @return string
      */
-    public function applyStdWrap($value = '')
+    public function applyStdWrap($value = ''): string
     {
         // only apply if actually configured
-        if (is_array($this->conf ['date_stdWrap.']) && count($this->conf ['date_stdWrap.']) && $value != '' && is_object($this->cObj) && is_object($GLOBALS ['TSFE'])) {
-            $value = $this->cObj->stdWrap($value, $this->conf ['date_stdWrap.']);
+        if (is_array($this->conf['date_stdWrap.']) && count($this->conf['date_stdWrap.']) && $value != '' && is_object($this->cObj) && is_object($GLOBALS['TSFE'])) {
+            $value = $this->cObj->stdWrap($value, $this->conf['date_stdWrap.']);
         }
         return $value;
     }
 
     // FIX for: getWeekOfYear doesn't recognize sunday as weekstartday.
     // @override
-    public function getWeekOfYear()
+    /**
+     * @return int
+     */
+    public function getWeekOfYear(): int
     {
         if (DATE_CALC_BEGIN_WEEKDAY == 0 && $this->getDayOfWeek() == 0) {
             $this->addSeconds(86400);
@@ -521,22 +595,18 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
      * uses a bytesafe cropping function if possible in order to not destroy multibyte chars from strings (e.g.
      * names in UTF-8)
      *
-     * @access public
-     * @param string $value
-     *        	The value to crop
-     * @param int $length
-     *        	The length
-     * @return the cropped string
+     * @param string $value The value to crop
+     * @param bool $length The length
+     * @return string
      */
-    public function crop($value = '', $length = false)
+    public function crop($value = '', $length = false): string
     {
         if ($length === false) {
             return $value;
         }
-        if (TYPO3_MODE == 'FE') {
-            return $GLOBALS ['TSFE']->csConvObj->substr($GLOBALS ['TSFE']->renderCharset, $value, 0, $length);
-        } else {
-            return $GLOBALS ['LANG']->csConvObj->substr($GLOBALS ['LANG']->charSet, $value, 0, $length);
+        if (TYPO3_MODE === 'FE') {
+            return mb_substr($value, 0, $length);
         }
+        return mb_substr($value, 0, $length);
     }
 }

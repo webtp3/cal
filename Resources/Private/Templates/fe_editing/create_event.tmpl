@@ -387,7 +387,7 @@
 			//DD Tab Menu- Last updated April 27th, 07: http://www.dynamicdrive.com
 			//Only 1 configuration variable below
 			
-			// modified [1] to change tabs only onclick
+			// modified[1] to change tabs only onclick
 			
 			var ddtabmenu={
 				disabletablinks: true, ////Disable hyperlinks in 1st level tabs with sub contents (true or false)?
@@ -430,11 +430,11 @@
 						if (menuitems[x].getAttribute("rel")){
 							this[tabid+"-menuitems"][x].hasSubContent=true
 							if (ddtabmenu.disabletablinks)
-								menuitems[x].onclick=function(){ddtabmenu.showsubmenu(tabid, this);return false}  // [1] replace with: menuitems[x].onclick=function(){return false}
+								menuitems[x].onclick=function(){ddtabmenu.showsubmenu(tabid, this);return false}  //[1] replace with: menuitems[x].onclick=function(){return false}
 						}
 						else //for items without a submenu, add onMouseout effect
 							menuitems[x].onmouseout=function(){this.className=""}
-						//menuitems[x].onmouseover=function(){ddtabmenu.showsubmenu(tabid, this)}  // [1] remove // 
+						//menuitems[x].onmouseover=function(){ddtabmenu.showsubmenu(tabid, this)}  //[1] remove //
 						if (dselected=="auto" && typeof setalready=="undefined" && this.isSelected(menuitems[x].href)){
 							ddtabmenu.showsubmenu(tabid, menuitems[x])
 							var setalready=true

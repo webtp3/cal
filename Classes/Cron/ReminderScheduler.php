@@ -9,7 +9,9 @@
 namespace TYPO3\CMS\Cal\Cron;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\FailedExecutionException;
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
@@ -19,28 +21,38 @@ use TYPO3\CMS\Scheduler\Task\AbstractTask;
  */
 class ReminderScheduler extends AbstractTask
 {
+
+    /** @var int */
     public $uid;
 
-    /**
-     * PHP4 wrapper for constructor,
-     * have to be here evne though the constructor is not defined in the derived class,
-     * else the constructor of the parent class will not be called in PHP4
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    /** @var ConnectionPool */
+    public $connectionPool;
 
-    public function execute()
+    /**
+     * This is the main method that is called when a task is executed
+     * It MUST be implemented by all classes inheriting from this one
+     * Note that there is no error handling, errors and failures are expected
+     * to be handled and logged by the client implementations.
+     * Should return TRUE on successful execution, FALSE on error.
+     *
+     * @return bool Returns TRUE on successful execution, FALSE on error
+     * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     */
+    public function execute(): bool
     {
+        $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+
         $event = BackendUtility::getRecord('tx_cal_event', $this->uid);
 
-        $select = '*';
+        $select = ['*'];
         $table = 'tx_cal_fe_user_event_monitor_mm';
-        $where = 'schedulerId = ' . $this->getTaskUid();
+        $where = ['schedulerId', $this->getTaskUid() ];
 
-        $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-        $eventMonitor = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result);
+        $connection = $this->connectionPool->getConnectionForTable($table);
+        $result = $connection->select($select, $table, $where);
+
+        $eventMonitor = $result->fetch();
         if (! is_array($event)) {
             // the event could not be found, so we delete this reminder
             $this->remove();
@@ -50,7 +62,31 @@ class ReminderScheduler extends AbstractTask
         // ******************
         // Constants defined
         // ******************
-        define('PATH_thisScript', str_replace('//', '/', str_replace('\\', '/', (php_sapi_name() == 'cgi' || php_sapi_name() == 'isapi' || php_sapi_name() == 'cgi-fcgi') && ($_SERVER ['ORIG_PATH_TRANSLATED'] ? $_SERVER ['ORIG_PATH_TRANSLATED'] : $_SERVER ['PATH_TRANSLATED']) ? ($_SERVER ['ORIG_PATH_TRANSLATED'] ? $_SERVER ['ORIG_PATH_TRANSLATED'] : $_SERVER ['PATH_TRANSLATED']) : ($_SERVER ['ORIG_SCRIPT_FILENAME'] ? $_SERVER ['ORIG_SCRIPT_FILENAME'] : $_SERVER ['SCRIPT_FILENAME']))));
+        if ($_SERVER ['ORIG_SCRIPT_FILENAME']) {
+            if ($_SERVER ['ORIG_PATH_TRANSLATED']) {
+                $path = (PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi') &&
+                ($_SERVER ['ORIG_PATH_TRANSLATED'] ?: $_SERVER ['PATH_TRANSLATED']) ?
+                    $_SERVER ['ORIG_PATH_TRANSLATED'] :
+                    $_SERVER ['ORIG_SCRIPT_FILENAME'];
+            } else {
+                $path = (PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi') &&
+                ($_SERVER ['ORIG_PATH_TRANSLATED'] ?: $_SERVER ['PATH_TRANSLATED']) ?
+                    $_SERVER ['PATH_TRANSLATED'] :
+                    $_SERVER ['ORIG_SCRIPT_FILENAME'];
+            }
+        } elseif ($_SERVER ['ORIG_PATH_TRANSLATED']) {
+            $path = (PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi') &&
+            ($_SERVER ['ORIG_PATH_TRANSLATED'] ?: $_SERVER ['PATH_TRANSLATED']) ?
+                $_SERVER ['ORIG_PATH_TRANSLATED'] :
+                $_SERVER ['SCRIPT_FILENAME'];
+        } else {
+            $path = (PHP_SAPI === 'cgi' || PHP_SAPI === 'isapi' || PHP_SAPI === 'cgi-fcgi') &&
+            ($_SERVER ['ORIG_PATH_TRANSLATED'] ?: $_SERVER ['PATH_TRANSLATED']) ?
+                $_SERVER ['PATH_TRANSLATED'] :
+                $_SERVER ['SCRIPT_FILENAME'];
+        }
+
+        define('PATH_thisScript', str_replace('//', '/', str_replace('\\', '/', $path)));
 
         define('PATH_site', dirname(PATH_thisScript) . '/');
 
@@ -69,7 +105,7 @@ class ReminderScheduler extends AbstractTask
             define('PATH_tslib', $configured_tslib_path);
         }
 
-        if (PATH_tslib == '') {
+        if (PATH_tslib === '') {
             die('Cannot find tslib/. Please set path by defining $configured_tslib_path in ' . basename(PATH_thisScript) . '.');
         }
 
@@ -77,17 +113,17 @@ class ReminderScheduler extends AbstractTask
 
         /* Check Page TSConfig for a preview page that we should use */
         $pageTSConf = BackendUtility::getPagesTSconfig($event ['pid']);
-        if ($pageTSConf ['options.'] ['tx_cal_controller.'] ['pageIDForPlugin']) {
-            $pageIDForPlugin = $pageTSConf ['options.'] ['tx_cal_controller.'] ['pageIDForPlugin'];
+        if ($pageTSConf ['options.']['tx_cal_controller.']['pageIDForPlugin']) {
+            $pageIDForPlugin = $pageTSConf ['options.']['tx_cal_controller.']['pageIDForPlugin'];
         } else {
             $pageIDForPlugin = $event ['pid'];
         }
 
         $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
-        if ($page ['doktype'] != 254) {
-            /** @var \TYPO3\CMS\Cal\Controller\Api $calAPI */
-            $calAPI = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\Api');
+        if ($page ['doktype'] !== 254) {
+            /** @var Api $calAPI */
+            $calAPI = GeneralUtility::makeInstance(Api::class);
             $calAPI = &$calAPI->tx_cal_api_without($pageIDForPlugin);
 
             $eventObject = $calAPI->modelObj->findEvent($event ['uid'], 'tx_cal_phpicalendar', $calAPI->conf ['pidList'], false, false, false, false);
@@ -102,11 +138,17 @@ class ReminderScheduler extends AbstractTask
         throw new FailedExecutionException($message, 1250596541);
     }
 
-    public function getUID()
+    /**
+     * @return int
+     */
+    public function getUID(): int
     {
         return $this->uid;
     }
 
+    /**
+     * @param int $uid
+     */
     public function setUID($uid)
     {
         $this->uid = $uid;

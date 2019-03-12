@@ -8,6 +8,9 @@
 
 namespace TYPO3\CMS\Cal\Updates;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -24,9 +27,9 @@ namespace TYPO3\CMS\Cal\Updates;
 /**
  * Upgrade wizard which goes through all files referenced in the tx_cal_event.image filed
  * and creates sys_file records as well as sys_file_reference records for the individual usages.
- *
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
-abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractUpdateWizard
+abstract class AbstractImagesUpdateWizard extends AbstractUpdateWizard
 {
 
     /**
@@ -38,6 +41,9 @@ abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\Abstrac
         return ['uid', 'pid', 'image', 'imagecaption', 'imagetitletext'];
     }
 
+    /**
+     * @return string
+     */
     protected function getColumnName()
     {
         return 'image';
@@ -47,29 +53,25 @@ abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\Abstrac
      * Processes the actual transformation from CSV to sys_file_references
      *
      * @param array $record
-     * @return void
      */
     protected function migrateRecord(array $record)
     {
         $collections = [];
 
-        $files = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $record['image'], true);
-        $descriptions = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('
+        $files = GeneralUtility::trimExplode(',', $record['image'], true);
+        $descriptions = GeneralUtility::trimExplode('
 ', $record['imagecaption']);
-        $titleText = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('
+        $titleText = GeneralUtility::trimExplode('
 ', $record['imagetitletext']);
         $i = 0;
         foreach ($files as $file) {
             if (file_exists(PATH_site . 'uploads/tx_cal/pics/' . $file)) {
-                \TYPO3\CMS\Core\Utility\GeneralUtility::upload_copy_move(PATH_site . 'uploads/tx_cal/pics/' . $file, $this->targetDirectory . $file);
+                GeneralUtility::upload_copy_move(
+                    PATH_site . 'uploads/tx_cal/pics/' . $file,
+                    $this->targetDirectory . $file
+                );
                 $fileObject = $this->storage->getFile(self::FOLDER_ContentUploads . '/' . $file);
-                //TYPO3 >= 6.2.0
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 6002000) {
-                    $this->fileIndexRepository->add($fileObject);
-                } else {
-                    //TYPO3 6.1.0
-                    $this->fileRepository->addToIndex($fileObject);
-                }
+                $this->fileIndexRepository->add($fileObject);
                 $dataArray = [
                     'uid_local' => $fileObject->getUid(),
                     'tablenames' => $this->getRecordTableName(),
@@ -100,7 +102,6 @@ abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\Abstrac
      * @param array $record
      * @param int $fileCount
      * @param array $collectionUids
-     * @return void
      */
     protected function cleanRecord(array $record, $fileCount, array $collectionUids)
     {
@@ -121,17 +122,20 @@ abstract class AbstractImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\Abstrac
         $mapping = [
             'mapTableName' => $this->getRecordTableName(),
             'mapFieldNames' => [
-                'uid'          => 'uid',
-                'pid'          => 'pid',
-                'image'        => 'image',
+                'uid' => 'uid',
+                'pid' => 'pid',
+                'image' => 'image',
                 'imagecaption' => 'imagecaption',
                 'imagetitletext' => 'imagetitletext',
             ]
         ];
 
-        if ($GLOBALS['TYPO3_DB'] instanceof \TYPO3\CMS\Dbal\Database\DatabaseConnection) {
+        if ($GLOBALS['TYPO3_DB'] instanceof DatabaseConnection) {
             if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['dbal']['mapping'][$this->getRecordTableName()])) {
-                $mapping = array_merge_recursive($mapping, $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['dbal']['mapping'][$this->getRecordTableName()]);
+                $mapping = array_merge_recursive(
+                    $mapping,
+                    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['dbal']['mapping'][$this->getRecordTableName()]
+                );
             }
         }
 

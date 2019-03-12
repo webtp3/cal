@@ -29,12 +29,12 @@ class DateEval
      * formats into the standard date format just like the evaluation
      * performed on regular TYPO3 date fields.
      *
-     * @return JavaScript code for evaluating the date field.
+     * @return string
      * @todo Add evaluations similar to what the backend already uses,
      *       converting periods and slashes into dashes and taking US date
      *       format into account.
      */
-    public function returnFieldJS()
+    public function returnFieldJS(): string
     {
         return '
 			//Convert the date to a timstamp using standard TYPO3 methods

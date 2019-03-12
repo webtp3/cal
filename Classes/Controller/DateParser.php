@@ -20,258 +20,316 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 
 /**
  * date parser
- *
  */
 class DateParser
 {
+    /**
+     * @var string
+     */
     public $tokenString = '';
-    public $mode = - 1; // 0 = string, 1 = number, 2 = range
-    public $stack = [];
-    public $day = 0;
-    public $week = 0;
-    public $weekday = - 1;
-    public $month = 0;
-    public $year = 0;
-    public $special = '';
-    public $timeObj;
-    public $conf;
 
+    /**
+     * @var int
+     */
+    public $mode = -1; // 0 = string, 1 = number, 2 = range
+
+    /**
+     * @var array
+     */
+    public $stack = [];
+
+    /**
+     * @var int
+     */
+    public $day = 0;
+
+    /**
+     * @var int
+     */
+    public $week = 0;
+
+    /**
+     * @var int
+     */
+    public $weekday = -1;
+
+    /**
+     * @var int
+     */
+    public $month = 0;
+
+    /**
+     * @var int
+     */
+    public $year = 0;
+
+    /**
+     * @var string
+     */
+    public $special = '';
+
+    /**
+     * @var CalDate
+     */
+    public $timeObj;
+
+    /**
+     * @var array
+     */
+    public $conf = [];
+
+    /**
+     * @param $value
+     * @param array $conf
+     * @param string $timeObj
+     */
     public function parse($value, $conf = [], $timeObj = '')
     {
-        if ($timeObj == '') {
-            $timeObj = new \TYPO3\CMS\Cal\Model\CalDate();
-            $timeObj->setTZbyId('UTC');
+        if ($timeObj === '') {
+            $timeObj = new CalDate();
+            $timeObj->setTZbyID('UTC');
         }
         $this->timeObj = $timeObj;
         $this->conf = &$conf;
-        for ($i = 0; $i < strlen($value); $i ++) {
-            $chr = $value {$i};
+        if (!empty($value) && is_array($value)) {
+            foreach ($value as $iValue) {
+                $chr = $iValue;
 
-            switch ($chr) {
-                case ' ':
-                case '_':
-                case '.':
-                case ':':
-                case ',':
-                case '/':
-                    if ($this->tokenString != '') {
-                        if ($this->mode == 0) {
-                            $this->_parseString($this->tokenString);
-                        } else {
-                            $this->_parseNumber($this->tokenString);
+                switch ($chr) {
+                    case ' ':
+                    case '_':
+                    case '.':
+                    case ':':
+                    case ',':
+                    case '/':
+                        if ($this->tokenString !== '') {
+                            if ($this->mode === 0) {
+                                $this->_parseString($this->tokenString);
+                            } else {
+                                $this->_parseNumber($this->tokenString);
+                            }
+                            $this->tokenString = '';
                         }
-                        $this->tokenString = '';
-                    }
-                    $this->mode = - 1;
-                    break;
-                case '-':
-                case '+':
-                    if ($this->mode == - 1) {
-                        $this->mode = 2;
-                        array_push($this->stack, [
+                        $this->mode = -1;
+                        break;
+                    case '-':
+                    case '+':
+                        if ($this->mode === -1) {
+                            $this->mode = 2;
+                            $this->stack[] = [
                                 '?',
                                 $chr
-                        ]);
-                    } else {
-                        $this->_parseString($this->tokenString);
-                        $this->tokenString = '';
-                        $this->mode = 0;
-                    }
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    if ($this->mode == 1) {
-                        $firstPart = array_pop($this->stack);
-                        $firstPart = array_pop($firstPart);
-                        $this->_parseNumber($firstPart . $chr);
-                    } elseif ($this->mode == 2) {
-                        $firstPart = array_pop($this->stack);
-                        $firstPart = array_pop($firstPart);
-                        array_push($this->stack, [
+                            ];
+                        } else {
+                            $this->_parseString($this->tokenString);
+                            $this->tokenString = '';
+                            $this->mode = 0;
+                        }
+                        break;
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        if ($this->mode === 1) {
+                            $firstPart = array_pop($this->stack);
+                            $firstPart = array_pop($firstPart);
+                            $this->_parseNumber($firstPart . $chr);
+                        } elseif ($this->mode === 2) {
+                            $firstPart = array_pop($this->stack);
+                            $firstPart = array_pop($firstPart);
+                            $this->stack[] = [
                                 'range' => intval($firstPart . $chr)
-                        ]);
-                    } else {
-                        $this->_parseNumber($chr);
-                    }
-                    if ($this->mode != 2) {
-                        $this->mode = 1;
-                    }
-                    $this->tokenString = '';
-                    break;
-                case 'A':
-                case 'B':
-                case 'C':
-                case 'D':
-                case 'E':
-                case 'F':
-                case 'G':
-                case 'H':
-                case 'I':
-                case 'J':
-                case 'K':
-                case 'L':
-                case 'M':
-                case 'N':
-                case 'O':
-                case 'P':
-                case 'Q':
-                case 'R':
-                case 'S':
-                case 'T':
-                case 'U':
-                case 'V':
-                case 'W':
-                case 'X':
-                case 'Y':
-                case 'Z':
-                case 'a':
-                case 'b':
-                case 'c':
-                case 'd':
-                case 'e':
-                case 'f':
-                case 'g':
-                case 'h':
-                case 'i':
-                case 'j':
-                case 'k':
-                case 'l':
-                case 'm':
-                case 'n':
-                case 'o':
-                case 'p':
-                case 'q':
-                case 'r':
-                case 's':
-                case 't':
-                case 'u':
-                case 'v':
-                case 'w':
-                case 'x':
-                case 'y':
-                case 'z':
-                    if ($this->mode == 1) {
-                        $this->_parseString($this->tokenString);
+                            ];
+                        } else {
+                            $this->_parseNumber($chr);
+                        }
+                        if ($this->mode !== 2) {
+                            $this->mode = 1;
+                        }
                         $this->tokenString = '';
-                    }
-                    $this->mode = 0;
-                    $this->tokenString .= $chr;
-                    break;
-                default:
-                    break;
+                        break;
+                    case 'A':
+                    case 'B':
+                    case 'C':
+                    case 'D':
+                    case 'E':
+                    case 'F':
+                    case 'G':
+                    case 'H':
+                    case 'I':
+                    case 'J':
+                    case 'K':
+                    case 'L':
+                    case 'M':
+                    case 'N':
+                    case 'O':
+                    case 'P':
+                    case 'Q':
+                    case 'R':
+                    case 'S':
+                    case 'T':
+                    case 'U':
+                    case 'V':
+                    case 'W':
+                    case 'X':
+                    case 'Y':
+                    case 'Z':
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                    case 'd':
+                    case 'e':
+                    case 'f':
+                    case 'g':
+                    case 'h':
+                    case 'i':
+                    case 'j':
+                    case 'k':
+                    case 'l':
+                    case 'm':
+                    case 'n':
+                    case 'o':
+                    case 'p':
+                    case 'q':
+                    case 'r':
+                    case 's':
+                    case 't':
+                    case 'u':
+                    case 'v':
+                    case 'w':
+                    case 'x':
+                    case 'y':
+                    case 'z':
+                        if ($this->mode === 1) {
+                            $this->_parseString($this->tokenString);
+                            $this->tokenString = '';
+                        }
+                        $this->mode = 0;
+                        $this->tokenString .= $chr;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
-        if ($this->tokenString != '') {
-            if ($this->mode == 0) {
+        if ($this->tokenString !== '') {
+            if ($this->mode === 0) {
                 $this->_parseString($this->tokenString);
             } else {
                 $this->_parseNumber($this->tokenString);
             }
         }
     }
+
+    /**
+     * @param $num
+     */
     public function _parseNumber($num)
     {
         $number = intval($num);
-        if ($this->mode != 2) {
+        if ($this->mode !== 2) {
             if ($number > 31) {
-                array_push($this->stack, [
-                        'year' => $number
-                ]);
+                $this->stack[] = [
+                    'year' => $number
+                ];
                 return;
             }
             if ($number > 12) {
-                array_push($this->stack, [
-                        'day' => $number
-                ]);
+                $this->stack[] = [
+                    'day' => $number
+                ];
                 return;
             }
         }
-        array_push($this->stack, [
-                '?' => $number
-        ]);
+        $this->stack[] = [
+            '?' => $number
+        ];
     }
+
+    /**
+     * @param $value
+     */
     public function _parseString($value)
     {
         $value = strtolower($value);
         switch ($value) {
             case 'last':
-                array_push($this->stack, [
-                        'range' => 'last'
-                ]);
+                $this->stack[] = [
+                    'range' => 'last'
+                ];
                 break;
             case 'next':
-                array_push($this->stack, [
-                        'range' => 'next'
-                ]);
+                $this->stack[] = [
+                    'range' => 'next'
+                ];
                 break;
             case 'now':
-                array_push($this->stack, [
-                        'abs' => $this->timeObj->getTime()
-                ]);
+                $this->stack[] = [
+                    'abs' => $this->timeObj->getTime()
+                ];
                 break;
             case 'today':
-                array_push($this->stack, [
-                        'today' => $this->timeObj->getTime()
-                ]);
+                $this->stack[] = [
+                    'today' => $this->timeObj->getTime()
+                ];
                 break;
             case 'current':
-                array_push($this->stack, [
-                        'today' => $this->timeObj->getTime()
-                ]);
+                $this->stack[] = [
+                    'today' => $this->timeObj->getTime()
+                ];
                 break;
             case 'tomorrow':
-                array_push($this->stack, [
-                        'tomorrow' => $this->timeObj->getTime()
-                ]);
+                $this->stack[] = [
+                    'tomorrow' => $this->timeObj->getTime()
+                ];
                 break;
             case 'yesterday':
-                array_push($this->stack, [
-                        'yesterday' => $this->timeObj->getTime()
-                ]);
+                $this->stack[] = [
+                    'yesterday' => $this->timeObj->getTime()
+                ];
                 break;
 
             case 'yearstart':
-                array_push($this->stack, [
-                        'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateStartYearTime($this->timeObj)
-                ]);
+                $this->stack[] = [
+                    'date' => Calendar::calculateStartYearTime($this->timeObj)
+                ];
                 break;
             case 'monthstart':
-                array_push($this->stack, [
-                        'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateStartMonthTime($this->timeObj)
-                ]);
+                $this->stack[] = [
+                    'date' => Calendar::calculateStartMonthTime($this->timeObj)
+                ];
                 break;
             case 'weekstart':
-                array_push($this->stack, [
-                        'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateStartWeekTime($this->timeObj)
-                ]);
+                $this->stack[] = [
+                    'date' => Calendar::calculateStartWeekTime($this->timeObj)
+                ];
                 break;
             case 'weekend':
-                array_push($this->stack, [
-                        'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateEndWeekTime($this->timeObj)
-                ]);
+                $this->stack[] = [
+                    'date' => Calendar::calculateEndWeekTime($this->timeObj)
+                ];
                 break;
             case 'monthend':
-                array_push($this->stack, [
-                        'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateEndMonthTime($this->timeObj)
-                ]);
+                $this->stack[] = [
+                    'date' => Calendar::calculateEndMonthTime($this->timeObj)
+                ];
                 break;
             case 'yearend':
-                array_push($this->stack, [
-                        'date' => \TYPO3\CMS\Cal\Controller\Calendar::calculateEndYearTime($this->timeObj)
-                ]);
+                $this->stack[] = [
+                    'date' => Calendar::calculateEndYearTime($this->timeObj)
+                ];
                 break;
             case 'quarterstart':
                 $timeObj = $this->timeObj;
@@ -292,9 +350,9 @@ class DateParser
                 $timeObj->setHour(0);
                 $timeObj->setMinute(0);
                 $timeObj->setSecond(0);
-                array_push($this->stack, [
-                        'date' => $timeObj
-                ]);
+                $this->stack[] = [
+                    'date' => $timeObj
+                ];
                 break;
             case 'quarterend':
                 $timeObj = $this->timeObj;
@@ -319,189 +377,193 @@ class DateParser
                 $timeObj->setHour(23);
                 $timeObj->setMinute(59);
                 $timeObj->setSecond(59);
-                array_push($this->stack, [
-                        'date' => $timeObj
-                ]);
+                $this->stack[] = [
+                    'date' => $timeObj
+                ];
                 break;
             case 'day':
             case 'days':
-                array_push($this->stack, [
-                        'value' => 86400
-                ]);
+                $this->stack[] = [
+                    'value' => 86400
+                ];
                 break;
             case 'week':
             case 'weeks':
-                array_push($this->stack, [
-                        'value' => 604800
-                ]);
+                $this->stack[] = [
+                    'value' => 604800
+                ];
                 break;
             case 'h':
             case 'hour':
             case 'hours':
                 $value = array_pop(array_pop($this->stack));
-                array_push($this->stack, [
-                        'range' => $value
-                ]);
-                array_push($this->stack, [
-                        'value' => 'hour'
-                ]);
+                $this->stack[] = [
+                    'range' => $value
+                ];
+                $this->stack[] = [
+                    'value' => 'hour'
+                ];
                 break;
             case 'm':
             case 'minute':
             case 'minutes':
                 $value = array_pop(array_pop($this->stack));
-                array_push($this->stack, [
-                        'range' => $value
-                ]);
-                array_push($this->stack, [
-                        'value' => 'minute'
-                ]);
+                $this->stack[] = [
+                    'range' => $value
+                ];
+                $this->stack[] = [
+                    'value' => 'minute'
+                ];
                 break;
             case 'month':
             case 'months':
-                array_push($this->stack, [
-                        'value' => 'month'
-                ]);
+                $this->stack[] = [
+                    'value' => 'month'
+                ];
                 break;
             case 'year':
             case 'years':
-                array_push($this->stack, [
-                        'value' => 'year'
-                ]);
+                $this->stack[] = [
+                    'value' => 'year'
+                ];
                 break;
             case 'mon':
             case 'monday':
-                array_push($this->stack, [
-                        'weekday' => 1
-                ]);
+                $this->stack[] = [
+                    'weekday' => 1
+                ];
                 break;
             case 'tue':
             case 'tuesday':
-                array_push($this->stack, [
-                        'weekday' => 2
-                ]);
+                $this->stack[] = [
+                    'weekday' => 2
+                ];
                 break;
             case 'wed':
             case 'wednesday':
-                array_push($this->stack, [
-                        'weekday' => 3
-                ]);
+                $this->stack[] = [
+                    'weekday' => 3
+                ];
                 break;
             case 'thu':
             case 'thursday':
-                array_push($this->stack, [
-                        'weekday' => 4
-                ]);
+                $this->stack[] = [
+                    'weekday' => 4
+                ];
                 break;
             case 'fri':
             case 'friday':
-                array_push($this->stack, [
-                        'weekday' => 5
-                ]);
+                $this->stack[] = [
+                    'weekday' => 5
+                ];
                 break;
             case 'sat':
             case 'saturday':
-                array_push($this->stack, [
-                        'weekday' => 6
-                ]);
+                $this->stack[] = [
+                    'weekday' => 6
+                ];
                 break;
             case 'sun':
             case 'sunday':
-                array_push($this->stack, [
-                        'weekday' => 0
-                ]);
+                $this->stack[] = [
+                    'weekday' => 0
+                ];
                 break;
             case 'jan':
             case 'january':
-                array_push($this->stack, [
-                        'month' => 1
-                ]);
+                $this->stack[] = [
+                    'month' => 1
+                ];
                 break;
             case 'feb':
             case 'february':
-                array_push($this->stack, [
-                        'month' => 2
-                ]);
+                $this->stack[] = [
+                    'month' => 2
+                ];
                 break;
             case 'mar':
             case 'march':
-                array_push($this->stack, [
-                        'month' => 3
-                ]);
+                $this->stack[] = [
+                    'month' => 3
+                ];
                 break;
             case 'apr':
             case 'april':
-                array_push($this->stack, [
-                        'month' => 4
-                ]);
+                $this->stack[] = [
+                    'month' => 4
+                ];
                 break;
             case 'may':
-                array_push($this->stack, [
-                        'month' => 5
-                ]);
+                $this->stack[] = [
+                    'month' => 5
+                ];
                 break;
             case 'jun':
             case 'june':
-                array_push($this->stack, [
-                        'month' => 6
-                ]);
+                $this->stack[] = [
+                    'month' => 6
+                ];
                 break;
             case 'jul':
             case 'july':
-                array_push($this->stack, [
-                        'month' => 7
-                ]);
+                $this->stack[] = [
+                    'month' => 7
+                ];
                 break;
             case 'aug':
             case 'august':
-                array_push($this->stack, [
-                        'month' => 8
-                ]);
+                $this->stack[] = [
+                    'month' => 8
+                ];
                 break;
             case 'sep':
             case 'september':
-                array_push($this->stack, [
-                        'month' => 9
-                ]);
+                $this->stack[] = [
+                    'month' => 9
+                ];
                 break;
             case 'oct':
             case 'october':
-                array_push($this->stack, [
-                        'month' => 10
-                ]);
+                $this->stack[] = [
+                    'month' => 10
+                ];
                 break;
             case 'nov':
             case 'november':
-                array_push($this->stack, [
-                        'month' => 11
-                ]);
+                $this->stack[] = [
+                    'month' => 11
+                ];
                 break;
             case 'dec':
             case 'december':
-                array_push($this->stack, [
-                        'month' => 12
-                ]);
+                $this->stack[] = [
+                    'month' => 12
+                ];
                 break;
             default:
                 break;
         }
     }
-    public function getDateObjectFromStack()
+
+    /**
+     * @return CalDate
+     */
+    public function getDateObjectFromStack(): CalDate
     {
-        $date = new \TYPO3\CMS\Cal\Model\CalDate();
-        $date->setTZbyId('UTC');
+        $date = new CalDate();
+        $date->setTZbyID('UTC');
         $date->copy($this->timeObj);
         $lastKey = '';
         $post = [];
         $foundMonth = false;
         $range = '';
         $rangeValue = '';
-        while (! empty($this->stack)) {
+        while (!empty($this->stack)) {
             $valueArray = array_shift($this->stack);
             foreach ($valueArray as $key => $value) {
                 switch ($key) {
                     case 'year':
-                        if (strlen($value) == 8) {
+                        if (strlen($value) === 8) {
                             $date->setYear(intval(substr($value, 0, 4)));
                             $date->setMonth(intval(substr($value, 4, 2)));
                             $date->setDay(intval(substr($value, 6, 2)));
@@ -544,14 +606,14 @@ class DateParser
                         $date->setHour(0);
                         break;
                     case '?':
-                        if ($lastKey == 'month') {
+                        if ($lastKey === 'month') {
                             $date->setDay($value);
                             $date->setMinute(0);
                             $date->setSecond(0);
                             $date->setHour(0);
                             $key = 'day';
-                        } elseif ($lastKey == 'year') {
-                            if ($this->conf ['USmode']) {
+                        } elseif ($lastKey === 'year') {
+                            if ($this->conf['USmode']) {
                                 $date->setDay($value);
                                 $date->setMinute(0);
                                 $date->setSecond(0);
@@ -565,7 +627,7 @@ class DateParser
                                 $foundMonth = true;
                                 $key = 'month';
                             }
-                        } elseif ($lastKey == 'day') {
+                        } elseif ($lastKey === 'day') {
                             $date->setMonth($value);
                             $date->setMinute(0);
                             $date->setSecond(0);
@@ -573,7 +635,7 @@ class DateParser
                             $foundMonth = true;
                             $key = 'month';
                         } else {
-                            $post [] = $valueArray;
+                            $post[] = $valueArray;
                         }
                         break;
                     case 'range':
@@ -612,42 +674,44 @@ class DateParser
                         break;
                     case 'date':
                         $date->copy($value);
-                        // no break
+                    // no break
                     default:
-                        $post [] = $valueArray;
+                        $post[] = $valueArray;
                         break;
                 }
                 $lastKey = $key;
             }
         }
 
-        while (! empty($post)) {
+        while (!empty($post)) {
             $valueArray = array_pop($post);
             foreach ($valueArray as $key => $value) {
-                switch ($key) {
-                    case '?':
-                        if ($foundMonth) {
-                            $date->setDay($value);
-                        } else {
-                            if ($this->conf ['USmode']) {
-                                $date->setDay($value);
-                            } else {
-                                $date->setMonth($value);
-                                $foundMonth = true;
-                            }
-                        }
-                        break;
+                if ($key === '?') {
+                    if ($foundMonth) {
+                        $date->setDay($value);
+                    } elseif ($this->conf['USmode']) {
+                        $date->setDay($value);
+                    } else {
+                        $date->setMonth($value);
+                        $foundMonth = true;
+                    }
                 }
             }
         }
         return $date;
     }
+
+    /**
+     * @param CalDate$date
+     * @param $range
+     * @param $rangeValue
+     */
     public function evaluateRange(&$date, $range, $rangeValue)
     {
-        if (! is_numeric($range)) {
-            if ($range == 'last') {
-                $range = - 1;
-            } elseif ($range == 'next') {
+        if (!is_numeric($range)) {
+            if ($range === 'last') {
+                $range = -1;
+            } elseif ($range === 'next') {
                 $range = 1;
             }
         }
@@ -655,29 +719,43 @@ class DateParser
             $date->addSeconds($rangeValue * $range);
         } elseif (is_array($rangeValue)) {
             foreach ($rangeValue as $key => $value) {
-                if ($key == 'weekday' && $range > 0) {
-                    for ($i = 0; $i < $range; $i ++) {
-                        $formatedDate = Calc::nextDayOfWeek($value, $date->getDay(), $date->getMonth(), $date->getYear());
-                        $date = new \TYPO3\CMS\Cal\Model\CalDate($formatedDate);
-                        $date->setTZbyId('UTC');
+                if ($key === 'weekday' && $range > 0) {
+                    for ($i = 0; $i < $range; $i++) {
+                        $formatedDate = Calc::nextDayOfWeek(
+                            $value,
+                            $date->getDay(),
+                            $date->getMonth(),
+                            $date->getYear()
+                        );
+                        $date = new CalDate($formatedDate);
+                        $date->setTZbyID('UTC');
                     }
-                } elseif ($key == 'weekday' && $range < 0) {
-                    for ($i = 0; $i > $range; $i --) {
-                        $formatedDate = Calc::prevDayOfWeek($value, $date->getDay(), $date->getMonth(), $date->getYear());
-                        $date = new \TYPO3\CMS\Cal\Model\CalDate($formatedDate);
-                        $date->setTZbyId('UTC');
+                } elseif ($key === 'weekday' && $range < 0) {
+                    for ($i = 0; $i > $range; $i--) {
+                        $formatedDate = Calc::prevDayOfWeek(
+                            $value,
+                            $date->getDay(),
+                            $date->getMonth(),
+                            $date->getYear()
+                        );
+                        $date = new CalDate($formatedDate);
+                        $date->setTZbyID('UTC');
                     }
-                } elseif ($value == 'week' && $range > 0) {
+                } elseif ($value === 'week' && $range > 0) {
                     $date->addSeconds($range * 604800);
-                } elseif ($value == 'week' && $range < 0) {
+                } elseif ($value === 'week' && $range < 0) {
                     $date->subtractSeconds($range * 604800);
                 }
             }
         } elseif ($range > 0) {
-            if ($rangeValue == 'month') {
-                for ($i = 0; $i < $range; $i ++) {
+            if ($rangeValue === 'month') {
+                for ($i = 0; $i < $range; $i++) {
                     $days = Calc::daysInMonth($date->getMonth(), $date->getYear());
-                    $endOfNextMonth = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfNextMonth($date->getDay(), $date->getMonth(), $date->getYear()));
+                    $endOfNextMonth = new CalDate(Calc::endOfNextMonth(
+                        $date->getDay(),
+                        $date->getMonth(),
+                        $date->getYear()
+                    ));
                     $date->addSeconds(60 * 60 * 24 * $days);
                     if ($date->after($endOfNextMonth)) {
                         $date->setDay($endOfNextMonth->getDay());
@@ -685,27 +763,31 @@ class DateParser
                         $date->setYear($endOfNextMonth->getYear());
                     }
                 }
-            } elseif ($rangeValue == 'year') {
+            } elseif ($rangeValue === 'year') {
                 $date->setYear($date->getYear() + $range);
-            } elseif ($rangeValue == 'hour') {
+            } elseif ($rangeValue === 'hour') {
                 $date->addSeconds($range * 3600);
-            } elseif ($rangeValue == 'minute') {
+            } elseif ($rangeValue === 'minute') {
                 $date->addSeconds($range * 60);
             } else {
                 $date->addSeconds($range * 86400);
             }
         } elseif ($range < 0) {
-            if ($rangeValue == 'month') {
-                for ($i = 0; $i > $range; $i --) {
-                    $endOfPrevMonth = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfPrevMonth($date->getDay(), $date->getMonth(), $date->getYear()));
+            if ($rangeValue === 'month') {
+                for ($i = 0; $i > $range; $i--) {
+                    $endOfPrevMonth = new CalDate(Calc::endOfPrevMonth(
+                        $date->getDay(),
+                        $date->getMonth(),
+                        $date->getYear()
+                    ));
                     $days = Calc::daysInMonth($endOfPrevMonth->getMonth(), $endOfPrevMonth->getYear());
                     $date->subtractSeconds(60 * 60 * 24 * $days);
                 }
-            } elseif ($rangeValue == 'year') {
+            } elseif ($rangeValue === 'year') {
                 $date->setYear($date->getYear() - abs($range));
-            } elseif ($rangeValue == 'hour') {
+            } elseif ($rangeValue === 'hour') {
                 $date->subtractSeconds(abs($range) * 3600);
-            } elseif ($rangeValue == 'minute') {
+            } elseif ($rangeValue === 'minute') {
                 $date->subtractSeconds(abs($range) * 60);
             } else {
                 $date->subtractSeconds(abs($range) * 86400);

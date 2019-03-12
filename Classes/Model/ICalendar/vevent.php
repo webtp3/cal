@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vEvents.
  *
@@ -20,55 +22,61 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  *
  * @since Horde 3.0
  */
-class vevent extends \TYPO3\CMS\Cal\Model\ICalendar
+class vevent extends ICalendar
 {
     public function getType()
     {
         return 'vEvent';
     }
+
     public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
     {
         parent::parsevCalendar($data, 'VEVENT');
     }
+
     public function exportvCalendar()
     {
         // Default values.
         $requiredAttributes = [];
-        $requiredAttributes ['DTSTAMP'] = time();
-        $requiredAttributes ['ORGANIZER'] = 'Unknown Organizer';
-        $requiredAttributes ['UID'] = $this->_exportDateTime(time()) . '@' . (isset($_SERVER ['SERVER_NAME']) ? $_SERVER ['SERVER_NAME'] : 'localhost');
+        $requiredAttributes['DTSTAMP'] = time();
+        $requiredAttributes['ORGANIZER'] = 'Unknown Organizer';
+        if (isset($_SERVER['SERVER_NAME'])) {
+            $requiredAttributes['UID'] = $this->_exportDateTime(time()) . '@' . ($_SERVER['SERVER_NAME']);
+        } else {
+            $requiredAttributes['UID'] = $this->_exportDateTime(time()) . '@' . ('localhost');
+        }
 
-        $method = ! empty($this->_container) ? $this->_container->getAttribute('METHOD') : 'PUBLISH';
+        $method = $this->_container !== null ? $this->_container->getAttribute('METHOD') : 'PUBLISH';
 
         switch ($method) {
             case 'PUBLISH':
-                $requiredAttributes ['DTSTART'] = time();
-                $requiredAttributes ['SUMMARY'] = '';
+                $requiredAttributes['DTSTART'] = time();
+                $requiredAttributes['SUMMARY'] = '';
                 break;
 
             case 'REQUEST':
-                $requiredAttributes ['ATTENDEE'] = '';
-                $requiredAttributes ['DTSTART'] = time();
-                $requiredAttributes ['SUMMARY'] = '';
+                $requiredAttributes['ATTENDEE'] = '';
+                $requiredAttributes['DTSTART'] = time();
+                $requiredAttributes['SUMMARY'] = '';
                 break;
 
             case 'REPLY':
-                $requiredAttributes ['ATTENDEE'] = '';
+                $requiredAttributes['ATTENDEE'] = '';
                 break;
 
             case 'ADD':
-                $requiredAttributes ['DTSTART'] = time();
-                $requiredAttributes ['SEQUENCE'] = 1;
-                $requiredAttributes ['SUMMARY'] = '';
+                $requiredAttributes['DTSTART'] = time();
+                $requiredAttributes['SEQUENCE'] = 1;
+                $requiredAttributes['SUMMARY'] = '';
                 break;
 
             case 'CANCEL':
-                $requiredAttributes ['ATTENDEE'] = '';
-                $requiredAttributes ['SEQUENCE'] = 1;
+                $requiredAttributes['ATTENDEE'] = '';
+                $requiredAttributes['SEQUENCE'] = 1;
                 break;
 
             case 'REFRESH':
-                $requiredAttributes ['ATTENDEE'] = '';
+                $requiredAttributes['ATTENDEE'] = '';
                 break;
         }
 
@@ -85,29 +93,29 @@ class vevent extends \TYPO3\CMS\Cal\Model\ICalendar
      * Update the status of an attendee of an event.
      *
      * @param string $email The
-     *        	email address of the attendee.
+     *            email address of the attendee.
      * @param string $status The
-     *        	participant status to set.
+     *            participant status to set.
      * @param string $fullname The
-     *        	full name of the participant to set.
+     *            full name of the participant to set.
      */
     public function updateAttendee($email, $status, $fullname = '')
     {
         foreach ($this->_attributes as $key => $attribute) {
-            if ($attribute ['name'] == 'ATTENDEE' && $attribute ['value'] == 'MAILTO:' . $email) {
-                $this->_attributes [$key] ['params'] ['PARTSTAT'] = $status;
-                if (! empty($fullname)) {
-                    $this->_attributes [$key] ['params'] ['CN'] = $fullname;
+            if ($attribute['name'] == 'ATTENDEE' && $attribute['value'] == 'MAILTO:' . $email) {
+                $this->_attributes[$key]['params']['PARTSTAT'] = $status;
+                if (!empty($fullname)) {
+                    $this->_attributes[$key]['params']['CN'] = $fullname;
                 }
-                unset($this->_attributes [$key] ['params'] ['RSVP']);
+                unset($this->_attributes[$key]['params']['RSVP']);
                 return;
             }
         }
         $params = [
-                'PARTSTAT' => $status
+            'PARTSTAT' => $status
         ];
-        if (! empty($fullname)) {
-            $params ['CN'] = $fullname;
+        if (!empty($fullname)) {
+            $params['CN'] = $fullname;
         }
         $this->setAttribute('ATTENDEE', 'MAILTO:' . $email, $params);
     }
@@ -124,29 +132,29 @@ class vevent extends \TYPO3\CMS\Cal\Model\ICalendar
             return null;
         }
 
-        if (isset($organizer [0] ['CN'])) {
-            return $organizer [0] ['CN'];
+        if (isset($organizer[0]['CN'])) {
+            return $organizer[0]['CN'];
         }
 
         $organizer = parse_url($this->getAttribute('ORGANIZER'));
 
-        return $organizer ['path'];
+        return $organizer['path'];
     }
 
     /**
      * Update this event with details from another event.
      *
      * @param Horde_iCalendar_vEvent $vevent
-     *        	The vEvent with latest details.
+     *            The vEvent with latest details.
      */
     public function updateFromvEvent($vevent)
     {
         $newAttributes = $vevent->getAllAttributes();
         foreach ($newAttributes as $newAttribute) {
-            $currentValue = $this->getAttribute($newAttribute ['name']);
+            $currentValue = $this->getAttribute($newAttribute['name']);
             if (is_a($currentValue, 'PEAR_error')) {
                 // Already exists so just add it.
-                $this->setAttribute($newAttribute ['name'], $newAttribute ['value'], $newAttribute ['params']);
+                $this->setAttribute($newAttribute['name'], $newAttribute['value'], $newAttribute['params']);
             } else {
                 // Already exists so locate and modify.
                 $found = false;
@@ -155,24 +163,24 @@ class vevent extends \TYPO3\CMS\Cal\Model\ICalendar
                 // only the params changed (eg attendee updating
                 // status).
                 foreach ($this->_attributes as $id => $attr) {
-                    if ($attr ['name'] == $newAttribute ['name'] && $attr ['value'] == $newAttribute ['value']) {
+                    if ($attr['name'] == $newAttribute['name'] && $attr['value'] == $newAttribute['value']) {
                         // merge the params
-                        foreach ($newAttribute ['params'] as $param_id => $param_name) {
-                            $this->_attributes [$id] ['params'] [$param_id] = $param_name;
+                        foreach ($newAttribute['params'] as $param_id => $param_name) {
+                            $this->_attributes[$id]['params'][$param_id] = $param_name;
                         }
                         $found = true;
                         break;
                     }
                 }
-                if (! $found) {
+                if (!$found) {
                     // Else match the first attribute with the same
                     // name (eg changing start time).
                     foreach ($this->_attributes as $id => $attr) {
-                        if ($attr ['name'] == $newAttribute ['name']) {
-                            $this->_attributes [$id] ['value'] = $newAttribute ['value'];
+                        if ($attr['name'] == $newAttribute['name']) {
+                            $this->_attributes[$id]['value'] = $newAttribute['value'];
                             // Merge the params.
-                            foreach ($newAttribute ['params'] as $param_id => $param_name) {
-                                $this->_attributes [$id] ['params'] [$param_id] = $param_name;
+                            foreach ($newAttribute['params'] as $param_id => $param_name) {
+                                $this->_attributes[$id]['params'][$param_id] = $param_name;
                             }
                             break;
                         }
@@ -187,19 +195,19 @@ class vevent extends \TYPO3\CMS\Cal\Model\ICalendar
      * event.
      *
      * @param Horde_iCalendar_vEvent $vevent
-     *        	The vEvent with latest details
+     *            The vEvent with latest details
      */
     public function updateAttendeesFromvEvent($vevent)
     {
         $newAttributes = $vevent->getAllAttributes();
         foreach ($newAttributes as $newAttribute) {
-            if ($newAttribute ['name'] != 'ATTENDEE') {
+            if ($newAttribute['name'] != 'ATTENDEE') {
                 continue;
             }
-            $currentValue = $this->getAttribute($newAttribute ['name']);
+            $currentValue = $this->getAttribute($newAttribute['name']);
             if (is_a($currentValue, 'PEAR_error')) {
                 // Already exists so just add it.
-                $this->setAttribute($newAttribute ['name'], $newAttribute ['value'], $newAttribute ['params']);
+                $this->setAttribute($newAttribute['name'], $newAttribute['value'], $newAttribute['params']);
             } else {
                 // Already exists so locate and modify.
                 $found = false;
@@ -207,25 +215,25 @@ class vevent extends \TYPO3\CMS\Cal\Model\ICalendar
                 // only the params changed (eg attendee updating
                 // status).
                 foreach ($this->_attributes as $id => $attr) {
-                    if ($attr ['name'] == $newAttribute ['name'] && $attr ['value'] == $newAttribute ['value']) {
+                    if ($attr['name'] == $newAttribute['name'] && $attr['value'] == $newAttribute['value']) {
                         // Merge the params.
-                        foreach ($newAttribute ['params'] as $param_id => $param_name) {
-                            $this->_attributes [$id] ['params'] [$param_id] = $param_name;
+                        foreach ($newAttribute['params'] as $param_id => $param_name) {
+                            $this->_attributes[$id]['params'][$param_id] = $param_name;
                         }
                         $found = true;
                         break;
                     }
                 }
 
-                if (! $found) {
+                if (!$found) {
                     // Else match the first attribute with the same
                     // name (eg changing start time).
                     foreach ($this->_attributes as $id => $attr) {
-                        if ($attr ['name'] == $newAttribute ['name']) {
-                            $this->_attributes [$id] ['value'] = $newAttribute ['value'];
+                        if ($attr['name'] == $newAttribute['name']) {
+                            $this->_attributes[$id]['value'] = $newAttribute['value'];
                             // Merge the params.
-                            foreach ($newAttribute ['params'] as $param_id => $param_name) {
-                                $this->_attributes [$id] ['params'] [$param_id] = $param_name;
+                            foreach ($newAttribute['params'] as $param_id => $param_name) {
+                                $this->_attributes[$id]['params'][$param_id] = $param_name;
                             }
                             break;
                         }

@@ -49,10 +49,6 @@ Others
   viewed. Typically, you will use the Calendar Base page and select the
   Subscription Manager as an Allowed View in the Flexform.
 
-- **Enable the Google Map (wec\_map need...):** Enables the WEC Map
-  Extension to work with the Location Views and displays a Google Map
-  for all Location Records.
-
 - **Page ID that Frontend-Created Recor...:** The Page ID (PID) that new
   Frontend created records should be saved on. This is typically the
   Cal-Base Storage page, if you created one. If left blank, the records

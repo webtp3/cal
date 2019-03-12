@@ -27,41 +27,42 @@ class RealUrl
      * Main hook function.
      * Generates an entire RealURL configuration.
      *
-     * @param
-     *        	array		Main parameters. Typically, 'config' is the
-     *        	existing RealURL configuration thas has been
-     *        	generated to this point and 'extKey' is unique
-     *        	that this hook used when it was registered.
+     * @param $params
+     * @param $parentObj
+     * @return array
      */
-    public function addRealURLConfig(&$params, $parentObj)
+    public function addRealURLConfig(&$params, $parentObj): array
     {
-        $config = &$params ['config'];
+        $config = &$params['config'];
 
-        if (! is_array($config ['postVarSets'] ['_DEFAULT'])) {
-            $config ['postVarSets'] ['_DEFAULT'] = [];
+        if (!is_array($config['postVarSets']['_DEFAULT'])) {
+            $config['postVarSets']['_DEFAULT'] = [];
         }
-        $config ['postVarSets'] ['_DEFAULT'] = array_merge($config ['postVarSets'] ['_DEFAULT'], $this->addPostVarSets());
+        $config['postVarSets']['_DEFAULT'] = array_merge($config['postVarSets']['_DEFAULT'], $this->addPostVarSets());
 
-        if (! is_array($config ['fileName'] ['index'])) {
-            $config ['fileName'] ['index'] = [];
+        if (!is_array($config['fileName']['index'])) {
+            $config['fileName']['index'] = [];
         }
-        $config ['fileName'] ['index'] = array_merge($config ['fileName'] ['index'], $this->addFilenameSet());
+        $config['fileName']['index'] = array_merge($config['fileName']['index'], $this->addFilenameSet());
 
         return $config;
     }
 
-    public function addFilenameSet()
+    /**
+     * @return array
+     */
+    public function addFilenameSet(): array
     {
         $calendarRSS = [];
-        $calendarRSS ['calendarRSS.xlf'] = [
-                'keyValues' => [
-                        'type' => 151
-                ]
+        $calendarRSS['calendarRSS.xlf'] = [
+            'keyValues' => [
+                'type' => 151
+            ]
         ];
-        $calendarRSS ['calendar.ics'] = [
-                'keyValues' => [
-                        'type' => 150
-                ]
+        $calendarRSS['calendar.ics'] = [
+            'keyValues' => [
+                'type' => 150
+            ]
         ];
         return $calendarRSS;
     }
@@ -71,168 +72,168 @@ class RealUrl
      *
      * @return array configuration element.
      */
-    public function addPostVarSets()
+    public function addPostVarSets(): array
     {
         $postVarSets = [];
 
-        $postVarSets ['calendar'] = [
-                $this->addValueMap('tx_cal_controller[year]', [
-                        '2000' => '2000',
-                        '2001' => '2001',
-                        '2002' => '2002',
-                        '2003' => '2003',
-                        '2004' => '2004',
-                        '2005' => '2005',
-                        '2006' => '2006',
-                        '2007' => '2007',
-                        '2008' => '2008',
-                        '2009' => '2009',
-                        '2010' => '2010',
-                        '2011' => '2011',
-                        '2012' => '2012',
-                        '2013' => '2013',
-                        '2014' => '2014',
-                        '2015' => '2015',
-                        '2016' => '2016',
-                        '2017' => '2017',
-                        '2018' => '2018',
-                        '2019' => '2019',
-                        '2020' => '2020'
-                ]),
-                $this->addValueMap('tx_cal_controller[month]', [
-                        '01' => '01',
-                        '02' => '02',
-                        '03' => '03',
-                        '04' => '04',
-                        '05' => '05',
-                        '06' => '06',
-                        '07' => '07',
-                        '08' => '08',
-                        '09' => '09',
-                        '10' => '10',
-                        '11' => '11',
-                        '12' => '12'
-                ]),
-                $this->addValueMap('tx_cal_controller[day]', [
-                        '01' => '01',
-                        '02' => '02',
-                        '03' => '03',
-                        '04' => '04',
-                        '05' => '05',
-                        '06' => '06',
-                        '07' => '07',
-                        '08' => '08',
-                        '09' => '09',
-                        '10' => '10',
-                        '11' => '11',
-                        '12' => '12',
-                        '13' => '13',
-                        '14' => '14',
-                        '15' => '15',
-                        '16' => '16',
-                        '17' => '17',
-                        '18' => '18',
-                        '19' => '19',
-                        '20' => '20',
-                        '21' => '21',
-                        '22' => '22',
-                        '23' => '23',
-                        '24' => '24',
-                        '25' => '25',
-                        '26' => '26',
-                        '27' => '27',
-                        '28' => '28',
-                        '29' => '29',
-                        '30' => '30',
-                        '31' => '31'
-                ]),
-                $this->addValueMap('tx_cal_controller[view]', [
-                        'month' => 'month',
-                        'year' => 'year',
-                        'week' => 'week',
-                        'day' => 'day',
-                        'event' => 'event',
-                        'list' => 'list',
-                        'admin' => 'admin',
-                        'search_event' => 'search_event',
-                        'search_location' => 'search_location',
-                        'search_organizer' => 'search_organizer',
-                        'search_all' => 'search_all',
-                        'create_event' => 'create_event',
-                        'confirm_event' => 'confirm_event',
-                        'save_event' => 'save_event',
-                        'edit_event' => 'edit_event',
-                        'delete_event' => 'delete_event',
-                        'remove_event' => 'remove_event',
-                        'save_exception_event' => 'save_exception_event',
-                        'create_calendar' => 'create_calendar',
-                        'confirm_calendar' => 'confirm_calendar',
-                        'save_calendar' => 'save_calendar',
-                        'edit_calendar' => 'edit_calendar',
-                        'delete_calendar' => 'delete_calendar',
-                        'remove_calendar' => 'remove_calendar',
-                        'create_category' => 'create_category',
-                        'confirm_category' => 'confirm_category',
-                        'save_category' => 'save_category',
-                        'edit_category' => 'edit_category',
-                        'delete_category' => 'delete_category',
-                        'remove_category' => 'remove_category',
-                        'create_location' => 'create_location',
-                        'confirm_location' => 'confirm_location',
-                        'save_location' => 'save_location',
-                        'edit_location' => 'edit_location',
-                        'delete_location' => 'delete_location',
-                        'remove_location' => 'remove_location',
-                        'create_organizer' => 'create_organizer',
-                        'confirm_organizer' => 'confirm_organizer',
-                        'save_organizer' => 'save_organizer',
-                        'edit_organizer' => 'edit_organizer',
-                        'delete_organizer' => 'delete_organizer',
-                        'remove_organizer' => 'remove_organizer',
-                        'organizer' => 'organizer',
-                        'location' => 'location',
-                        'ics' => 'ics',
-                        'icslist' => 'icslist',
-                        'single_ics' => 'single_ics',
-                        'subscription' => 'subscription',
-                        'meeting' => 'meeting',
-                        'translation' => 'translation',
-                        'todo' => 'todo',
-                        'ajax' => 'ajax'
-                ]),
-                $this->addValueMap('tx_cal_controller[type]', [
-                        'tx_cal_phpicalendar' => 'tx_cal_phpicalendar',
-                        'tx_cal_organizer' => 'tx_cal_organizer',
-                        'tx_cal_location' => 'tx_cal_location',
-                        'tx_cal_calendar' => 'tx_cal_calendar',
-                        'tx_cal_category' => 'tx_cal_category',
-                        'sys_category' => 'sys_category',
-                        'tx_cal_attendee' => 'tx_cal_attendee',
-                        'tx_tt_address' => 'tx_tt_address',
-                        'tx_feuser' => 'tx_feuser',
-                        'tx_partner_main' => 'tx_feuser',
-                        'tx_cal_ts_service' => 'tx_cal_ts_service'
-                ]),
-                $this->addTable('tx_cal_controller[uid]', 'tx_cal_event', 'title', 'tx_cal_phpicalendar'),
-                $this->addTable('tx_cal_controller[uid]', 'tx_cal_organizer', 'name', 'tx_cal_organizer'),
-                $this->addTable('tx_cal_controller[uid]', 'tx_cal_location', 'name', 'tx_cal_location')
+        $postVarSets['calendar'] = [
+            $this->addValueMap('tx_cal_controller[year]', [
+                '2000' => '2000',
+                '2001' => '2001',
+                '2002' => '2002',
+                '2003' => '2003',
+                '2004' => '2004',
+                '2005' => '2005',
+                '2006' => '2006',
+                '2007' => '2007',
+                '2008' => '2008',
+                '2009' => '2009',
+                '2010' => '2010',
+                '2011' => '2011',
+                '2012' => '2012',
+                '2013' => '2013',
+                '2014' => '2014',
+                '2015' => '2015',
+                '2016' => '2016',
+                '2017' => '2017',
+                '2018' => '2018',
+                '2019' => '2019',
+                '2020' => '2020'
+            ]),
+            $this->addValueMap('tx_cal_controller[month]', [
+                '01' => '01',
+                '02' => '02',
+                '03' => '03',
+                '04' => '04',
+                '05' => '05',
+                '06' => '06',
+                '07' => '07',
+                '08' => '08',
+                '09' => '09',
+                '10' => '10',
+                '11' => '11',
+                '12' => '12'
+            ]),
+            $this->addValueMap('tx_cal_controller[day]', [
+                '01' => '01',
+                '02' => '02',
+                '03' => '03',
+                '04' => '04',
+                '05' => '05',
+                '06' => '06',
+                '07' => '07',
+                '08' => '08',
+                '09' => '09',
+                '10' => '10',
+                '11' => '11',
+                '12' => '12',
+                '13' => '13',
+                '14' => '14',
+                '15' => '15',
+                '16' => '16',
+                '17' => '17',
+                '18' => '18',
+                '19' => '19',
+                '20' => '20',
+                '21' => '21',
+                '22' => '22',
+                '23' => '23',
+                '24' => '24',
+                '25' => '25',
+                '26' => '26',
+                '27' => '27',
+                '28' => '28',
+                '29' => '29',
+                '30' => '30',
+                '31' => '31'
+            ]),
+            $this->addValueMap('tx_cal_controller[view]', [
+                'month' => 'month',
+                'year' => 'year',
+                'week' => 'week',
+                'day' => 'day',
+                'event' => 'event',
+                'list' => 'list',
+                'admin' => 'admin',
+                'search_event' => 'search_event',
+                'search_location' => 'search_location',
+                'search_organizer' => 'search_organizer',
+                'search_all' => 'search_all',
+                'create_event' => 'create_event',
+                'confirm_event' => 'confirm_event',
+                'save_event' => 'save_event',
+                'edit_event' => 'edit_event',
+                'delete_event' => 'delete_event',
+                'remove_event' => 'remove_event',
+                'save_exception_event' => 'save_exception_event',
+                'create_calendar' => 'create_calendar',
+                'confirm_calendar' => 'confirm_calendar',
+                'save_calendar' => 'save_calendar',
+                'edit_calendar' => 'edit_calendar',
+                'delete_calendar' => 'delete_calendar',
+                'remove_calendar' => 'remove_calendar',
+                'create_category' => 'create_category',
+                'confirm_category' => 'confirm_category',
+                'save_category' => 'save_category',
+                'edit_category' => 'edit_category',
+                'delete_category' => 'delete_category',
+                'remove_category' => 'remove_category',
+                'create_location' => 'create_location',
+                'confirm_location' => 'confirm_location',
+                'save_location' => 'save_location',
+                'edit_location' => 'edit_location',
+                'delete_location' => 'delete_location',
+                'remove_location' => 'remove_location',
+                'create_organizer' => 'create_organizer',
+                'confirm_organizer' => 'confirm_organizer',
+                'save_organizer' => 'save_organizer',
+                'edit_organizer' => 'edit_organizer',
+                'delete_organizer' => 'delete_organizer',
+                'remove_organizer' => 'remove_organizer',
+                'organizer' => 'organizer',
+                'location' => 'location',
+                'ics' => 'ics',
+                'icslist' => 'icslist',
+                'single_ics' => 'single_ics',
+                'subscription' => 'subscription',
+                'meeting' => 'meeting',
+                'translation' => 'translation',
+                'todo' => 'todo',
+                'ajax' => 'ajax'
+            ]),
+            $this->addValueMap('tx_cal_controller[type]', [
+                'tx_cal_phpicalendar' => 'tx_cal_phpicalendar',
+                'tx_cal_organizer' => 'tx_cal_organizer',
+                'tx_cal_location' => 'tx_cal_location',
+                'tx_cal_calendar' => 'tx_cal_calendar',
+                'tx_cal_category' => 'tx_cal_category',
+                'sys_category' => 'sys_category',
+                'tx_cal_attendee' => 'tx_cal_attendee',
+                'tx_tt_address' => 'tx_tt_address',
+                'tx_feuser' => 'tx_feuser',
+                'tx_partner_main' => 'tx_feuser',
+                'tx_cal_ts_service' => 'tx_cal_ts_service'
+            ]),
+            $this->addTable('tx_cal_controller[uid]', 'tx_cal_event', 'title', 'tx_cal_phpicalendar'),
+            $this->addTable('tx_cal_controller[uid]', 'tx_cal_organizer', 'name', 'tx_cal_organizer'),
+            $this->addTable('tx_cal_controller[uid]', 'tx_cal_location', 'name', 'tx_cal_location')
         ];
 
-        $postVarSets ['export'] = [
-                0 => [
-                        'GETvar' => 'tx_cal_controller[calendar]',
-                        'lookUpTable' => [
-                                'table' => 'tx_cal_calendar',
-                                'id_field' => 'uid',
-                                'alias_field' => 'title',
-                                'addWhereClause' => ' AND NOT deleted',
-                                'useUniqueCache' => 1,
-                                'useUniqueCache_conf' => [
-                                        'strtolower' => 1,
-                                        'spaceCharacter' => '_'
-                                ]
-                        ]
+        $postVarSets['export'] = [
+            0 => [
+                'GETvar' => 'tx_cal_controller[calendar]',
+                'lookUpTable' => [
+                    'table' => 'tx_cal_calendar',
+                    'id_field' => 'uid',
+                    'alias_field' => 'title',
+                    'addWhereClause' => ' AND NOT deleted',
+                    'useUniqueCache' => 1,
+                    'useUniqueCache_conf' => [
+                        'strtolower' => 1,
+                        'spaceCharacter' => '_'
+                    ]
                 ]
+            ]
         ];
 
         return $postVarSets;
@@ -252,13 +253,13 @@ class RealUrl
      * array( 'GETvar' => 'tx_calendar_pi1[f1]' ),
      *
      * @param
-     *        	string		The GET variable.
+     *            string        The GET variable.
      * @return array config element.
      */
-    public function addSimple($key)
+    public function addSimple($key): array
     {
         return [
-                'GETvar' => $key
+            'GETvar' => $key
         ];
     }
 
@@ -280,38 +281,34 @@ class RealUrl
      * )
      * )
      *
-     * @param
-     *        	string		The GET variable.
-     * @param
-     *        	string		The name of the table.
-     * @param
-     *        	string		The field in the table to be used in the URL.
-     * @param
-     *        	string		Previous GET variable that must be present for
-     *        	this rule to be evaluated.
+     * @param $key
+     * @param $table
+     * @param string $aliasField
+     * @param bool $condForPrevious
+     * @param string $where
      * @return array config element.
      */
-    public function addTable($key, $table, $aliasField = 'title', $condForPrevious = false, $where = ' AND NOT deleted')
+    public function addTable($key, $table, $aliasField = 'title', $condForPrevious = false, $where = ' AND NOT deleted'): array
     {
         $configArray = [];
 
         if ($condForPrevious) {
-            $configArray ['cond'] = [
-                    'prevValueInList' => $condForPrevious
+            $configArray['cond'] = [
+                'prevValueInList' => $condForPrevious
             ];
         }
 
-        $configArray ['GETvar'] = $key;
-        $configArray ['lookUpTable'] = [
-                'table' => $table,
-                'id_field' => 'uid',
-                'alias_field' => $aliasField,
-                'addWhereClause' => $where,
-                'useUniqueCache' => 1,
-                'useUniqueCache_conf' => [
-                        'strtolower' => 1,
-                        'spaceCharacter' => '_'
-                ]
+        $configArray['GETvar'] = $key;
+        $configArray['lookUpTable'] = [
+            'table' => $table,
+            'id_field' => 'uid',
+            'alias_field' => $aliasField,
+            'addWhereClause' => $where,
+            'useUniqueCache' => 1,
+            'useUniqueCache_conf' => [
+                'strtolower' => 1,
+                'spaceCharacter' => '_'
+            ]
         ];
 
         return $configArray;
@@ -329,25 +326,25 @@ class RealUrl
      * )
      *
      * @param
-     *        	string		The GET variable.
+     *            string        The GET variable.
      * @param
-     *        	array		Associative array with label and value.
+     *            array        Associative array with label and value.
      * @param
-     *        	string		noMatch behavior.
+     *            string        noMatch behavior.
      * @return array config element.
      */
-    public function addValueMap($key, $valueMapArray, $noMatch = 'bypass')
+    public function addValueMap($key, $valueMapArray, $noMatch = 'bypass'): array
     {
         $configArray = [];
-        $configArray ['GETvar'] = $key;
+        $configArray['GETvar'] = $key;
 
         if (is_array($valueMapArray)) {
             foreach ($valueMapArray as $key => $value) {
-                $configArray ['valueMap'] [$key] = $value;
+                $configArray['valueMap'][$key] = $value;
             }
         }
 
-        $configArray ['noMatch'] = $noMatch;
+        $configArray['noMatch'] = $noMatch;
         return $configArray;
     }
 
@@ -362,18 +359,18 @@ class RealUrl
      * )
      *
      * @param
-     *        	array		Associative array of GET variables and values.
-     *        	All values must be matched.
+     *            array        Associative array of GET variables and values.
+     *            All values must be matched.
      * @return array config element.
      */
-    public function addSingle($keyValueArray)
+    public function addSingle($keyValueArray): array
     {
         $configArray = [];
-        $configArray ['type'] = 'single';
+        $configArray['type'] = 'single';
 
         if (is_array($keyValueArray)) {
             foreach ($keyValueArray as $key => $value) {
-                $configArray ['keyValues'] [$key] = $value;
+                $configArray['keyValues'][$key] = $value;
             }
         }
 

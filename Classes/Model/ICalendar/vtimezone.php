@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vTimezones.
  *
@@ -20,16 +22,18 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  *
  * @since Horde 3.0
  */
-class vtimezone extends \TYPO3\CMS\Cal\Model\ICalendar
+class vtimezone extends ICalendar
 {
     public function getType()
     {
         return 'vTimeZone';
     }
+
     public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
     {
         parent::parsevCalendar($data, 'VTIMEZONE');
     }
+
     public function exportvCalendar()
     {
         return parent::_exportvData('VTIMEZONE');
@@ -46,19 +50,19 @@ class vtimezone extends \TYPO3\CMS\Cal\Model\ICalendar
     {
         // Make sure 'time' key is first for sort().
         $result = [];
-        $result ['time'] = 0;
+        $result['time'] = 0;
 
         $t = $child->getAttribute('TZOFFSETFROM');
         if (empty($t)) {
             return false;
         }
-        $result ['from'] = ($t ['hour'] * 60 * 60 + $t ['minute'] * 60) * ($t ['ahead'] ? 1 : - 1);
+        $result['from'] = ($t['hour'] * 60 * 60 + $t['minute'] * 60) * ($t['ahead'] ? 1 : -1);
 
         $t = $child->getAttribute('TZOFFSETTO');
         if (empty($t)) {
             return false;
         }
-        $result ['to'] = ($t ['hour'] * 60 * 60 + $t ['minute'] * 60) * ($t ['ahead'] ? 1 : - 1);
+        $result['to'] = ($t['hour'] * 60 * 60 + $t['minute'] * 60) * ($t['ahead'] ? 1 : -1);
 
         $switch_time = $child->getAttribute('DTSTART');
         if (empty($switch_time)) {
@@ -67,64 +71,64 @@ class vtimezone extends \TYPO3\CMS\Cal\Model\ICalendar
 
         $rrules = $child->getAttribute('RRULE');
         if (empty($rrules)) {
-            if (! is_int($switch_time)) {
+            if (!is_int($switch_time)) {
                 return false;
             }
             // Convert this timestamp from local time to UTC for
             // comparison (All dates are compared as if they are UTC).
             $t = getdate($switch_time);
-            $result ['time'] = @gmmktime($t ['hours'], $t ['minutes'], $t ['seconds'], $t ['mon'], $t ['mday'], $t ['year']);
+            $result['time'] = @gmmktime($t['hours'], $t['minutes'], $t['seconds'], $t['mon'], $t['mday'], $t['year']);
             return $result;
         }
 
         $rrules = explode(';', $rrules);
         foreach ($rrules as $rrule) {
             $t = explode('=', $rrule);
-            switch ($t [0]) {
+            switch ($t[0]) {
                 case 'FREQ':
-                    if ($t [1] != 'YEARLY') {
+                    if ($t[1] != 'YEARLY') {
                         return false;
                     }
                     break;
 
                 case 'INTERVAL':
-                    if ($t [1] != '1') {
+                    if ($t[1] != '1') {
                         return false;
                     }
                     break;
 
                 case 'BYMONTH':
-                    $month = intval($t [1]);
+                    $month = intval($t[1]);
                     break;
 
                 case 'BYDAY':
-                    $len = strspn($t [1], '1234567890-+');
+                    $len = strspn($t[1], '1234567890-+');
                     if ($len == 0) {
                         return false;
                     }
-                    $weekday = substr($t [1], $len);
+                    $weekday = substr($t[1], $len);
                     $weekdays = [
-                            'SU' => 0,
-                            'MO' => 1,
-                            'TU' => 2,
-                            'WE' => 3,
-                            'TH' => 4,
-                            'FR' => 5,
-                            'SA' => 6
+                        'SU' => 0,
+                        'MO' => 1,
+                        'TU' => 2,
+                        'WE' => 3,
+                        'TH' => 4,
+                        'FR' => 5,
+                        'SA' => 6
                     ];
-                    $weekday = $weekdays [$weekday];
-                    $which = intval(substr($t [1], 0, $len));
+                    $weekday = $weekdays[$weekday];
+                    $which = intval(substr($t[1], 0, $len));
                     break;
 
                 case 'UNTIL':
-                    if (intval($year) > intval(substr($t [1], 0, 4))) {
+                    if (intval($year) > intval(substr($t[1], 0, 4))) {
                         return false;
                     }
                     break;
             }
         }
 
-        if (empty($month) || ! isset($weekday)) {
+        if (empty($month) || !isset($weekday)) {
             return false;
         }
 
@@ -137,13 +141,13 @@ class vtimezone extends \TYPO3\CMS\Cal\Model\ICalendar
             if (count($switch_time) != 2) {
                 return false;
             }
-            $switch_time [0] = substr($switch_time [1], 0, 2);
-            $switch_time [2] = substr($switch_time [1], 4, 2);
-            $switch_time [1] = substr($switch_time [1], 2, 2);
+            $switch_time[0] = substr($switch_time[1], 0, 2);
+            $switch_time[2] = substr($switch_time[1], 4, 2);
+            $switch_time[1] = substr($switch_time[1], 2, 2);
         }
 
         // Get the timestamp for the first day of $month.
-        $when = gmmktime($switch_time [0], $switch_time [1], $switch_time [2], $month, 1, $year);
+        $when = gmmktime($switch_time[0], $switch_time[1], $switch_time[2], $month, 1, $year);
         // Get the day of the week for the first day of $month.
         $first_of_month_weekday = intval(gmstrftime('%w', $when));
 
@@ -164,7 +168,7 @@ class vtimezone extends \TYPO3\CMS\Cal\Model\ICalendar
         // Calculate $weekday number $which.
         $when += $which * 60 * 60 * 24 * 7;
 
-        $result ['time'] = $when;
+        $result['time'] = $when;
 
         return $result;
     }

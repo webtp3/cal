@@ -20,11 +20,11 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 
 /**
  * This class combines all the time related functions
- *
  */
 class Calendar
 {
@@ -33,11 +33,11 @@ class Calendar
      * Takes iCalendar 2 day format and makes it into 3 characters
      * if $txt is true, it returns the 3 letters, otherwise it returns the
      * integer of that day; 0=Sun, 1=Mon, etc.
-     * @param unknown $day
-     * @param string $txt
+     * @param string $day
+     * @param bool $txt
      * @return string
      */
-    public static function two2threeCharDays($day, $txt = true)
+    public static function two2threeCharDays($day, $txt = true): string
     {
         switch ($day) {
             case 'SU':
@@ -55,53 +55,50 @@ class Calendar
             case 'SA':
                 return $txt ? 'sat' : '6';
         }
+        return '';
     }
 
     /**
-     *
-     * @param unknown $date
-     * @return The year
+     * @param $date
+     * @return mixed
      */
     public static function getYear($date)
     {
         $day_array2 = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $date, $day_array2);
-        return $day_array2 [1];
+        return $day_array2[1];
     }
 
     /**
-     *
-     * @param unknown $date
-     * @return The month
+     * @param $date
+     * @return mixed
      */
     public static function getMonth($date)
     {
         $day_array2 = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $date, $day_array2);
-        return $day_array2 [2];
+        return $day_array2[2];
     }
 
     /**
-     *
-     * @param unknown $date
-     * @return The day
+     * @param $date
+     * @return mixed
      */
     public static function getDay($date)
     {
         $day_array2 = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $date, $day_array2);
-        return $day_array2 [3];
+        return $day_array2[3];
     }
 
     /**
-     *
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
-    public static function calculateStartDayTime($dateObject = '')
+    public static function calculateStartDayTime($dateObject = ''): CalDate
     {
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate();
-        $timeObj->setTZbyId('UTC');
+        $timeObj = new CalDate();
+        $timeObj->setTZbyID('UTC');
         if ($dateObject) {
             $timeObj->copy($dateObject);
         }
@@ -112,14 +109,13 @@ class Calendar
     }
 
     /**
-     *
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
-    public static function calculateEndDayTime($dateObject = '')
+    public static function calculateEndDayTime($dateObject = ''): CalDate
     {
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate();
-        $timeObj->setTZbyId('UTC');
+        $timeObj = new CalDate();
+        $timeObj->setTZbyID('UTC');
         if ($dateObject) {
             $timeObj->copy($dateObject);
         }
@@ -130,24 +126,26 @@ class Calendar
     }
 
     /**
-     *
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
-    public static function calculateStartWeekTime($dateObject = '')
+    public static function calculateStartWeekTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartDayTime($dateObject);
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate(Calc::beginOfWeek($timeObj->getDay(), $timeObj->getMonth(), $timeObj->getYear()));
-        $timeObj->setTZbyId('UTC');
+        $timeObj = new CalDate(Calc::beginOfWeek(
+            $timeObj->getDay(),
+            $timeObj->getMonth(),
+            $timeObj->getYear()
+        ));
+        $timeObj->setTZbyID('UTC');
         return $timeObj;
     }
 
     /**
-     *
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
-    public static function calculateEndWeekTime($dateObject = '')
+    public static function calculateEndWeekTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartWeekTime($dateObject);
         $timeObj->addSeconds(604799);
@@ -155,11 +153,10 @@ class Calendar
     }
 
     /**
-     *
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
-    public static function calculateStartMonthTime($dateObject = '')
+    public static function calculateStartMonthTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartDayTime($dateObject);
         $timeObj->setDay(1);
@@ -167,26 +164,28 @@ class Calendar
     }
 
     /**
-     *
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
-    public static function calculateEndMonthTime($dateObject = '')
+    public static function calculateEndMonthTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartDayTime($dateObject);
-        $timeObj = new \TYPO3\CMS\Cal\Model\CalDate(Calc::endOfNextMonth($timeObj->getDay(), $timeObj->getMonth(), $timeObj->getYear()));
+        $timeObj = new CalDate(Calc::endOfNextMonth(
+            $timeObj->getDay(),
+            $timeObj->getMonth(),
+            $timeObj->getYear()
+        ));
         $timeObj->setDay(1);
         $timeObj->subtractSeconds(1);
-        $timeObj->setTZbyId('UTC');
+        $timeObj->setTZbyID('UTC');
         return $timeObj;
     }
 
     /**
-     *
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
-    public static function calculateStartYearTime($dateObject = '')
+    public static function calculateStartYearTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartMonthTime($dateObject);
         $timeObj->setMonth(1);
@@ -194,11 +193,10 @@ class Calendar
     }
 
     /**
-     *
      * @param string $dateObject
-     * @return \TYPO3\CMS\Cal\Model\CalDate
+     * @return CalDate
      */
-    public static function calculateEndYearTime($dateObject = '')
+    public static function calculateEndYearTime($dateObject = ''): CalDate
     {
         $timeObj = self::calculateStartYearTime($dateObject);
         $timeObj->setYear($timeObj->getYear() + 1);
@@ -207,37 +205,36 @@ class Calendar
     }
 
     /**
-     *
-     * @param unknown $time
+     * @param $time
      * @return string
      */
-    public static function getHourFromTime($time)
+    public static function getHourFromTime($time): string
     {
+        $retVal = '';
         $time = str_replace(':', '', $time);
 
         if ($time) {
-            $retVal = substr($time, 0, strlen($time) - 2);
+            $retVal = substr($time, 0, -2);
         }
         return $retVal;
     }
 
     /**
-     *
-     * @param unknown $time
+     * @param $time
      * @return string
      */
-    public static function getMinutesFromTime($time)
+    public static function getMinutesFromTime($time): string
     {
+        $retVal = '';
         $time = str_replace(':', '', $time);
         if ($time) {
-            $retVal = substr($time, - 2);
+            $retVal = substr($time, -2);
         }
         return $retVal;
     }
 
     /**
-     *
-     * @param number $timestamp
+     * @param int $timestamp
      * @return number
      */
     public static function getTimeFromTimestamp($timestamp = 0)

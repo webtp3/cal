@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -25,18 +27,15 @@ namespace TYPO3\CMS\Cal\Model;
  * Base model for the calendar location.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- *
  */
-class LocationAddress extends \TYPO3\CMS\Cal\Model\Location
+class LocationAddress extends Location
 {
 
     /**
      * Constructor
      *
-     * @param int $uid
-     *        	to search for
+     * @param $row
      * @param string $pidList
-     *        	to search in
      */
     public function __construct($row, $pidList)
     {
@@ -44,22 +43,26 @@ class LocationAddress extends \TYPO3\CMS\Cal\Model\Location
         $this->setObjectType('location');
         $this->setType('tx_tt_address');
         $this->createLocation($row);
-        $this->templatePath = $this->conf ['view.'] ['location.'] ['locationModelTemplate4Address'];
+        $this->templatePath = $this->conf['view.']['location.']['locationModelTemplate4Address'];
     }
+
+    /**
+     * @param $row
+     */
     public function createLocation($row)
     {
         $this->row = $row;
-        $this->setUid($row ['uid']);
-        $this->setName($row ['name']);
-        $this->setDescription($row ['description']);
-        $this->setStreet($row ['address']);
-        $this->setZip($row ['zip']);
-        $this->setCity($row ['city']);
-        $this->setCountry($row ['country']);
-        $this->setPhone($row ['phone']);
-        $this->setEmail($row ['email']);
-        $this->setImage(\TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $row ['image'], 1));
-        $this->setLink($row ['www']);
+        $this->setUid($row['uid']);
+        $this->setName($row['name']);
+        $this->setDescription($row['description']);
+        $this->setStreet($row['address']);
+        $this->setZip($row['zip']);
+        $this->setCity($row['city']);
+        $this->setCountry($row['country']);
+        $this->setPhone($row['phone']);
+        $this->setEmail($row['email']);
+        $this->setImage(GeneralUtility::trimExplode(',', $row['image'], 1));
+        $this->setLink($row['www']);
         $this->row = $row;
     }
 }

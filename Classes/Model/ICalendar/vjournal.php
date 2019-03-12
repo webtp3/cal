@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Model\ICalendar;
 
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 /**
  * Class representing vJournals.
  *
@@ -20,16 +22,18 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
  *
  * @since Horde 3.0
  */
-class vjournal extends \TYPO3\CMS\Cal\Model\ICalendar
+class vjournal extends ICalendar
 {
     public function getType()
     {
         return 'vJournal';
     }
+
     public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
     {
         parent::parsevCalendar($data, 'VJOURNAL');
     }
+
     public function exportvCalendar()
     {
         return parent::_exportvData('VJOURNAL');

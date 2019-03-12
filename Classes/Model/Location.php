@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -25,18 +27,15 @@ namespace TYPO3\CMS\Cal\Model;
  * Base model for the calendar location.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- *
  */
-class Location extends \TYPO3\CMS\Cal\Model\LocationModel
+class Location extends LocationModel
 {
 
     /**
      * Constructor
      *
      * @param array $row
-     *        	array
      * @param string $pidList
-     *        	to search in
      */
     public function __construct($row, $pidList)
     {
@@ -44,27 +43,41 @@ class Location extends \TYPO3\CMS\Cal\Model\LocationModel
         $this->setType('tx_cal_location');
         parent::__construct($this->controller, $this->getType());
         $this->createLocation($row);
-        $this->templatePath = $this->conf ['view.'] ['location.'] ['locationModelTemplate'];
+        $this->templatePath = $this->conf['view.']['location.']['locationModelTemplate'];
     }
-    public function renderLocation()
+
+    /**
+     * @return string
+     */
+    public function renderLocation(): string
     {
         return $this->fillTemplate('###TEMPLATE_LOCATION_LOCATION###');
     }
-    public function renderOrganizer()
+
+    /**
+     * @return string
+     */
+    public function renderOrganizer(): string
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_ORGANIZER###');
     }
-    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = [])
+
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
+    public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        if (! $rightsObj->isViewEnabled('edit_location')) {
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        if (!$rightsObj->isViewEnabled('edit_location')) {
             return false;
         }
         if ($rightsObj->isCalAdmin()) {
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -81,17 +94,22 @@ class Location extends \TYPO3\CMS\Cal\Model\LocationModel
         return $isAllowedToEditLocations;
     }
 
-    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = [])
+    /**
+     * @param string $feUserUid
+     * @param array $feGroupsArray
+     * @return bool
+     */
+    public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        if (! $rightsObj->isViewEnabled('delete_location')) {
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        if (!$rightsObj->isViewEnabled('delete_location')) {
             return false;
         }
         if ($rightsObj->isCalAdmin()) {
             return true;
         }
 
-        if ($feUserUid == '') {
+        if ($feUserUid === '') {
             $feUserUid = $rightsObj->getUserId();
         }
         if (empty($feGroupsArray)) {
@@ -107,40 +125,76 @@ class Location extends \TYPO3\CMS\Cal\Model\LocationModel
         return $isAllowedToDeleteLocation;
     }
 
-    public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     * @return string
+     */
+    public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view): string
     {
         $editlink = '';
         if ($this->isUserAllowedToEdit()) {
             $this->initLocalCObject($this->getValuesAsArray());
 
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_edit_location'));
-            $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
+            $this->controller->getParametersForTyposcriptLink(
+                $this->local_cObj->data,
+                [
                     'view' => 'edit_location',
                     'type' => $this->getType(),
                     'uid' => $this->getUid()
-            ], $this->conf ['cache'], $this->conf ['clear_anyway'], $this->conf ['view.'] ['calendar.'] ['editLocationViewPid']);
-            $editlink = $this->local_cObj->cObjGetSingle($this->conf ['view.'] [$view . '.'] ['location.'] ['editLink'], $this->conf ['view.'] [$view . '.'] ['location.'] ['editLink.']);
+                ],
+                $this->conf['cache'],
+                $this->conf['clear_anyway'],
+                $this->conf['view.']['calendar.']['editLocationViewPid']
+            );
+            $editlink = $this->local_cObj->cObjGetSingle(
+                $this->conf['view.'][$view . '.']['location.']['editLink'],
+                $this->conf['view.'][$view . '.']['location.']['editLink.']
+            );
         }
         if ($this->isUserAllowedToDelete()) {
             $this->initLocalCObject($this->getValuesAsArray());
 
             $this->local_cObj->setCurrentVal($this->controller->pi_getLL('l_delete_location'));
-            $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
+            $this->controller->getParametersForTyposcriptLink(
+                $this->local_cObj->data,
+                [
                     'view' => 'delete_location',
                     'type' => $this->getType(),
                     'uid' => $this->getUid()
-            ], $this->conf ['cache'], $this->conf ['clear_anyway'], $this->conf ['view.'] ['location.'] ['deleteLocationViewPid']);
-            $editlink .= $this->local_cObj->cObjGetSingle($this->conf ['view.'] [$view . '.'] ['location.'] ['deleteLink'], $this->conf ['view.'] [$view . '.'] ['location.'] ['deleteLink.']);
+                ],
+                $this->conf['cache'],
+                $this->conf['clear_anyway'],
+                $this->conf['view.']['location.']['deleteLocationViewPid']
+            );
+            $editlink .= $this->local_cObj->cObjGetSingle(
+                $this->conf['view.'][$view . '.']['location.']['deleteLink'],
+                $this->conf['view.'][$view . '.']['location.']['deleteLink.']
+            );
         }
         return $editlink;
     }
 
-    public function renderLocationFor($viewType, $subpartSuffix = '')
+    /**
+     * @param $viewType
+     * @param string $subpartSuffix
+     * @return string
+     */
+    public function renderLocationFor($viewType, $subpartSuffix = ''): string
     {
         return $this->fillTemplate('###TEMPLATE_LOCATION_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }
 
-    public function renderOrganizerFor($viewType, $subpartSuffix = '')
+    /**
+     * @param $viewType
+     * @param string $subpartSuffix
+     * @return string
+     */
+    public function renderOrganizerFor($viewType, $subpartSuffix = ''): string
     {
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }

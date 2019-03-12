@@ -10,6 +10,8 @@ namespace TYPO3\CMS\Cal\Model\ICalendar;
 
 // The following were shamelessly yoinked from Contact_Vcard_Build
 // Part numbers for N components.
+use TYPO3\CMS\Cal\Model\ICalendar;
+
 define('VCARD_N_FAMILY', 0);
 define('VCARD_N_GIVEN', 1);
 define('VCARD_N_ADDL', 2);
@@ -40,16 +42,18 @@ define('VCARD_GEO_LON', 1);
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
  *
  */
-class vcard extends \TYPO3\CMS\Cal\Model\ICalendar
+class vcard extends ICalendar
 {
     public function __construct($version = '2.1')
     {
         return parent::__construct($version);
     }
+
     public function getType()
     {
         return 'vcard';
     }
+
     public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
     {
         return parent::parsevCalendar($data, 'vcard');
@@ -63,8 +67,8 @@ class vcard extends \TYPO3\CMS\Cal\Model\ICalendar
     public function exportvCalendar()
     {
         $requiredAttributes = [];
-        $requiredAttributes ['BODY'] = '';
-        $requiredAttributes ['VERSION'] = '2.1';
+        $requiredAttributes['BODY'] = '';
+        $requiredAttributes['VERSION'] = '2.1';
 
         foreach ($requiredAttributes as $name => $default_value) {
             if (is_a($this->getAttribute($name), 'PEAR_Error')) {
@@ -95,20 +99,20 @@ class vcard extends \TYPO3\CMS\Cal\Model\ICalendar
         }
 
         $name_arr = [];
-        if (! empty($name_parts [VCARD_N_PREFIX])) {
-            $name_arr [] = $name_parts [VCARD_N_PREFIX];
+        if (!empty($name_parts[VCARD_N_PREFIX])) {
+            $name_arr[] = $name_parts[VCARD_N_PREFIX];
         }
-        if (! empty($name_parts [VCARD_N_GIVEN])) {
-            $name_arr [] = $name_parts [VCARD_N_GIVEN];
+        if (!empty($name_parts[VCARD_N_GIVEN])) {
+            $name_arr[] = $name_parts[VCARD_N_GIVEN];
         }
-        if (! empty($name_parts [VCARD_N_ADDL])) {
-            $name_arr [] = $name_parts [VCARD_N_ADDL];
+        if (!empty($name_parts[VCARD_N_ADDL])) {
+            $name_arr[] = $name_parts[VCARD_N_ADDL];
         }
-        if (! empty($name_parts [VCARD_N_FAMILY])) {
-            $name_arr [] = $name_parts [VCARD_N_FAMILY];
+        if (!empty($name_parts[VCARD_N_FAMILY])) {
+            $name_arr[] = $name_parts[VCARD_N_FAMILY];
         }
-        if (! empty($name_parts [VCARD_N_SUFFIX])) {
-            $name_arr [] = $name_parts [VCARD_N_SUFFIX];
+        if (!empty($name_parts[VCARD_N_SUFFIX])) {
+            $name_arr[] = $name_parts[VCARD_N_SUFFIX];
         }
 
         return implode(' ', $name_arr);

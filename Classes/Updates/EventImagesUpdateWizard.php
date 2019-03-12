@@ -24,9 +24,9 @@ namespace TYPO3\CMS\Cal\Updates;
 /**
  * Upgrade wizard which goes through all files referenced in the tx_cal_event.image filed
  * and creates sys_file records as well as sys_file_reference records for the individual usages.
- *
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
-class EventImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractImagesUpdateWizard
+class EventImagesUpdateWizard extends AbstractImagesUpdateWizard
 {
 
     /**
@@ -43,6 +43,9 @@ class EventImagesUpdateWizard extends \TYPO3\CMS\Cal\Updates\AbstractImagesUpdat
         return 'There are Content Elements of type "image" which are referencing files that are not using the File Abstraction Layer. This wizard will move the files to fileadmin/' . self::FOLDER_ContentUploads . ' and index them.';
     }
 
+    /**
+     * @return mixed|string
+     */
     protected function getRecordTableName()
     {
         return 'tx_cal_event';

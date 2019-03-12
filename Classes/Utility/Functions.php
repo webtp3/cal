@@ -20,48 +20,56 @@ namespace TYPO3\CMS\Cal\Utility;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Controller\UriHandler;
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This is a collection of many useful functions
- *
  */
 class Functions
 {
-    /*
-     * Expands a path if it includes EXT: shorthand. @param		string		The path to be expanded. @return					The expanded path.
+    /**
+     * Expands a path if it includes EXT: shorthand.
+     * @param string $path The path to be expanded.
+     * @return string The expanded path.
      */
-    public static function expandPath($path)
+    public static function expandPath(string $path): string
     {
-        if (! strcmp(substr($path, 0, 4), 'EXT:')) {
+        if (!strcmp(substr($path, 0, 4), 'EXT:')) {
             list($extKey, $script) = explode('/', substr($path, 4), 2);
-            if ($extKey && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded($extKey)) {
-                $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($extKey);
+            if ($extKey && ExtensionManagementUtility::isLoaded($extKey)) {
+                $extPath = ExtensionManagementUtility::extPath($extKey);
                 $path = substr($extPath, strlen(PATH_site)) . $script;
             }
         }
 
         return $path;
     }
+
     public static function clearCache()
     {
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7005000) {
-            $pageCache = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager')->getCache('cache_pages');
-            $pageCache->flushByTag('cal');
-        } else {
-            // only use cachingFramework if initialized and configured in TYPO3
-            if (\TYPO3\CMS\Core\Cache\Cache::isCachingFrameworkInitialized() && TYPO3_UseCachingFramework && is_object($GLOBALS ['typo3CacheManager'])) {
-                $pageCache = $GLOBALS ['typo3CacheManager']->getCache('cache_pages');
-                $pageCache->flushByTag('cal');
-            }
-        }
+        $pageCache = GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_pages');
+        $pageCache->flushByTag('cal');
     }
+
+    /**
+     * @return object|string[]
+     */
     public static function &getNotificationService()
     {
         $key = 'tx_default_notification';
         $serviceChain = '';
         /* Loop over all services providign the specified service type and subtype */
-        while (is_object($notificationService = GeneralUtility::makeInstanceService('cal_view', 'notify', $serviceChain))) {
+        while (is_object($notificationService = GeneralUtility::makeInstanceService(
+            'cal_view',
+            'notify',
+            $serviceChain
+        ))) {
             $serviceChain .= ',' . $notificationService->getServiceKey();
             /* If the key of the current service matches what we're looking for, return the object */
             if ($key == $notificationService->getServiceKey()) {
@@ -69,6 +77,10 @@ class Functions
             }
         }
     }
+
+    /**
+     * @return object|string[]
+     */
     public static function &getReminderService()
     {
         $key = 'tx_default_reminder';
@@ -83,12 +95,20 @@ class Functions
             }
         }
     }
+
+    /**
+     * @return object|string[]
+     */
     public static function &getEventService()
     {
         $key = 'tx_cal_phpicalendar';
         $serviceChain = '';
         /* Loop over all services providign the specified service type and subtype */
-        while (is_object($eventService = GeneralUtility::makeInstanceService('cal_event_model', 'event', $serviceChain))) {
+        while (is_object($eventService = GeneralUtility::makeInstanceService(
+            'cal_event_model',
+            'event',
+            $serviceChain
+        ))) {
             $serviceChain .= ',' . $eventService->getServiceKey();
             /* If the key of the current service matches what we're looking for, return the object */
             if ($key == $eventService->getServiceKey()) {
@@ -98,81 +118,125 @@ class Functions
     }
 
     // get used charset
-    public static function getCharset()
-    {
-        if ($GLOBALS ['TYPO3_CONF_VARS'] ['BE'] ['forceCharset']) { // First priority: forceCharset! If set, this will be authoritative!
-            $charset = $GLOBALS ['TYPO3_CONF_VARS'] ['BE'] ['forceCharset'];
-        } elseif (is_object($GLOBALS ['LANG'])) {
-            $charset = $GLOBALS ['LANG']->charSet; // If "LANG" is around, that will hold the current charset
-        } else {
-            $charset = 'utf-8'; // THIS is just a hopeful guess!
-        }
 
-        return $charset;
+    /**
+     * @return string
+     */
+    public static function getCharset(): string
+    {
+        return 'utf-8';
     }
+
+    /**
+     * @param $table
+     * @return mixed
+     */
     public static function getOrderBy($table)
     {
-        if (isset($GLOBALS['TCA'] [$table] ['ctrl'] ['default_sortby'])) {
-            $orderBy = str_replace('ORDER BY ', '', $GLOBALS['TCA'] [$table] ['ctrl'] ['default_sortby']);
-        } elseif (isset($GLOBALS['TCA'] [$table] ['ctrl'] ['sortby'])) {
-            $orderBy = $GLOBALS['TCA'] [$table] ['ctrl'] ['sortby'];
+        if (isset($GLOBALS['TCA'][$table]['ctrl']['default_sortby'])) {
+            $orderBy = str_replace('ORDER BY ', '', $GLOBALS['TCA'][$table]['ctrl']['default_sortby']);
+        } elseif (isset($GLOBALS['TCA'][$table]['ctrl']['sortby'])) {
+            $orderBy = $GLOBALS['TCA'][$table]['ctrl']['sortby'];
         }
 
         return $orderBy;
     }
-    public static function getmicrotime()
+
+    /**
+     * @return string
+     */
+    public static function getmicrotime(): string
     {
         list($asec, $sec) = explode(' ', microtime());
         return date('H:m:s', intval($sec)) . ' ' . $asec;
     }
+
+    /**
+     * @param $unixtime
+     * @return float|int
+     */
     public static function strtotimeOffset($unixtime)
     {
         $zone = intval(date('O', $unixtime)) / 100;
         return $zone * 60 * 60;
     }
-    public static function getFormatStringFromConf($conf)
+
+    /**
+     * @param $conf
+     * @return string
+     */
+    public static function getFormatStringFromConf($conf): string
     {
         $dateFormatArray = [];
-        $dateFormatArray [$conf ['dateConfig.'] ['dayPosition']] = '%d';
-        $dateFormatArray [$conf ['dateConfig.'] ['monthPosition']] = '%m';
-        $dateFormatArray [$conf ['dateConfig.'] ['yearPosition']] = '%Y';
-        $format = $dateFormatArray [0] . $conf ['dateConfig.'] ['splitSymbol'] . $dateFormatArray [1] . $conf ['dateConfig.'] ['splitSymbol'] . $dateFormatArray [2];
+        $dateFormatArray[$conf['dateConfig.']['dayPosition']] = '%d';
+        $dateFormatArray[$conf['dateConfig.']['monthPosition']] = '%m';
+        $dateFormatArray[$conf['dateConfig.']['yearPosition']] = '%Y';
+        $format = $dateFormatArray[0] . $conf['dateConfig.']['splitSymbol'] . $dateFormatArray[1] . $conf['dateConfig.']['splitSymbol'] . $dateFormatArray[2];
         return $format;
     }
-    public static function getYmdFromDateString($conf, $string)
+
+    /**
+     * @param $conf
+     * @param $string
+     * @return string
+     */
+    public static function getYmdFromDateString($conf, $string): string
     {
         // yyyy.mm.dd or dd.mm.yyyy or mm.dd.yyyy
-        $stringArray = explode($conf ['dateConfig.'] ['splitSymbol'], $string);
-        $ymdString = $stringArray [$conf ['dateConfig.'] ['yearPosition']] . $stringArray [$conf ['dateConfig.'] ['monthPosition']] . $stringArray [$conf ['dateConfig.'] ['dayPosition']];
+        $stringArray = explode($conf['dateConfig.']['splitSymbol'], $string);
+        $ymdString = $stringArray[$conf['dateConfig.']['yearPosition']] . $stringArray[$conf['dateConfig.']['monthPosition']] . $stringArray[$conf['dateConfig.']['dayPosition']];
         return $ymdString;
     }
 
     // returns true if $str begins with $sub
-    public static function beginsWith($str, $sub)
+
+    /**
+     * @param $str
+     * @param $sub
+     * @return bool
+     */
+    public static function beginsWith($str, $sub): bool
     {
         return substr($str, 0, strlen($sub)) == $sub;
     }
 
     // return tru if $str ends with $sub
-    public static function endsWith($str, $sub)
+
+    /**
+     * @param $str
+     * @param $sub
+     * @return bool
+     */
+    public static function endsWith($str, $sub): bool
     {
         return substr($str, strlen($str) - strlen($sub)) == $sub;
     }
 
     // function that provides the same functionality like substituteMarkerArrayCached - but not cached, which is far better in case of cal
-    public static function substituteMarkerArrayNotCached($content, $markContentArray = [], $subpartContentArray = [], $wrappedSubpartContentArray = [])
-    {
-        $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
-        // return $cObj->substituteMarkerArrayCached($content,$markContentArray,$subpartContentArray,$wrappedSubpartContentArray);
+
+    /**
+     * @param $content
+     * @param array $markContentArray
+     * @param array $subpartContentArray
+     * @param array $wrappedSubpartContentArray
+     * @return mixed
+     */
+    public static function substituteMarkerArrayNotCached(
+        $content,
+        $markContentArray = [],
+        $subpartContentArray = [],
+        $wrappedSubpartContentArray = []
+    ) {
+        $markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
 
         // If not arrays then set them
-        if (! is_array($markContentArray)) {
+        if (!is_array($markContentArray)) {
             $markContentArray = [];
         } // Plain markers
-        if (! is_array($subpartContentArray)) {
+        if (!is_array($subpartContentArray)) {
             $subpartContentArray = [];
         } // Subparts being directly substituted
-        if (! is_array($wrappedSubpartContentArray)) {
+        if (!is_array($wrappedSubpartContentArray)) {
             $wrappedSubpartContentArray = [];
         } // Subparts being wrapped
         // Finding keys and check hash:
@@ -181,35 +245,33 @@ class Functions
 
         // Finding subparts and substituting them with the subpart as a marker
         foreach ($sPkeys as $key => $sPK) {
-            $content = $cObj->substituteSubpart($content, $sPK, $subpartContentArray [$sPK]);
+            $content = $markerBasedTemplateService->substituteSubpart($content, $sPK, $subpartContentArray[$sPK]);
         }
 
         // Finding subparts and wrapping them with markers
         foreach ($wPkeys as $key => $wPK) {
-            if (is_array($wrappedSubpartContentArray [$wPK])) {
-                $parts = &$wrappedSubpartContentArray [$wPK];
+            if (is_array($wrappedSubpartContentArray[$wPK])) {
+                $parts = &$wrappedSubpartContentArray[$wPK];
             } else {
-                $parts = explode('|', $wrappedSubpartContentArray [$wPK]);
+                $parts = explode('|', $wrappedSubpartContentArray[$wPK]);
             }
-            $content = $cObj->substituteSubpart($content, $wPK, $parts);
+            $content = $markerBasedTemplateService->substituteSubpart($content, $wPK, $parts);
         }
 
-        return $cObj->substituteMarkerArray($content, $markContentArray);
+        return $markerBasedTemplateService->substituteMarkerArray($content, $markContentArray);
     }
 
     /**
      * Removes potential XSS code from an input string.
      * Copied from typo3/contrib/RemoveXSS/RemoveXSS.php in TYPO3 trunk.
      *
-     * @param
-     *        	string		Input string
-     * @param
-     *        	string		replaceString for inserting in keywords (which destroyes the tags)
+     * @param string        Input string
+     * @param string        replaceString for inserting in keywords (which destroyes the tags)
      * @return string string with potential XSS code removed
      *
      * @todo Once TYPO3 4.3 is released and required by cal, remove this method.
      */
-    public static function removeXSS($val, $replaceString = '<x>')
+    public static function removeXSS($val, $replaceString = '<x>'): string
     {
         // don't use empty $replaceString because then no XSS-remove will be done
         if ($replaceString == '') {
@@ -224,7 +286,7 @@ class Functions
         // this prevents like <IMG SRC=&#X40&#X61&#X76&#X61&#X73&#X63&#X72&#X69&#X70&#X74&#X3A&#X61&#X6C&#X65&#X72&#X74&#X28&#X27&#X58&#X53&#X53&#X27&#X29>
         $search = '/&#[xX]0{0,8}(21|22|23|24|25|26|27|28|29|2a|2b|2d|2f|30|31|32|33|34|35|36|37|38|39|3a|3b|3d|3f|40|41|42|43|44|45|46|47|48|49|4a|4b|4c|4d|4e|4f|50|51|52|53|54|55|56|57|58|59|5a|5b|5c|5d|5e|5f|60|61|62|63|64|65|66|67|68|69|6a|6b|6c|6d|6e|6f|70|71|72|73|74|75|76|77|78|79|7a|7b|7c|7d|7e);?/i';
         // $val = preg_replace($search, "chr(hexdec('\\1'))", $val);
-        // mixed preg_replace_callback ( mixed $pattern , callable $callback , mixed $subject [, int $limit = -1 [, int &$count ]] )
+        // mixed preg_replace_callback ( mixed $pattern , callable $callback , mixed $subject[, int $limit = -1[, int &$count ]] )
         $val = preg_replace_callback($search, function ($value) {
             return chr(hexdec($value));
         }, $val);
@@ -236,209 +298,209 @@ class Functions
 
         // now the only remaining whitespace attacks are \t, \n, and \r
         $ra1 = [
-                'javascript',
-                'vbscript',
-                'expression',
-                'applet',
-                'meta',
-                'xml',
-                'blink',
-                'link',
-                'style',
-                'script',
-                'embed',
-                'object',
-                'iframe',
-                'frame',
-                'frameset',
-                'ilayer',
-                'layer',
-                'bgsound',
-                'title',
-                'base',
-                'onabort',
-                'onactivate',
-                'onafterprint',
-                'onafterupdate',
-                'onbeforeactivate',
-                'onbeforecopy',
-                'onbeforecut',
-                'onbeforedeactivate',
-                'onbeforeeditfocus',
-                'onbeforepaste',
-                'onbeforeprint',
-                'onbeforeunload',
-                'onbeforeupdate',
-                'onblur',
-                'onbounce',
-                'oncellchange',
-                'onchange',
-                'onclick',
-                'oncontextmenu',
-                'oncontrolselect',
-                'oncopy',
-                'oncut',
-                'ondataavailable',
-                'ondatasetchanged',
-                'ondatasetcomplete',
-                'ondblclick',
-                'ondeactivate',
-                'ondrag',
-                'ondragend',
-                'ondragenter',
-                'ondragleave',
-                'ondragover',
-                'ondragstart',
-                'ondrop',
-                'onerror',
-                'onerrorupdate',
-                'onfilterchange',
-                'onfinish',
-                'onfocus',
-                'onfocusin',
-                'onfocusout',
-                'onhelp',
-                'onkeydown',
-                'onkeypress',
-                'onkeyup',
-                'onlayoutcomplete',
-                'onload',
-                'onlosecapture',
-                'onmousedown',
-                'onmouseenter',
-                'onmouseleave',
-                'onmousemove',
-                'onmouseout',
-                'onmouseover',
-                'onmouseup',
-                'onmousewheel',
-                'onmove',
-                'onmoveend',
-                'onmovestart',
-                'onpaste',
-                'onpropertychange',
-                'onreadystatechange',
-                'onreset',
-                'onresize',
-                'onresizeend',
-                'onresizestart',
-                'onrowenter',
-                'onrowexit',
-                'onrowsdelete',
-                'onrowsinserted',
-                'onscroll',
-                'onselect',
-                'onselectionchange',
-                'onselectstart',
-                'onstart',
-                'onstop',
-                'onsubmit',
-                'onunload'
+            'javascript',
+            'vbscript',
+            'expression',
+            'applet',
+            'meta',
+            'xml',
+            'blink',
+            'link',
+            'style',
+            'script',
+            'embed',
+            'object',
+            'iframe',
+            'frame',
+            'frameset',
+            'ilayer',
+            'layer',
+            'bgsound',
+            'title',
+            'base',
+            'onabort',
+            'onactivate',
+            'onafterprint',
+            'onafterupdate',
+            'onbeforeactivate',
+            'onbeforecopy',
+            'onbeforecut',
+            'onbeforedeactivate',
+            'onbeforeeditfocus',
+            'onbeforepaste',
+            'onbeforeprint',
+            'onbeforeunload',
+            'onbeforeupdate',
+            'onblur',
+            'onbounce',
+            'oncellchange',
+            'onchange',
+            'onclick',
+            'oncontextmenu',
+            'oncontrolselect',
+            'oncopy',
+            'oncut',
+            'ondataavailable',
+            'ondatasetchanged',
+            'ondatasetcomplete',
+            'ondblclick',
+            'ondeactivate',
+            'ondrag',
+            'ondragend',
+            'ondragenter',
+            'ondragleave',
+            'ondragover',
+            'ondragstart',
+            'ondrop',
+            'onerror',
+            'onerrorupdate',
+            'onfilterchange',
+            'onfinish',
+            'onfocus',
+            'onfocusin',
+            'onfocusout',
+            'onhelp',
+            'onkeydown',
+            'onkeypress',
+            'onkeyup',
+            'onlayoutcomplete',
+            'onload',
+            'onlosecapture',
+            'onmousedown',
+            'onmouseenter',
+            'onmouseleave',
+            'onmousemove',
+            'onmouseout',
+            'onmouseover',
+            'onmouseup',
+            'onmousewheel',
+            'onmove',
+            'onmoveend',
+            'onmovestart',
+            'onpaste',
+            'onpropertychange',
+            'onreadystatechange',
+            'onreset',
+            'onresize',
+            'onresizeend',
+            'onresizestart',
+            'onrowenter',
+            'onrowexit',
+            'onrowsdelete',
+            'onrowsinserted',
+            'onscroll',
+            'onselect',
+            'onselectionchange',
+            'onselectstart',
+            'onstart',
+            'onstop',
+            'onsubmit',
+            'onunload'
         ];
         $ra_tag = [
-                'applet',
-                'meta',
-                'xml',
-                'blink',
-                'link',
-                'style',
-                'script',
-                'embed',
-                'object',
-                'iframe',
-                'frame',
-                'frameset',
-                'ilayer',
-                'layer',
-                'bgsound',
-                'title',
-                'base'
+            'applet',
+            'meta',
+            'xml',
+            'blink',
+            'link',
+            'style',
+            'script',
+            'embed',
+            'object',
+            'iframe',
+            'frame',
+            'frameset',
+            'ilayer',
+            'layer',
+            'bgsound',
+            'title',
+            'base'
         ];
         $ra_attribute = [
-                'style',
-                'onabort',
-                'onactivate',
-                'onafterprint',
-                'onafterupdate',
-                'onbeforeactivate',
-                'onbeforecopy',
-                'onbeforecut',
-                'onbeforedeactivate',
-                'onbeforeeditfocus',
-                'onbeforepaste',
-                'onbeforeprint',
-                'onbeforeunload',
-                'onbeforeupdate',
-                'onblur',
-                'onbounce',
-                'oncellchange',
-                'onchange',
-                'onclick',
-                'oncontextmenu',
-                'oncontrolselect',
-                'oncopy',
-                'oncut',
-                'ondataavailable',
-                'ondatasetchanged',
-                'ondatasetcomplete',
-                'ondblclick',
-                'ondeactivate',
-                'ondrag',
-                'ondragend',
-                'ondragenter',
-                'ondragleave',
-                'ondragover',
-                'ondragstart',
-                'ondrop',
-                'onerror',
-                'onerrorupdate',
-                'onfilterchange',
-                'onfinish',
-                'onfocus',
-                'onfocusin',
-                'onfocusout',
-                'onhelp',
-                'onkeydown',
-                'onkeypress',
-                'onkeyup',
-                'onlayoutcomplete',
-                'onload',
-                'onlosecapture',
-                'onmousedown',
-                'onmouseenter',
-                'onmouseleave',
-                'onmousemove',
-                'onmouseout',
-                'onmouseover',
-                'onmouseup',
-                'onmousewheel',
-                'onmove',
-                'onmoveend',
-                'onmovestart',
-                'onpaste',
-                'onpropertychange',
-                'onreadystatechange',
-                'onreset',
-                'onresize',
-                'onresizeend',
-                'onresizestart',
-                'onrowenter',
-                'onrowexit',
-                'onrowsdelete',
-                'onrowsinserted',
-                'onscroll',
-                'onselect',
-                'onselectionchange',
-                'onselectstart',
-                'onstart',
-                'onstop',
-                'onsubmit',
-                'onunload'
+            'style',
+            'onabort',
+            'onactivate',
+            'onafterprint',
+            'onafterupdate',
+            'onbeforeactivate',
+            'onbeforecopy',
+            'onbeforecut',
+            'onbeforedeactivate',
+            'onbeforeeditfocus',
+            'onbeforepaste',
+            'onbeforeprint',
+            'onbeforeunload',
+            'onbeforeupdate',
+            'onblur',
+            'onbounce',
+            'oncellchange',
+            'onchange',
+            'onclick',
+            'oncontextmenu',
+            'oncontrolselect',
+            'oncopy',
+            'oncut',
+            'ondataavailable',
+            'ondatasetchanged',
+            'ondatasetcomplete',
+            'ondblclick',
+            'ondeactivate',
+            'ondrag',
+            'ondragend',
+            'ondragenter',
+            'ondragleave',
+            'ondragover',
+            'ondragstart',
+            'ondrop',
+            'onerror',
+            'onerrorupdate',
+            'onfilterchange',
+            'onfinish',
+            'onfocus',
+            'onfocusin',
+            'onfocusout',
+            'onhelp',
+            'onkeydown',
+            'onkeypress',
+            'onkeyup',
+            'onlayoutcomplete',
+            'onload',
+            'onlosecapture',
+            'onmousedown',
+            'onmouseenter',
+            'onmouseleave',
+            'onmousemove',
+            'onmouseout',
+            'onmouseover',
+            'onmouseup',
+            'onmousewheel',
+            'onmove',
+            'onmoveend',
+            'onmovestart',
+            'onpaste',
+            'onpropertychange',
+            'onreadystatechange',
+            'onreset',
+            'onresize',
+            'onresizeend',
+            'onresizestart',
+            'onrowenter',
+            'onrowexit',
+            'onrowsdelete',
+            'onrowsinserted',
+            'onscroll',
+            'onselect',
+            'onselectionchange',
+            'onselectstart',
+            'onstart',
+            'onstop',
+            'onsubmit',
+            'onunload'
         ];
         $ra_protocol = [
-                'javascript',
-                'vbscript',
-                'expression'
+            'javascript',
+            'vbscript',
+            'expression'
         ];
 
         // remove the potential &#xxx; stuff for testing
@@ -451,22 +513,22 @@ class Functions
             // we can use the non-multibyte safe version
             if (stripos($val2, $ra1word) !== false) {
                 // keep list of potential words that were found
-                if (in_array($ra1word, $ra_protocol)) {
-                    $ra [] = [
-                            $ra1word,
-                            'ra_protocol'
+                if (in_array($ra1word, $ra_protocol, true)) {
+                    $ra[] = [
+                        $ra1word,
+                        'ra_protocol'
                     ];
                 }
-                if (in_array($ra1word, $ra_tag)) {
-                    $ra [] = [
-                            $ra1word,
-                            'ra_tag'
+                if (in_array($ra1word, $ra_tag, true)) {
+                    $ra[] = [
+                        $ra1word,
+                        'ra_tag'
                     ];
                 }
-                if (in_array($ra1word, $ra_attribute)) {
-                    $ra [] = [
-                            $ra1word,
-                            'ra_attribute'
+                if (in_array($ra1word, $ra_attribute, true)) {
+                    $ra[] = [
+                        $ra1word,
+                        'ra_attribute'
                     ];
                 }
                 // some keywords appear in more than one array
@@ -479,16 +541,16 @@ class Functions
             $found = true;
             while ($found == true) {
                 $val_before = $val;
-                for ($i = 0; $i < count($ra); $i ++) {
+                foreach ($ra as $i => $iValue) {
                     $pattern = '';
-                    for ($j = 0; $j < strlen($ra [$i] [0]); $j ++) {
+                    foreach ($ra[$i][0] as $j => $jValue) {
                         if ($j > 0) {
                             $pattern .= '((&#[xX]0{0,8}([9ab]);)|(&#0{0,8}(9|10|13);)|\s)*';
                         }
-                        $pattern .= $ra [$i] [0] [$j];
+                        $pattern .= $jValue;
                     }
                     // handle each type a little different (extra conditions to prevent false positives a bit better)
-                    switch ($ra [$i] [1]) {
+                    switch ($ra[$i][1]) {
                         case 'ra_protocol':
                             // these take the form of e.g. 'javascript:'
                             $pattern .= '((&#[xX]0{0,8}([9ab]);)|(&#0{0,8}(9|10|13);)|\s)*(?=:)';
@@ -505,7 +567,7 @@ class Functions
                     }
                     $pattern = '/' . $pattern . '/i';
                     // add in <x> to nerf the tag
-                    $replacement = substr_replace($ra [$i] [0], $replaceString, 2, 0);
+                    $replacement = substr_replace($ra[$i][0], $replaceString, 2, 0);
                     // filter out the hex tags
                     $val = preg_replace($pattern, $replacement, $val);
                     if ($val_before == $val) {
@@ -522,16 +584,18 @@ class Functions
     /*
      * Sets up a hook in the $className PHP file with the specified name. @param	string	The class name. @param	string	The name of the hook. @return	array	The array of objects implementing this hoook.
      */
-    public static function getHookObjectsArray($className, $hookName, $modulePath = 'controller')
+    /**
+     * @param $className
+     * @param $hookName
+     * @param string $modulePath
+     * @return array
+     */
+    public static function getHookObjectsArray($className, $hookName, $modulePath = 'controller'): array
     {
         $hookObjectsArr = [];
-        if (is_array($GLOBALS ['TYPO3_CONF_VARS'] [TYPO3_MODE] ['EXTCONF'] ['ext/cal/' . $modulePath . '/class.' . $className . '.php'] [$hookName])) {
-            foreach ($GLOBALS ['TYPO3_CONF_VARS'] [TYPO3_MODE] ['EXTCONF'] ['ext/cal/' . $modulePath . '/class.' . $className . '.php'] [$hookName] as $classRef) {
-                if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 8000000) {
-                    $hookObjectsArr [] = GeneralUtility::makeInstance($classRef);
-                } else {
-                    $hookObjectsArr [] = GeneralUtility::getUserObj($classRef);
-                }
+        if (is_array($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['EXTCONF']['ext/cal/' . $modulePath . '/class.' . $className . '.php'][$hookName])) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['EXTCONF']['ext/cal/' . $modulePath . '/class.' . $className . '.php'][$hookName] as $classRef) {
+                $hookObjectsArr[] = GeneralUtility::makeInstance($classRef);
             }
         }
 
@@ -540,6 +604,12 @@ class Functions
 
     /*
      * Executes the specified function for each item in the array of hook objects. @param	array	The array of hook objects. @param	string	The name of the function to execute. @return	none
+     */
+    /**
+     * @param $hookObjectsArray
+     * @param $function
+     * @param $parentObject
+     * @param $params
      */
     public static function executeHookObjectsFunction($hookObjectsArray, $function, &$parentObject, &$params)
     {
@@ -554,8 +624,7 @@ class Functions
      * Returns a Classname and allows various parameter to be passed to the constructor.
      *
      *
-     * @param
-     *        	string		className
+     * @param string        className
      * @return object reference to the object
      *
      * @todo Once TYPO3 4.3 is released and required by cal, remove this method and replace calls to it with GeneralUtility::makeInstance.
@@ -564,33 +633,55 @@ class Functions
     {
         $constructorArguments = func_get_args();
         return call_user_func_array([
-                'TYPO3\\CMS\\Core\\Utility\\GeneralUtility',
-                'makeInstance'
+            GeneralUtility::class,
+            'makeInstance'
         ], $constructorArguments);
     }
+
+    /**
+     * @param $string
+     * @return string|string[]|null
+     */
     public static function removeEmptyLines($string)
     {
         return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $string);
     }
-    public static function getMonthNames($type)
+
+    /**
+     * @param $type
+     * @return array
+     */
+    public static function getMonthNames($type): array
     {
         $monthNames = [];
-        for ($i = 0; $i < 12; $i ++) {
-            $monthNames [] = strftime($type, ($i * 2592000) + 1000000);
+        for ($i = 0; $i < 12; $i++) {
+            $monthNames[] = strftime($type, ($i * 2592000) + 1000000);
         }
         return $monthNames;
     }
-    public static function getWeekdayNames($type)
+
+    /**
+     * @param $type
+     * @return array
+     */
+    public static function getWeekdayNames($type): array
     {
         $weekdayNames = [];
-        for ($i = 3; $i < 10; $i ++) {
-            $weekdayNames [] = strftime($type, ($i * 86400));
+        for ($i = 3; $i < 10; $i++) {
+            $weekdayNames[] = strftime($type, ($i * 86400));
         }
         return $weekdayNames;
     }
-    public static function getDayByWeek($year, $week, $weekday)
+
+    /**
+     * @param $year
+     * @param $week
+     * @param $weekday
+     * @return string
+     */
+    public static function getDayByWeek($year, $week, $weekday): string
     {
-        $date = new \TYPO3\CMS\Cal\Model\CalDate($year . '0101');
+        $date = new CalDate($year . '0101');
         $date->setTZbyID('UTC');
 
         $offset = $weekday - $date->format('%w');
@@ -605,35 +696,46 @@ class Functions
 
         return $date->format('%Y%m%d');
     }
-    public static function createErrorMessage($error, $note)
+
+    /**
+     * @param $error
+     * @param $note
+     * @return string
+     */
+    public static function createErrorMessage($error, $note): string
     {
         return '<div class="error"><h2>Calendar Base Error</h2><p class="message"><strong>Message:</strong> ' . $error . '</p><p class="note"><strong>Note:</strong> ' . $note . '</p></div>';
     }
+
+    /**
+     * @param $string
+     * @return mixed
+     */
     public static function replaceLineFeed($string)
     {
         return str_replace([
-                "\n\r",
-                "\r\n",
-                "\r",
-                "\n"
+            "\n\r",
+            "\r\n",
+            "\r",
+            "\n"
         ], [
-                '\n',
-                '\n',
-                '\n',
-                '\n'
+            '\n',
+            '\n',
+            '\n',
+            '\n'
         ], $string);
     }
 
     /**
      * Wrapper to replace relative links with absolute ones for notifications
      *
-     * @param string $html:
-     *        	code thak can potentially have relative links that need to be fixed
+     * @param string $html :
+     *            code thak can potentially have relative links that need to be fixed
      * @return string code with absolute links
      */
-    public static function fixURI($html)
+    public static function fixURI($html): string
     {
-        $uriHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Cal\\Controller\\UriHandler');
+        $uriHandler = GeneralUtility::makeInstance(UriHandler::class);
         $uriHandler->setHTML($html);
         $uriHandler->setPATH('http://' . GeneralUtility::getHostname(1) . '/');
 
@@ -652,14 +754,18 @@ class Functions
      * @param array $conf
      * @return array
      */
-    public static function getTsSetupAsPlainArray(&$conf)
+    public static function getTsSetupAsPlainArray(&$conf): array
     {
 
         /** @var TypoScriptService $typoScriptService */
-        $typoScriptService = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
+        $typoScriptService = GeneralUtility::makeInstance(TypoScriptService::class);
         return $typoScriptService->convertTypoScriptArrayToPlainArray($conf);
     }
 
+    /**
+     * @param $path
+     * @return bool|string
+     */
     public static function getContent($path)
     {
         if (self::beginsWith($path, '/')) {
@@ -671,12 +777,12 @@ class Functions
     }
 
     /**
-     *
      * @param array $conf
      * @param array $eventArray
+     * @return string
      */
-    public static function getIcsUid($conf, $eventArray)
+    public static function getIcsUid($conf, $eventArray): string
     {
-        return $conf ['view.'] ['ics.'] ['eventUidPrefix'] . '_' . $eventArray ['calendar_id'] . '_' . $eventArray ['uid'];
+        return $conf['view.']['ics.']['eventUidPrefix'] . '_' . $eventArray['calendar_id'] . '_' . $eventArray['uid'];
     }
 }

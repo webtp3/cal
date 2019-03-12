@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -25,18 +27,15 @@ namespace TYPO3\CMS\Cal\Model;
  * Base model for the calendar organizer.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- *
  */
-class OrganizerAddress extends \TYPO3\CMS\Cal\Model\Organizer
+class OrganizerAddress extends Organizer
 {
 
     /**
      * Constructor
      *
      * @param array $row
-     *        	array
      * @param string $pidList
-     *        	to search in
      */
     public function __construct($row, $pidList)
     {
@@ -44,20 +43,24 @@ class OrganizerAddress extends \TYPO3\CMS\Cal\Model\Organizer
         $this->setObjectType('organizer');
         $this->setType('tx_tt_address');
         $this->createOrganizer($row);
-        $this->templatePath = $this->conf ['view.'] ['organizer.'] ['organizerModelTemplate4Address'];
+        $this->templatePath = $this->conf['view.']['organizer.']['organizerModelTemplate4Address'];
     }
+
+    /**
+     * @param $row
+     */
     public function createOrganizer($row)
     {
-        $this->setUid($row ['uid']);
-        $this->setName($row ['name']);
-        $this->setDescription($row ['description']);
-        $this->setStreet($row ['address']);
-        $this->setZip($row ['zip']);
-        $this->setCity($row ['city']);
-        $this->setPhone($row ['phone']);
-        $this->setEmail($row ['email']);
-        $this->setImage(\TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $row ['image'], 1));
-        $this->setLink($row ['www']);
+        $this->setUid($row['uid']);
+        $this->setName($row['name']);
+        $this->setDescription($row['description']);
+        $this->setStreet($row['address']);
+        $this->setZip($row['zip']);
+        $this->setCity($row['city']);
+        $this->setPhone($row['phone']);
+        $this->setEmail($row['email']);
+        $this->setImage(GeneralUtility::trimExplode(',', $row['image'], 1));
+        $this->setLink($row['www']);
         $this->row = $row;
     }
 }

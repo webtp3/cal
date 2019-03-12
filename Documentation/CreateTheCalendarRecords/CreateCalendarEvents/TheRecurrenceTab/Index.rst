@@ -15,7 +15,7 @@ The Recurrence Tab contains fields pertaining to repeating events. The default s
 Refer to Illustration 22.
 - **Frequency:** Sets the frequency of the reoccurring event. Each selection will change the form's relative options.
 
-|img-4| **Note**: There are options such as an  **Until Date** that determines how long the frequency will last by setting an end date in the field. You could also set the  **Count** that will determine the number of times a recurrence will appear. The  **Interval** allows you set the event for every-other [year, month, week, day], every-third, every-fourth, etc.
+|img-4| **Note**: There are options such as an  **Until Date** that determines how long the frequency will last by setting an end date in the field. You could also set the  **Count** that will determine the number of times a recurrence will appear. The  **Interval** allows you set the event for every-other[year, month, week, day], every-third, every-fourth, etc.
 
 - **By Day of the Week:** Sets the recurring event to a specific day/s of the week. For instance, the first Monday of the selected month (as determined by the By Month field). Click the Add Recurrence icon to add an additional instance.
 

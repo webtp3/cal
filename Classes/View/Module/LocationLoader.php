@@ -22,9 +22,10 @@ namespace TYPO3\CMS\Cal\View\Module;
  */
 use TYPO3\CMS\Cal\Service\AbstractModul;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Cal\Utility\Registry;
 
 /**
- *
+ * Class LocationLoader
  */
 class LocationLoader extends AbstractModul
 {
@@ -32,22 +33,23 @@ class LocationLoader extends AbstractModul
     /**
      * The function adds location markers into the event template
      *
-     * @param Object $moduleCaller
-     *        	Instance of the event model (phpicalendar_model)
+     * @param object $moduleCaller Instance of the event model (phpicalendar_model)
+     * @param bool $onlyMarker
+     * @return array|mixed|string
      */
     public function start(&$moduleCaller, $onlyMarker = false)
     {
         if ($moduleCaller->getLocationId() > 0) {
-            $this->modelObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'modelcontroller');
-            $this->cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
+            $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
+            $this->cObj = &Registry::Registry('basic', 'cobj');
 
-            $moduleCaller->confArr = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
-            $useLocationStructure = ($moduleCaller->confArr ['useLocationStructure'] ? $moduleCaller->confArr ['useLocationStructure'] : 'tx_cal_location');
+            $moduleCaller->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            $useLocationStructure = ($moduleCaller->confArr['useLocationStructure'] ?: 'tx_cal_location');
             $location = $this->modelObj->findLocation($moduleCaller->getLocationId(), $useLocationStructure);
             if (is_object($location)) {
-                $page = Functions::getContent($moduleCaller->conf ['module.'] ['locationloader.'] ['template']);
-                if ($page == '') {
-                    return '<h3>module locationloader: no template file found:</h3>' . $moduleCaller->conf ['module.'] ['locationloader.'] ['template'];
+                $page = Functions::getContent($moduleCaller->conf['module.']['locationloader.']['template']);
+                if ($page === '') {
+                    return '<h3>module locationloader: no template file found:</h3>' . $moduleCaller->conf['module.']['locationloader.']['template'];
                 }
                 $sims = [];
                 $rems = [];
@@ -56,7 +58,7 @@ class LocationLoader extends AbstractModul
                 if ($onlyMarker) {
                     return $sims;
                 }
-                return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, $rems, []);
+                return Functions::substituteMarkerArrayNotCached($page, $sims, $rems, []);
             }
         }
         return '';

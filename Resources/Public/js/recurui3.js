@@ -2,9 +2,9 @@ function RecurUI(containerID, storageID, rowClass, rowHTML){
 	this.containerID = containerID;
 	this.storageID = storageID;
 	this.rowClass = rowClass;
-	this.rowHTML = rowHTML;	
-};
+	this.rowHTML = rowHTML;
 
+}
 RecurUI.prototype = {
 	
 	addRecurrence: function(defaultValues) {
@@ -83,7 +83,7 @@ RecurUI.prototype = {
 			
 		});
 	}
-}
+};
 
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -91,7 +91,7 @@ function escapeRegExp(str) {
 
 function ByDayUI(containerID, storageID, rowClass, rowHTML){
 	RecurUI.call(this, containerID, storageID, rowClass, rowHTML);
-};
+}
 ByDayUI.prototype = Object.create(RecurUI.prototype, {
 	storageToHash: {
 		value: function(recur) {
@@ -117,7 +117,7 @@ ByDayUI.prototype = Object.create(RecurUI.prototype, {
 
 function ByMonthDayUI(containerID, storageID, rowClass, rowHTML){
 	RecurUI.call(this, containerID, storageID, rowClass, rowHTML);
-};
+}
 ByMonthDayUI.prototype = Object.create(RecurUI.prototype, {
 	storageToHash: {
 		value: function(recur) {
@@ -129,7 +129,7 @@ ByMonthDayUI.prototype = Object.create(RecurUI.prototype, {
 
 function ByMonthUI(containerID, storageID, rowClass, rowHTML){
 	RecurUI.call(this, containerID, storageID, rowClass, rowHTML);
-};
+}
 ByMonthUI.prototype = Object.create(RecurUI.prototype, {
 	storageToHash: {
 		value: function(recur) {

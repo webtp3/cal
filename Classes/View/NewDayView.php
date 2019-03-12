@@ -8,6 +8,10 @@
 
 namespace TYPO3\CMS\Cal\View;
 
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Utility\Registry;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -23,9 +27,8 @@ namespace TYPO3\CMS\Cal\View;
 
 /**
  * Base model for the day.
- *
  */
-class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
+class NewDayView extends NewTimeView
 {
     private $hasAlldayEvents = false;
     private $Ymd;
@@ -34,6 +37,10 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
 
     /**
      * Constructor.
+     * @param $day
+     * @param $month
+     * @param $year
+     * @param int $parentMonth
      */
     public function __construct($day, $month, $year, $parentMonth = -1)
     {
@@ -42,7 +49,7 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         $this->setDay(intval($day));
         $this->setMonth(intval($month));
         $this->setYear(intval($year));
-        $date = new \TYPO3\CMS\Cal\Model\CalDate();
+        $date = new CalDate();
         $date->setDay($this->getDay());
         $date->setMonth($this->getMonth());
         $date->setYear($this->getYear());
@@ -55,36 +62,51 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
             $this->setParentMonth($this->getMonth());
         }
     }
+
+    /**
+     * @param EventModel $event
+     */
     public function addEvent(&$event)
     {
-        // if (($event->isAllday())&&($event->getStart()->format('%Y%m%d')!=$this->Ymd) ) {
-        // } else {
-        $this->events [$event->getStart()->format('%H%M')] [$event->getUid()] = &$event;
-        // }
+        $this->events[$event->getStart()->format('%H%M')][$event->getUid()] = &$event;
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventsMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $content = '';
         $timeKeys = array_keys($this->events);
         foreach ($timeKeys as $timeKey) {
-            $eventKeys = array_keys($this->events [$timeKey]);
+            $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
-                if (! $this->events [$timeKey] [$eventKey]->isAllday()) {
-                    $content .= $this->events [$timeKey] [$eventKey]->renderEventFor($view);
+                if (!$this->events[$timeKey][$eventKey]->isAllday()) {
+                    $content .= $this->events[$timeKey][$eventKey]->renderEventFor($view);
                 }
             }
         }
 
-        $sims ['###EVENTS###'] = $content;
+        $sims['###EVENTS###'] = $content;
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getEventsColumnMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $content = '';
-
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        $dayStart = $conf ['view.'] ['day.'] ['dayStart']; // '0700'; // Start time for day grid
-        $dayEnd = $conf ['view.'] ['day.'] ['dayEnd']; // '2300'; // End time for day grid
-        $gridLength = $conf ['view.'] ['day.'] ['gridLength']; // '15'; // Grid distance in minutes for day view, multiples of 15 preferred
+        $conf = &Registry::Registry('basic', 'conf');
+        $dayStart = $conf['view.']['day.']['dayStart']; // '0700'; // Start time for day grid
+        $dayEnd = $conf['view.']['day.']['dayEnd']; // '2300'; // End time for day grid
+        $gridLength = $conf['view.']['day.']['gridLength']; // '15'; // Grid distance in minutes for day view, multiples of 15 preferred
 
         while (strlen($dayStart) < 6) {
             $dayStart .= '0';
@@ -92,17 +114,17 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         while (strlen($dayEnd) < 6) {
             $dayEnd .= '0';
         }
-        if ($gridLength == 0) {
+        if ((int)$gridLength === 0) {
             $gridLength = 15;
         }
 
-        $d_start = new \TYPO3\CMS\Cal\Model\CalDate($this->getYmd() . $dayStart);
-        $d_start->setTZbyId('UTC');
-        $d_end = new \TYPO3\CMS\Cal\Model\CalDate($this->getYmd() . $dayEnd);
-        $d_end->setTZbyId('UTC');
+        $d_start = new CalDate($this->getYmd() . $dayStart);
+        $d_start->setTZbyID('UTC');
+        $d_end = new CalDate($this->getYmd() . $dayEnd);
+        $d_end->setTZbyID('UTC');
 
         // splitting the events into H:M, to find out if events run in parallel
-        $i = new \TYPO3\CMS\Cal\Model\CalDate();
+        $i = new CalDate();
         $eventArray = [];
         $viewArray = [];
         $positionArray = [];
@@ -112,45 +134,45 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         asort($timeKeys);
 
         foreach ($timeKeys as $timeKey) {
-            $eventKeys = array_keys($this->events [$timeKey]);
+            $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
-                if (! $this->events [$timeKey] [$eventKey]->isAllday() && ($this->events [$timeKey] [$eventKey]->getStart()->format('%Y%m%d') == $this->events [$timeKey] [$eventKey]->getEnd()->format('%Y%m%d'))) {
-                    $eventMappingKey = $this->events [$timeKey] [$eventKey]->getType() . '_' . $this->events [$timeKey] [$eventKey]->getUid() . '_' . $this->events [$timeKey] [$eventKey]->getStart()->format('%Y%m%d%H%M%S');
-                    $eventArray [$eventMappingKey] = &$this->events [$timeKey] [$eventKey];
+                if (!$this->events[$timeKey][$eventKey]->isAllday() && ($this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d') === $this->events[$timeKey][$eventKey]->getEnd()->format('%Y%m%d'))) {
+                    $eventMappingKey = $this->events[$timeKey][$eventKey]->getType() . '_' . $this->events[$timeKey][$eventKey]->getUid() . '_' . $this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d%H%M%S');
+                    $eventArray[$eventMappingKey] = &$this->events[$timeKey][$eventKey];
 
-                    $i->copy($this->events [$timeKey] [$eventKey]->getStart());
+                    $i->copy($this->events[$timeKey][$eventKey]->getStart());
                     $time = $i->getTime();
-                    $time = $time - ($time % ($gridLength * 60));
-                    $i = new \TYPO3\CMS\Cal\Model\CalDate($time);
+                    $time -= ($time % ($gridLength * 60));
+                    $i = new CalDate($time);
                     if ($i->before($d_start)) {
                         $i->copy($d_start);
                     }
 
                     $entries = 0;
-                    for (; $i->before($this->events [$timeKey] [$eventKey]->getEnd()); $i->addSeconds($gridLength * 60)) {
+                    for (; $i->before($this->events[$timeKey][$eventKey]->getEnd()); $i->addSeconds($gridLength * 60)) {
                         $ymd = $i->format('%Y%m%d');
                         $hm = $i->format('%H%M');
-                        $viewArray [$ymd] [$hm] [] = $eventMappingKey;
-                        $entries ++;
+                        $viewArray[$ymd][$hm][] = $eventMappingKey;
+                        $entries++;
 
-                        $count = count($viewArray [$ymd] [$hm]);
+                        $count = count($viewArray[$ymd][$hm]);
 
-                        foreach ($viewArray [$ymd] [$hm] as $mappingKey) {
-                            if (! $positionArray [$mappingKey] || $positionArray [$mappingKey] < $count) {
-                                $positionArray [$mappingKey] = $count;
+                        foreach ($viewArray[$ymd][$hm] as $mappingKey) {
+                            if (!$positionArray[$mappingKey] || $positionArray[$mappingKey] < $count) {
+                                $positionArray[$mappingKey] = $count;
                             }
                         }
                     }
-                    $rowspan_array [$this->getYmd()] [$eventMappingKey] = $entries;
+                    $rowspan_array[$this->getYmd()][$eventMappingKey] = $entries;
                 }
             }
         }
 
-        if (! empty($viewArray [$this->getYmd()])) {
+        if (!empty($viewArray[$this->getYmd()])) {
             $max = [];
-            foreach ($viewArray [$this->getYmd()] as $array_time => $time_val) {
-                $c = count($viewArray [$this->getYmd()] [$array_time]);
-                array_push($max, $c);
+            foreach ($viewArray[$this->getYmd()] as $array_time => $time_val) {
+                $c = count($viewArray[$this->getYmd()][$array_time]);
+                $max[] = $c;
             }
             $nbrGridCols = max($max);
         } else {
@@ -165,29 +187,29 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         while ($i->before($d_end)) {
             $i_formatted = $i->format('%H%M');
 
-            if (is_array($viewArray [$this->getYmd()] [$i_formatted]) && count($viewArray [$this->getYmd()] [$i_formatted]) > 0) {
-                foreach ($viewArray [$this->getYmd()] [$i_formatted] as $eventKey) {
-                    $event = &$eventArray [$eventKey];
+            if (is_array($viewArray[$this->getYmd()][$i_formatted]) && count($viewArray[$this->getYmd()][$i_formatted]) > 0) {
+                foreach ($viewArray[$this->getYmd()][$i_formatted] as $eventKey) {
+                    $event = &$eventArray[$eventKey];
                     $eventStart = $event->getStart();
                     $eventMappingKey = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M%S');
                     if (array_key_exists($eventMappingKey, $pos_array)) {
                         $eventEnd = $event->getEnd();
-                        $eventEnd->subtractSeconds((($eventEnd->getMinute() % $gridLength) * 60));
+                        $eventEnd->subtractSeconds(($eventEnd->getMinute() % $gridLength) * 60);
                         if ($i_formatted >= $eventEnd->format('%H%M')) {
-                            $t_array [$i_formatted] [$pos_array [$eventMappingKey]] = [
-                                    'ended' => $eventMappingKey
+                            $t_array[$i_formatted][$pos_array[$eventMappingKey]] = [
+                                'ended' => $eventMappingKey
                             ];
                         } else {
-                            $t_array [$i_formatted] [$pos_array [$eventMappingKey]] = [
-                                    'started' => $eventMappingKey
+                            $t_array[$i_formatted][$pos_array[$eventMappingKey]] = [
+                                'started' => $eventMappingKey
                             ];
                         }
                     } else {
-                        for ($j = 0; $j < $nbrGridCols; $j ++) {
-                            if (count($t_array [$i_formatted] [$j]) == 0 || ! isset($t_array [$i_formatted] [$j])) {
-                                $pos_array [$eventMappingKey] = $j;
-                                $t_array [$i_formatted] [$j] = [
-                                        'begin' => $eventMappingKey
+                        for ($j = 0; $j < $nbrGridCols; $j++) {
+                            if (empty($t_array[$i_formatted][$j])) {
+                                $pos_array[$eventMappingKey] = $j;
+                                $t_array[$i_formatted][$j] = [
+                                    'begin' => $eventMappingKey
                                 ];
                                 break;
                             }
@@ -195,72 +217,91 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
                     }
                 }
             } else {
-                $t_array [$i_formatted] = '';
+                $t_array[$i_formatted] = '';
             }
 
             $i->addSeconds($gridLength * 60);
         }
 
-        $sims ['###EVENTS_COLUMN###'] = $this->renderEventsColumn($eventArray, $d_start, $d_end, $viewArray, $t_array, $positionArray);
+        $sims['###EVENTS_COLUMN###'] = $this->renderEventsColumn(
+            $eventArray,
+            $d_start,
+            $d_end,
+            $viewArray,
+            $t_array,
+            $positionArray
+        );
     }
-    private function renderEventsColumn(&$eventArray, &$d_start, &$d_end, &$view_array, &$t_array, &$positionArray)
-    {
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        $gridLength = $conf ['day.'] ['gridLength'];
 
-        $cal_time_obj = new \TYPO3\CMS\Cal\Model\CalDate($this->getYmd() . '000000');
-        $cal_time_obj->setTZbyId('UTC');
-        $eventCounter = 0;
+    /**
+     * @param $eventArray
+     * @param $d_start
+     * @param $d_end
+     * @param $view_array
+     * @param $t_array
+     * @param $positionArray
+     * @return string
+     */
+    private function renderEventsColumn(
+        &$eventArray,
+        &$d_start,
+        &$d_end,
+        &$view_array,
+        &$t_array,
+        &$positionArray
+    ): string {
+        $daydisplay = '';
+        $conf = &Registry::Registry('basic', 'conf');
+
+        $cal_time_obj = new CalDate($this->getYmd() . '000000');
+        $cal_time_obj->setTZbyID('UTC');
         foreach ($t_array as $cal_time => $val) {
             preg_match('/([0-9]{2})([0-9]{2})/', $cal_time, $dTimeStart);
-            $cal_time_obj->setHour($dTimeStart [1]);
-            $cal_time_obj->setMinute($dTimeStart [2]);
-            $key = $cal_time_obj->format($conf ['view.'] [$conf ['view'] . '.'] ['timeFormatDay']);
+            $cal_time_obj->setHour($dTimeStart[1]);
+            $cal_time_obj->setMinute($dTimeStart[2]);
 
-            if ($val != '' && count($val) > 0) {
-                for ($i = 0; $i < count($val); $i ++) {
-                    if (! empty($val [$i])) {
-                        $keys = array_keys($val [$i]);
-                        switch ($keys [0]) {
-                            case 'begin':
-                                $event = &$eventArray [$val [$i] [$keys [0]]];
-                                $eventContent = $event->renderEventFor($conf ['view']);
-                                $colSpan = $positionArray [$val [$i] [$keys [0]]];
-                                // left
-                                // 1 = 0
-                                // 2 = 50
-                                // 3 = 33.333
-                                // 4 = 25
+            if ($val !== '' && count($val) > 0) {
+                for ($i = 0, $iMax = count($val); $i < $iMax; $i++) {
+                    if (!empty($val[$i])) {
+                        $keys = array_keys($val[$i]);
+                        if ($keys[0] === 'begin') {
+                            $event = &$eventArray[$val[$i][$keys[0]]];
+                            $eventContent = $event->renderEventFor($conf['view']);
+                            $colSpan = $positionArray[$val[$i][$keys[0]]];
+                            // left
+                            // 1 = 0
+                            // 2 = 50
+                            // 3 = 33.333
+                            // 4 = 25
 
-                                $left = 0;
-                                if ($colSpan > 1) {
-                                    $left = 100 / $colSpan * $i;
-                                }
+                            $left = 0;
+                            if ($colSpan > 1) {
+                                $left = 100 / $colSpan * $i;
+                            }
 
-                                // width
-                                // 1 = 100
-                                // 2 = 85,50
-                                // 3 = 56.666, 56.666, 33.333
-                                // 4 = 42.5, 42.5, 42.5, 25
-                                // 5 = 34,34,34,34,20
+                            // width
+                            // 1 = 100
+                            // 2 = 85,50
+                            // 3 = 56.666, 56.666, 33.333
+                            // 4 = 42.5, 42.5, 42.5, 25
+                            // 5 = 34,34,34,34,20
 
-                                $width = 100;
-                                if ($colSpan > 1) {
-                                    $width = 135 / $colSpan;
-                                }
+                            $width = 100;
+                            if ($colSpan > 1) {
+                                $width = 135 / $colSpan;
+                            }
 
-                                // TODO: move this into a hook
-                                $eventContent = str_replace([
-                                        '***LEFT***',
-                                        '***WIDTH***'
-                                ], [
-                                        $left,
-                                        $width
-                                ], $eventContent);
+                            // TODO: move this into a hook
+                            $eventContent = str_replace([
+                                '***LEFT***',
+                                '***WIDTH***'
+                            ], [
+                                $left,
+                                $width
+                            ], $eventContent);
 
-                                $daydisplay .= $eventContent;
-                                // End event drawing
-                                break;
+                            $daydisplay .= $eventContent;
+                            // End event drawing
                         }
                     }
                 }
@@ -268,6 +309,14 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         }
         return $daydisplay;
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDayClassesMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $classes = 'day weekday' . $this->getWeekdayNumber();
@@ -277,111 +326,183 @@ class NewDayView extends \TYPO3\CMS\Cal\View\NewTimeView
         if ($this->selected) {
             $classes .= ' selectedDay';
         }
-        if (! empty($this->events) || $this->hasAlldayEvents) {
+        if (!empty($this->events) || $this->hasAlldayEvents) {
             $classes .= ' withEventDay';
         }
-        if (intval($this->getParentMonth()) != intval($this->getMonth())) {
+        if (intval($this->getParentMonth()) !== intval($this->getMonth())) {
             $classes .= ' monthOff';
         }
 
-        $sims ['###DAY_CLASSES###'] = $classes;
+        $sims['###DAY_CLASSES###'] = $classes;
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDayTitleMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAY_TITLE###'] = $this->getWeekdayString($this->time, $view);
+        $sims['###DAY_TITLE###'] = $this->getWeekdayString($this->time);
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getDayLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $sims ['###DAY_LINK###'] = $this->getDayLink($view, $this->time);
+        $sims['###DAY_LINK###'] = $this->getDayLink($view, $this->time);
     }
+
+    /**
+     * @param $view
+     * @param $value
+     * @param bool $hasEvent
+     * @return mixed
+     */
     public function getDayLink($view, $value, $hasEvent = false)
     {
-        $rightsObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'rightscontroller');
-        $conf = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'conf');
-        $dayLinkViewTarget = $conf ['view.'] ['dayLinkTarget'];
+        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $conf = &Registry::Registry('basic', 'conf');
+        $dayLinkViewTarget = $conf['view.']['dayLinkTarget'];
         $isAllowedToCreateEvent = $rightsObj->isAllowedToCreateEvent();
 
         $local_cObj = &$this->getLocalCObject();
         $local_cObj->setCurrentVal($value);
-        $local_cObj->data ['view'] = $dayLinkViewTarget;
-        $local_cObj->data ['link_timestamp'] = $value;
-        $controller = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'controller');
+        $local_cObj->data['view'] = $dayLinkViewTarget;
+        $local_cObj->data['link_timestamp'] = $value;
+        $controller = &Registry::Registry('basic', 'controller');
 
-        if (($rightsObj->isViewEnabled($dayLinkViewTarget) || $conf ['view.'] [$dayLinkViewTarget . '.'] [$dayLinkViewTarget . 'ViewPid']) && (! empty($this->events) || $hasEvent || $this->hasAlldayEvents || $isAllowedToCreateEvent)) {
-            $controller->getParametersForTyposcriptLink($local_cObj->data, [
+        if (($hasEvent || !empty($this->events) || $this->hasAlldayEvents || $isAllowedToCreateEvent) && ($rightsObj->isViewEnabled($dayLinkViewTarget) || $conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid'])) {
+            $controller->getParametersForTyposcriptLink(
+                $local_cObj->data,
+                [
                     'getdate' => $this->getYmd(),
                     'view' => $dayLinkViewTarget,
                     $controller->getPointerName() => null
-            ], $conf ['cache'], $conf ['clear_anyway'], $conf ['view.'] [$dayLinkViewTarget . '.'] [$dayLinkViewTarget . 'ViewPid']);
+                ],
+                $conf['cache'],
+                $conf['clear_anyway'],
+                $conf['view.'][$dayLinkViewTarget . '.'][$dayLinkViewTarget . 'ViewPid']
+            );
         }
-        return $local_cObj->cObjGetSingle($conf ['view.'] [$view . '.'] [$dayLinkViewTarget . 'ViewLink'], $conf ['view.'] [$view . '.'] [$dayLinkViewTarget . 'ViewLink.']);
+        return $local_cObj->cObjGetSingle(
+            $conf['view.'][$view . '.'][$dayLinkViewTarget . 'ViewLink'],
+            $conf['view.'][$view . '.'][$dayLinkViewTarget . 'ViewLink.']
+        );
     }
+
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $wrapped
+     * @param $view
+     */
     public function getAlldayMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $content = '';
         $timeKeys = array_keys($this->events);
         foreach ($timeKeys as $timeKey) {
-            $eventKeys = array_keys($this->events [$timeKey]);
+            $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
-                if ($this->events [$timeKey] [$eventKey]->isAllday() || ($this->events [$timeKey] [$eventKey]->getStart()->format('%Y%m%d') != $this->events [$timeKey] [$eventKey]->getEnd()->format('%Y%m%d'))) {
-                    $content .= $this->events [$timeKey] [$eventKey]->renderEventFor($view);
+                if ($this->events[$timeKey][$eventKey]->isAllday() || ($this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d') !== $this->events[$timeKey][$eventKey]->getEnd()->format('%Y%m%d'))) {
+                    $content .= $this->events[$timeKey][$eventKey]->renderEventFor($view);
                 }
             }
         }
-        if ($content == '' && ($view == 'week' || $view == 'day')) {
+        if ($content === '' && ($view === 'week' || $view === 'day')) {
             $content = '<td class="st-c st-s">&nbsp;</td>';
         }
-        $sims ['###ALLDAY###'] = $content;
+        $sims['###ALLDAY###'] = $content;
     }
+
+    /**
+     * @param $dateObject
+     */
     public function setCurrent(&$dateObject)
     {
-        if ($this->getDay() == $dateObject->day && $this->getMonth() == $dateObject->month && $this->getYear() == $dateObject->year) {
+        if ($this->getDay() === $dateObject->day && $this->getMonth() === $dateObject->month && $this->getYear() === $dateObject->year) {
             $this->current = true;
         }
     }
+
+    /**
+     * @param $dateObject
+     */
     public function setSelected(&$dateObject)
     {
-        if ($this->getDay() == $dateObject->day && $this->getMonth() == $dateObject->month && $this->getYear() == $dateObject->year) {
+        if ($this->getDay() === $dateObject->day && $this->getMonth() === $dateObject->month && $this->getYear() === $dateObject->year) {
             $this->selected = true;
         }
     }
 
-    public function getTime()
+    /**
+     * @return int
+     */
+    public function getTime(): int
     {
         return $this->time;
     }
 
+    /**
+     * @return mixed
+     */
     public function getYmd()
     {
         return $this->Ymd;
     }
 
+    /**
+     * @param $ymd
+     */
     public function setYmd($ymd)
     {
         $this->Ymd = $ymd;
     }
 
-    public function getEvents()
+    /**
+     * @return array
+     */
+    public function getEvents(): array
     {
         return $this->events;
     }
 
+    /**
+     * @param $events
+     */
     public function setEvents($events)
     {
         $this->events = $events;
     }
 
-    public function getHasAlldayEvents()
+    /**
+     * @return bool
+     */
+    public function getHasAlldayEvents(): bool
     {
         return $this->hasAlldayEvents;
     }
 
+    /**
+     * @param $hasAlldayEvents
+     */
     public function setHasAlldayEvents($hasAlldayEvents)
     {
         $this->hasAlldayEvents = $hasAlldayEvents;
     }
 
-    public function hasEvents()
+    /**
+     * @return bool
+     */
+    public function hasEvents(): bool
     {
         return !empty($this->getEvents()) || $this->getHasAlldayEvents();
     }

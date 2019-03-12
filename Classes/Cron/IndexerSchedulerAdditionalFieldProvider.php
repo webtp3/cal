@@ -14,7 +14,6 @@ use TYPO3\CMS\Scheduler\Task\AbstractTask;
 
 /**
  * Additional BE fields for cal recurring event indexer task.
- *
  */
 class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProviderInterface
 {
@@ -23,17 +22,33 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * Add additional fields
      *
      * @param array $taskInfo Reference to the array containing the info used in the add/edit form
-     * @param AbstractTask|NULL $task When editing, reference to the current task. NULL when adding.
+     * @param AbstractTask|null $task When editing, reference to the current task. NULL when adding.
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    public function getAdditionalFields(array &$taskInfo, $task, SchedulerModuleController $parentObject)
+    public function getAdditionalFields(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         $additionalFields = [];
-        $additionalFields['task_eventIndexer_eventFolder'] = $this->getEventFolderAdditionalField($taskInfo, $task, $parentObject);
-        $additionalFields['task_eventIndexer_typoscriptPage'] = $this->getTyposcriptPageAdditionalField($taskInfo, $task, $parentObject);
-        $additionalFields['task_eventIndexer_starttime'] = $this->getStarttimeAdditionalField($taskInfo, $task, $parentObject);
-        $additionalFields['task_eventIndexer_endtime'] = $this->getEndtimeAdditionalField($taskInfo, $task, $parentObject);
+        $additionalFields['task_eventIndexer_eventFolder'] = $this->getEventFolderAdditionalField(
+            $taskInfo,
+            $task,
+            $parentObject
+        );
+        $additionalFields['task_eventIndexer_typoscriptPage'] = $this->getTyposcriptPageAdditionalField(
+            $taskInfo,
+            $task,
+            $parentObject
+        );
+        $additionalFields['task_eventIndexer_starttime'] = $this->getStarttimeAdditionalField(
+            $taskInfo,
+            $task,
+            $parentObject
+        );
+        $additionalFields['task_eventIndexer_endtime'] = $this->getEndtimeAdditionalField(
+            $taskInfo,
+            $task,
+            $parentObject
+        );
         return $additionalFields;
     }
 
@@ -41,11 +56,11 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * Add an input field for event folders.
      *
      * @param array $taskInfo Reference to the array containing the info used in the add/edit form
-     * @param AbstractTask|NULL $task When editing, reference to the current task. NULL when adding.
+     * @param AbstractTask|null $task When editing, reference to the current task. NULL when adding.
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    protected function getEventFolderAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject)
+    protected function getEventFolderAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         $fieldName = 'tx_scheduler[cal_eventIndexer_eventFolder]';
         $fieldId = 'task_eventIndexer_eventFolder';
@@ -63,20 +78,23 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * Add an input field for the typoscript page.
      *
      * @param array $taskInfo Reference to the array containing the info used in the add/edit form
-     * @param AbstractTask|NULL $task When editing, reference to the current task. NULL when adding.
+     * @param AbstractTask|null $task When editing, reference to the current task. NULL when adding.
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    protected function getTyposcriptPageAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject)
-    {
+    protected function getTyposcriptPageAdditionalField(
+        array &$taskInfo,
+        $task,
+        SchedulerModuleController $parentObject
+    ): array {
         $fieldName = 'tx_scheduler[cal_eventIndexer_typoscriptPage]';
         $fieldId = 'task_eventIndexer_typoscriptPage';
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->typoscriptPage . '" />';
         $fieldConfiguration = [
-                'code' => $fieldHtml,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:tableHeader2',
-                'cshKey' => '',
-                'cshLabel' => $fieldId
+            'code' => $fieldHtml,
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:tableHeader2',
+            'cshKey' => '',
+            'cshLabel' => $fieldId
         ];
         return $fieldConfiguration;
     }
@@ -85,20 +103,20 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * Add an input field for the starttime.
      *
      * @param array $taskInfo Reference to the array containing the info used in the add/edit form
-     * @param AbstractTask|NULL $task When editing, reference to the current task. NULL when adding.
+     * @param AbstractTask|null $task When editing, reference to the current task. NULL when adding.
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    protected function getStarttimeAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject)
+    protected function getStarttimeAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         $fieldName = 'tx_scheduler[cal_eventIndexer_starttime]';
         $fieldId = 'task_eventIndexer_starttime';
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->starttime . '" />';
         $fieldConfiguration = [
-                'code' => $fieldHtml,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexStart',
-                'cshKey' => '',
-                'cshLabel' => $fieldId
+            'code' => $fieldHtml,
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexStart',
+            'cshKey' => '',
+            'cshLabel' => $fieldId
         ];
         return $fieldConfiguration;
     }
@@ -107,20 +125,20 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * Add an input field for the endtime.
      *
      * @param array $taskInfo Reference to the array containing the info used in the add/edit form
-     * @param AbstractTask|NULL $task When editing, reference to the current task. NULL when adding.
+     * @param AbstractTask|null $task When editing, reference to the current task. NULL when adding.
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return array Array containing all the information pertaining to the additional fields
      */
-    protected function getEndtimeAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject)
+    protected function getEndtimeAdditionalField(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         $fieldName = 'tx_scheduler[cal_eventIndexer_endtime]';
         $fieldId = 'task_eventIndexer_endtime';
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->endtime . '" />';
         $fieldConfiguration = [
-                'code' => $fieldHtml,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexEnd',
-                'cshKey' => '',
-                'cshLabel' => $fieldId
+            'code' => $fieldHtml,
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexEnd',
+            'cshKey' => '',
+            'cshLabel' => $fieldId
         ];
         return $fieldConfiguration;
     }
@@ -132,7 +150,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if validation was ok (or selected class is not relevant), false otherwise
      */
-    public function validateAdditionalFields(array &$submittedData, SchedulerModuleController $parentObject)
+    public function validateAdditionalFields(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $validData = $this->validateEventFolderAdditionalField($submittedData, $parentObject);
         $validData &= $this->validateTyposcriptPageAdditionalField($submittedData, $parentObject);
@@ -148,7 +166,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if data is valid
      */
-    public function validateEventFolderAdditionalField(array &$submittedData, SchedulerModuleController $parentObject)
+    public function validateEventFolderAdditionalField(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $validData = false;
         if (!isset($submittedData['cal_eventIndexer_eventFolder'])) {
@@ -166,8 +184,10 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if data is valid
      */
-    public function validateTyposcriptPageAdditionalField(array &$submittedData, SchedulerModuleController $parentObject)
-    {
+    public function validateTyposcriptPageAdditionalField(
+        array &$submittedData,
+        SchedulerModuleController $parentObject
+    ): bool {
         $validData = false;
         if (!isset($submittedData['cal_eventIndexer_typoscriptPage'])) {
             $validData = true;
@@ -184,7 +204,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if data is valid
      */
-    public function validateStarttimeAdditionalField(array &$submittedData, SchedulerModuleController $parentObject)
+    public function validateStarttimeAdditionalField(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $validData = false;
         if (isset($submittedData['cal_eventIndexer_starttime'])) {
@@ -200,7 +220,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      * @param SchedulerModuleController $parentObject Reference to the calling object (Scheduler's BE module)
      * @return bool True if data is valid
      */
-    public function validateEndtimeAdditionalField(array &$submittedData, SchedulerModuleController $parentObject)
+    public function validateEndtimeAdditionalField(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $validData = false;
         if (isset($submittedData['cal_eventIndexer_endtime'])) {
@@ -214,7 +234,6 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
      *
      * @param array $submittedData Contains data submitted by the user
      * @param AbstractTask $task Reference to the current task object
-     * @return void
      */
     public function saveAdditionalFields(array $submittedData, AbstractTask $task)
     {

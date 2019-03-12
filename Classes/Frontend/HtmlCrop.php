@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Frontend;
 
+use DOMDocument;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -33,25 +35,38 @@ namespace TYPO3\CMS\Cal\Frontend;
  */
 class HtmlCrop
 {
-    public function html_substr2PHP4($content, $conf)
+    /**
+     * @param $content
+     * @param $conf
+     * @return string
+     */
+    public function html_substr2PHP4($content, $conf): string
     {
 
         // The approximate length you want the concatenated text to be
-        $minimum_length = $conf ['minLength'] ? $conf ['minLength'] : 200;
+        $minimum_length = $conf['minLength'] ?: 200;
         // The variation in how long the text can be
         // in this example text length will be between 200-10=190 characters
         // and the character where the last tag ends
         // $length_offset = $conf['lengthOffset'] ? $conf['lengthOffset'] : 10;
 
-        $replaceString = $conf ['replaceString'] ? $conf ['replaceString'] : '...';
+        $replaceString = $conf['replaceString'] ?: '...';
         // Reset tag counter & quote checker
         $doc = domxml_xmltree('<body>' . $content . '</body>');
         $body = $doc->get_elements_by_tagname('body');
         $length = 0;
-        $content = $this->getContentAsStringPHP4($body [0], $length, $minimum_length, $replaceString);
+        $content = $this->getContentAsStringPHP4($body[0], $length, $minimum_length, $replaceString);
         return $content;
     }
-    public function getContentAsStringPHP4($node, &$length, $maxLength = 200, $replaceString = '...')
+
+    /**
+     * @param $node
+     * @param $length
+     * @param int $maxLength
+     * @param string $replaceString
+     * @return string
+     */
+    public function getContentAsStringPHP4($node, &$length, $maxLength = 200, $replaceString = '...'): string
     {
         $st = '';
         if ($length >= $maxLength) {
@@ -78,7 +93,7 @@ class HtmlCrop
                         }
                     }
                     $nodeText = $this->getContentAsString($cnode, $length, $maxLength, $replaceString);
-                    if (empty($nodeText) && ! $attribnodes) {
+                    if (empty($nodeText) && !$attribnodes) {
                         $st .= ' />';
                     } // unary
                     else {
@@ -92,17 +107,23 @@ class HtmlCrop
         }
         return $st;
     }
+
+    /**
+     * @param $content
+     * @param $conf
+     * @return string
+     */
     public function html_substr2PHP5($content, $conf)
     {
 
         // The approximate length you want the concatenated text to be
-        $minimum_length = $conf ['minLength'] ? $conf ['minLength'] : 200;
+        $minimum_length = $conf['minLength'] ?: 200;
         // The variation in how long the text can be
         // in this example text length will be between 200-10=190 characters
         // and the character where the last tag ends
         // $length_offset = $conf['lengthOffset'] ? $conf['lengthOffset'] : 10;
 
-        $replaceString = $conf ['replaceString'] ? $conf ['replaceString'] : '...';
+        $replaceString = $conf['replaceString'] ?: '...';
         // Reset tag counter & quote checker
 
         $doc = new DOMDocument('1.0', 'utf-8');
@@ -114,7 +135,15 @@ class HtmlCrop
             return $content;
         }
     }
-    public function getContentAsStringPHP5($node, &$length, $maxLength = 200, $replaceString = '...')
+
+    /**
+     * @param $node
+     * @param $length
+     * @param int $maxLength
+     * @param string $replaceString
+     * @return string
+     */
+    public function getContentAsStringPHP5($node, &$length, $maxLength = 200, $replaceString = '...'): string
     {
         $st = '';
         if ($length >= $maxLength) {
@@ -141,7 +170,7 @@ class HtmlCrop
                         }
                     }
                     $nodeText = $this->getContentAsStringPHP5($cnode, $length, $maxLength, $replaceString);
-                    if (empty($nodeText) && ! $attribnodes) {
+                    if (empty($nodeText) && !$attribnodes) {
                         $st .= ' />';
                     } // unary
                     else {

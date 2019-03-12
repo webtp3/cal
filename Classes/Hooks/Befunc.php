@@ -8,6 +8,8 @@
 
 namespace TYPO3\CMS\Cal\Hooks;
 
+use TYPO3\CMS\Cal\Model\CalDate;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -24,27 +26,33 @@ namespace TYPO3\CMS\Cal\Hooks;
 /**
  * This hook extends the befunc class.
  * It changes the date values in the list view for tx_cal_event and tx_cal_exception_event
- *
  */
 class Befunc
 {
+    /**
+     * @param $conf
+     */
     public function preprocessvalue(&$conf)
     {
-        if ($conf ['tx_cal_event']) {
-            unset($conf ['eval']);
+        if ($conf['tx_cal_event']) {
+            unset($conf['eval']);
         }
     }
 
-    public function postprocessvalue(&$conf)
+    /**
+     * @param $conf
+     * @return string
+     */
+    public function postprocessvalue(&$conf): string
     {
-        if ($conf ['colConf'] ['tx_cal_event']) {
-            $value = new \TYPO3\CMS\Cal\Model\CalDate($conf ['value'] . '000000');
-            if ($GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['USdateFormat'] == '1') {
-                $conf ['value'] = $value->format('%d.%m.%Y');
+        if ($conf['colConf']['tx_cal_event']) {
+            $value = new CalDate($conf['value'] . '000000');
+            if ((int)$GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] === '1') {
+                $conf['value'] = $value->format('%d.%m.%Y');
             } else {
-                $conf ['value'] = $value->format('%d-%m-%Y');
+                $conf['value'] = $value->format('%d-%m-%Y');
             }
         }
-        return $conf ['value'];
+        return $conf['value'] ?? '';
     }
 }

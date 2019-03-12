@@ -20,29 +20,34 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarModel;
+use TYPO3\CMS\Cal\Model\CategoryModel;
+use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Model\EventRecDeviationModel;
+use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A concrete view for the calendar.
  * It is based on the phpicalendar project
- *
  */
-class IcsView extends \TYPO3\CMS\Cal\View\BaseView
+class IcsView extends BaseView
 {
     public $limitAttendeeToThisEmail = '';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * @param $master_array
+     * @param $getdate
+     * @return mixed
+     */
     public function drawIcsList(&$master_array, $getdate)
     {
         $this->_init($master_array);
-        $page = Functions::getContent($this->conf ['view.'] ['ics.'] ['icsListTemplate']);
-        if ($page == '') {
-            // return '<h3>calendar: no icsListTemplate file found:</h3>'.$this->conf['view.']['ics.']['icsListTemplate'];
-            // falling back to default:
+        $page = Functions::getContent($this->conf['view.']['ics.']['icsListTemplate']);
+        if ($page === '') {
             $page = '<h3>###L_ICSLISTTITLE###:</h3><br />
 <h4>###CALENDAR_LABEL###</h4>
 <!-- ###CALENDARLINK_LOOP### start -->
@@ -58,78 +63,95 @@ class IcsView extends \TYPO3\CMS\Cal\View\BaseView
 ###BACK_LINK###';
         }
 
-        $calendarLinkLoop = $this->cObj->getSubpart($page, '###CALENDARLINK_LOOP###');
-        $return = '';
+        $calendarLinkLoop = $this->markerBasedTemplateService->getSubpart($page, '###CALENDARLINK_LOOP###');
         $page = str_replace('###L_ICSLISTTITLE###', $this->controller->pi_getLL('l_icslist_title'), $page);
         $rememberUid = [];
 
         // by calendar
-        $this->calendarService = $this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $calendarIds = $this->calendarService->getIdsFromTable('', $this->conf ['pidList'], true, true);
+        $this->calendarService = $this->modelObj->getServiceObjByKey(
+            'cal_calendar_model',
+            'calendar',
+            'tx_cal_calendar'
+        );
 
-        $calendarArray = $this->modelObj->findAllCalendar('tx_cal_calendar', $this->conf ['pidList']);
-
-        foreach ($calendarArray ['tx_cal_calendar'] as $calendar) {
+        $calendarArray = $this->modelObj->findAllCalendar('tx_cal_calendar', $this->conf['pidList']);
+        $calendarReturn = '';
+        /** @var CalendarModel $calendar */
+        foreach ($calendarArray['tx_cal_calendar'] as $calendar) {
+            $icslink = '';
             if (is_object($calendar)) {
-                if ($this->conf ['view.'] ['ics.'] ['showIcsLinks'] == 1) {
+                if ((int)$this->conf['view.']['ics.']['showIcsLinks'] === 1) {
                     $this->initLocalCObject($calendar->getValuesAsArray());
                     $this->local_cObj->setCurrentVal($calendar->getTitle());
                     $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
-                            'calendar' => $calendar->getUid(),
-                            'view' => 'ics'
-                    ], $this->conf ['cache'], 1);
-                    $icslink = $this->local_cObj->cObjGetSingle($this->conf ['view.'] ['ics.'] ['icsViewCalendarLink'], $this->conf ['view.'] ['ics.'] ['icsViewCalendarLink.']);
+                        'calendar' => $calendar->getUid(),
+                        'view' => 'ics'
+                    ], $this->conf['cache'], 1);
+                    $icslink = $this->local_cObj->cObjGetSingle(
+                        $this->conf['view.']['ics.']['icsViewCalendarLink'],
+                        $this->conf['view.']['ics.']['icsViewCalendarLink.']
+                    );
                 }
                 $calendarReturn .= str_replace('###LINK###', $icslink, $calendarLinkLoop);
             }
         }
 
-        $categoryLinkLoop = $this->cObj->getSubpart($page, '###CATEGORYLINK_LOOP###');
+        $categoryLinkLoop = $this->markerBasedTemplateService->getSubpart($page, '###CATEGORYLINK_LOOP###');
 
         // by category
-        $categories = $master_array ['tx_cal_category'] [0] [0];
-        foreach ((array) $categories as $category) {
+        $categoryReturn = '';
+        $categories = $master_array['sys_category'][0][0];
+        /** @var CategoryModel $category */
+        foreach ((array)$categories as $category) {
             if (is_object($category)) {
-                if (in_array($category->getUid(), $rememberUid)) {
+                if (in_array($category->getUid(), $rememberUid, true)) {
                     continue;
                 }
                 $icslink = '';
-                if ($this->conf ['view.'] ['ics.'] ['showIcsLinks'] == 1) {
+                if ((int)$this->conf['view.']['ics.']['showIcsLinks'] === 1) {
                     $this->initLocalCObject($category->getValuesAsArray());
                     $this->local_cObj->setCurrentVal($category->getTitle());
                     $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
-                            'category' => $category->getUid(),
-                            'type' => 'tx_cal_phpicalendar',
-                            'view' => 'ics'
-                    ], $this->conf ['cache'], 1);
-                    $icslink = $this->local_cObj->cObjGetSingle($this->conf ['view.'] ['ics.'] ['icsViewCategoryLink'], $this->conf ['view.'] ['ics.'] ['icsViewCategoryLink.']);
+                        'category' => $category->getUid(),
+                        'type' => 'tx_cal_phpicalendar',
+                        'view' => 'ics'
+                    ], $this->conf['cache'], 1);
+                    $icslink = $this->local_cObj->cObjGetSingle(
+                        $this->conf['view.']['ics.']['icsViewCategoryLink'],
+                        $this->conf['view.']['ics.']['icsViewCategoryLink.']
+                    );
                 }
                 $categoryReturn .= str_replace('###LINK###', $icslink, $categoryLinkLoop);
-                $rememberUid [] = $category->getUid();
+                $rememberUid[] = $category->getUid();
             }
         }
 
         $sims = [];
-        $sims ['###CALENDAR_LABEL###'] = $this->controller->pi_getLL('l_calendar');
-        $sims ['###CATEGORY_LABEL###'] = $this->controller->pi_getLL('l_category');
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $sims['###CALENDAR_LABEL###'] = $this->controller->pi_getLL('l_calendar');
+        $sims['###CATEGORY_LABEL###'] = $this->controller->pi_getLL('l_category');
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
         $a = [
-                '###CATEGORYLINK_LOOP###' => $categoryReturn,
-                '###CALENDARLINK_LOOP###' => $calendarReturn
+            '###CATEGORYLINK_LOOP###' => $categoryReturn,
+            '###CALENDARLINK_LOOP###' => $calendarReturn
         ];
         return $this->finish($page, $a);
     }
 
+    /**
+     * @param $master_array
+     * @param $getdate
+     * @param bool $sendHeaders
+     * @param string $limitAttendeeToThisEmail
+     * @return string|string[]|null
+     */
     public function drawIcs(&$master_array, $getdate, $sendHeaders = true, $limitAttendeeToThisEmail = '')
     {
         $this->_init($master_array);
         $this->limitAttendeeToThisEmail = $limitAttendeeToThisEmail;
-        $absFile = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($this->conf ['view.'] ['ics.'] ['icsTemplate']);
-        $page = \TYPO3\CMS\Core\Utility\GeneralUtility::getURL($absFile);
+        $absFile = GeneralUtility::getFileAbsFileName($this->conf['view.']['ics.']['icsTemplate']);
+        $page = GeneralUtility::getUrl($absFile);
 
-        if ($page == '') {
-            // return '<h3>calendar: no ics template file found:</h3>'.$this->conf['view.']['ics.']['icsTemplate'];
-            // falling back to default:
+        if ($page === '') {
             $page = 'BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//TYPO3/NONSGML Calendar Base (cal) V###CAL_VERSION###//EN
@@ -144,65 +166,76 @@ END:VCALENDAR
         $select = 'tx_cal_event_deviation.*,tx_cal_index.start_datetime,tx_cal_index.end_datetime';
         $table = 'tx_cal_event_deviation right outer join tx_cal_index on tx_cal_event_deviation.uid = tx_cal_index.event_deviation_uid';
 
-        $oldView = $this->conf ['view'];
-        $this->conf ['view'] = 'single_ics';
+        $oldView = $this->conf['view'];
+        $this->conf['view'] = 'single_ics';
 
         foreach ($this->master_array as $eventDate => $eventTimeArray) {
-            if (is_subclass_of($eventTimeArray, 'TYPO3\CMS\Cal\Model\Model')) {
+            if (is_subclass_of($eventTimeArray, Model::class)) {
                 $ics_events .= $eventTimeArray->renderEventFor('ics');
             } else {
                 foreach ($eventTimeArray as $key => $eventArray) {
+                    /**
+                     * @var int $eventUid
+                     * @var EventModel $event
+                     */
                     foreach ($eventArray as $eventUid => $event) {
                         if (is_object($event)) {
                             $ics_events .= $event->renderEventFor('ics');
 
                             $where = 'tx_cal_event_deviation.parentid = ' . $event->getUid() . $this->cObj->enableFields('tx_cal_event_deviation');
-                            $deviationResult = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
+                            $deviationResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
                             if ($deviationResult) {
-                                while ($deviationRow = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($deviationResult)) {
-                                    $start = new  \TYPO3\CMS\Cal\Model\CalDate(substr($deviationRow ['start_datetime'], 0, 8));
-                                    $start->setHour(substr($deviationRow ['start_datetime'], 8, 2));
-                                    $start->setMinute(substr($deviationRow ['start_datetime'], 10, 2));
-                                    $start->setTZbyId('UTC');
-                                    $end = new  \TYPO3\CMS\Cal\Model\CalDate(substr($deviationRow ['end_datetime'], 0, 8));
-                                    $end->setHour(substr($deviationRow ['end_datetime'], 8, 2));
-                                    $end->setMinute(substr($deviationRow ['end_datetime'], 10, 2));
-                                    $end->setTZbyId('UTC');
-                                    unset($deviationRow ['start_datetime']);
-                                    unset($deviationRow ['end_datetime']);
-                                    $new_event = new \TYPO3\CMS\Cal\Model\EventRecDeviationModel($event, $deviationRow, $start, $end);
+                                while ($deviationRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($deviationResult)) {
+                                    $start = new  CalDate(substr(
+                                        $deviationRow['start_datetime'],
+                                        0,
+                                        8
+                                    ));
+                                    $start->setHour(substr($deviationRow['start_datetime'], 8, 2));
+                                    $start->setMinute(substr($deviationRow['start_datetime'], 10, 2));
+                                    $start->setTZbyID('UTC');
+                                    $end = new  CalDate(substr(
+                                        $deviationRow['end_datetime'],
+                                        0,
+                                        8
+                                    ));
+                                    $end->setHour(substr($deviationRow['end_datetime'], 8, 2));
+                                    $end->setMinute(substr($deviationRow['end_datetime'], 10, 2));
+                                    $end->setTZbyID('UTC');
+                                    unset($deviationRow['start_datetime'], $deviationRow['end_datetime']);
+                                    $new_event = new EventRecDeviationModel(
+                                        $event,
+                                        $deviationRow,
+                                        $start,
+                                        $end
+                                    );
                                     $ics_events .= $new_event->renderEventFor('ics');
                                 }
-                                $GLOBALS ['TYPO3_DB']->sql_free_result($deviationResult);
+                                $GLOBALS['TYPO3_DB']->sql_free_result($deviationResult);
                             }
                         }
                     }
                 }
             }
         }
-        $this->conf ['view'] = $oldView;
+        $this->conf['view'] = $oldView;
 
         $rems = [];
-        $rems ['###EVENT###'] = strip_tags($ics_events);
+        $rems['###EVENT###'] = strip_tags($ics_events);
         $title = '';
-        if (! empty($this->master_array)) {
-            if (is_subclass_of($this->master_array [0], 'TYPO3\CMS\Cal\Model\Model')) {
-                $title = $this->master_array [0]->getTitle();
-            } else {
-                $title = $this->appendCalendarTitle($title);
-                $title = $this->appendCategoryTitle($title);
-            }
+        if (!empty($this->master_array) && is_subclass_of($this->master_array[0], Model::class)) {
+            $title = $this->master_array[0]->getTitle();
         } else {
             $title = $this->appendCalendarTitle($title);
             $title = $this->appendCategoryTitle($title);
         }
-        if ($title == '') {
+        if ($title === '') {
             $title = $getdate;
         }
         $title .= '.ics';
         $title = strtr($title, [
-                ' ' => '',
-                ',' => '_'
+            ' ' => '',
+            ',' => '_'
         ]);
 
         if ($sendHeaders) {
@@ -213,28 +246,35 @@ END:VCALENDAR
             header('Pragma: ');
             header('Cache-Control:');
         }
-        include(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cal') . 'ext_emconf.php');
+        include ExtensionManagementUtility::extPath('cal') . 'ext_emconf.php';
         $myem_conf = array_pop($EM_CONF);
         $method = 'PUBLISH';
         if ($this->limitAttendeeToThisEmail) {
             $method = 'REQUEST';
         }
 
-        $return = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [
-                '###CAL_VERSION###' => $myem_conf ['version'],
-                '###METHOD###' => $method,
-                '###TIMEZONE###' => $this->cObj->cObjGetSingle($this->conf ['view.'] ['ics.'] ['timezone'], $this->conf ['view.'] ['ics.'] ['timezone.'])
+        $return = Functions::substituteMarkerArrayNotCached($page, [
+            '###CAL_VERSION###' => $myem_conf['version'],
+            '###METHOD###' => $method,
+            '###TIMEZONE###' => $this->cObj->cObjGetSingle(
+                $this->conf['view.']['ics.']['timezone'],
+                $this->conf['view.']['ics.']['timezone.']
+            )
         ], $rems, []);
-        return \TYPO3\CMS\Cal\Utility\Functions::removeEmptyLines($return);
+        return Functions::removeEmptyLines($return);
     }
 
-    private function appendCalendarTitle($title)
+    /**
+     * @param string $title
+     * @return string
+     */
+    private function appendCalendarTitle($title): string
     {
-        if ($this->controller->piVars ['calendar']) {
-            foreach (explode(',', $this->controller->piVars ['calendar']) as $calendarId) {
-                $calendar = $this->modelObj->findCalendar($calendarId, 'tx_cal_calendar', $this->conf ['pidList']);
+        if ($this->controller->piVars['calendar']) {
+            foreach (explode(',', $this->controller->piVars['calendar']) as $calendarId) {
+                $calendar = $this->modelObj->findCalendar($calendarId, 'tx_cal_calendar', $this->conf['pidList']);
                 if (is_object($calendar)) {
-                    if ($title != '') {
+                    if ($title !== '') {
                         $title .= '_';
                     }
                     $title .= $calendar->getTitle();
@@ -244,13 +284,17 @@ END:VCALENDAR
         return $title;
     }
 
-    private function appendCategoryTitle($title)
+    /**
+     * @param string $title
+     * @return string
+     */
+    private function appendCategoryTitle($title): string
     {
-        if ($this->controller->piVars ['category']) {
-            foreach (explode(',', $this->controller->piVars ['category']) as $categoryId) {
-                $category = $this->modelObj->findCategory($categoryId, 'tx_cal_category', $this->conf ['pidList']);
+        if ($this->controller->piVars['category']) {
+            foreach (explode(',', $this->controller->piVars['category']) as $categoryId) {
+                $category = $this->modelObj->findCategory($categoryId, 'sys_category', $this->conf['pidList']);
                 if (is_object($category)) {
-                    if ($title != '') {
+                    if ($title !== '') {
                         $title .= '_';
                     }
                     $title .= $category->getTitle();

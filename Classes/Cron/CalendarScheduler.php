@@ -19,16 +19,9 @@ class CalendarScheduler extends AbstractTask
     public $uid;
 
     /**
-     * PHP4 wrapper for constructor,
-     * have to be here even though the constructor is not defined in the derived class,
-     * else the constructor of the parent class will not be called in PHP4
+     * @return bool
      */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function execute()
+    public function execute(): bool
     {
         $success = true;
         $service = new ICalendarService();
@@ -37,11 +30,17 @@ class CalendarScheduler extends AbstractTask
         return $success;
     }
 
+    /**
+     * @return mixed
+     */
     public function getUID()
     {
         return $this->uid;
     }
 
+    /**
+     * @param $uid
+     */
     public function setUID($uid)
     {
         $this->uid = $uid;

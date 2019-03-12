@@ -8,6 +8,9 @@
 
 namespace TYPO3\CMS\Cal\Model;
 
+use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Class representing iCalendar files.
  *
@@ -49,6 +52,7 @@ define('TX_MODEL_CALICALENDAR_ITIP_REQUEST', 1);
 define('TX_MODEL_CALICALENDAR_ITIP_CANCEL', 2);
 
 define('TX_MODEL_CALICALENDAR_ERROR_FB_NOT_FOUND', 1);
+
 class ICalendar
 {
     public $_calscale = '';
@@ -103,17 +107,17 @@ class ICalendar
      * Return a reference to a new component.
      *
      * @param string $type
-     *        	The type of component to return
+     *            The type of component to return
      * @param Horde_iCalendar $container
-     *        	A container that this component
-     *        	will be associated with.
+     *            A container that this component
+     *            will be associated with.
      *
      * @return object Reference to a Horde_iCalendar_* object as specified.
      */
     public function newComponent($type, &$container)
     {
         $type = strtolower($type);
-        $class = '\\TYPO3\\CMS\\Cal\\Model\\ICalendar\\' . $type;
+        $class = __CLASS__ . $type;
         if (class_exists($class)) {
             $component = new $class();
             if ($container !== false) {
@@ -130,19 +134,19 @@ class ICalendar
      * Set the value of an attribute.
      *
      * @param string $name
-     *        	The name of the attribute.
+     *            The name of the attribute.
      * @param string $value
-     *        	The value of the attribute.
+     *            The value of the attribute.
      * @param array $params
-     *        	Array containing any addition parameters for
-     *        	this attribute.
+     *            Array containing any addition parameters for
+     *            this attribute.
      * @param bool $append
-     *        	True to append the attribute, False to replace
-     *        	the first matching attribute found.
+     *            True to append the attribute, False to replace
+     *            the first matching attribute found.
      * @param array $values
-     *        	Array representation of $value. For
-     *        	comma/semicolon seperated lists of values. If
-     *        	not set use $value as single array element.
+     *            Array representation of $value. For
+     *            comma/semicolon seperated lists of values. If
+     *            not set use $value as single array element.
      */
     public function setAttribute($name, $value, $params = [], $append = true, $values = false)
     {
@@ -155,31 +159,31 @@ class ICalendar
             }
         }
 
-        if (! $values) {
+        if (!$values) {
             $values = [
-                    $value
+                $value
             ];
         }
         $found = false;
-        if (! $append) {
+        if (!$append) {
             $keys = array_keys($this->_attributes);
             foreach ($keys as $key) {
-                if ($this->_attributes [$key] ['name'] == String::upper($name)) {
-                    $this->_attributes [$key] ['params'] = $params;
-                    $this->_attributes [$key] ['value'] = $value;
-                    $this->_attributes [$key] ['values'] = $values;
+                if ($this->_attributes[$key]['name'] == String::upper($name)) {
+                    $this->_attributes[$key]['params'] = $params;
+                    $this->_attributes[$key]['value'] = $value;
+                    $this->_attributes[$key]['values'] = $values;
                     $found = true;
                     break;
                 }
             }
         }
 
-        if ($append || ! $found) {
-            $this->_attributes [] = [
-                    'name' => strtoupper($name),
-                    'params' => $params,
-                    'value' => $value,
-                    'values' => $values
+        if ($append || !$found) {
+            $this->_attributes[] = [
+                'name' => strtoupper($name),
+                'params' => $params,
+                'value' => $value,
+                'values' => $values
             ];
         }
     }
@@ -190,18 +194,18 @@ class ICalendar
      * parameter set is merged into the existing set.
      *
      * @param string $name
-     *        	The name of the attribute.
+     *            The name of the attribute.
      * @param array $params
-     *        	Array containing any additional parameters for
-     *        	this attribute.
+     *            Array containing any additional parameters for
+     *            this attribute.
      * @return bool True on success, false if no attribute $name exists.
      */
-    public function setParameter($name, $params)
+    public function setParameter($name, $params): bool
     {
         $keys = array_keys($this->_attributes);
         foreach ($keys as $key) {
-            if ($this->_attributes [$key] ['name'] == $name) {
-                $this->_attributes [$key] ['params'] = array_merge($this->_attributes [$key] ['params'], $params);
+            if ($this->_attributes[$key]['name'] == $name) {
+                $this->_attributes[$key]['params'] = array_merge($this->_attributes[$key]['params'], $params);
                 return true;
             }
         }
@@ -213,10 +217,10 @@ class ICalendar
      * Get the value of an attribute.
      *
      * @param string $name
-     *        	The name of the attribute.
+     *            The name of the attribute.
      * @param bool $params
-     *        	Return the parameters for this attribute instead
-     *        	of its value.
+     *            Return the parameters for this attribute instead
+     *            of its value.
      *
      * @return mixed (object) PEAR_Error if the attribute does not exist.
      *         (string) The value of the attribute.
@@ -227,23 +231,22 @@ class ICalendar
     {
         $result = [];
         foreach ($this->_attributes as $attribute) {
-            if ($attribute ['name'] == $name) {
+            if ($attribute['name'] == $name) {
                 if ($params) {
-                    $result [] = $attribute ['params'];
+                    $result[] = $attribute['params'];
                 } else {
-                    $result [] = $attribute ['value'];
+                    $result[] = $attribute['value'];
                 }
             }
         }
-        if (! count($result)) {
+        if (!count($result)) {
             // require_once 'PEAR.php';
             return null;
         }
-        if (count($result) == 1 && ! $params) {
-            return $result [0];
-        } else {
-            return $result;
+        if (count($result) == 1 && !$params) {
+            return $result[0];
         }
+        return $result;
     }
 
     /**
@@ -258,7 +261,7 @@ class ICalendar
      * will return array('a','b','c').
      *
      * @param string $name
-     *        	The name of the attribute.
+     *            The name of the attribute.
      * @return mixed (object) PEAR_Error if the attribute does not exist.
      *         (array) Multiple values for an attribute.
      */
@@ -266,23 +269,22 @@ class ICalendar
     {
         $result = [];
         foreach ($this->_attributes as $attribute) {
-            if ($attribute ['name'] == $name) {
+            if ($attribute['name'] == $name) {
                 if ($params) {
-                    $result [] = $attribute ['params'];
+                    $result[] = $attribute['params'];
                 } else {
-                    $result [] = $attribute ['value'];
+                    $result[] = $attribute['value'];
                 }
             }
         }
-        if (! count($result)) {
-            /* @todo 	What should we do when we have an error? */
+        if (!count($result)) {
+            /* @todo    What should we do when we have an error? */
             // return PEAR::raiseError('Attribute ' . $name . ' Not Found');
         }
-        if (count($result) == 1 && ! $params) {
-            return $result [0];
-        } else {
-            return $result;
+        if (count($result) == 1 && !$params) {
+            return $result[0];
         }
+        return $result;
     }
 
     /**
@@ -297,7 +299,7 @@ class ICalendar
      * will return array('a','b','c').
      *
      * @param string $name
-     *        	The name of the parameter.
+     *            The name of the parameter.
      * @return mixed (object) PEAR_Error if the parameter does not exist.
      *         (array) Multiple values for an attribute.
      */
@@ -305,12 +307,12 @@ class ICalendar
     {
         $result = [];
         foreach ($this->_attributes as $attribute) {
-            if ($attribute ['name'] == $name) {
-                $result = array_merge($attribute ['params'], $result);
+            if ($attribute['name'] == $name) {
+                $result = array_merge($attribute['params'], $result);
             }
         }
-        if (! count($result)) {
-            /* @todo 	What should we do when we have an error? */
+        if (!count($result)) {
+            /* @todo    What should we do when we have an error? */
             // return PEAR::raiseError('Parameter ' . $name . ' Not Found');
         }
         return $result;
@@ -321,10 +323,10 @@ class ICalendar
      * if the attribute does not exist.
      *
      * @param string $name
-     *        	The name of the attribute.
+     *            The name of the attribute.
      * @param mixed $default
-     *        	What to return if the attribute specified by
-     *        	$name does not exist.
+     *            What to return if the attribute specified by
+     *            $name does not exist.
      *
      * @return mixed (string) The value of $name.
      *         (mixed) $default if $name does not exist.
@@ -339,14 +341,14 @@ class ICalendar
      * Remove all occurences of an attribute.
      *
      * @param string $name
-     *        	The name of the attribute.
+     *            The name of the attribute.
      */
     public function removeAttribute($name)
     {
         $keys = array_keys($this->_attributes);
         foreach ($keys as $key) {
-            if ($this->_attributes [$key] ['name'] == $name) {
-                unset($this->_attributes [$key]);
+            if ($this->_attributes[$key]['name'] == $name) {
+                unset($this->_attributes[$key]);
             }
         }
     }
@@ -355,20 +357,20 @@ class ICalendar
      * Get attributes for all tags or for a given tag.
      *
      * @param string $tag
-     *        	Return attributes for this tag, or all attributes if
-     *        	not given.
+     *            Return attributes for this tag, or all attributes if
+     *            not given.
      *
      * @return array An array containing all the attributes and their types.
      */
-    public function getAllAttributes($tag = false)
+    public function getAllAttributes($tag = false): array
     {
         if ($tag === false) {
             return $this->_attributes;
         }
         $result = [];
         foreach ($this->_attributes as $attribute) {
-            if ($attribute ['name'] == $tag) {
-                $result [] = $attribute;
+            if ($attribute['name'] == $tag) {
+                $result[] = $attribute;
             }
         }
         return $result;
@@ -378,13 +380,13 @@ class ICalendar
      * Add a vCalendar component (eg vEvent, vTimezone, etc.).
      *
      * @param Horde_iCalendar $component
-     *        	Component (subclass) to add.
+     *            Component (subclass) to add.
      */
     public function addComponent($component)
     {
-        if (is_a($component, 'TYPO3\CMS\Cal\Model\ICalendar')) {
+        if (is_a($component, __CLASS__)) {
             $component->_container = &$this;
-            $this->_components [] = &$component;
+            $this->_components[] = &$component;
         }
     }
 
@@ -393,11 +395,12 @@ class ICalendar
      *
      * @return array Array of Horde_iCalendar objects.
      */
-    public function getComponents()
+    public function getComponents(): array
     {
         return $this->_components;
     }
-    public function getType()
+
+    public function getType(): string
     {
         return 'vcalendar';
     }
@@ -408,15 +411,15 @@ class ICalendar
      * @return array Hash with class names Horde_iCalendar_xxx as keys
      *         and number of components of this class as value.
      */
-    public function getComponentClasses()
+    public function getComponentClasses(): array
     {
         $r = [];
         foreach ($this->_components as $c) {
             $cn = strtolower(get_class($c));
-            if (empty($r [$cn])) {
-                $r [$cn] = 1;
+            if (empty($r[$cn])) {
+                $r[$cn] = 1;
             } else {
-                $r [$cn] ++;
+                $r[$cn]++;
             }
         }
 
@@ -428,7 +431,7 @@ class ICalendar
      *
      * @return int Number of components in this container.
      */
-    public function getComponentCount()
+    public function getComponentCount(): int
     {
         return count($this->_components);
     }
@@ -437,18 +440,14 @@ class ICalendar
      * Retrieve a specific component.
      *
      * @param int $idx
-     *        	The index of the object to retrieve.
+     *            The index of the object to retrieve.
      *
      * @return mixed (boolean) False if the index does not exist.
      *         (Horde_iCalendar_*) The requested component.
      */
     public function getComponent($idx)
     {
-        if (isset($this->_components [$idx])) {
-            return $this->_components [$idx];
-        } else {
-            return false;
-        }
+        return $this->_components[$idx] ?? false;
     }
 
     /**
@@ -456,7 +455,7 @@ class ICalendar
      * returns a reference to this component.
      *
      * @param string $type
-     *        	The type of component to find.
+     *            The type of component to find.
      *
      * @return mixed (boolean) False if no subcomponent of the specified
      *         class exists.
@@ -467,8 +466,8 @@ class ICalendar
         $childclass = strtolower($childclass);
         $keys = array_keys($this->_components);
         foreach ($keys as $key) {
-            if (is_a($this->_components [$key], $childclass)) {
-                return $this->_components [$key];
+            if (is_a($this->_components[$key], $childclass)) {
+                return $this->_components[$key];
             }
         }
 
@@ -480,32 +479,32 @@ class ICalendar
      * returns a reference to it.
      *
      * @param string $childclass
-     *        	The type of component to find.
+     *            The type of component to find.
      * @param string $attribute
-     *        	This attribute must be set in the component
-     *        	for it to match.
+     *            This attribute must be set in the component
+     *            for it to match.
      * @param string $value
-     *        	Optional value that $attribute must match.
+     *            Optional value that $attribute must match.
      *
      * @return bool * if no matching subcomponent of
      *         the specified class exists, or a
      *         reference to the requested component.
      */
-    public function &findComponentByAttribute($childclass, $attribute, $value = null)
+    public function &findComponentByAttribute($childclass, $attribute, $value = null): bool
     {
         $childclassB = $childclass;
         $childclass = strtolower($childclass);
         $keys = array_keys($this->_components);
         foreach ($keys as $key) {
-            if (is_a($this->_components [$key], $childclass) || is_a($this->_components [$key], $childclassB)) {
-                $attr = $this->_components [$key]->getAttribute($attribute);
+            if (is_a($this->_components[$key], $childclass) || is_a($this->_components[$key], $childclassB)) {
+                $attr = $this->_components[$key]->getAttribute($attribute);
                 if (is_a($attr, 'PEAR_Error')) {
                     continue;
                 }
                 if ($value !== null && $value != $attr) {
                     continue;
                 }
-                return $this->_components [$key];
+                return $this->_components[$key];
             }
         }
 
@@ -532,7 +531,7 @@ class ICalendar
      *
      * @since Horde 3.1.2
      */
-    public function isOldFormat()
+    public function isOldFormat(): bool
     {
         if ($this->_container !== false) {
             return $this->_container->isOldFormat();
@@ -552,11 +551,11 @@ class ICalendar
     /**
      * Export as vCalendar format.
      */
-    public function exportvCalendar()
+    public function exportvCalendar(): string
     {
         // Default values.
-        $requiredAttributes ['PRODID'] = '-//The TYPO3 Project//cal extension//EN';
-        $requiredAttributes ['METHOD'] = 'PUBLISH';
+        $requiredAttributes['PRODID'] = '-//The TYPO3 Project//cal extension//EN';
+        $requiredAttributes['METHOD'] = 'PUBLISH';
 
         foreach ($requiredAttributes as $name => $default_value) {
             if (is_a($this->getattribute($name), 'PEAR_Error')) {
@@ -571,26 +570,26 @@ class ICalendar
      * Export this entry as a hash array with tag names as keys.
      *
      * @param bool $paramsInKeys
-     *        	If false, the operation can be quite lossy as the
-     *        	parameters are ignored when building the array keys.
-     *        	So if you export a vcard with
-     *        	LABEL;TYPE=WORK:foo
-     *        	LABEL;TYPE=HOME:bar
-     *        	the resulting hash contains only one label field!
-     *        	If set to true, array keys look like 'LABEL;TYPE=WORK'
+     *            If false, the operation can be quite lossy as the
+     *            parameters are ignored when building the array keys.
+     *            So if you export a vcard with
+     *            LABEL;TYPE=WORK:foo
+     *            LABEL;TYPE=HOME:bar
+     *            the resulting hash contains only one label field!
+     *            If set to true, array keys look like 'LABEL;TYPE=WORK'
      * @return array A hash array with tag names as keys.
      */
-    public function toHash($paramsInKeys = false)
+    public function toHash($paramsInKeys = false): array
     {
         $hash = [];
         foreach ($this->_attributes as $a) {
-            $k = $a ['name'];
-            if ($paramsInKeys && is_array($a ['params'])) {
-                foreach ($a ['params'] as $p => $v) {
+            $k = $a['name'];
+            if ($paramsInKeys && is_array($a['params'])) {
+                foreach ($a['params'] as $p => $v) {
                     $k .= ';$p=$v';
                 }
             }
-            $hash [$k] = $a ['value'];
+            $hash[$k] = $a['value'];
         }
 
         return $hash;
@@ -600,25 +599,25 @@ class ICalendar
      * Parses a string containing vCalendar data.
      *
      * @param string $text
-     *        	The data to parse.
+     *            The data to parse.
      * @param string $base
-     *        	The type of the base object.
+     *            The type of the base object.
      * @param string $charset
-     *        	The encoding charset for $text. Defaults to
-     *        	utf-8.
+     *            The encoding charset for $text. Defaults to
+     *            utf-8.
      * @param bool $clear
-     *        	If true clears the iCal object before parsing.
+     *            If true clears the iCal object before parsing.
      *
      * @return bool True on successful import, false otherwise.
      */
-    public function parsevCalendar($text, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    public function parsevCalendar($text, $base = 'VCALENDAR', $charset = 'utf8', $clear = true): bool
     {
         if ($clear) {
             $this->clear();
         }
         $matches = [];
         if (preg_match('/(BEGIN:' . $base . '\r?\n?)([\W\w]*)(END:' . $base . '\r?\n?)/i', $text, $matches)) {
-            $vCal = $matches [2];
+            $vCal = $matches[2];
         } else {
             // Text isn't enclosed in BEGIN:VCALENDAR
             // .. END:VCALENDAR. We'll try to parse it anyway.
@@ -630,8 +629,8 @@ class ICalendar
         if (preg_match_all('/BEGIN:([\W\w]*)(\r\n|\r|\n)([\W\w]*)END:\1(\r\n|\r|\n)/Ui', $vCal, $matches)) {
             // vTimezone components are processed first. They are
             // needed to process vEvents that may use a TZID.
-            foreach ($matches [0] as $key => $data) {
-                $type = trim($matches [1] [$key]);
+            foreach ($matches[0] as $key => $data) {
+                $type = trim($matches[1][$key]);
                 if ($type != 'VTIMEZONE') {
                     continue;
                 }
@@ -648,8 +647,8 @@ class ICalendar
             }
 
             // Now process the non-vTimezone components.
-            foreach ($matches [0] as $key => $data) {
-                $type = trim($matches [1] [$key]);
+            foreach ($matches[0] as $key => $data) {
+                $type = trim($matches[1][$key]);
                 if ($type == 'VTIMEZONE') {
                     continue;
                 }
@@ -675,55 +674,47 @@ class ICalendar
         // another=20line=
         // last=20line
         while (preg_match_all('/^([^:]+;\s*ENCODING=QUOTED-PRINTABLE(.*=\r?\n)+(.*[^=])?\r?\n)/mU', $vCal, $matches)) {
-            foreach ($matches [1] as $s) {
+            foreach ($matches[1] as $s) {
                 $r = preg_replace('/=\r?\n/', '', $s);
                 $vCal = str_replace($s, $r, $vCal);
             }
         }
 
-        if (is_object($GLOBALS ['LANG'])) {
-            $csConvObj = &$GLOBALS ['LANG']->csConvObj;
-        } elseif (is_object($GLOBALS ['TSFE'])) {
-            $csConvObj = &$GLOBALS ['TSFE']->csConvObj;
-        } else {
-            require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('lang') . 'lang.php');
-            $LANG = new language();
-            if (TYPO3_MODE == 'BE') {
-                $LANG->init($GLOBALS['BE_USER']->uc ['lang']);
-                $csConvObj = &$LANG->csConvObj;
-            } else {
-                $LANG->init($GLOBALS ['TSFE']->config ['config'] ['language']);
-                $csConvObj = &$GLOBALS ['TSFE']->csConvObj;
-            }
-        }
-        $renderCharset = $csConvObj->parse_charset($GLOBALS ['TYPO3_CONF_VARS'] ['BE'] ['forceCharset'] ? $GLOBALS ['TYPO3_CONF_VARS'] ['BE'] ['forceCharset'] : $this->defaultCharSet);
+        $csConvObj = GeneralUtility::makeInstance(CharsetConverter::class);
+
+        $renderCharset = $csConvObj->parse_charset($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ?: $this->defaultCharSet);
 
         // Parse the remaining attributes.
         if (preg_match_all('/(.*):([^\r\n]*)[\r\n]+/', $vCal, $matches)) {
-            foreach ($matches [0] as $attribute) {
+            foreach ($matches[0] as $attribute) {
                 $parts = [];
                 preg_match('/([^;^:]*)((;[^:]*)?):([^\r\n]*)[\r\n]*/', $attribute, $parts);
-                $tag = $parts [1];
-                $value = $parts [4];
+                $tag = $parts[1];
+                $value = $parts[4];
                 $params = [];
                 // Parse parameters.
 
-                if (! empty($parts [2])) {
+                if (!empty($parts[2])) {
                     $param_parts = [];
-                    preg_match_all('/;(([^;=]*)(=([^;]*))?)/', $parts [2], $param_parts);
-                    foreach ($param_parts [2] as $key => $paramName) {
-                        $paramValue = $param_parts [4] [$key];
-                        $params [strtoupper($paramName)] = $paramValue;
+                    preg_match_all('/;(([^;=]*)(=([^;]*))?)/', $parts[2], $param_parts);
+                    foreach ($param_parts[2] as $key => $paramName) {
+                        $paramValue = $param_parts[4][$key];
+                        $params[strtoupper($paramName)] = $paramValue;
                     }
                 }
 
                 // Charset and encoding handling.
-                if ((isset($params ['ENCODING']) && strtoupper($params ['ENCODING']) == 'QUOTED-PRINTABLE') || isset($params ['QUOTED-PRINTABLE'])) {
+                if ((isset($params['ENCODING']) && strtoupper($params['ENCODING']) == 'QUOTED-PRINTABLE') || isset($params['QUOTED-PRINTABLE'])) {
                     $value = quoted_printable_decode($value);
 
-                    $value = $csConvObj->conv($value, $csConvObj->parse_charset [$params ['CHARSET']] ? $csConvObj->parse_charset [$params ['CHARSET']] : 'utf-8', $renderCharset, 1);
-                } elseif (isset($params ['CHARSET'])) {
-                    $value = $csConvObj->conv($value, $csConvObj->parse_charset [$params ['CHARSET']], $renderCharset, 1);
+                    $value = $csConvObj->conv(
+                        $value,
+                        $csConvObj->parse_charset[$params['CHARSET']] ?: 'utf-8',
+                        $renderCharset,
+                        1
+                    );
+                } elseif (isset($params['CHARSET'])) {
+                    $value = $csConvObj->conv($value, $csConvObj->parse_charset[$params['CHARSET']], $renderCharset, 1);
                 } else {
                     // As per RFC 2279, assume UTF8 if we don't have an
                     // explicit charset parameter.
@@ -731,7 +722,7 @@ class ICalendar
                 }
 
                 // Get timezone info for date fields from $params.
-                $tzid = isset($params ['TZID']) ? trim($params ['TZID'], '\"') : false;
+                $tzid = isset($params['TZID']) ? trim($params['TZID'], '\"') : false;
 
                 switch ($tag) {
                     // Date fields.
@@ -751,7 +742,7 @@ class ICalendar
                     case 'DUE':
                     case 'AALARM':
                     case 'RECURRENCE-ID':
-                        if (isset($params ['VALUE']) && $params ['VALUE'] == 'DATE') {
+                        if (isset($params['VALUE']) && $params['VALUE'] == 'DATE') {
                             $this->setAttribute($tag, $this->_parseDate($value), $params);
                         } else {
                             $this->setAttribute($tag, $this->_parseDateTime($value, $tzid), $params);
@@ -759,8 +750,8 @@ class ICalendar
                         break;
 
                     case 'TRIGGER':
-                        if (isset($params ['VALUE'])) {
-                            if ($params ['VALUE'] == 'DATE-TIME') {
+                        if (isset($params['VALUE'])) {
+                            if ($params['VALUE'] == 'DATE-TIME') {
                                 $this->setAttribute($tag, $this->_parseDateTime($value, $tzid), $params);
                             } else {
                                 $this->setAttribute($tag, $this->_parseDuration($value), $params);
@@ -785,11 +776,11 @@ class ICalendar
                     case 'FREEBUSY':
                         $periods = [];
                         preg_match_all('/,([^,]*)/', ',' . $value, $values);
-                        foreach ($values [1] as $value) {
-                            $periods [] = $this->_parsePeriod($value);
+                        foreach ($values[1] as $value) {
+                            $periods[] = $this->_parsePeriod($value);
                         }
 
-                        $this->setAttribute($tag, isset($periods [0]) ? $periods [0] : null, $params, true, $periods);
+                        $this->setAttribute($tag, $periods[0] ?? null, $params, true, $periods);
                         break;
 
                     // UTC offset fields.
@@ -809,8 +800,8 @@ class ICalendar
                     // Geo fields.
                     case 'GEO':
                         $floats = explode(';', $value);
-                        $value ['latitude'] = floatval($floats [0]);
-                        $value ['longitude'] = floatval($floats [1]);
+                        $value['latitude'] = floatval($floats[0]);
+                        $value['longitude'] = floatval($floats[1]);
                         $this->setAttribute($tag, $value, $params);
                         break;
 
@@ -829,15 +820,15 @@ class ICalendar
                         // As of rfc 2426 2.4.2 semicolon, comma, and colon must
                         // be escaped (comma is unescaped after splitting below).
                         $value = str_replace([
-                                '\\n',
-                                '\\N',
-                                '\\;',
-                                '\\:'
+                            '\\n',
+                            '\\N',
+                            '\\;',
+                            '\\:'
                         ], [
-                                $this->_newline,
-                                $this->_newline,
-                                ';',
-                                ':'
+                            $this->_newline,
+                            $this->_newline,
+                            ';',
+                            ':'
                         ], $value);
 
                         // Split by unescaped semicolons:
@@ -865,17 +856,17 @@ class ICalendar
                             // colon must be escaped (comma is unescaped after
                             // splitting below).
                             $value = str_replace([
-                                    '\\n',
-                                    '\\N',
-                                    '\\;',
-                                    '\\:',
-                                    '\\\\'
+                                '\\n',
+                                '\\N',
+                                '\\;',
+                                '\\:',
+                                '\\\\'
                             ], [
-                                    $this->_newline,
-                                    $this->_newline,
-                                    ';',
-                                    ':',
-                                    '\\'
+                                $this->_newline,
+                                $this->_newline,
+                                ';',
+                                ':',
+                                '\\'
                             ], $value);
 
                             // Split by unescaped commas:
@@ -896,11 +887,11 @@ class ICalendar
      * Export this component in vCal format.
      *
      * @param string $base
-     *        	The type of the base object.
+     *            The type of the base object.
      *
      * @return string vCal format data.
      */
-    public function _exportvData($base = 'VCALENDAR')
+    public function _exportvData($base = 'VCALENDAR'): string
     {
         $result = 'BEGIN:' . strtoupper($base) . $this->_newline;
 
@@ -911,18 +902,18 @@ class ICalendar
             $result .= 'VERSION:' . $this->_version . $this->_newline;
         }
         foreach ($this->_attributes as $attribute) {
-            $name = $attribute ['name'];
+            $name = $attribute['name'];
             if ($name == 'VERSION') {
                 // Already done.
                 continue;
             }
 
             $params_str = '';
-            $params = $attribute ['params'];
+            $params = $attribute['params'];
             if ($params) {
                 foreach ($params as $param_name => $param_value) {
                     /* Skip CHARSET for iCalendar 2.0 data, not allowed. */
-                    if ($param_name == 'CHARSET' && ! $this->isOldFormat()) {
+                    if ($param_name == 'CHARSET' && !$this->isOldFormat()) {
                         continue;
                     }
                     /* Skip VALUE=DATE for vCalendar 1.0 data, not allowed. */
@@ -938,7 +929,7 @@ class ICalendar
                 }
             }
 
-            $value = $attribute ['value'];
+            $value = $attribute['value'];
             switch ($name) {
                 // Date fields.
                 case 'COMPLETED':
@@ -954,8 +945,8 @@ class ICalendar
                 case 'DUE':
                 case 'AALARM':
                 case 'RECURRENCE-ID':
-                    if (isset($params ['VALUE'])) {
-                        if ($params ['VALUE'] == 'DATE') {
+                    if (isset($params['VALUE'])) {
+                        if ($params['VALUE'] == 'DATE') {
                             $value = $this->_exportDate($value, $name == 'DTEND' ? '235959' : '000000');
                         } else {
                             $value = $this->_exportDateTime($value);
@@ -970,26 +961,26 @@ class ICalendar
                 case 'RDATE':
                     $dates = [];
                     foreach ($value as $date) {
-                        if (isset($params ['VALUE'])) {
-                            if ($params ['VALUE'] == 'DATE') {
-                                $dates [] = $this->_exportDate($date, '000000');
-                            } elseif ($params ['VALUE'] == 'PERIOD') {
-                                $dates [] = $this->_exportPeriod($date);
+                        if (isset($params['VALUE'])) {
+                            if ($params['VALUE'] == 'DATE') {
+                                $dates[] = $this->_exportDate($date, '000000');
+                            } elseif ($params['VALUE'] == 'PERIOD') {
+                                $dates[] = $this->_exportPeriod($date);
                             } else {
-                                $dates [] = $this->_exportDateTime($date);
+                                $dates[] = $this->_exportDateTime($date);
                             }
                         } else {
-                            $dates [] = $this->_exportDateTime($date);
+                            $dates[] = $this->_exportDateTime($date);
                         }
                     }
                     $value = implode(',', $dates);
                     break;
 
                 case 'TRIGGER':
-                    if (isset($params ['VALUE'])) {
-                        if ($params ['VALUE'] == 'DATE-TIME') {
+                    if (isset($params['VALUE'])) {
+                        if ($params['VALUE'] == 'DATE-TIME') {
                             $value = $this->_exportDateTime($value);
-                        } elseif ($params ['VALUE'] == 'DURATION') {
+                        } elseif ($params['VALUE'] == 'DURATION') {
                             $value = $this->_exportDuration($value);
                         }
                     } else {
@@ -1028,7 +1019,7 @@ class ICalendar
 
                 // Geo fields.
                 case 'GEO':
-                    $value = $value ['latitude'] . ',' . $value ['longitude'];
+                    $value = $value['latitude'] . ',' . $value['longitude'];
                     break;
 
                 // Recurrence fields.
@@ -1056,8 +1047,8 @@ class ICalendar
 
                 default:
                     if ($this->isOldFormat()) {
-                        if (is_array($attribute ['values']) && count($attribute ['values']) > 1) {
-                            $values = $attribute ['values'];
+                        if (is_array($attribute['values']) && count($attribute['values']) > 1) {
+                            $values = $attribute['values'];
                             if ($name == 'N' || $name == 'ADR' || $name == 'ORG') {
                                 $glue = ';';
                             } else {
@@ -1080,19 +1071,19 @@ class ICalendar
                         // or QUOTED-PRINTABLE encoded. Currently we use
                         // QUOTED-PRINTABLE as default.
                         // FIXME: deal with base64 encodings!
-                        if (preg_match("/[^\x20-\x7F\r\n]/", $value) && empty($params ['ENCODING'])) {
-                            $params ['ENCODING'] = 'QUOTED-PRINTABLE';
+                        if (preg_match("/[^\x20-\x7F\r\n]/", $value) && empty($params['ENCODING'])) {
+                            $params['ENCODING'] = 'QUOTED-PRINTABLE';
                             $params_str .= ';ENCODING=QUOTED-PRINTABLE';
                             // Add CHARSET as well. At least the synthesis client
                             // gets confused otherwise
-                            if (empty($params ['CHARSET'])) {
-                                $params ['CHARSET'] = NLS::getCharset();
-                                $params_str .= ';CHARSET=' . $params ['CHARSET'];
+                            if (empty($params['CHARSET'])) {
+                                $params['CHARSET'] = NLS::getCharset();
+                                $params_str .= ';CHARSET=' . $params['CHARSET'];
                             }
                         }
                     } else {
-                        if (is_array($attribute ['values']) && count($attribute ['values']) > 1) {
-                            $values = $attribute ['values'];
+                        if (is_array($attribute['values']) && count($attribute['values']) > 1) {
+                            $values = $attribute['values'];
                             if ($name == 'N' || $name == 'ADR' || $name == 'ORG') {
                                 $glue = ';';
                             } else {
@@ -1101,38 +1092,42 @@ class ICalendar
                             // As of rfc 2426 2.5 semicolon and comma must be
                             // escaped.
                             $values = str_replace([
-                                    ';',
-                                    ',',
-                                    '\\'
+                                ';',
+                                ',',
+                                '\\'
                             ], [
-                                    '\\;',
-                                    '\\,',
-                                    '\\\\'
+                                '\\;',
+                                '\\,',
+                                '\\\\'
                             ], $values);
                             $value = implode($glue, $values);
                         } else {
                             // As of rfc 2426 2.5 semicolon and comma must be
                             // escaped.
                             $value = str_replace([
-                                    ';',
-                                    ',',
-                                    '\\'
+                                ';',
+                                ',',
+                                '\\'
                             ], [
-                                    '\\;',
-                                    '\\,',
-                                    '\\\\'
+                                '\\;',
+                                '\\,',
+                                '\\\\'
                             ], $value);
                         }
                     }
                     break;
             }
 
-            if (! empty($params ['ENCODING']) && $params ['ENCODING'] == 'QUOTED-PRINTABLE' && strlen(trim($value)) > 0) {
+            if (!empty($params['ENCODING']) && $params['ENCODING'] == 'QUOTED-PRINTABLE' && strlen(trim($value)) > 0) {
                 $value = str_replace('\r', '', $value);
                 /*
                  * quotedPrintableEncode does not escape CRLFs, but strange enough single LFs. so convert everything to LF only and replace afterwards.
                  */
-                $result .= $name . $params_str . ':=' . $this->_newline . str_replace('=0A', '=0D=0A', $this->_quotedPrintableEncode($value)) . $this->_newline;
+                $result .= $name . $params_str . ':=' . $this->_newline . str_replace(
+                    '=0A',
+                    '=0D=0A',
+                    $this->_quotedPrintableEncode($value)
+                    ) . $this->_newline;
             } else {
                 $attr_string = $name . $params_str . ':' . $value;
                 $result .= $this->_foldLine($attr_string) . $this->_newline;
@@ -1154,27 +1149,26 @@ class ICalendar
         $offset = [];
         $timeParts = [];
         if (preg_match('/(\+|-)([0-9]{2})([0-9]{2})([0-9]{2})?/', $text, $timeParts)) {
-            $offset ['ahead'] = (bool) ($timeParts [1] == '+');
-            $offset ['hour'] = intval($timeParts [2]);
-            $offset ['minute'] = intval($timeParts [3]);
-            if (isset($timeParts [4])) {
-                $offset ['second'] = intval($timeParts [4]);
+            $offset['ahead'] = (bool)($timeParts[1] == '+');
+            $offset['hour'] = intval($timeParts[2]);
+            $offset['minute'] = intval($timeParts[3]);
+            if (isset($timeParts[4])) {
+                $offset['second'] = intval($timeParts[4]);
             }
             return $offset;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
      * Export a UTC Offset field.
      */
-    public function _exportUtcOffset($value)
+    public function _exportUtcOffset($value): string
     {
-        $offset = $value ['ahead'] ? '+' : '-';
-        $offset .= sprintf('%02d%02d', $value ['hour'], $value ['minute']);
-        if (isset($value ['second'])) {
-            $offset .= sprintf('%02d', $value ['second']);
+        $offset = $value['ahead'] ? '+' : '-';
+        $offset .= sprintf('%02d%02d', $value['hour'], $value['minute']);
+        if (isset($value['second'])) {
+            $offset .= sprintf('%02d', $value['second']);
         }
 
         return $offset;
@@ -1187,17 +1181,18 @@ class ICalendar
     {
         $periodParts = explode('/', $text);
 
-        $start = $this->_parseDateTime($periodParts [0]);
+        $start = $this->_parseDateTime($periodParts[0]);
 
-        if ($duration = $this->_parseDuration($periodParts [1])) {
+        if ($duration = $this->_parseDuration($periodParts[1])) {
             return [
-                    'start' => $start,
-                    'duration' => $duration
+                'start' => $start,
+                'duration' => $duration
             ];
-        } elseif ($end = $this->_parseDateTime($periodParts [1])) {
+        }
+        if ($end = $this->_parseDateTime($periodParts[1])) {
             return [
-                    'start' => $start,
-                    'end' => $end
+                'start' => $start,
+                'end' => $end
             ];
         }
     }
@@ -1205,14 +1200,14 @@ class ICalendar
     /**
      * Export a Time Period field.
      */
-    public function _exportPeriod($value)
+    public function _exportPeriod($value): string
     {
-        $period = $this->_exportDateTime($value ['start']);
+        $period = $this->_exportDateTime($value['start']);
         $period .= '/';
-        if (isset($value ['duration'])) {
-            $period .= $this->_exportDuration($value ['duration']);
+        if (isset($value['duration'])) {
+            $period .= $this->_exportDuration($value['duration']);
         } else {
-            $period .= $this->_exportDateTime($value ['end']);
+            $period .= $this->_exportDateTime($value['end']);
         }
         return $period;
     }
@@ -1221,41 +1216,41 @@ class ICalendar
      * Grok the TZID and return an offset in seconds from UTC for this
      * date and time.
      */
-    public function _parseTZID($date, $time, $tzid)
+    public function _parseTZID($date, $time, $tzid): bool
     {
         $vtimezone = $this->_container->findComponentByAttribute('vtimezone', 'TZID', $tzid);
-        if (! $vtimezone) {
+        if (!$vtimezone) {
             return false;
         }
         $change_times = [];
         foreach ($vtimezone->getComponents() as $o) {
-            $t = $vtimezone->parseChild($o, $date ['year']);
+            $t = $vtimezone->parseChild($o, $date['year']);
             if ($t !== false) {
-                $change_times [] = $t;
+                $change_times[] = $t;
             }
         }
 
-        if (! $change_times) {
+        if (!$change_times) {
             return false;
         }
 
         sort($change_times);
 
         // Time is arbitrarily based on UTC for comparison.
-        $t = @gmmktime($time ['hour'], $time ['minute'], $time ['second'], $date ['month'], $date ['mday'], $date ['year']);
+        $t = @gmmktime($time['hour'], $time['minute'], $time['second'], $date['month'], $date['mday'], $date['year']);
 
-        if ($t < $change_times [0] ['time']) {
-            return $change_times [0] ['from'];
+        if ($t < $change_times[0]['time']) {
+            return $change_times[0]['from'];
         }
 
-        for ($i = 0, $n = count($change_times); $i < $n - 1; $i ++) {
-            if (($t >= $change_times [$i] ['time']) && ($t < $change_times [$i + 1] ['time'])) {
-                return $change_times [$i] ['to'];
+        for ($i = 0, $n = count($change_times); $i < $n - 1; $i++) {
+            if (($t >= $change_times[$i]['time']) && ($t < $change_times[$i + 1]['time'])) {
+                return $change_times[$i]['to'];
             }
         }
 
-        if ($t >= $change_times [$n - 1] ['time']) {
-            return $change_times [$n - 1] ['to'];
+        if ($t >= $change_times[$n - 1]['time']) {
+            return $change_times[$n - 1]['to'];
         }
 
         return false;
@@ -1267,32 +1262,46 @@ class ICalendar
     public function _parseDateTime($text, $tzid = false)
     {
         $dateParts = explode('T', $text);
-        if (count($dateParts) != 2 && ! empty($text)) {
+        if (count($dateParts) != 2 && !empty($text)) {
             // Not a datetime field but may be just a date field.
-            if (! $date = $this->_parseDate($text)) {
+            if (!$date = $this->_parseDate($text)) {
                 return $date;
             }
             $newtext = $text . 'T000000';
             $dateParts = explode('T', $newtext);
         }
 
-        if (! $date = $this->_parseDate($dateParts [0])) {
+        if (!$date = $this->_parseDate($dateParts[0])) {
             return $text;
         }
-        if (! $time = $this->_parseTime($dateParts [1])) {
+        if (!$time = $this->_parseTime($dateParts[1])) {
             return $text;
         }
 
         // Get timezone info for date fields from $tzid and container.
-        $tzoffset = ($time ['zone'] == 'Local' && $tzid) ? $this->_parseTZID($date, $time, $tzid) : false;
+        $tzoffset = ($time['zone'] == 'Local' && $tzid) ? $this->_parseTZID($date, $time, $tzid) : false;
 
-        if ($time ['zone'] == 'UTC' || $tzoffset !== false) {
-            $result = @gmmktime($time ['hour'], $time ['minute'], $time ['second'], $date ['month'], $date ['mday'], $date ['year']);
+        if ($time['zone'] == 'UTC' || $tzoffset !== false) {
+            $result = @gmmktime(
+                $time['hour'],
+                $time['minute'],
+                $time['second'],
+                $date['month'],
+                $date['mday'],
+                $date['year']
+            );
             if ($tzoffset) {
                 $result -= $tzoffset;
             }
         } else {
-            $result = @mktime($time ['hour'], $time ['minute'], $time ['second'], $date ['month'], $date ['mday'], $date ['year']);
+            $result = @mktime(
+                $time['hour'],
+                $time['minute'],
+                $time['second'],
+                $date['month'],
+                $date['mday'],
+                $date['year']
+            );
         }
         return ($result !== false) ? $result : $text;
     }
@@ -1300,23 +1309,23 @@ class ICalendar
     /**
      * Export a DateTime field.
      */
-    public function _exportDateTime($value)
+    public function _exportDateTime($value): string
     {
         $temp = [];
-        if (! is_object($value) && ! is_array($value)) {
+        if (!is_object($value) && !is_array($value)) {
             $tz = date('O', $value);
             $TZOffset = (3600 * substr($tz, 0, 3)) + (60 * substr(date('O', $value), 3, 2));
             $value -= $TZOffset;
 
-            $temp ['zone'] = 'UTC';
-            $temp ['year'] = date('Y', $value);
-            $temp ['month'] = date('n', $value);
-            $temp ['mday'] = date('j', $value);
-            $temp ['hour'] = date('G', $value);
-            $temp ['minute'] = date('i', $value);
-            $temp ['second'] = date('s', $value);
+            $temp['zone'] = 'UTC';
+            $temp['year'] = date('Y', $value);
+            $temp['month'] = date('n', $value);
+            $temp['mday'] = date('j', $value);
+            $temp['hour'] = date('G', $value);
+            $temp['minute'] = date('i', $value);
+            $temp['second'] = date('s', $value);
         } else {
-            $dateOb = new \TYPO3\CMS\Cal\Model\CalDate($value);
+            $dateOb = new CalDate($value);
             return self::_exportDateTime($dateOb->timestamp());
         }
 
@@ -1326,31 +1335,30 @@ class ICalendar
     /**
      * Parse a Time field.
      */
-    public function _parseTime($text)
+    public function _parseTime($text): bool
     {
         $timeParts = [];
         if (preg_match('/([0-9]{2})([0-9]{2})([0-9]{2})(Z)?/', $text, $timeParts)) {
-            $time ['hour'] = intval($timeParts [1]);
-            $time ['minute'] = intval($timeParts [2]);
-            $time ['second'] = intval($timeParts [3]);
-            if (isset($timeParts [4])) {
-                $time ['zone'] = 'UTC';
+            $time['hour'] = intval($timeParts[1]);
+            $time['minute'] = intval($timeParts[2]);
+            $time['second'] = intval($timeParts[3]);
+            if (isset($timeParts[4])) {
+                $time['zone'] = 'UTC';
             } else {
-                $time ['zone'] = 'Local';
+                $time['zone'] = 'Local';
             }
             return $time;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
      * Export a Time field.
      */
-    public function _exportTime($value)
+    public function _exportTime($value): string
     {
-        $time = sprintf('%02d%02d%02d', $value ['hour'], $value ['minute'], $value ['second']);
-        if ($value ['zone'] == 'UTC') {
+        $time = sprintf('%02d%02d%02d', $value['hour'], $value['minute'], $value['second']);
+        if ($value['zone'] == 'UTC') {
             $time .= 'Z';
         }
         return $time;
@@ -1363,37 +1371,36 @@ class ICalendar
     {
         $parts = explode('T', $text);
         if (count($parts) == 2) {
-            $text = $parts [0];
+            $text = $parts[0];
         }
         $match = [];
-        if (! preg_match('/^(\d{4})-?(\d{2})-?(\d{2})$/', $text, $match)) {
+        if (!preg_match('/^(\d{4})-?(\d{2})-?(\d{2})$/', $text, $match)) {
             return false;
         }
 
         return [
-                'year' => $match [1],
-                'month' => $match [2],
-                'mday' => $match [3]
+            'year' => $match[1],
+            'month' => $match[2],
+            'mday' => $match[3]
         ];
     }
 
     /**
      * Export a Date field.
      */
-    public function _exportDate($value, $autoconvert = false)
+    public function _exportDate($value, $autoconvert = false): string
     {
         if (is_object($value)) {
             $value = [
-                    'year' => $value->year,
-                    'month' => $value->month,
-                    'mday' => $value->mday
+                'year' => $value->year,
+                'month' => $value->month,
+                'mday' => $value->mday
             ];
         }
         if ($autoconvert !== false && $this->isOldFormat()) {
-            return sprintf('%04d%02d%02dT%s', $value ['year'], $value ['month'], $value ['mday'], $autoconvert);
-        } else {
-            return sprintf('%04d%02d%02d', $value ['year'], $value ['month'], $value ['mday']);
+            return sprintf('%04d%02d%02dT%s', $value['year'], $value['month'], $value['mday'], $autoconvert);
         }
+        return sprintf('%04d%02d%02d', $value['year'], $value['month'], $value['mday']);
     }
 
     /**
@@ -1402,48 +1409,51 @@ class ICalendar
     public function _parseDuration($text)
     {
         $durvalue = [];
-        if (preg_match('/([+]?|[-])P(([0-9]+W)|([0-9]+D)|)(T(([0-9]+H)|([0-9]+M)|([0-9]+S))+)?/', trim($text), $durvalue)) {
+        if (preg_match(
+            '/([+]?|[-])P(([0-9]+W)|([0-9]+D)|)(T(([0-9]+H)|([0-9]+M)|([0-9]+S))+)?/',
+            trim($text),
+            $durvalue
+        )) {
             // Weeks.
-            $duration = 7 * 86400 * intval($durvalue [3]);
+            $duration = 7 * 86400 * intval($durvalue[3]);
 
             if (count($durvalue) > 4) {
                 // Days.
-                $duration += 86400 * intval($durvalue [4]);
+                $duration += 86400 * intval($durvalue[4]);
             }
             if (count($durvalue) > 5) {
                 // Hours.
-                $duration += 3600 * intval($durvalue [7]);
+                $duration += 3600 * intval($durvalue[7]);
 
                 // Mins.
-                if (isset($durvalue [8])) {
-                    $duration += 60 * intval($durvalue [8]);
+                if (isset($durvalue[8])) {
+                    $duration += 60 * intval($durvalue[8]);
                 }
 
                 // Secs.
-                if (isset($durvalue [9])) {
-                    $duration += intval($durvalue [9]);
+                if (isset($durvalue[9])) {
+                    $duration += intval($durvalue[9]);
                 }
             }
 
             // Sign.
-            if ($durvalue [1] == '-') {
-                $duration *= - 1;
+            if ($durvalue[1] == '-') {
+                $duration *= -1;
             }
 
             return $duration;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
      * Export a duration value.
      */
-    public function _exportDuration($value)
+    public function _exportDuration($value): string
     {
         $duration = '';
         if ($value < 0) {
-            $value *= - 1;
+            $value *= -1;
             $duration .= '-';
         }
         $duration .= 'P';
@@ -1491,11 +1501,15 @@ class ICalendar
         $line = preg_replace('/\r\n|\n|\r/', '\n', $line);
         if (strlen($line) > 75) {
             $foldedline = '';
-            while (! empty($line)) {
+            while (!empty($line)) {
                 $maxLine = substr($line, 0, 75);
                 $cutPoint = max(60, max(strrpos($maxLine, ';'), strrpos($maxLine, ':')) + 1);
 
-                $foldedline .= (empty($foldedline)) ? substr($line, 0, $cutPoint) : $this->_newline . ' ' . substr($line, 0, $cutPoint);
+                $foldedline .= (empty($foldedline)) ? substr(
+                    $line,
+                    0,
+                    $cutPoint
+                ) : $this->_newline . ' ' . substr($line, 0, $cutPoint);
 
                 $line = (strlen($line) <= $cutPoint) ? '' : substr($line, $cutPoint);
             }
@@ -1511,11 +1525,11 @@ class ICalendar
      * Uses imap_8bit if available.
      *
      * @param string $input
-     *        	The string to be encoded.
+     *            The string to be encoded.
      *
      * @return string The quoted-printable encoded string.
      */
-    public function _quotedPrintableEncode($input = '')
+    public function _quotedPrintableEncode($input = ''): string
     {
         // If imap_8bit() is available, use it.
         if (function_exists('imap_8bit')) {
@@ -1524,30 +1538,30 @@ class ICalendar
 
         // Rather dumb replacment: just encode everything.
         $hex = [
-                '0',
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                'A',
-                'B',
-                'C',
-                'D',
-                'E',
-                'F'
+            '0',
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+            'A',
+            'B',
+            'C',
+            'D',
+            'E',
+            'F'
         ];
 
         $output = '';
         $len = strlen($input);
-        for ($i = 0; $i < $len; ++ $i) {
-            $c = substr($input, $i, 1);
+        for ($i = 0; $i < $len; ++$i) {
+            $c = $input[$i];
             $dec = ord($c);
-            $output .= '=' . $hex [floor($dec / 16)] . $hex [floor($dec % 16)];
+            $output .= '=' . $hex[floor($dec / 16)] . $hex[floor($dec % 16)];
             if (($i + 1) % 25 == 0) {
                 $output .= '=\r\n';
             }

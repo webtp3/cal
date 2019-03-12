@@ -6,6 +6,10 @@
  * LICENSE file that was distributed with this source code.
  */
 
+use SJBR\StaticInfoTables\Hook\Backend\Form\Wizard\SuggestReceiver;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 defined('TYPO3_MODE') or die();
 
 $tx_cal_location = [
@@ -17,7 +21,7 @@ $tx_cal_location = [
         'cruser_id' => 'cruser_id',
         'default_sortby' => 'ORDER BY name',
         'delete' => 'deleted',
-        'iconfile' => 'EXT:cal/Resources/Public/icons/icon_tx_cal_location.gif',
+        'iconfile' => 'EXT:cal/Resources/Public/Icons/tx_cal_location.svg',
         'enablecolumns' => [
             'disabled' => 'hidden'
         ],
@@ -38,10 +42,10 @@ $tx_cal_location = [
     'columns' => [
         'hidden' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.hidden',
+            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
-                'default' => '0'
+                'default' => 0
             ]
         ],
         'name' => [
@@ -49,8 +53,9 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.name',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128,
+                'eval' => 'required',
             ]
         ],
         'description' => [
@@ -58,8 +63,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.description',
             'config' => [
                 'type' => 'text',
-                'cols' => '30',
-                'rows' => '5',
+                'cols' => 30,
+                'rows' => 5,
                 'enableRichtext' => true,
                 'fieldControl' => [
                     'fullScreenRichtext' => [
@@ -71,7 +76,8 @@ $tx_cal_location = [
                 ],
                 'wizards' => [
                     '_PADDING' => 2,
-                ]
+                ],
+                'default' => '',
             ]
         ],
         'street' => [
@@ -79,8 +85,9 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.street',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128,
+                'default' => '',
             ]
         ],
         'zip' => [
@@ -88,8 +95,9 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.zip',
             'config' => [
                 'type' => 'input',
-                'size' => '15',
-                'max' => '15'
+                'size' => 15,
+                'max' => 15,
+                'default' => '',
             ]
         ],
         'city' => [
@@ -97,8 +105,9 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.city',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '128'
+                'size' => 30,
+                'max' => 128,
+                'default' => '',
             ]
         ],
         'phone' => [
@@ -106,8 +115,9 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.phone',
             'config' => [
                 'type' => 'input',
-                'size' => '15',
-                'max' => '24'
+                'size' => 15,
+                'max' => 24,
+                'default' => '',
             ]
         ],
         'fax' => [
@@ -115,8 +125,9 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.fax',
             'config' => [
                 'type' => 'input',
-                'size' => '15',
-                'max' => '24'
+                'size' => 15,
+                'max' => 24,
+                'default' => '',
             ]
         ],
         'email' => [
@@ -124,26 +135,27 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.email',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
-                'max' => '64',
-                'eval' => 'lower'
+                'size' => 30,
+                'max' => 64,
+                'eval' => 'lower, email',
+                'default' => '',
             ]
         ],
         'image' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.image',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig('image', [
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig('image', [
                 'maxitems' => 5,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
                 'foreign_types' => [
                     '0' => [
                         'showitem' => '
-						--palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+						--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 						--palette--;;filePalette'
                     ],
-                    \TYPO3\CMS\Core\Resource\File::FILETYPE_IMAGE => [
+                    File::FILETYPE_IMAGE => [
                         'showitem' => '
-						--palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+						--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 						--palette--;;filePalette'
                     ]
                 ]
@@ -154,10 +166,11 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.link',
             'config' => [
                 'type' => 'input',
-                'size' => '25',
-                'max' => '128',
+                'size' => 25,
+                'max' => 128,
                 'checkbox' => '',
                 'eval' => 'trim',
+                'default' => '',
                 'renderType' => 'inputLink',
                 'wizards' => [
                     '_PADDING' => 2,
@@ -175,6 +188,7 @@ $tx_cal_location = [
                 'minitems' => 0,
                 'maxitems' => 100,
                 'MM' => 'tx_cal_location_shared_user_mm',
+                'default' => 0,
             ]
         ],
         'latitude' => [
@@ -182,7 +196,8 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.latitude',
             'config' => [
                 'type' => 'input',
-                'readOnly' => 1
+                'readOnly' => 1,
+                'default' => 0,
             ]
         ],
         'longitude' => [
@@ -190,12 +205,13 @@ $tx_cal_location = [
             'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.longitude',
             'config' => [
                 'type' => 'input',
-                'readOnly' => 1
+                'readOnly' => 1,
+                'default' => 0,
             ]
         ],
         'sys_language_uid' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.language',
+            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.language',
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
@@ -203,11 +219,11 @@ $tx_cal_location = [
                 'foreign_table_where' => 'ORDER BY sys_language.title',
                 'items' => [
                     [
-                        'LLL:EXT:lang/locallang_general.xlf:LGL.allLanguages',
-                        - 1
+                        'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.allLanguages',
+                        -1
                     ],
                     [
-                        'LLL:EXT:lang/locallang_general.xlf:LGL.default_value',
+                        'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.default_value',
                         0
                     ]
                 ]
@@ -216,7 +232,7 @@ $tx_cal_location = [
         'l18n_parent' => [
             'displayCond' => 'FIELD:sys_language_uid:>:0',
             'exclude' => 1,
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.l18n_parent',
+            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.l18n_parent',
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
@@ -237,7 +253,7 @@ $tx_cal_location = [
         ],
         't3ver_label' => [
             'displayCond' => 'FIELD:t3ver_label:REQ:true',
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.versionLabel',
+            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.versionLabel',
             'config' => [
                 'type' => 'none',
                 'cols' => 27
@@ -256,42 +272,20 @@ $tx_cal_location = [
     ]
 ];
 
-/* If wec_map is present, define the address fields */
-if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')) {
-    $tx_cal_location['ctrl']['EXT']['wec_map'] = [
-        'isMappable' => 1,
-        'addressFields' => [
-            'street' => 'street',
-            'city' => 'city',
-            'state' => 'country_zone',
-            'zip' => 'zip',
-            'country' => 'country'
-        ]
-    ];
-    $tx_cal_location['columns']['tx_wecmap_geocode'] = [
-        'exclude' => 1,
-        'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xlf:berecord_geocodelabel',
-        'config' => [
-            'type' => 'user',
-            'userFunc' => 'JBartels\\WecMap\\Utility\\Backend->checkGeocodeStatus'
-        ]
-    ];
-    $tx_cal_location['interface']['showRecordFieldList'] .= ', tx_wecmap_geocode';
-    $tx_cal_location['types']['0']['showitem'] .= ', tx_wecmap_geocode';
+$dummy = [
+    'exclude' => 1,
+    'label' => 'dummy',
+    'config' => [
+        'type' => 'text',
+        'default' => '',
+    ]
+];
 
-    $tx_cal_location['columns']['tx_wecmap_map'] = [
-        'exclude' => 1,
-        'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xlf:berecord_maplabel',
-        'config' => [
-            'type' => 'user',
-            'userFunc' => 'JBartels\\WecMap\\Utility\\Backend->drawMap'
-        ]
-    ];
-    $tx_cal_location['interface']['showRecordFieldList'] .= ', tx_wecmap_map';
-    $tx_cal_location['types']['0']['showitem'] .= ', tx_wecmap_map';
-}
+$tx_cal_location['columns']['imagecaption'] = $dummy;
+$tx_cal_location['columns']['imagealttext'] = $dummy;
+$tx_cal_location['columns']['imagetitletext'] = $dummy;
 
-if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
+if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
     $tx_cal_location['columns']['country_zone'] = [
         'exclude' => 1,
         'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.countryzone',
@@ -310,6 +304,7 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
             'size' => 1,
             'minitems' => 0,
             'maxitems' => 1,
+            'default' => 0,
         ]
     ];
     $tx_cal_location['columns']['country'] = [
@@ -330,18 +325,13 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
             'size' => 1,
             'minitems' => 0,
             'maxitems' => 1,
-         ]
+            'default' => 0,
+        ]
     ];
-    if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 7006000) {
-        $tx_cal_location['columns']['country_zone']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountryZonesSelector';
-        $tx_cal_location['columns']['country_zone']['config']['wizards']['suggest']['default']['receiverClass'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\Wizard\\SuggestReceiver';
-        $tx_cal_location['columns']['country']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountriesSelector';
-        $tx_cal_location['columns']['country']['config']['wizards']['suggest']['default']['receiverClass'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\Wizard\\SuggestReceiver';
-    }
-}
-
-if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 7000000) {
-    $tx_cal_location['types']['0']['showitem'] = 'name, --palette--;;1, description;;;richtext:rte_transform[flag=rte_enabled|mode=ts_css],, street, city, country, country_zone, zip, latitude, longitude, phone, fax, email, image, link, shared_user_cnt';
+    $tx_cal_location['columns']['country_zone']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountryZonesSelector';
+    $tx_cal_location['columns']['country_zone']['config']['wizards']['suggest']['default']['receiverClass'] = SuggestReceiver::class;
+    $tx_cal_location['columns']['country']['config']['itemsProcFunc'] = 'SJBR\\StaticInfoTables\\Hook\\Backend\\Form\\FormDataProvider\\TcaSelectItemsProcessor->translateCountriesSelector';
+    $tx_cal_location['columns']['country']['config']['wizards']['suggest']['default']['receiverClass'] = SuggestReceiver::class;
 }
 
 return $tx_cal_location;

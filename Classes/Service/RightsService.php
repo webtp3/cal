@@ -23,1091 +23,1472 @@ namespace TYPO3\CMS\Cal\Service;
 
 /**
  * This class handles all cal(endar)-rights of a current logged-in user
- *
  */
-class RightsService extends \TYPO3\CMS\Cal\Service\BaseService
+class RightsService extends BaseService
 {
     public $confArr = [];
 
     public function __construct()
     {
         parent::__construct();
-        $this->confArr = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
+        $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
     }
-    public function isLoggedIn()
+
+    /**
+     * @return bool
+     */
+    public function isLoggedIn(): bool
     {
-        return $GLOBALS ['TSFE']->loginUser;
+        return $GLOBALS['TSFE']->loginUser;
     }
-    public function getUserGroups()
+
+    /**
+     * @return array
+     */
+    public function getUserGroups(): array
     {
         if ($this->isLoggedIn()) {
-            return $GLOBALS ['TSFE']->fe_user->groupData ['uid'];
+            return $GLOBALS['TSFE']->fe_user->groupData['uid'];
         }
         return [];
     }
-    public function getUserId()
+
+    /**
+     * @return int
+     */
+    public function getUserId(): int
     {
-        if ($this->isLoggedIn() && ! empty($GLOBALS ['TSFE']->fe_user->user ['uid'])) {
-            $val = intval($GLOBALS ['TSFE']->fe_user->user ['uid']);
+        if (!empty($GLOBALS['TSFE']->fe_user->user['uid']) && $this->isLoggedIn()) {
+            $val = intval($GLOBALS['TSFE']->fe_user->user['uid']);
             return $val;
         }
-        return - 1;
+        return -1;
     }
-    public function getUserName()
+
+    /**
+     * @return int
+     */
+    public function getUserName(): int
     {
         if ($this->isLoggedIn()) {
-            $val = $GLOBALS ['TSFE']->fe_user->user ['username'];
+            $val = $GLOBALS['TSFE']->fe_user->user['username'];
             return $val;
         }
-        return - 1;
+        return -1;
     }
-    public function isCalEditable()
+
+    /**
+     * @return bool
+     */
+    public function isCalEditable(): bool
     {
-        if ($this->conf ['rights.'] ['edit'] == 1) {
-            return true;
-        }
-        return false;
+        return (int)$this->conf['rights.']['edit'] === 1;
     }
-    public function isCalAdmin()
+
+    /**
+     * @return bool
+     */
+    public function isCalAdmin(): bool
     {
         if ($this->isLoggedIn()) {
-            $users = explode(',', $this->conf ['rights.'] ['admin.'] ['user']);
-            $groups = explode(',', $this->conf ['rights.'] ['admin.'] ['group']);
-            if (array_search($this->getUserId(), $users) !== false) {
+            $users = explode(',', $this->conf['rights.']['admin.']['user']);
+            $groups = explode(',', $this->conf['rights.']['admin.']['group']);
+            if (in_array($this->getUserId(), $users, true)) {
                 return true;
             }
             $userGroups = $this->getUserGroups();
             foreach ($groups as $key => $group) {
-                if (array_search(ltrim($group), $userGroups) !== false) {
+                if (in_array(ltrim($group), $userGroups, true)) {
                     return true;
                 }
             }
         }
         return false;
     }
-    public function isAllowedToCreateEvent()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEvent(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['event.']);
+        return $this->checkRights($this->conf['rights.']['create.']['event.']);
     }
-    public function isAllowedToCreateEventInPast()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventInPast(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['inPast.']);
+        return $this->checkRights($this->conf['rights.']['create.']['event.']['inPast.']);
     }
-    public function isAllowedToCreateEventForTodayAndFuture()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventForTodayAndFuture(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['forTodayAndFuture.']);
+        return $this->checkRights($this->conf['rights.']['create.']['event.']['forTodayAndFuture.']);
     }
-    public function isAllowedToEditEventInPast()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventInPast(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['inPast.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['inPast.']);
     }
-    public function isAllowedToDeleteEventInPast()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteEventInPast(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['event.'] ['inPast.']);
+        return $this->checkRights($this->conf['rights.']['delete.']['event.']['inPast.']);
     }
-    public function isAllowedToCreateEventHidden()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventHidden(): bool
     {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['hidden.'] ['public']) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['hidden.']['public']) {
             return true;
         }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateEventCategory()
-    {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['category.'] ['public']) {
-            return true;
-        }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['category.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateEventCalendar()
-    {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['calendar_id.'] ['public']) {
-            return true;
-        }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['calendar_id.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreatePublicEvent()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['publicEvents.']);
-    }
-    public function isAllowedToCreateEventDateTime()
-    {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && ($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['startdate.'] ['public'] || $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['enddate.'] ['public'] || $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['starttime.'] ['public'] || $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['endtime.'] ['public'])) {
-            return true;
-        }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['startdate.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['enddate.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['starttime.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['endtime.'])) {
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['hidden.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToCreateEventTitle()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventCategory(): bool
     {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['title.'] ['public']) {
+        if ($this->conf['rights.']['create.']['event.']['fields.']['category.']['public']) {
             return true;
         }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateEventOrganizer()
-    {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['organizer.'] ['public']) {
-            return true;
-        }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['organizer.'])) {
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['category.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToCreateEventLocation()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventCalendar(): bool
     {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['location.'] ['public']) {
+        if ($this->conf['rights.']['create.']['event.']['fields.']['calendar_id.']['public']) {
             return true;
         }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['location.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateEventDescription()
-    {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['description.'] ['public']) {
-            return true;
-        }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['description.'])) {
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['calendar_id.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToCreateEventTeaser()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreatePublicEvent(): bool
     {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['teaser.'] ['public']) {
-            return true;
-        }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['teaser.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['event.']['publicEvents.']);
     }
-    public function isAllowedToCreateEventRecurring()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventDateTime(): bool
     {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['recurring.'] ['public']) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && ($this->conf['rights.']['create.']['event.']['fields.']['startdate.']['public'] || $this->conf['rights.']['create.']['event.']['fields.']['enddate.']['public'] || $this->conf['rights.']['create.']['event.']['fields.']['starttime.']['public'] || $this->conf['rights.']['create.']['event.']['fields.']['endtime.']['public'])) {
             return true;
         }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['recurring.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateEventNotify()
-    {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['notify.'] ['public']) {
-            return true;
-        }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['notify.'])) {
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['startdate.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['enddate.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['starttime.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['endtime.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToCreateEventException()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventTitle(): bool
     {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['exception.'] ['public']) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['title.']['public']) {
             return true;
         }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['exception.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateEventShared()
-    {
-        if ($this->conf ['rights.'] ['create.'] ['event.'] ['public'] && $this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['shared.'] ['public']) {
-            return true;
-        }
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['shared.'])) {
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['title.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEvent()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventOrganizer(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.']);
-    }
-    public function isPublicAllowedToEditEvents()
-    {
-        return $this->conf ['rights.'] ['edit.'] ['event.'] ['public'] == 1;
-    }
-    public function isAllowedToEditStartedEvent()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['startedEvents.']);
-    }
-    public function isAllowedToEditOnlyOwnEvent()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['onlyOwnEvents.']);
-    }
-    public function isAllowedToEditEventHidden()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['hidden.'])) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['organizer.']['public']) {
+            return true;
+        }
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['organizer.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEventCalendar()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventLocation(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['calendar_id.'])) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['location.']['public']) {
+            return true;
+        }
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['location.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEventCategory()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventDescription(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['category.'])) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['description.']['public']) {
+            return true;
+        }
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['description.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEventDateTime()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventTeaser(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['startdate.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['enddate.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['starttime.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['event.'] ['fields.'] ['endtime.'])) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['teaser.']['public']) {
+            return true;
+        }
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['teaser.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEventTitle()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventRecurring(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['title.'])) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['recurring.']['public']) {
+            return true;
+        }
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['recurring.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEventOrganizer()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventNotify(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['organizer.'])) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['notify.']['public']) {
+            return true;
+        }
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['notify.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEventLocation()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventException(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['location.'])) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['exception.']['public']) {
+            return true;
+        }
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['exception.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEventDescription()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateEventShared(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['description.'])) {
+        if ($this->conf['rights.']['create.']['event.']['public'] && $this->conf['rights.']['create.']['event.']['fields.']['shared.']['public']) {
+            return true;
+        }
+        if ($this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['shared.'])) {
             return true;
         }
         return false;
     }
-    public function isAllowedToEditEventTeaser()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEvent(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['teaser.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']);
     }
-    public function isAllowedToEditEventRecurring()
+
+    /**
+     * @return bool
+     */
+    public function isPublicAllowedToEditEvents(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['recurring.'])) {
-            return true;
-        }
-        return false;
+        return (int)$this->conf['rights.']['edit.']['event.']['public'] === 1;
     }
-    public function isAllowedToEditEventNotify()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditStartedEvent(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['notify.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['startedEvents.']);
     }
-    public function isAllowedToEditEventException()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOnlyOwnEvent(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['event.'] ['fields.'] ['exception.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['onlyOwnEvents.']);
     }
-    public function isAllowedToDeleteEvents()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventHidden(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['event.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['hidden.']);
     }
-    public function isAllowedToDeleteOnlyOwnEvents()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventCalendar(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['event.'] ['onlyOwnEvents.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['calendar_id.']);
     }
-    public function isAllowedToDeleteStartedEvents()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventCategory(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['event.'] ['startedEvents.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['category.']);
     }
-    public function isAllowedToCreateExceptionEvent()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventDateTime(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['exceptionEvent.']);
+        return $this->checkRights($this->conf['rights.']['create.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['startdate.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['enddate.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['starttime.']) || $this->checkRights($this->conf['rights.']['create.']['event.']['fields.']['endtime.']);
     }
-    public function isAllowedToEditExceptionEvent()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventTitle(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['exceptionEvent.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['title.']);
     }
-    public function isAllowedToDeleteExceptionEvents()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventOrganizer(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['exceptionEvent.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['organizer.']);
     }
-    public function isAllowedToCreateLocations()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventLocation(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['location.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['location.']);
     }
-    public function isAllowedToCreateLocationHidden()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventDescription(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['description.']);
     }
-    public function isAllowedToCreateLocationTitle()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventTeaser(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['teaser.']);
     }
-    public function isAllowedToCreateLocationDescription()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventRecurring(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['description.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['recurring.']);
     }
-    public function isAllowedToCreateLocationName()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventNotify(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['name.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['notify.']);
     }
-    public function isAllowedToCreateLocationStreet()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditEventException(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['street.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['event.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['event.']['fields.']['exception.']);
     }
-    public function isAllowedToCreateLocationZip()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteEvents(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['zip.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['delete.']['event.']);
     }
-    public function isAllowedToCreateLocationCity()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteOnlyOwnEvents(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['city.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['delete.']['event.']['onlyOwnEvents.']);
     }
-    public function isAllowedToCreateLocationCountryZone()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteStartedEvents(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['countryZone.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['delete.']['event.']['startedEvents.']);
     }
-    public function isAllowedToCreateLocationCountry()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateExceptionEvent(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['country.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['exceptionEvent.']);
     }
-    public function isAllowedToCreateLocationPhone()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditExceptionEvent(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['phone.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['exceptionEvent.']);
     }
-    public function isAllowedToCreateLocationEmail()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteExceptionEvents(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['email.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['delete.']['exceptionEvent.']);
     }
-    public function isAllowedToCreateLocationImage()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocations(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['image.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']);
     }
-    public function isAllowedToCreateLocationLink()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationHidden(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['location.'] ['fields.'] ['link.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['hidden.']);
     }
-    public function isAllowedToEditLocation()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationTitle(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.']);
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['title.']);
     }
-    public function isAllowedToEditLocationHidden()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationDescription(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['description.']);
     }
-    public function isAllowedToEditLocationTitle()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationName(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['name.']);
     }
-    public function isAllowedToEditLocationDescription()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationStreet(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['description.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['street.']);
     }
-    public function isAllowedToEditLocationName()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationZip(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['name.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['zip.']);
     }
-    public function isAllowedToEditLocationStreet()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationCity(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['street.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['city.']);
     }
-    public function isAllowedToEditLocationZip()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationCountryZone(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['zip.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['countryZone.']);
     }
-    public function isAllowedToEditLocationCity()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationCountry(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['city.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['country.']);
     }
-    public function isAllowedToEditLocationCountryZone()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationPhone(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['countryZone.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['phone.']);
     }
-    public function isAllowedToEditLocationCountry()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationEmail(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['country.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['email.']);
     }
-    public function isAllowedToEditLocationPhone()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationImage(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['phone.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['image.']);
     }
-    public function isAllowedToEditLocationEmail()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateLocationLink(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['email.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['location.']['fields.']['link.']);
     }
-    public function isAllowedToEditLocationLogo()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocation(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['logo.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']);
     }
-    public function isAllowedToEditLocationHomepage()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationHidden(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['fields.'] ['homepage.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['hidden.']);
     }
-    public function isAllowedToDeleteLocation()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationTitle(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['location.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['title.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationDescription(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['description.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationName(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['name.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationStreet(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['street.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationZip(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['zip.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationCity(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['city.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationCountryZone(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['countryZone.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationCountry(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['country.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationPhone(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['phone.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationEmail(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['email.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationLogo(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['logo.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditLocationHomepage(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['location.']['fields.']['homepage.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteLocation(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['delete.']['location.']);
     }
 
     // TODO: Remove for version 1.4.0, but keep this function for backwards compatibility until than
-    public function isAllowedToDeleteLocations()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteLocations(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['delete.']['location.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOnlyOwnLocation(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['location.']['onlyOwnLocation.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteOnlyOwnLocation(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['delete.']['location.']['onlyOwnLocation.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizer(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerHidden(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['hidden.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerTitle(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['title.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerDescription(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['description.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerName(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['name.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerStreet(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['street.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerZip(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['zip.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerCity(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['city.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerPhone(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['phone.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerEmail(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['location.']);
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['email.']);
     }
-    public function isAllowedToEditOnlyOwnLocation()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerImage(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['location.'] ['onlyOwnLocation.']);
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['image.']);
     }
-    public function isAllowedToDeleteOnlyOwnLocation()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateOrganizerLink(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['location.'] ['onlyOwnLocation.']);
+        return $this->checkRights($this->conf['rights.']['create.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['organizer.']['fields.']['link.']);
     }
-    public function isAllowedToCreateOrganizer()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizer(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']);
     }
-    public function isAllowedToCreateOrganizerHidden()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerHidden(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['hidden.']);
     }
-    public function isAllowedToCreateOrganizerTitle()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerTitle(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['title.']);
     }
-    public function isAllowedToCreateOrganizerDescription()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerDescription(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['description.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['description.']);
     }
-    public function isAllowedToCreateOrganizerName()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerName(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['name.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['name.']);
     }
-    public function isAllowedToCreateOrganizerStreet()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerStreet(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['street.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['street.']);
     }
-    public function isAllowedToCreateOrganizerZip()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerZip(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['zip.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['zip.']);
     }
-    public function isAllowedToCreateOrganizerCity()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerCity(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['city.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['city.']);
     }
-    public function isAllowedToCreateOrganizerPhone()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerPhone(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['phone.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['phone.']);
     }
-    public function isAllowedToCreateOrganizerEmail()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerEmail(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['email.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['email.']);
     }
-    public function isAllowedToCreateOrganizerImage()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerLogo(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['image.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['logo.']);
     }
-    public function isAllowedToCreateOrganizerLink()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOrganizerHomepage(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['organizer.'] ['fields.'] ['link.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['organizer.']['fields.']['homepage.']);
     }
-    public function isAllowedToEditOrganizer()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteOrganizer(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.']);
+        return $this->checkRights($this->conf['rights.']['delete.']['organizer.']);
     }
-    public function isAllowedToEditOrganizerHidden()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOnlyOwnOrganizer(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['organizer.']['onlyOwnOrganizer.']);
     }
-    public function isAllowedToEditOrganizerTitle()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteOnlyOwnOrganizer(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['delete.']['organizer.']['onlyOwnOrganizer.']);
     }
-    public function isAllowedToEditOrganizerDescription()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCalendar(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['description.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['calendar.']);
     }
-    public function isAllowedToEditOrganizerName()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCalendarHidden(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['name.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['hidden.']);
     }
-    public function isAllowedToEditOrganizerStreet()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCalendarTitle(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['street.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['title.']);
     }
-    public function isAllowedToEditOrganizerZip()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCalendarOwner(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['zip.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['owner.']);
     }
-    public function isAllowedToEditOrganizerCity()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCalendarActivateFreeAndBusy(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['city.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['activateFreeAndBusy.']);
     }
-    public function isAllowedToEditOrganizerPhone()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCalendarFreeAndBusyUser(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['phone.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['freeAndBusyUser.']);
     }
-    public function isAllowedToEditOrganizerEmail()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCalendarType(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['email.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['calendar.']['fields.']['type.']);
     }
-    public function isAllowedToEditOrganizerLogo()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCalendar(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['logo.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']);
     }
-    public function isAllowedToEditOrganizerHomepage()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOnlyOwnCalendar(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['fields.'] ['homepage.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['onlyOwnCalendar.']);
     }
-    public function isAllowedToDeleteOrganizer()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditPublicCalendar(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['organizer.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['publicCalendar.']);
     }
-    public function isAllowedToEditOnlyOwnOrganizer()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCalendarHidden(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['organizer.'] ['onlyOwnOrganizer.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['hidden.']);
     }
-    public function isAllowedToDeleteOnlyOwnOrganizer()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCalendarType(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['organizer.'] ['onlyOwnOrganizer.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['type.']);
     }
-    public function isAllowedToCreateCalendar()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCalendarTitle(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['title.']);
     }
-    public function isAllowedToCreateCalendarHidden()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCalendarOwner(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['owner.']);
     }
-    public function isAllowedToCreateCalendarTitle()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCalendarActivateFreeAndBusy(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['activateFreeAndBusy.']);
     }
-    public function isAllowedToCreateCalendarOwner()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCalendarFreeAndBusyUser(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['fields.'] ['owner.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['edit.']['calendar.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['calendar.']['fields.']['freeAndBusyUser.']);
     }
-    public function isAllowedToCreateCalendarActivateFreeAndBusy()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteCalendar(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['fields.'] ['activateFreeAndBusy.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['delete.']['calendar.']);
     }
-    public function isAllowedToCreateCalendarFreeAndBusyUser()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteOnlyOwnCalendar(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['fields.'] ['freeAndBusyUser.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['delete.']['calendar.']['onlyOwnCalendar.']);
     }
-    public function isAllowedToCreateCalendarType()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeletePublicCalendar(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['calendar.'] ['fields.'] ['type.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['delete.']['calendar.']['publicCalendar.']);
     }
-    public function isAllowedToEditCalendar()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCategory(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.']);
+        return $this->checkRights($this->conf['rights.']['create.']['category.']);
     }
-    public function isAllowedToEditOnlyOwnCalendar()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCategoryHidden(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['onlyOwnCalendar.']);
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['hidden.']);
     }
-    public function isAllowedToEditPublicCalendar()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCategoryTitle(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['publicCalendar.']);
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['title.']);
     }
-    public function isAllowedToEditCalendarHidden()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCategoryHeaderStyle(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['headerstyle.']);
     }
-    public function isAllowedToEditCalendarType()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCategoryBodyStyle(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['fields.'] ['type.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['bodystyle.']);
     }
-    public function isAllowedToEditCalendarTitle()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCategoryCalendar(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['calendar.']);
     }
-    public function isAllowedToEditCalendarOwner()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCategoryParent(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['fields.'] ['owner.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['parent.']);
     }
-    public function isAllowedToEditCalendarActivateFreeAndBusy()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateGeneralCategory(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['fields.'] ['activateFreeAndBusy.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['generalCategory.']);
     }
-    public function isAllowedToEditCalendarFreeAndBusyUser()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreatePublicCategory(): bool
     {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['calendar.'] ['fields.'] ['freeAndBusyUser.'])) {
-            return true;
-        }
-        return false;
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['publicCategory.']);
     }
-    public function isAllowedToDeleteCalendar()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToCreateCategorySharedUser(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['calendar.']);
+        return $this->checkRights($this->conf['rights.']['create.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['create.']['category.']['fields.']['sharedUser.']);
     }
-    public function isAllowedToDeleteOnlyOwnCalendar()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCategory(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['calendar.'] ['onlyOwnCalendar.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']);
     }
-    public function isAllowedToDeletePublicCalendar()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditOnlyOwnCategory(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['calendar.'] ['publicCalendar.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['onlyOwnCategory.']);
     }
-    public function isAllowedToCreateCategory()
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditGeneralCategory(): bool
     {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['category.']);
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['generalCategory.']);
     }
-    public function isAllowedToCreateCategoryHidden()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateCategoryTitle()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateCategoryHeaderStyle()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['fields.'] ['headerstyle.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateCategoryBodyStyle()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['fields.'] ['bodystyle.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateCategoryCalendar()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['fields.'] ['calendar.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateCategoryParent()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['fields.'] ['parent.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToCreateGeneralCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['generalCategory.']);
-    }
-    public function isAllowedToCreatePublicCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['publicCategory.']);
-    }
-    public function isAllowedToCreateCategorySharedUser()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['create.'] ['category.'] ['fields.'] ['sharedUser.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToEditCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.']);
-    }
-    public function isAllowedToEditOnlyOwnCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['onlyOwnCategory.']);
-    }
-    public function isAllowedToEditGeneralCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['generalCategory.']);
-    }
-    public function isAllowedToEditPublicCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['publicCategory.']);
-    }
-    public function isAllowedToEditCategoryHidden()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['fields.'] ['hidden.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToEditCategoryTitle()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['fields.'] ['title.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToEditCategoryHeaderstyle()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['fields.'] ['headerstyle.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToEditCategoryBodystyle()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['fields.'] ['bodystyle.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToEditCategoryCalendar()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['fields.'] ['calendar.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToEditCategoryParent()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['fields.'] ['parent.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToEditCategorySharedUser()
-    {
-        if ($this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] ['edit.'] ['category.'] ['fields.'] ['sharedUser.'])) {
-            return true;
-        }
-        return false;
-    }
-    public function isAllowedToDeleteCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['category.']);
-    }
-    public function isAllowedToDeleteOnlyOwnCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['category.'] ['onlyOwnCategory.']);
-    }
-    public function isAllowedToDeleteGeneralCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['category.'] ['generalCategory.']);
-    }
-    public function isAllowedToDeletePublicCategory()
-    {
-        return $this->checkRights($this->conf ['rights.'] ['delete.'] ['category.'] ['publicCategory.']);
-    }
-    public function isAllowedToConfigure()
-    {
-        return $this->isLoggedIn() && $this->isViewEnabled('admin') && ($this->isCalAdmin() || $this->isAllowedToCreateCalendar() || $this->isAllowedToEditCalendar() || $this->isAllowedToDeleteCalendar() || $this->isAllowedToCreateCategory() || $this->isAllowedToEditCategory() || $this->isAllowedToDeleteCategory() || $this->isAllowedTo('create', 'location') || $this->isAllowedTo('edit', 'location') || $this->isAllowedTo('delete', 'location') || $this->isAllowedToCreateOrganizer() || $this->isAllowedToEditOrganizer() || $this->isAllowedToDeleteOrganizer());
-    }
-    public function isAllowedTo($type, $object, $field = '')
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditPublicCategory(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['publicCategory.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCategoryHidden(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['hidden.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCategoryTitle(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['title.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCategoryHeaderstyle(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['headerstyle.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCategoryBodystyle(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['bodystyle.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCategoryCalendar(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['calendar.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCategoryParent(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['parent.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToEditCategorySharedUser(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['edit.']['category.']['enableAllFields.']) || $this->checkRights($this->conf['rights.']['edit.']['category.']['fields.']['sharedUser.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteCategory(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['delete.']['category.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteOnlyOwnCategory(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['delete.']['category.']['onlyOwnCategory.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeleteGeneralCategory(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['delete.']['category.']['generalCategory.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToDeletePublicCategory(): bool
+    {
+        return $this->checkRights($this->conf['rights.']['delete.']['category.']['publicCategory.']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToConfigure(): bool
+    {
+        return $this->isLoggedIn() && $this->isViewEnabled('admin') && ($this->isCalAdmin() || $this->isAllowedToCreateCalendar() || $this->isAllowedToEditCalendar() || $this->isAllowedToDeleteCalendar() || $this->isAllowedToCreateCategory() || $this->isAllowedToEditCategory() || $this->isAllowedToDeleteCategory() || $this->isAllowedTo(
+            'create',
+            'location'
+                ) || $this->isAllowedTo('edit', 'location') || $this->isAllowedTo(
+                    'delete',
+                    'location'
+                ) || $this->isAllowedToCreateOrganizer() || $this->isAllowedToEditOrganizer() || $this->isAllowedToDeleteOrganizer());
+    }
+
+    /**
+     * @param $type
+     * @param $object
+     * @param string $field
+     * @return bool
+     */
+    public function isAllowedTo($type, $object, $field = ''): bool
     {
         $field = strtolower($field);
         if ($field == '') {
-            return $this->checkRights($this->conf ['rights.'] [$type . '.'] [$object . '.']);
-        } elseif ($field == 'teaser' && ! $this->confArr ['useTeaser']) {
+            return $this->checkRights($this->conf['rights.'][$type . '.'][$object . '.']);
+        }
+        if ($field === 'teaser' && !$this->confArr['useTeaser']) {
             return false;
         }
 
-        if (($this->conf ['rights.'] [$type . '.'] ['public'] && $this->conf ['rights.'] [$type . '.'] [$object . '.'] ['fields.'] [$field . '.'] ['public']) || $this->checkRights($this->conf ['rights.'] [$type . '.'] [$object . '.'] ['enableAllFields.']) || $this->checkRights($this->conf ['rights.'] [$type . '.'] [$object . '.'] ['fields.'] [$field . '.'])) {
+        if (($this->conf['rights.'][$type . '.']['public'] && $this->conf['rights.'][$type . '.'][$object . '.']['fields.'][$field . '.']['public']) || $this->checkRights($this->conf['rights.'][$type . '.'][$object . '.']['enableAllFields.']) || $this->checkRights($this->conf['rights.'][$type . '.'][$object . '.']['fields.'][$field . '.'])) {
             return true;
         }
 
         return false;
     }
-    public function checkRights($category)
+
+    /**
+     * @param $category
+     * @return bool
+     */
+    public function checkRights($category): bool
     {
         if ($this->isCalAdmin()) {
             return true;
         }
         if ($this->isLoggedIn()) {
-            $users = explode(',', $category ['user']);
-            $groups = explode(',', $category ['group']);
+            $users = explode(',', $category['user']);
+            $groups = explode(',', $category['group']);
 
-            if (array_search($this->getUserId(), $users) !== false) {
+            if (in_array($this->getUserId(), $users, true)) {
                 return true;
             }
             $userGroups = $this->getUserGroups();
             foreach ($groups as $key => $group) {
-                if (array_search(ltrim($group), $userGroups) !== false) {
+                if (in_array(ltrim($group), $userGroups, true)) {
                     return true;
                 }
             }
         }
-        if ($category ['public'] == 1) {
-            return true;
-        }
-        return false;
+        return $category['public'] == 1;
     }
+
+    /**
+     * @param $view
+     * @return string|void
+     */
     public function checkView($view)
     {
-        if ($view == 'day' || $view == 'week' || $view == 'month' || $view == 'year' || $view == 'event' || $view == 'todo' || $view == 'location' || $view == 'organizer' || $view == 'list' || $view == 'icslist' || $view == 'search_all' || $view == 'search_event' || $view == 'search_location' || $view == 'search_organizer') {
+        if ($view === 'day' || $view === 'week' || $view === 'month' || $view === 'year' || $view === 'event' || $view === 'todo' || $view === 'location' || $view === 'organizer' || $view === 'list' || $view === 'icslist' || $view === 'search_all' || $view === 'search_event' || $view === 'search_location' || $view === 'search_organizer') {
             // catch all allowed standard view types
-        } elseif (($view == 'ics' || $view == 'single_ics') && $this->conf ['view.'] ['ics.'] ['showIcsLinks'] && $this->isViewEnabled($view)) {
-            $this->conf ['view.'] ['allowedViews'] = [
-                    0 => $view
+        } elseif (($view === 'ics' || $view === 'single_ics') && $this->conf['view.']['ics.']['showIcsLinks'] && $this->isViewEnabled($view)) {
+            $this->conf['view.']['allowedViews'] = [
+                0 => $view
             ];
             return $view;
-        } elseif ($view == 'rss') {
-            $this->conf ['view.'] ['allowedViews'] = [
-                    0 => $view
+        } elseif ($view === 'rss') {
+            $this->conf['view.']['allowedViews'] = [
+                0 => $view
             ];
             return $view;
-        } elseif ($view == 'subscription' && $this->conf ['allowSubscribe'] && $this->isViewEnabled($view)) {
-        } elseif ($view == 'translation' && $this->rightsObj->isAllowedTo('create', 'translation') && $this->isViewEnabled($view)) {
-        } elseif ($view == 'meeting' && $this->isViewEnabled($view)) {
-        } elseif ($view == 'admin' && $this->rightsObj->isAllowedToConfigure()) {
-        } elseif (($view == 'load_events' || $view == 'load_todos' || $view == 'load_calendars' || $view == 'load_categories' || $view == 'load_rights' || $view == 'load_locations' || $view == 'load_organizers' || $view == 'search_user_and_group') && $this->conf ['view.'] ['enableAjax']) {
+        } elseif ($view === 'subscription' && $this->conf['allowSubscribe'] && $this->isViewEnabled($view)) {
+        } elseif ($view === 'translation' && $this->rightsObj->isAllowedTo(
+            'create',
+            'translation'
+            ) && $this->isViewEnabled($view)) {
+        } elseif ($view === 'meeting' && $this->isViewEnabled($view)) {
+        } elseif ($view === 'admin' && $this->rightsObj->isAllowedToConfigure()) {
+        } elseif (($view === 'load_events' || $view === 'load_todos' || $view === 'load_calendars' || $view === 'load_categories' || $view === 'load_rights' || $view === 'load_locations' || $view === 'load_organizers' || $view === 'search_user_and_group') && $this->conf['view.']['enableAjax']) {
             // catch all allowed standard view types
-        } elseif (($view == 'save_calendar' || $view == 'edit_calendar' || $view == 'confirm_calendar' || $view == 'delete_calendar' || $view == 'remove_calendar' || $view == 'create_calendar') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateCalendar() || $this->rightsObj->isAllowedToEditCalendar() || $this->rightsObj->isAllowedToDeleteCalendar())) {
-        } elseif (($view == 'save_category' || $view == 'edit_category' || $view == 'confirm_category' || $view == 'delete_category' || $view == 'remove_category' || $view == 'create_category') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateCalendar() || $this->rightsObj->isAllowedToEditCategory() || $this->rightsObj->isAllowedToDeleteCategory())) {
-        } elseif (($view == 'save_event' || $view == 'edit_event' || $view == 'confirm_event' || $view == 'delete_event' || $view == 'remove_event' || $view == 'create_event') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateEvent() || $this->rightsObj->isAllowedToEditEvent() || $this->rightsObj->isAllowedToDeleteEvents())) {
-        } elseif (($view == 'save_exception_event' || $view == 'edit_exception_event' || $view == 'confirm_exception_event' || $view == 'delete_exception_event' || $view == 'remove_exception_event' || $view == 'create_exception_event') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateExceptionEvent() || $this->rightsObj->isAllowedToEditExceptionEvent() || $this->rightsObj->isAllowedToDeleteExceptionEvents())) {
-        } elseif (($view == 'save_location' || $view == 'confirm_location' || $view == 'create_location' || $view == 'edit_location' || $view == 'delete_location' || $view == 'remove_location') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateLocations() || $this->rightsObj->isAllowedToEditLocation() || $this->rightsObj->isAllowedToDeleteLocation())) {
+        } elseif (($view === 'save_calendar' || $view === 'edit_calendar' || $view === 'confirm_calendar' || $view === 'delete_calendar' || $view === 'remove_calendar' || $view === 'create_calendar') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateCalendar() || $this->rightsObj->isAllowedToEditCalendar() || $this->rightsObj->isAllowedToDeleteCalendar())) {
+        } elseif (($view === 'save_category' || $view === 'edit_category' || $view === 'confirm_category' || $view === 'delete_category' || $view === 'remove_category' || $view === 'create_category') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateCalendar() || $this->rightsObj->isAllowedToEditCategory() || $this->rightsObj->isAllowedToDeleteCategory())) {
+        } elseif (($view === 'save_event' || $view === 'edit_event' || $view === 'confirm_event' || $view === 'delete_event' || $view === 'remove_event' || $view === 'create_event') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateEvent() || $this->rightsObj->isAllowedToEditEvent() || $this->rightsObj->isAllowedToDeleteEvents())) {
+        } elseif (($view === 'save_exception_event' || $view === 'edit_exception_event' || $view === 'confirm_exception_event' || $view === 'delete_exception_event' || $view === 'remove_exception_event' || $view === 'create_exception_event') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateExceptionEvent() || $this->rightsObj->isAllowedToEditExceptionEvent() || $this->rightsObj->isAllowedToDeleteExceptionEvents())) {
+        } elseif (($view === 'save_location' || $view === 'confirm_location' || $view === 'create_location' || $view === 'edit_location' || $view === 'delete_location' || $view === 'remove_location') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateLocations() || $this->rightsObj->isAllowedToEditLocation() || $this->rightsObj->isAllowedToDeleteLocation())) {
             // catch create_location view type and check all conditions
-        } elseif (($view == 'save_organizer' || $view == 'confirm_organizer' || $view == 'create_organizer' || $view == 'edit_organizer' || $view == 'delete_organizer' || $view == 'remove_organizer') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateOrganizer() || $this->rightsObj->isAllowedToEditOrganizer() || $this->rightsObj->isAllowedToDeleteOrganizer())) {
+        } elseif (($view === 'save_organizer' || $view === 'confirm_organizer' || $view === 'create_organizer' || $view === 'edit_organizer' || $view === 'delete_organizer' || $view === 'remove_organizer') && $this->rightsObj->isCalEditable() && ($this->rightsObj->isAllowedToCreateOrganizer() || $this->rightsObj->isAllowedToEditOrganizer() || $this->rightsObj->isAllowedToDeleteOrganizer())) {
             // catch create_organizer view type and check all conditions
             // I'm not sure why this is in here, but I think it shouldn't, b/c you will get an empty create_event view even if you are not allowed to create events
             // } else if ($this->isViewEnabled($view)){
         } else {
             // a not wanted view type -> convert it
-            $view = $this->conf ['view.'] ['allowedViews'] [0];
-            if ($view == '') {
+            $view = $this->conf['view.']['allowedViews'][0];
+            if ($view === '') {
                 $view = 'month';
             }
-            $this->conf ['type'] = '';
-            $this->controller->piVars ['type'] = null;
+            $this->conf['type'] = '';
+            $this->controller->piVars['type'] = null;
         }
-        if (count($this->conf ['view.'] ['allowedViews']) == 1) {
-            $view = $this->conf ['view.'] ['allowedViews'] [0];
-            if (! in_array($this->conf ['view.'] ['allowedViews'] [0], [
-                    'event',
-                    'organizer',
-                    'location'
+        if (count($this->conf['view.']['allowedViews']) === 1) {
+            $view = $this->conf['view.']['allowedViews'][0];
+            if (!in_array($this->conf['view.']['allowedViews'][0], [
+                'event',
+                'organizer',
+                'location'
             ])) {
-                $this->conf ['uid'] = '';
-                $this->piVars ['uid'] = null;
-                $this->conf ['type'] = '';
-                $this->piVars ['type'] = null;
-            } elseif ($this->conf ['view.'] ['allowedViews'] [0] == 'event' && (($this->piVars ['view'] == 'location' && ! in_array('location', $this->conf ['view.'] ['allowedViews'])) || ($this->piVars ['view'] == 'organizer' && ! in_array('organizer', $this->conf ['view.'] ['allowedViews'])))) {
+                $this->conf['uid'] = '';
+                $this->piVars['uid'] = null;
+                $this->conf['type'] = '';
+                $this->piVars['type'] = null;
+            } elseif ($this->conf['view.']['allowedViews'][0] === 'event' && (($this->piVars['view'] === 'location' && !in_array(
+                'location',
+                $this->conf['view.']['allowedViews'],
+                true
+            )) || ($this->piVars['view'] === 'organizer' && !in_array(
+                'organizer',
+                $this->conf['view.']['allowedViews'],
+                true
+                            )))) {
                 return;
             }
-        } elseif (! ($view == 'admin' && $this->rightsObj->isAllowedToConfigure()) && ! in_array($view, $this->conf ['view.'] ['allowedViews'])) {
-            $view = $this->conf ['view.'] ['allowedViews'] [0];
+        } elseif (!($view === 'admin' && $this->rightsObj->isAllowedToConfigure()) && !in_array(
+            $view,
+            $this->conf['view.']['allowedViews'],
+            true
+        )) {
+            $view = $this->conf['view.']['allowedViews'][0];
         }
-        if (! $view) {
-            $view = $this->conf ['view.'] ['allowedViews'] [0];
+        if (!$view) {
+            $view = $this->conf['view.']['allowedViews'][0];
         }
         return $view;
     }
 
-    /* @todo Is there a way to check for allowed views on other pages that are specified by TS? */
-    public function isViewEnabled($view)
+    /* @todo Is there a way to check for allowed views on other pages that are specified by TS?
+     * @param $view
+     * @return bool
+     */
+    public function isViewEnabled($view): bool
     {
-        if (in_array($view, $this->conf ['view.'] ['allowedViewsToLinkTo'])) {
+        if (in_array($view, $this->conf['view.']['allowedViewsToLinkTo'], true)) {
             return true;
         }
         return false;
@@ -1118,39 +1499,34 @@ class RightsService extends \TYPO3\CMS\Cal\Service\BaseService
      * If the Typoscript
      * is not set and there's only one page in the pidList, then we can set this
      * page be default.
-     *
-     * @return none
      */
     public function setDefaultSaveToPage()
     {
-        $pagesArray = explode(',', $this->conf ['pidList']);
+        $pagesArray = explode(',', $this->conf['pidList']);
 
         /* If there's only one page in pidList */
-        if (count($pagesArray) == 1) {
-            $pid = $pagesArray [0];
+        if (count($pagesArray) === 1) {
+            $pid = $pagesArray[0];
 
             /* If a saveTo page does not have a value set, set a default */
-            $this->setPidIfEmpty($this->conf ['rights.'] ['create.'] ['calendar.'] ['saveCalendarToPid'], $pid);
-            $this->setPidIfEmpty($this->conf ['rights.'] ['create.'] ['category.'] ['saveCategoryToPid'], $pid);
-            $this->setPidIfEmpty($this->conf ['rights.'] ['create.'] ['event.'] ['saveEventToPid'], $pid);
-            $this->setPidIfEmpty($this->conf ['rights.'] ['create.'] ['exceptionEvent.'] ['saveExceptionEventToPid'], $pid);
-            $this->setPidIfEmpty($this->conf ['rights.'] ['create.'] ['location.'] ['saveLocationToPid'], $pid);
-            $this->setPidIfEmpty($this->conf ['rights.'] ['create.'] ['organizer.'] ['saveOrganizerToPid'], $pid);
+            $this->setPidIfEmpty($this->conf['rights.']['create.']['calendar.']['saveCalendarToPid'], $pid);
+            $this->setPidIfEmpty($this->conf['rights.']['create.']['category.']['saveCategoryToPid'], $pid);
+            $this->setPidIfEmpty($this->conf['rights.']['create.']['event.']['saveEventToPid'], $pid);
+            $this->setPidIfEmpty($this->conf['rights.']['create.']['exceptionEvent.']['saveExceptionEventToPid'], $pid);
+            $this->setPidIfEmpty($this->conf['rights.']['create.']['location.']['saveLocationToPid'], $pid);
+            $this->setPidIfEmpty($this->conf['rights.']['create.']['organizer.']['saveOrganizerToPid'], $pid);
         }
     }
 
     /**
      * Sets a conf value if it is currently empty.
      * Helper function for setDefaultSaveToPage().
-     *
-     * @param
-     *        	mixed		The conf value to be set.
-     * @param
-     *        	mixed		The value to set.
+     * @param $conf
+     * @param $value
      */
     public function setPidIfEmpty(&$conf, $value)
     {
-        if (! $conf) {
+        if (!$conf) {
             $conf = $value;
         }
     }

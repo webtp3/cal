@@ -51,7 +51,7 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  */
 
 // }}}
-if (! defined('DATE_CALC_BEGIN_WEEKDAY')) {
+if (!defined('DATE_CALC_BEGIN_WEEKDAY')) {
     /**
      * Defines what day starts the week
      *
@@ -61,7 +61,7 @@ if (! defined('DATE_CALC_BEGIN_WEEKDAY')) {
     define('DATE_CALC_BEGIN_WEEKDAY', 1);
 }
 
-if (! defined('DATE_CALC_FORMAT')) {
+if (!defined('DATE_CALC_FORMAT')) {
     /**
      * The default value for each method's $format parameter
      *
@@ -123,25 +123,23 @@ class Calc
      * </pre>
      *
      * @param int $day
-     *        	the day of the month
+     *            the day of the month
      * @param int $month
-     *        	the month
+     *            the month
      * @param int $year
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      * @param string $format
-     *        	the format string
+     *            the format string
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function dateFormat($day, $month, $year, $format)
+    public static function dateFormat($day, $month, $year, $format): string
     {
-        if (! self::isValidDate($day, $month, $year)) {
+        if (!self::isValidDate($day, $month, $year)) {
             $year = self::dateNow('%Y');
             $month = self::dateNow('%m');
             $day = self::dateNow('%d');
@@ -149,10 +147,10 @@ class Calc
 
         $output = '';
 
-        for ($strpos = 0; $strpos < strlen($format); $strpos ++) {
-            $char = substr($format, $strpos, 1);
-            if ($char == '%') {
-                $nextchar = substr($format, $strpos + 1, 1);
+        for ($strpos = 0, $strposMax = strlen($format); $strpos < $strposMax; $strpos++) {
+            $char = $format[$strpos];
+            if ($char === '%') {
+                $nextchar = $format[$strpos + 1];
                 switch ($nextchar) {
                     case 'a':
                         $output .= self::getWeekdayAbbrname($day, $month, $year);
@@ -205,7 +203,7 @@ class Calc
                     default:
                         $output .= $char . $nextchar;
                 }
-                $strpos ++;
+                $strpos++;
             } else {
                 $output .= $char;
             }
@@ -222,24 +220,21 @@ class Calc
      * From '51 to '99 is in the 1900's, otherwise it's in the 2000's.
      *
      * @param int $year
-     *        	the 2 digit year
+     *            the 2 digit year
      *
      * @return string the 4 digit year
      *
-     * @access public
      * @static
-     *
      */
-    public static function defaultCentury($year)
+    public static function defaultCentury($year): string
     {
         if (strlen($year) == 1) {
             $year = '0' . $year;
         }
         if ($year > 50) {
             return '19' . $year;
-        } else {
-            return '20' . $year;
         }
+        return '20' . $year;
     }
 
     // }}}
@@ -249,33 +244,31 @@ class Calc
      * Converts a date to number of days since a distant unspecified epoch
      *
      * @param int $day
-     *        	the day of the month
+     *            the day of the month
      * @param int $month
-     *        	the month
+     *            the month
      * @param int $year
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      *
      * @return int the number of days since the Calc epoch
      *
-     * @access public
      * @static
-     *
      */
-    public static function dateToDays($day, $month, $year)
+    public static function dateToDays($day, $month, $year): int
     {
-        $century = (int) substr($year, 0, 2);
-        $year = (int) substr($year, 2, 2);
+        $century = (int)substr($year, 0, 2);
+        $year = (int)substr($year, 2, 2);
         if ($month > 2) {
             $month -= 3;
         } else {
             $month += 9;
             if ($year) {
-                $year --;
+                $year--;
             } else {
                 $year = 99;
-                $century --;
+                $century--;
             }
         }
 
@@ -289,17 +282,15 @@ class Calc
      * Converts number of days to a distant unspecified epoch
      *
      * @param int $days
-     *        	the number of days since the Calc epoch
+     *            the number of days since the Calc epoch
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function daysToDate($days, $format = DATE_CALC_FORMAT)
+    public static function daysToDate($days, $format = DATE_CALC_FORMAT): string
     {
         $days -= 1721119;
         $century = floor((4 * $days - 1) / 146097);
@@ -318,9 +309,9 @@ class Calc
             $month += 3;
         } else {
             $month -= 9;
-            if ($year ++ == 99) {
+            if ($year++ == 99) {
                 $year = 0;
-                $century ++;
+                $century++;
             }
         }
 
@@ -343,22 +334,21 @@ class Calc
      * class and its related functions defines Sunday as 0.
      *
      * @param int $pn_day
-     *        	the day of the month
+     *            the day of the month
      * @param int $pn_month
-     *        	the month
+     *            the month
      * @param int $pn_year
-     *        	the year
+     *            the year
      *
      * @return array array of ISO Year, ISO Week No, ISO Day No as
      *         integers
-     * @access public
      * @static
      *
      * @since Method available since Release 1.5.0
      */
-    public static function isoWeekDate($pn_day = 0, $pn_month = 0, $pn_year = null)
+    public static function isoWeekDate($pn_day = 0, $pn_month = 0, $pn_year = null): array
     {
-        if (is_null($pn_year)) {
+        if ($pn_year === null) {
             $pn_year = self::dateNow('%Y');
         }
         if (empty($pn_month)) {
@@ -395,7 +385,7 @@ class Calc
                     break;
                 case 0:
                     $hn_wd1 = 7;
-                    // no break
+                // no break
                 case 5:
                 case 6:
                     // Friday - Sunday:
@@ -403,8 +393,15 @@ class Calc
                     if ($hn_day <= 8 - $hn_wd1) {
                         // ISO week is the last week of the previous ISO year:
                         //
-                        list($hn_year, $hn_lastmonth, $hn_lastday) = explode(' ', self::daysToDate($hn_jd1 - 1, '%Y %m %d'));
-                        list($hn_year, $hn_isoweek, $hn_pisoday) = self::isoWeekDate($hn_lastday, $hn_lastmonth, $hn_year);
+                        list($hn_year, $hn_lastmonth, $hn_lastday) = explode(
+                            ' ',
+                            self::daysToDate($hn_jd1 - 1, '%Y %m %d')
+                        );
+                        list($hn_year, $hn_isoweek) = self::isoWeekDate(
+                            $hn_lastday,
+                            $hn_lastmonth,
+                            $hn_year
+                        );
                     } else {
                         $hn_year = $pn_year;
                         $hn_isoweek = floor(($hn_day + $hn_wd1 - 9) / 7) + 1;
@@ -413,9 +410,9 @@ class Calc
             }
         }
         return [
-                (int) $hn_year,
-                (int) $hn_isoweek,
-                (int) $hn_wd
+            (int)$hn_year,
+            (int)$hn_isoweek,
+            (int)$hn_wd
         ];
     }
 
@@ -430,41 +427,39 @@ class Calc
      * Transcribed to PHP by Jesus M. Castagnetto.
      *
      * @param int $day
-     *        	the day of the month
+     *            the day of the month
      * @param int $month
-     *        	the month
+     *            the month
      * @param int $year
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      *
      * @return string the date in ISO Year-WeekNumber-WeekDay format
      *
-     * @access public
      * @static
-     *
      */
-    public static function gregorianToISO($day, $month, $year)
+    public static function gregorianToISO($day, $month, $year): string
     {
         $mnth = [
-                0,
-                31,
-                59,
-                90,
-                120,
-                151,
-                181,
-                212,
-                243,
-                273,
-                304,
-                334
+            0,
+            31,
+            59,
+            90,
+            120,
+            151,
+            181,
+            212,
+            243,
+            273,
+            304,
+            334
         ];
         $y_isleap = self::isLeapYear($year);
         $y_1_isleap = self::isLeapYear($year - 1);
-        $day_of_year_number = $day + $mnth [$month - 1];
+        $day_of_year_number = $day + $mnth[$month - 1];
         if ($y_isleap && $month > 2) {
-            $day_of_year_number ++;
+            $day_of_year_number++;
         }
         // find Jan 1 weekday (monday = 1, sunday = 7)
         $yy = ($year - 1) % 100;
@@ -493,7 +488,7 @@ class Calc
                 $i = 365;
             }
             if (($i - $day_of_year_number) < (4 - $weekday)) {
-                $yearnumber ++;
+                $yearnumber++;
                 $weeknumber = 1;
             }
         }
@@ -502,7 +497,7 @@ class Calc
             $j = $day_of_year_number + (7 - $weekday) + ($jan1_weekday - 1);
             $weeknumber = intval($j / 7);
             if ($jan1_weekday > 4) {
-                $weeknumber --;
+                $weeknumber--;
             }
         }
         // put it all together
@@ -521,29 +516,27 @@ class Calc
      * Adapted from previous work in Java by James Mark Hamilton.
      *
      * @param string $season
-     *        	the season to get the date for: VERNALEQUINOX,
-     *        	SUMMERSOLSTICE, AUTUMNALEQUINOX,
-     *        	or WINTERSOLSTICE
+     *            the season to get the date for: VERNALEQUINOX,
+     *            SUMMERSOLSTICE, AUTUMNALEQUINOX,
+     *            or WINTERSOLSTICE
      * @param string $year
-     *        	the year in four digit format. Must be between
-     *        	-1000BC and 3000AD.
+     *            the year in four digit format. Must be between
+     *            -1000BC and 3000AD.
      *
      * @return float the julian date the season starts on
      *
-     * @access public
      * @static
-     *
      */
-    public static function dateSeason($season, $year = 0)
+    public static function dateSeason($season, $year = 0): float
     {
         if ($year == '') {
             $year = self::dateNow('%Y');
         }
-        if (($year >= - 1000) && ($year <= 1000)) {
+        if (($year >= -1000) && ($year <= 1000)) {
             $y = $year / 1000.0;
             switch ($season) {
                 case 'VERNALEQUINOX':
-                    $juliandate = (((((((- 0.00071 * $y) - 0.00111) * $y) + 0.06134) * $y) + 365242.1374) * $y) + 1721139.29189;
+                    $juliandate = (((((((-0.00071 * $y) - 0.00111) * $y) + 0.06134) * $y) + 365242.1374) * $y) + 1721139.29189;
                     break;
                 case 'SUMMERSOLSTICE':
                     $juliandate = (((((((0.00025 * $y) + 0.00907) * $y) - 0.05323) * $y) + 365241.72562) * $y) + 1721233.25401;
@@ -553,16 +546,16 @@ class Calc
                     break;
                 case 'WINTERSOLSTICE':
                 default:
-                    $juliandate = (((((((- 0.00006 * $y) - 0.00933) * $y) - 0.00769) * $y) + 365242.88257) * $y) + 1721414.39987;
+                    $juliandate = (((((((-0.00006 * $y) - 0.00933) * $y) - 0.00769) * $y) + 365242.88257) * $y) + 1721414.39987;
             }
         } elseif (($year > 1000) && ($year <= 3000)) {
             $y = ($year - 2000) / 1000;
             switch ($season) {
                 case 'VERNALEQUINOX':
-                    $juliandate = (((((((- 0.00057 * $y) - 0.00411) * $y) + 0.05169) * $y) + 365242.37404) * $y) + 2451623.80984;
+                    $juliandate = (((((((-0.00057 * $y) - 0.00411) * $y) + 0.05169) * $y) + 365242.37404) * $y) + 2451623.80984;
                     break;
                 case 'SUMMERSOLSTICE':
-                    $juliandate = (((((((- 0.0003 * $y) + 0.00888) * $y) + 0.00325) * $y) + 365241.62603) * $y) + 2451716.56767;
+                    $juliandate = (((((((-0.0003 * $y) + 0.00888) * $y) + 0.00325) * $y) + 365241.62603) * $y) + 2451716.56767;
                     break;
                 case 'AUTUMNALEQUINOX':
                     $juliandate = (((((((0.00078 * $y) + 0.00337) * $y) - 0.11575) * $y) + 365242.01767) * $y) + 2451810.21715;
@@ -585,15 +578,13 @@ class Calc
      * which may or may not be 32-bit safe on your system.
      *
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the current date in the specified format
      *
-     * @access public
      * @static
-     *
      */
-    public static function dateNow($format = DATE_CALC_FORMAT)
+    public static function dateNow($format = DATE_CALC_FORMAT): string
     {
         return strftime($format, time());
     }
@@ -606,11 +597,9 @@ class Calc
      *
      * @return string the current year in four digit format
      *
-     * @access public
      * @static
-     *
      */
-    public static function getYear()
+    public static function getYear(): string
     {
         return self::dateNow('%Y');
     }
@@ -623,11 +612,9 @@ class Calc
      *
      * @return string the current month in two digit format
      *
-     * @access public
      * @static
-     *
      */
-    public static function getMonth()
+    public static function getMonth(): string
     {
         return self::dateNow('%m');
     }
@@ -640,11 +627,9 @@ class Calc
      *
      * @return string the current day of the month in two digit format
      *
-     * @access public
      * @static
-     *
      */
-    public static function getDay()
+    public static function getDay(): string
     {
         return self::dateNow('%d');
     }
@@ -656,19 +641,17 @@ class Calc
      * Returns number of days since 31 December of year before given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      *
      * @return int the julian date for the date
      *
-     * @access public
      * @static
-     *
      */
-    public static function julianDate($day = 0, $month = 0, $year = 0)
+    public static function julianDate($day = 0, $month = 0, $year = 0): int
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -680,22 +663,22 @@ class Calc
             $day = self::dateNow('%d');
         }
         $days = [
-                0,
-                31,
-                59,
-                90,
-                120,
-                151,
-                181,
-                212,
-                243,
-                273,
-                304,
-                334
+            0,
+            31,
+            59,
+            90,
+            120,
+            151,
+            181,
+            212,
+            243,
+            273,
+            304,
+            334
         ];
-        $julian = ($days [$month - 1] + $day);
+        $julian = ($days[$month - 1] + $day);
         if ($month > 2 && self::isLeapYear($year)) {
-            $julian ++;
+            $julian++;
         }
         return $julian;
     }
@@ -707,19 +690,17 @@ class Calc
      * Returns the full weekday name for the given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      *
      * @return string the full name of the day of the week
      *
-     * @access public
      * @static
-     *
      */
-    public static function getWeekdayFullname($day = 0, $month = 0, $year = 0)
+    public static function getWeekdayFullname($day = 0, $month = 0, $year = 0): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -732,7 +713,7 @@ class Calc
         }
         $weekday_names = self::getWeekDays();
         $weekday = self::dayOfWeek($day, $month, $year);
-        return $weekday_names [$weekday];
+        return $weekday_names[$weekday];
     }
 
     // }}}
@@ -742,22 +723,21 @@ class Calc
      * Returns the abbreviated weekday name for the given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param int $length
-     *        	the length of abbreviation
+     *            the length of abbreviation
      *
      * @return string the abbreviated name of the day of the week
      *
-     * @access public
      * @static
      *
      * @see Calc::getWeekdayFullname()
      */
-    public static function getWeekdayAbbrname($day = 0, $month = 0, $year = 0, $length = 3)
+    public static function getWeekdayAbbrname($day = 0, $month = 0, $year = 0, $length = 3): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -778,22 +758,20 @@ class Calc
      * Returns the full month name for the given month
      *
      * @param int $month
-     *        	the month
+     *            the month
      *
      * @return string the full name of the month
      *
-     * @access public
      * @static
-     *
      */
-    public static function getMonthFullname($month)
+    public static function getMonthFullname($month): string
     {
-        $month = (int) $month;
+        $month = (int)$month;
         if (empty($month)) {
-            $month = (int) self::dateNow('%m');
+            $month = (int)self::dateNow('%m');
         }
         $month_names = self::getMonthNames();
-        return $month_names [$month];
+        return $month_names[$month];
     }
 
     // }}}
@@ -803,20 +781,19 @@ class Calc
      * Returns the abbreviated month name for the given month
      *
      * @param int $month
-     *        	the month
+     *            the month
      * @param int $length
-     *        	the length of abbreviation
+     *            the length of abbreviation
      *
      * @return string the abbreviated name of the month
      *
-     * @access public
      * @static
      *
      * @see Calc::getMonthFullname
      */
-    public static function getMonthAbbrname($month, $length = 3)
+    public static function getMonthAbbrname($month, $length = 3): string
     {
-        $month = (int) $month;
+        $month = (int)$month;
         if (empty($month)) {
             $month = self::dateNow('%m');
         }
@@ -832,16 +809,14 @@ class Calc
      * Both August and Aug would return 8.
      *
      * @param string $month
-     *        	the name of the month to examine.
-     *        	Case insensitive.
+     *            the name of the month to examine.
+     *            Case insensitive.
      *
      * @return int the month's number
      *
-     * @access public
      * @static
-     *
      */
-    public static function getMonthFromFullName($month)
+    public static function getMonthFromFullName($month): int
     {
         $month = strtolower($month);
         $months = self::getMonthNames();
@@ -865,17 +840,15 @@ class Calc
      * TODO: cache values to some global array to avoid preformace
      * hits when called more than once.
      *
-     * @return s array an array of month names
+     * @return array an array of month names
      *
-     * @access public
      * @static
-     *
      */
-    public static function getMonthNames()
+    public static function getMonthNames(): array
     {
         $months = [];
-        for ($i = 1; $i < 13; $i ++) {
-            $months [$i] = strftime('%B', mktime(0, 0, 0, $i, 1, 2001));
+        for ($i = 1; $i < 13; $i++) {
+            $months[$i] = strftime('%B', mktime(0, 0, 0, $i, 1, 2001));
         }
         return $months;
     }
@@ -892,17 +865,15 @@ class Calc
      * TODO: cache values to some global array to avoid preformace
      * hits when called more than once.
      *
-     * @return s array an array of week day names
+     * @return array an array of week day names
      *
-     * @access public
      * @static
-     *
      */
-    public static function getWeekDays()
+    public static function getWeekDays(): array
     {
         $weekdays = [];
-        for ($i = 0; $i < 7; $i ++) {
-            $weekdays [$i] = strftime('%A', mktime(0, 0, 0, 1, $i, 2001));
+        for ($i = 0; $i < 7; $i++) {
+            $weekdays[$i] = strftime('%A', mktime(0, 0, 0, 1, $i, 2001));
         }
         return $weekdays;
     }
@@ -914,19 +885,17 @@ class Calc
      * Returns day of week for given date (0 = Sunday)
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      *
      * @return int the number of the day in the week
      *
-     * @access public
      * @static
-     *
      */
-    public static function dayOfWeek($day = 0, $month = 0, $year = 0)
+    public static function dayOfWeek($day = 0, $month = 0, $year = 0): int
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -941,7 +910,7 @@ class Calc
             $month -= 2;
         } else {
             $month += 10;
-            $year --;
+            $year--;
         }
 
         $day = (floor((13 * $month - 1) / 5) + $day + ($year % 100) + floor(($year % 100) / 4) + floor(($year / 100) / 4) - 2 * floor($year / 100) + 77);
@@ -957,19 +926,17 @@ class Calc
      * Returns week of the year, first Sunday is first day of first week
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      *
      * @return int the number of the week in the year
      *
-     * @access public
      * @static
-     *
      */
-    public static function weekOfYear($day = 0, $month = 0, $year = 0)
+    public static function weekOfYear($day = 0, $month = 0, $year = 0): int
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -982,7 +949,7 @@ class Calc
         }
         $iso = self::gregorianToISO($day, $month, $year);
         $parts = explode('-', $iso);
-        $week_number = intval($parts [1]);
+        $week_number = intval($parts[1]);
         return $week_number;
     }
 
@@ -993,28 +960,20 @@ class Calc
      * Returns quarter of the year for given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      *
      * @return int the number of the quarter in the year
      *
-     * @access public
      * @static
-     *
      */
-    public static function quarterOfYear($day = 0, $month = 0, $year = 0)
+    public static function quarterOfYear($day = 0, $month = 0, $year = 0): int
     {
-        if (empty($year)) {
-            $year = self::dateNow('%Y');
-        }
         if (empty($month)) {
             $month = self::dateNow('%m');
-        }
-        if (empty($day)) {
-            $day = self::dateNow('%d');
         }
         $year_quarter = intval(($month - 1) / 3 + 1);
         return $year_quarter;
@@ -1027,17 +986,15 @@ class Calc
      * Find the number of days in the given month
      *
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      *
      * @return int the number of days the month has
      *
-     * @access public
      * @static
-     *
      */
-    public static function daysInMonth($month = 0, $year = 0)
+    public static function daysInMonth($month = 0, $year = 0): int
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1053,14 +1010,13 @@ class Calc
         if ($month == 2) {
             if (self::isLeapYear($year)) {
                 return 29;
-            } else {
-                return 28;
             }
-        } elseif ($month == 4 or $month == 6 or $month == 9 or $month == 11) {
-            return 30;
-        } else {
-            return 31;
+            return 28;
         }
+        if ($month == 4 or $month == 6 or $month == 9 or $month == 11) {
+            return 30;
+        }
+        return 31;
     }
 
     // }}}
@@ -1073,17 +1029,15 @@ class Calc
      * month calendar.
      *
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      *
      * @return int the number of weeks the month has
      *
-     * @access public
      * @static
-     *
      */
-    public static function weeksInMonth($month = 0, $year = 0)
+    public static function weeksInMonth($month = 0, $year = 0): int
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1113,21 +1067,19 @@ class Calc
      * Return an array with days in week
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return array $week[$weekday]
      *
-     * @access public
      * @static
-     *
      */
-    public static function getCalendarWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function getCalendarWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): array
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1145,9 +1097,9 @@ class Calc
 
         $curr_day = self::beginOfWeek($day, $month, $year, '%E');
 
-        for ($counter = 0; $counter <= 6; $counter ++) {
-            $week_array [$counter] = self::daysToDate($curr_day, $format);
-            $curr_day ++;
+        for ($counter = 0; $counter <= 6; $counter++) {
+            $week_array[$counter] = self::daysToDate($curr_day, $format);
+            $curr_day++;
         }
         return $week_array;
     }
@@ -1159,19 +1111,17 @@ class Calc
      * Return a set of arrays to construct a calendar month for the given date
      *
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return array $month[$row][$col]
      *
-     * @access public
      * @static
-     *
      */
-    public static function getCalendarMonth($month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function getCalendarMonth($month = 0, $year = 0, $format = DATE_CALC_FORMAT): array
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1193,14 +1143,11 @@ class Calc
             $curr_day = (self::dateToDays('01', $month, $year) - self::firstOfMonthWeekday($month, $year));
         }
 
-        // number of days in this month
-        $daysInMonth = self::daysInMonth($month, $year);
-
         $weeksInMonth = self::weeksInMonth($month, $year);
-        for ($row_counter = 0; $row_counter < $weeksInMonth; $row_counter ++) {
-            for ($column_counter = 0; $column_counter <= 6; $column_counter ++) {
-                $month_array [$row_counter] [$column_counter] = self::daysToDate($curr_day, $format);
-                $curr_day ++;
+        for ($row_counter = 0; $row_counter < $weeksInMonth; $row_counter++) {
+            for ($column_counter = 0; $column_counter <= 6; $column_counter++) {
+                $month_array[$row_counter][$column_counter] = self::daysToDate($curr_day, $format);
+                $curr_day++;
             }
         }
 
@@ -1214,17 +1161,15 @@ class Calc
      * Return a set of arrays to construct a calendar year for the given date
      *
      * @param int $year
-     *        	the year in four digit format, default current local year
+     *            the year in four digit format, default current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return array $year[$month][$row][$col]
      *
-     * @access public
      * @static
-     *
      */
-    public static function getCalendarYear($year = 0, $format = DATE_CALC_FORMAT)
+    public static function getCalendarYear($year = 0, $format = DATE_CALC_FORMAT): array
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1232,8 +1177,8 @@ class Calc
 
         $year_array = [];
 
-        for ($curr_month = 0; $curr_month <= 11; $curr_month ++) {
-            $year_array [$curr_month] = self::getCalendarMonth($curr_month + 1, $year, $format);
+        for ($curr_month = 0; $curr_month <= 11; $curr_month++) {
+            $year_array[$curr_month] = self::getCalendarMonth($curr_month + 1, $year, $format);
         }
 
         return $year_array;
@@ -1246,21 +1191,19 @@ class Calc
      * Returns date of day before given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function prevDay($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function prevDay($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1282,21 +1225,19 @@ class Calc
      * Returns date of day after given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function nextDay($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function nextDay($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1318,21 +1259,19 @@ class Calc
      * Returns date of the previous weekday, skipping from Monday to Friday
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function prevWeekday($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function prevWeekday($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1362,21 +1301,19 @@ class Calc
      * Friday to Monday
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function nextWeekday($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function nextWeekday($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1406,26 +1343,30 @@ class Calc
      * from the given date
      *
      * @param
-     *        	int day of week, 0=Sunday
+     *            int day of week, 0=Sunday
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param bool $onOrBefore
-     *        	if true and days are same, returns current day
+     *            if true and days are same, returns current day
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function prevDayOfWeek($dow, $day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT, $onOrBefore = false)
-    {
+    public static function prevDayOfWeek(
+        $dow,
+        $day = 0,
+        $month = 0,
+        $year = 0,
+        $format = DATE_CALC_FORMAT,
+        $onOrBefore = false
+    ): string {
         if (empty($year)) {
             $year = self::dateNow('%Y');
         }
@@ -1438,7 +1379,7 @@ class Calc
         $days = self::dateToDays($day, $month, $year);
         $curr_weekday = self::dayOfWeek($day, $month, $year);
         if ($curr_weekday == $dow) {
-            if (! $onOrBefore) {
+            if (!$onOrBefore) {
                 $days -= 7;
             }
         } elseif ($curr_weekday < $dow) {
@@ -1457,26 +1398,30 @@ class Calc
      * from the given date
      *
      * @param int $dow
-     *        	the day of the week (0 = Sunday)
+     *            the day of the week (0 = Sunday)
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param bool $onOrAfter
-     *        	if true and days are same, returns current day
+     *            if true and days are same, returns current day
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function nextDayOfWeek($dow, $day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT, $onOrAfter = false)
-    {
+    public static function nextDayOfWeek(
+        $dow,
+        $day = 0,
+        $month = 0,
+        $year = 0,
+        $format = DATE_CALC_FORMAT,
+        $onOrAfter = false
+    ): string {
         if (empty($year)) {
             $year = self::dateNow('%Y');
         }
@@ -1491,7 +1436,7 @@ class Calc
         $curr_weekday = self::dayOfWeek($day, $month, $year);
 
         if ($curr_weekday == $dow) {
-            if (! $onOrAfter) {
+            if (!$onOrAfter) {
                 $days += 7;
             }
         } elseif ($curr_weekday > $dow) {
@@ -1511,23 +1456,21 @@ class Calc
      * on or before the given date
      *
      * @param int $dow
-     *        	the day of the week (0 = Sunday)
+     *            the day of the week (0 = Sunday)
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function prevDayOfWeekOnOrBefore($dow, $day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function prevDayOfWeekOnOrBefore($dow, $day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         return self::prevDayOfWeek($dow, $day, $month, $year, $format, true);
     }
@@ -1540,23 +1483,21 @@ class Calc
      * on or after the given date
      *
      * @param int $dow
-     *        	the day of the week (0 = Sunday)
+     *            the day of the week (0 = Sunday)
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function nextDayOfWeekOnOrAfter($dow, $day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function nextDayOfWeekOnOrAfter($dow, $day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         return self::nextDayOfWeek($dow, $day, $month, $year, $format, true);
     }
@@ -1571,21 +1512,19 @@ class Calc
      * Can return weekday of prev month.
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function beginOfWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function beginOfWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1611,21 +1550,19 @@ class Calc
      * Can return weekday of following month.
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function endOfWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function endOfWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1651,21 +1588,19 @@ class Calc
      * Can return weekday of prev month.
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function beginOfPrevWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function beginOfPrevWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1696,21 +1631,19 @@ class Calc
      * Can return weekday of prev month.
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function beginOfNextWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function beginOfNextWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1738,21 +1671,20 @@ class Calc
      * Return date of first day of month of given date
      *
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
      *
      * @see Calc::beginOfMonthBySpan()
      * @deprecated Method deprecated in Release 1.4.4
      */
-    public static function beginOfMonth($month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function beginOfMonth($month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1770,23 +1702,22 @@ class Calc
      * Returns date of the first day of previous month of given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
      *
      * @see Calc::beginOfMonthBySpan()
      * @deprecated Method deprecated in Release 1.4.4
      */
-    public static function beginOfPrevMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function beginOfPrevMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1794,14 +1725,11 @@ class Calc
         if (empty($month)) {
             $month = self::dateNow('%m');
         }
-        if (empty($day)) {
-            $day = self::dateNow('%d');
-        }
         if ($month > 1) {
-            $month --;
+            $month--;
             $day = 1;
         } else {
-            $year --;
+            $year--;
             $month = 12;
             $day = 1;
         }
@@ -1815,23 +1743,22 @@ class Calc
      * Returns date of the last day of previous month for given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
      *
      * @see Calc::endOfMonthBySpan()
      * @deprecated Method deprecated in Release 1.4.4
      */
-    public static function endOfPrevMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function endOfPrevMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1839,13 +1766,10 @@ class Calc
         if (empty($month)) {
             $month = self::dateNow('%m');
         }
-        if (empty($day)) {
-            $day = self::dateNow('%d');
-        }
         if ($month > 1) {
-            $month --;
+            $month--;
         } else {
-            $year --;
+            $year--;
             $month = 12;
         }
         $day = self::daysInMonth($month, $year);
@@ -1859,23 +1783,22 @@ class Calc
      * Returns date of begin of next month of given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
      *
      * @see Calc::beginOfMonthBySpan()
      * @deprecated Method deprecated in Release 1.4.4
      */
-    public static function beginOfNextMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function beginOfNextMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1883,14 +1806,11 @@ class Calc
         if (empty($month)) {
             $month = self::dateNow('%m');
         }
-        if (empty($day)) {
-            $day = self::dateNow('%d');
-        }
         if ($month < 12) {
-            $month ++;
+            $month++;
             $day = 1;
         } else {
-            $year ++;
+            $year++;
             $month = 1;
             $day = 1;
         }
@@ -1904,23 +1824,22 @@ class Calc
      * Returns date of the last day of next month of given date
      *
      * @param int $day
-     *        	the day of the month, default is current local day
+     *            the day of the month, default is current local day
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
      *
      * @see Calc::endOfMonthBySpan()
      * @deprecated Method deprecated in Release 1.4.4
      */
-    public static function endOfNextMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function endOfNextMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1928,13 +1847,10 @@ class Calc
         if (empty($month)) {
             $month = self::dateNow('%m');
         }
-        if (empty($day)) {
-            $day = self::dateNow('%d');
-        }
         if ($month < 12) {
-            $month ++;
+            $month++;
         } else {
-            $year ++;
+            $year++;
             $month = 1;
         }
         $day = self::daysInMonth($month, $year);
@@ -1949,26 +1865,25 @@ class Calc
      * from the given date
      *
      * @param int $months
-     *        	the number of months from the date provided.
-     *        	Positive numbers go into the future.
-     *        	Negative numbers go into the past.
-     *        	0 is the month presented in $month.
+     *            the number of months from the date provided.
+     *            Positive numbers go into the future.
+     *            Negative numbers go into the past.
+     *            0 is the month presented in $month.
      * @param string $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param string $year
-     *        	the year in four digit format, default is the
-     *        	current local year
+     *            the year in four digit format, default is the
+     *            current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
      *
      * @since Method available since Release 1.4.4
      */
-    public static function beginOfMonthBySpan($months = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function beginOfMonthBySpan($months = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1995,7 +1910,7 @@ class Calc
             } elseif ($tmp_mo == 0) {
                 // prior dec
                 $month = 12;
-                $year --;
+                $year--;
             } else {
                 // some time in a prior year
                 $month = 12 + ($tmp_mo % 12);
@@ -2013,26 +1928,25 @@ class Calc
      * from the given date
      *
      * @param int $months
-     *        	the number of months from the date provided.
-     *        	Positive numbers go into the future.
-     *        	Negative numbers go into the past.
-     *        	0 is the month presented in $month.
+     *            the number of months from the date provided.
+     *            Positive numbers go into the future.
+     *            Negative numbers go into the past.
+     *            0 is the month presented in $month.
      * @param string $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param string $year
-     *        	the year in four digit format, default is the
-     *        	current local year
+     *            the year in four digit format, default is the
+     *            current local year
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
      *
      * @since Method available since Release 1.4.4
      */
-    public static function endOfMonthBySpan($months = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT)
+    public static function endOfMonthBySpan($months = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -2059,7 +1973,7 @@ class Calc
             } elseif ($tmp_mo == 0) {
                 // prior dec
                 $month = 12;
-                $year --;
+                $year--;
             } else {
                 // some time in a prior year
                 $month = 12 + ($tmp_mo % 12);
@@ -2076,17 +1990,15 @@ class Calc
      * Find the day of the week for the first of the month of given date
      *
      * @param int $month
-     *        	the month, default is current local month
+     *            the month, default is current local month
      * @param int $year
-     *        	the year in four digit format, default is current local year
+     *            the year in four digit format, default is current local year
      *
      * @return int number of weekday for the first day, 0=Sunday
      *
-     * @access public
      * @static
-     *
      */
-    public static function firstOfMonthWeekday($month = 0, $year = 0)
+    public static function firstOfMonthWeekday($month = 0, $year = 0): int
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -2105,48 +2017,44 @@ class Calc
      * such as the second Saturday of January 2000
      *
      * @param int $week
-     *        	the number of the week to get
-     *        	(1 = first, etc. Also can be 'last'.)
+     *            the number of the week to get
+     *            (1 = first, etc. Also can be 'last'.)
      * @param int $dow
-     *        	the day of the week (0 = Sunday)
+     *            the day of the week (0 = Sunday)
      * @param int $month
-     *        	the month
+     *            the month
      * @param int $year
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      * @param string $format
-     *        	the string indicating how to format the output
+     *            the string indicating how to format the output
      *
      * @return string the date in the desired format
      *
-     * @access public
      * @static
-     *
      */
-    public static function NWeekdayOfMonth($week, $dow, $month, $year, $format = DATE_CALC_FORMAT)
+    public static function NWeekdayOfMonth($week, $dow, $month, $year, $format = DATE_CALC_FORMAT): string
     {
         if (is_numeric($week)) {
             $DOW1day = ($week - 1) * 7 + 1;
             $DOW1 = self::dayOfWeek($DOW1day, $month, $year);
             $wdate = ($week - 1) * 7 + 1 + (7 + $dow - $DOW1) % 7;
             if ($wdate > self::daysInMonth($month, $year)) {
-                return - 1;
-            } else {
-                return self::dateFormat($wdate, $month, $year, $format);
+                return -1;
             }
-        } elseif ($week == 'last' && $dow < 7) {
+            return self::dateFormat($wdate, $month, $year, $format);
+        }
+        if ($week === 'last' && $dow < 7) {
             $lastday = self::daysInMonth($month, $year);
             $lastdow = self::dayOfWeek($lastday, $month, $year);
             $diff = $dow - $lastdow;
             if ($diff > 0) {
                 return self::dateFormat($lastday - (7 - $diff), $month, $year, $format);
-            } else {
-                return self::dateFormat($lastday + $diff, $month, $year, $format);
             }
-        } else {
-            return - 1;
+            return self::dateFormat($lastday + $diff, $month, $year, $format);
         }
+        return -1;
     }
 
     // }}}
@@ -2156,26 +2064,24 @@ class Calc
      * Returns true for valid date, false for invalid date
      *
      * @param int $day
-     *        	the day of the month
+     *            the day of the month
      * @param int $month
-     *        	the month
+     *            the month
      * @param int $year
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      *
      * @return bool
      *
-     * @access public
      * @static
-     *
      */
-    public static function isValidDate($day, $month, $year)
+    public static function isValidDate($day, $month, $year): bool
     {
         if ($year < 0 || $year > 9999) {
             return false;
         }
-        if (! checkdate($month, $day, $year)) {
+        if (!checkdate($month, $day, $year)) {
             return false;
         }
         return true;
@@ -2188,17 +2094,15 @@ class Calc
      * Returns true for a leap year, else false
      *
      * @param int $year
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      *
      * @return bool
      *
-     * @access public
      * @static
-     *
      */
-    public static function isLeapYear($year = 0)
+    public static function isLeapYear($year = 0): bool
     {
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -2212,10 +2116,9 @@ class Calc
         if ($year < 1582) {
             // pre Gregorio XIII - 1582
             return $year % 4 == 0;
-        } else {
-            // post Gregorio XIII - 1582
-            return (($year % 4 == 0) && ($year % 100 != 0)) || ($year % 400 == 0);
         }
+        // post Gregorio XIII - 1582
+        return (($year % 4 == 0) && ($year % 100 != 0)) || ($year % 400 == 0);
     }
 
     // }}}
@@ -2225,21 +2128,19 @@ class Calc
      * Determines if given date is a future date from now
      *
      * @param int $day
-     *        	the day of the month
+     *            the day of the month
      * @param int $month
-     *        	the month
+     *            the month
      * @param int $year
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      *
      * @return bool
      *
-     * @access public
      * @static
-     *
      */
-    public static function isFutureDate($day, $month, $year)
+    public static function isFutureDate($day, $month, $year): bool
     {
         $this_year = self::dateNow('%Y');
         $this_month = self::dateNow('%m');
@@ -2247,10 +2148,12 @@ class Calc
 
         if ($year > $this_year) {
             return true;
-        } elseif ($year == $this_year) {
+        }
+        if ($year == $this_year) {
             if ($month > $this_month) {
                 return true;
-            } elseif ($month == $this_month) {
+            }
+            if ($month == $this_month) {
                 if ($day > $this_day) {
                     return true;
                 }
@@ -2266,21 +2169,19 @@ class Calc
      * Determines if given date is a past date from now
      *
      * @param int $day
-     *        	the day of the month
+     *            the day of the month
      * @param int $month
-     *        	the month
+     *            the month
      * @param int $year
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      *
      * @return bool
      *
-     * @access public
      * @static
-     *
      */
-    public static function isPastDate($day, $month, $year)
+    public static function isPastDate($day, $month, $year): bool
     {
         $this_year = self::dateNow('%Y');
         $this_month = self::dateNow('%m');
@@ -2288,10 +2189,12 @@ class Calc
 
         if ($year < $this_year) {
             return true;
-        } elseif ($year == $this_year) {
+        }
+        if ($year == $this_year) {
             if ($month < $this_month) {
                 return true;
-            } elseif ($month == $this_month) {
+            }
+            if ($month == $this_month) {
                 if ($day < $this_day) {
                     return true;
                 }
@@ -2307,36 +2210,34 @@ class Calc
      * Returns number of days between two given dates
      *
      * @param int $day1
-     *        	the day of the month
+     *            the day of the month
      * @param int $month1
-     *        	the month
+     *            the month
      * @param int $year1
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      * @param int $day2
-     *        	the day of the month
+     *            the day of the month
      * @param int $month2
-     *        	the month
+     *            the month
      * @param int $year2
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      *
      * @return int the absolute number of days between the two dates.
      *         If an error occurs, -1 is returned.
      *
-     * @access public
      * @static
-     *
      */
-    public static function dateDiff($day1, $month1, $year1, $day2, $month2, $year2)
+    public static function dateDiff($day1, $month1, $year1, $day2, $month2, $year2): int
     {
-        if (! self::isValidDate($day1, $month1, $year1)) {
-            return - 1;
+        if (!self::isValidDate($day1, $month1, $year1)) {
+            return -1;
         }
-        if (! self::isValidDate($day2, $month2, $year2)) {
-            return - 1;
+        if (!self::isValidDate($day2, $month2, $year2)) {
+            return -1;
         }
         return abs(self::dateToDays($day1, $month1, $year1) - self::dateToDays($day2, $month2, $year2));
     }
@@ -2348,37 +2249,35 @@ class Calc
      * Compares two dates
      *
      * @param int $day1
-     *        	the day of the month
+     *            the day of the month
      * @param int $month1
-     *        	the month
+     *            the month
      * @param int $year1
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      * @param int $day2
-     *        	the day of the month
+     *            the day of the month
      * @param int $month2
-     *        	the month
+     *            the month
      * @param int $year2
-     *        	the year. Use the complete year instead of the
-     *        	abbreviated version. E.g. use 2005, not 05.
-     *        	Do not add leading 0's for years prior to 1000.
+     *            the year. Use the complete year instead of the
+     *            abbreviated version. E.g. use 2005, not 05.
+     *            Do not add leading 0's for years prior to 1000.
      *
      * @return int 0 if the dates are equal. 1 if date 1 is later, -1 if
      *         date 1 is earlier.
      *
-     * @access public
      * @static
-     *
      */
-    public static function compareDates($day1, $month1, $year1, $day2, $month2, $year2)
+    public static function compareDates($day1, $month1, $year1, $day2, $month2, $year2): int
     {
         $ndays1 = self::dateToDays($day1, $month1, $year1);
         $ndays2 = self::dateToDays($day2, $month2, $year2);
         if ($ndays1 == $ndays2) {
             return 0;
         }
-        return ($ndays1 > $ndays2) ? 1 : - 1;
+        return ($ndays1 > $ndays2) ? 1 : -1;
     }
 
     // }}}

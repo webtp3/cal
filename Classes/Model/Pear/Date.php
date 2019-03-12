@@ -191,16 +191,15 @@ class Date
      * or another Date object. If no date is passed, the current date/time
      * is used.
      *
-     * @access public
      * @see setDate()
      * @param mixed $date
-     *        	optional - date/time to initialize
+     *            optional - date/time to initialize
      * @return object Date the new Date object
      */
     public function Date($date = null)
     {
         $this->tz = TimeZone::getDefault();
-        if (is_null($date)) {
+        if ($date === null) {
             $this->setDate(date('Y-m-d H:i:s'));
         } elseif (is_a($date, 'TYPO3\CMS\Cal\Model\Pear\Date\Date')) {
             $this->copy($date);
@@ -218,36 +217,39 @@ class Date
      * Set the fields of a Date object based on the input date and format,
      * which is specified by the DATE_FORMAT_* constants.
      *
-     * @access public
      * @param string $date
-     *        	input date
+     *            input date
      * @param int $format
-     *        	Optional format constant (DATE_FORMAT_*) of the input date.
-     *        	This parameter isn't really needed anymore, but you could
-     *        	use it to force DATE_FORMAT_UNIXTIME.
+     *            Optional format constant (DATE_FORMAT_*) of the input date.
+     *            This parameter isn't really needed anymore, but you could
+     *            use it to force DATE_FORMAT_UNIXTIME.
      */
     public function setDate($date, $format = DATE_FORMAT_ISO)
     {
-        if (preg_match('/^(\d{4})-?(\d{2})-?(\d{2})([T\s]?(\d{2}):?(\d{2}):?(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:?\d{2})?)?$/i', $date, $regs) && $format != DATE_FORMAT_UNIXTIME) {
+        if (preg_match(
+            '/^(\d{4})-?(\d{2})-?(\d{2})([T\s]?(\d{2}):?(\d{2}):?(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:?\d{2})?)?$/i',
+            $date,
+            $regs
+            ) && $format != DATE_FORMAT_UNIXTIME) {
             // DATE_FORMAT_ISO, ISO_BASIC, ISO_EXTENDED, and TIMESTAMP
             // These formats are extremely close to each other. This regex
             // is very loose and accepts almost any butchered format you could
             // throw at it. e.g. 2003-10-07 19:45:15 and 2003-10071945:15
             // are the same thing in the eyes of this regex, even though the
             // latter is not a valid ISO 8601 date.
-            $this->year = $regs [1];
-            $this->month = $regs [2];
-            $this->day = $regs [3];
-            $this->hour = isset($regs [5]) ? $regs [5] : 0;
-            $this->minute = isset($regs [6]) ? $regs [6] : 0;
-            $this->second = isset($regs [7]) ? $regs [7] : 0;
-            $this->partsecond = isset($regs [8]) ? (float) $regs [8] : (float) 0;
+            $this->year = $regs[1];
+            $this->month = $regs[2];
+            $this->day = $regs[3];
+            $this->hour = $regs[5] ?? 0;
+            $this->minute = $regs[6] ?? 0;
+            $this->second = $regs[7] ?? 0;
+            $this->partsecond = isset($regs[8]) ? (float)$regs[8] : (float)0;
 
             // if an offset is defined, convert time to UTC
             // Date currently can't set a timezone only by offset,
             // so it has to store it as UTC
-            if (isset($regs [9])) {
-                $this->toUTCbyOffset($regs [9]);
+            if (isset($regs[9])) {
+                $this->toUTCbyOffset($regs[9]);
             }
         } elseif (is_numeric($date)) {
             // UNIXTIME
@@ -260,7 +262,7 @@ class Date
             $this->hour = 0;
             $this->minute = 0;
             $this->second = 0;
-            $this->partsecond = (float) 0;
+            $this->partsecond = (float)0;
         }
     }
 
@@ -273,9 +275,8 @@ class Date
      * Get a string (or other) representation of this date in the
      * format specified by the DATE_FORMAT_* constants.
      *
-     * @access public
      * @param int $format
-     *        	format constant (DATE_FORMAT_*) of the output date
+     *            format constant (DATE_FORMAT_*) of the output date
      * @return string the date in the requested format
      */
     public function getDate($format = DATE_FORMAT_ISO)
@@ -322,9 +323,8 @@ class Date
      *
      * Makes this Date a copy of another Date object.
      *
-     * @access public
      * @param
-     *        	object Date $date Date to copy from
+     *            object Date $date Date to copy from
      */
     public function copy($date)
     {
@@ -380,22 +380,26 @@ class Date
      * <code>%% </code> literal '%' <br>
      * <br>
      *
-     * @access public
      * @param
-     *        	string format the format string for returned date/time
+     *            string format the format string for returned date/time
      * @return string date/time in given format
      */
-    public function format($format)
+    public function format($format): string
     {
         $output = '';
 
-        for ($strpos = 0; $strpos < strlen($format); $strpos ++) {
+        for ($strpos = 0, $strposMax = strlen($format); $strpos < $strposMax; $strpos++) {
             $char = substr($format, $strpos, 1);
             if ($char == '%') {
                 $nextchar = substr($format, $strpos + 1, 1);
                 switch ($nextchar) {
                     case 'a':
-                        $output .= Calc::getWeekdayAbbrname($this->day, $this->month, $this->year, $this->getWeekdayAbbrnameLength);
+                        $output .= Calc::getWeekdayAbbrname(
+                            $this->day,
+                            $this->month,
+                            $this->year,
+                            $this->getWeekdayAbbrnameLength
+                        );
                         break;
                     case 'A':
                         $output .= Calc::getWeekdayFullname($this->day, $this->month, $this->year);
@@ -448,8 +452,8 @@ class Date
                         $output .= "\n";
                         break;
                     case 'N':
-                            $output .= $this->month;
-                            break;
+                        $output .= $this->month;
+                        break;
                     case 'O':
                         $offms = $this->tz->getOffset($this);
                         $direction = $offms >= 0 ? '+' : '-';
@@ -474,13 +478,23 @@ class Date
                         break;
                     case 'r':
                         $hour = ($this->hour + 1) > 12 ? $this->hour - 12 : $this->hour;
-                        $output .= sprintf('%02d:%02d:%02d %s', $hour == 0 ? 12 : $hour, $this->minute, $this->second, $this->hour >= 12 ? 'PM' : 'AM');
+                        $output .= sprintf(
+                            '%02d:%02d:%02d %s',
+                            $hour == 0 ? 12 : $hour,
+                            $this->minute,
+                            $this->second,
+                            $this->hour >= 12 ? 'PM' : 'AM'
+                        );
                         break;
                     case 'R':
                         $output .= sprintf('%02d:%02d', $this->hour, $this->minute);
                         break;
                     case 's':
-                        $output .= str_replace(',', '.', sprintf('%09f', (float) ((float) $this->second + $this->partsecond)));
+                        $output .= str_replace(
+                            ',',
+                            '.',
+                            sprintf('%09f', (float)((float)$this->second + $this->partsecond))
+                        );
                         break;
                     case 'S':
                         $output .= sprintf('%02d', $this->second);
@@ -512,7 +526,7 @@ class Date
                     default:
                         $output .= $char . $nextchar;
                 }
-                $strpos ++;
+                $strpos++;
             } else {
                 $output .= $char;
             }
@@ -529,10 +543,9 @@ class Date
      * Get a representation of this date in Unix time() format. This may only be
      * valid for dates from 1970 to ~2038.
      *
-     * @access public
      * @return int number of seconds since the unix epoch
      */
-    public function getTime()
+    public function getTime(): int
     {
         return $this->getDate(DATE_FORMAT_UNIXTIME);
     }
@@ -548,15 +561,14 @@ class Date
      * only assigns a new time zone. For conversion, use
      * convertTZ().
      *
-     * @access public
      * @param
-     *        	object TimeZone $tz the TimeZone object to use, if called
-     *        	with a paramater that is not a TimeZone object, will fall through to
-     *        	setTZbyID().
+     *            object TimeZone $tz the TimeZone object to use, if called
+     *            with a paramater that is not a TimeZone object, will fall through to
+     *            setTZbyID().
      */
     public function setTZ($tz)
     {
-        if (is_a($tz, 'TYPO3\CMS\Cal\Model\Pear\Date\Timezone')) {
+        if ($tz instanceof Timezone) {
             $this->tz = $tz;
         } else {
             $this->setTZbyID($tz);
@@ -575,9 +587,8 @@ class Date
      * only assigns a new time zone. For conversion, use
      * convertTZ().
      *
-     * @access public
      * @param
-     *        	string id a time zone id
+     *            string id a time zone id
      */
     public function setTZbyID($id)
     {
@@ -598,10 +609,9 @@ class Date
      * this date in this date's time zone. See TimeZone::inDaylightTime()
      * for compatability information.
      *
-     * @access public
      * @return bool true if DST is in effect for this date
      */
-    public function inDaylightTime()
+    public function inDaylightTime(): bool
     {
         return $this->tz->inDaylightTime($this);
     }
@@ -613,8 +623,6 @@ class Date
      * Converts this date to UTC and sets this date's timezone to UTC
      *
      * Converts this date to UTC and sets this date's timezone to UTC
-     *
-     * @access public
      */
     public function toUTC()
     {
@@ -637,9 +645,8 @@ class Date
      * putenv() or if localtime() does not work in your environment. See
      * Date::TimeZone::inDaylightTime() for more information.
      *
-     * @access public
      * @param
-     *        	object TimeZone $tz the Date::TimeZone object for the conversion time zone
+     *            object TimeZone $tz the Date::TimeZone object for the conversion time zone
      */
     public function convertTZ($tz)
     {
@@ -669,9 +676,8 @@ class Date
      * putenv() or if localtime() does not work in your environment. See
      * Date::TimeZone::inDaylightTime() for more information.
      *
-     * @access public
      * @param
-     *        	string id a time zone id
+     *            string id a time zone id
      */
     public function convertTZbyID($id)
     {
@@ -685,7 +691,7 @@ class Date
 
     // }}}
     // {{{ toUTCbyOffset()
-    public function toUTCbyOffset($offset)
+    public function toUTCbyOffset($offset): bool
     {
         if ($offset == 'Z' || $offset == '+00:00' || $offset == '+0000') {
             $this->toUTC();
@@ -694,12 +700,12 @@ class Date
 
         if (preg_match('/([\+\-])(\d{2}):?(\d{2})/', $offset, $regs)) {
             // convert offset to seconds
-            $hours = (int) isset($regs [2]) ? $regs [2] : 0;
-            $mins = (int) isset($regs [3]) ? $regs [3] : 0;
+            $hours = (int)isset($regs[2]) ? $regs[2] : 0;
+            $mins = (int)isset($regs[3]) ? $regs[3] : 0;
             $offset = ($hours * 3600) + ($mins * 60);
 
-            if (isset($regs [1]) && $regs [1] == '-') {
-                $offset *= - 1;
+            if (isset($regs[1]) && $regs[1] == '-') {
+                $offset *= -1;
             }
 
             if ($offset > 0) {
@@ -723,9 +729,8 @@ class Date
      *
      * Adds a given number of seconds to the date
      *
-     * @access public
      * @param int $sec
-     *        	the number of seconds to add
+     *            the number of seconds to add
      */
     public function addSeconds($sec)
     {
@@ -748,27 +753,30 @@ class Date
      *
      * Adds a time span to the date
      *
-     * @access public
      * @param
-     *        	object Span $span the time span to add
+     *            object Span $span the time span to add
      */
     public function addSpan($span)
     {
-        if (! is_a($span, 'TYPO3\CMS\Cal\Model\Pear\Date\Span')) {
+        if (!is_a($span, Span::class)) {
             return;
         }
 
         $this->second += $span->second;
         if ($this->second >= 60) {
-            $this->minute ++;
+            $this->minute++;
             $this->second -= 60;
         }
 
         $this->minute += $span->minute;
         if ($this->minute >= 60) {
-            $this->hour ++;
+            $this->hour++;
             if ($this->hour >= 24) {
-                list($this->year, $this->month, $this->day) = sscanf(Calc::nextDay($this->day, $this->month, $this->year), '%04s%02s%02s');
+                list($this->year, $this->month, $this->day) = sscanf(Calc::nextDay(
+                    $this->day,
+                    $this->month,
+                    $this->year
+                ), '%04s%02s%02s');
                 $this->hour -= 24;
             }
             $this->minute -= 60;
@@ -776,7 +784,10 @@ class Date
 
         $this->hour += $span->hour;
         if ($this->hour >= 24) {
-            list($this->year, $this->month, $this->day) = sscanf(Calc::nextDay($this->day, $this->month, $this->year), '%04s%02s%02s');
+            list($this->year, $this->month, $this->day) = sscanf(
+                Calc::nextDay($this->day, $this->month, $this->year),
+                '%04s%02s%02s'
+            );
             $this->hour -= 24;
         }
 
@@ -797,9 +808,8 @@ class Date
      *
      * Subtracts a given number of seconds from the date
      *
-     * @access public
      * @param int $sec
-     *        	the number of seconds to subtract
+     *            the number of seconds to subtract
      */
     public function subtractSeconds($sec)
     {
@@ -822,13 +832,12 @@ class Date
      *
      * Subtracts a time span to the date
      *
-     * @access public
      * @param
-     *        	object Span $span the time span to subtract
+     *            object Span $span the time span to subtract
      */
     public function subtractSpan($span)
     {
-        if (! is_a($span, 'TYPO3\CMS\Cal\Model\Pear\Date\Span')) {
+        if (!is_a($span, Span::class)) {
             return;
         }
         if ($span->isEmpty()) {
@@ -837,15 +846,19 @@ class Date
 
         $this->second -= $span->second;
         if ($this->second < 0) {
-            $this->minute --;
+            $this->minute--;
             $this->second += 60;
         }
 
         $this->minute -= $span->minute;
         if ($this->minute < 0) {
-            $this->hour --;
+            $this->hour--;
             if ($this->hour < 0) {
-                list($this->year, $this->month, $this->day) = sscanf(Calc::prevDay($this->day, $this->month, $this->year), '%04s%02s%02s');
+                list($this->year, $this->month, $this->day) = sscanf(Calc::prevDay(
+                    $this->day,
+                    $this->month,
+                    $this->year
+                ), '%04s%02s%02s');
                 $this->hour += 24;
             }
             $this->minute += 60;
@@ -853,7 +866,10 @@ class Date
 
         $this->hour -= $span->hour;
         if ($this->hour < 0) {
-            list($this->year, $this->month, $this->day) = sscanf(Calc::prevDay($this->day, $this->month, $this->year), '%04s%02s%02s');
+            list($this->year, $this->month, $this->day) = sscanf(
+                Calc::prevDay($this->day, $this->month, $this->year),
+                '%04s%02s%02s'
+            );
             $this->hour += 24;
         }
 
@@ -875,39 +891,38 @@ class Date
      * Compares two dates. Suitable for use
      * in sorting functions.
      *
-     * @access public
      * @param
-     *        	object Date $d1 the first date
+     *            object Date $d1 the first date
      * @param
-     *        	object Date $d2 the second date
+     *            object Date $d2 the second date
      * @return int 0 if the dates are equal, -1 if d1 is before d2, 1 if d1 is after d2
      */
-    public function compare($d1, $d2)
+    public function compare($d1, $d2): int
     {
         $d1->convertTZ(new TimeZone('UTC'));
         $d2->convertTZ(new TimeZone('UTC'));
         $days1 = Calc::dateToDays($d1->day, $d1->month, $d1->year);
         $days2 = Calc::dateToDays($d2->day, $d2->month, $d2->year);
         if ($days1 < $days2) {
-            return - 1;
+            return -1;
         }
         if ($days1 > $days2) {
             return 1;
         }
         if ($d1->hour < $d2->hour) {
-            return - 1;
+            return -1;
         }
         if ($d1->hour > $d2->hour) {
             return 1;
         }
         if ($d1->minute < $d2->minute) {
-            return - 1;
+            return -1;
         }
         if ($d1->minute > $d2->minute) {
             return 1;
         }
         if ($d1->second < $d2->second) {
-            return - 1;
+            return -1;
         }
         if ($d1->second > $d2->second) {
             return 1;
@@ -923,18 +938,16 @@ class Date
      *
      * Test if this date/time is before a certain date/time
      *
-     * @access public
      * @param
-     *        	object Date $when the date to test against
+     *            object Date $when the date to test against
      * @return bool true if this date is before $when
      */
-    public function before($when)
+    public function before($when): bool
     {
-        if (self::compare($this, $when) == - 1) {
+        if (self::compare($this, $when) == -1) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     // }}}
@@ -945,18 +958,16 @@ class Date
      *
      * Test if this date/time is after a certian date/time
      *
-     * @access public
      * @param
-     *        	object Date $when the date to test against
+     *            object Date $when the date to test against
      * @return bool true if this date is after $when
      */
-    public function after($when)
+    public function after($when): bool
     {
         if (self::compare($this, $when) == 1) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     // }}}
@@ -967,18 +978,16 @@ class Date
      *
      * Test if this date/time is exactly equal to a certian date/time
      *
-     * @access public
      * @param
-     *        	object Date $when the date to test against
+     *            object Date $when the date to test against
      * @return bool true if this date is exactly equal to $when
      */
-    public function equals($when)
+    public function equals($when): bool
     {
         if (self::compare($this, $when) == 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     // }}}
@@ -989,17 +998,15 @@ class Date
      *
      * Determine if this date is in the future
      *
-     * @access public
      * @return bool true if this date is in the future
      */
-    public function isFuture()
+    public function isFuture(): bool
     {
         $now = new self();
         if ($this->after($now)) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     // }}}
@@ -1010,17 +1017,15 @@ class Date
      *
      * Determine if this date is in the past
      *
-     * @access public
      * @return bool true if this date is in the past
      */
-    public function isPast()
+    public function isPast(): bool
     {
         $now = new self();
         if ($this->before($now)) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     // }}}
@@ -1031,10 +1036,9 @@ class Date
      *
      * Determine if the year in this date is a leap year
      *
-     * @access public
      * @return bool true if this year is a leap year
      */
-    public function isLeapYear()
+    public function isLeapYear(): bool
     {
         return Calc::isLeapYear($this->year);
     }
@@ -1047,10 +1051,9 @@ class Date
      *
      * Get the Julian date for this date
      *
-     * @access public
      * @return int the Julian date
      */
-    public function getJulianDate()
+    public function getJulianDate(): int
     {
         return Calc::julianDate($this->day, $this->month, $this->year);
     }
@@ -1063,10 +1066,9 @@ class Date
      *
      * Gets the day of the week for this date (0=Sunday)
      *
-     * @access public
      * @return int the day of the week (0=Sunday)
      */
-    public function getDayOfWeek()
+    public function getDayOfWeek(): int
     {
         return Calc::dayOfWeek($this->day, $this->month, $this->year);
     }
@@ -1079,7 +1081,6 @@ class Date
      *
      * Gets the week of the year for this date
      *
-     * @access public
      * @return int the week of the year
      */
     public function getWeekOfYear()
@@ -1095,10 +1096,9 @@ class Date
      *
      * Gets the quarter of the year for this date
      *
-     * @access public
      * @return int the quarter of the year (1-4)
      */
-    public function getQuarterOfYear()
+    public function getQuarterOfYear(): int
     {
         return Calc::quarterOfYear($this->day, $this->month, $this->year);
     }
@@ -1111,10 +1111,9 @@ class Date
      *
      * Gets number of days in the month for this date
      *
-     * @access public
      * @return int number of days in this month
      */
-    public function getDaysInMonth()
+    public function getDaysInMonth(): int
     {
         return Calc::daysInMonth($this->month, $this->year);
     }
@@ -1127,10 +1126,9 @@ class Date
      *
      * Gets the number of weeks in the month for this date
      *
-     * @access public
      * @return int number of weeks in this month
      */
-    public function getWeeksInMonth()
+    public function getWeeksInMonth(): int
     {
         return Calc::weeksInMonth($this->month, $this->year);
     }
@@ -1143,18 +1141,16 @@ class Date
      *
      * Gets the full name or abbriviated name of this weekday
      *
-     * @access public
      * @param bool $abbr
-     *        	abbrivate the name
+     *            abbrivate the name
      * @return string name of this day
      */
     public function getDayName($abbr = false, $length = 3)
     {
         if ($abbr) {
             return Calc::getWeekdayAbbrname($this->day, $this->month, $this->year, $length);
-        } else {
-            return Calc::getWeekdayFullname($this->day, $this->month, $this->year);
         }
+        return Calc::getWeekdayFullname($this->day, $this->month, $this->year);
     }
 
     // }}}
@@ -1165,18 +1161,16 @@ class Date
      *
      * Gets the full name or abbriviated name of this month
      *
-     * @access public
      * @param bool $abbr
-     *        	abbrivate the name
+     *            abbrivate the name
      * @return string name of this month
      */
     public function getMonthName($abbr = false)
     {
         if ($abbr) {
             return Calc::getMonthAbbrname($this->month);
-        } else {
-            return Calc::getMonthFullname($this->month);
         }
+        return Calc::getMonthFullname($this->month);
     }
 
     // }}}
@@ -1188,7 +1182,6 @@ class Date
      * Get a Date object for the day after this one.
      * The time of the returned Date object is the same as this time.
      *
-     * @access public
      * @return object Date Date representing the next day
      */
     public function getNextDay()
@@ -1209,7 +1202,6 @@ class Date
      * Get a Date object for the day before this one.
      * The time of the returned Date object is the same as this time.
      *
-     * @access public
      * @return object Date Date representing the previous day
      */
     public function getPrevDay()
@@ -1230,7 +1222,6 @@ class Date
      * Get a Date object for the weekday after this one.
      * The time of the returned Date object is the same as this time.
      *
-     * @access public
      * @return object Date Date representing the next weekday
      */
     public function getNextWeekday()
@@ -1251,7 +1242,6 @@ class Date
      * Get a Date object for the weekday before this one.
      * The time of the returned Date object is the same as this time.
      *
-     * @access public
      * @return object Date Date representing the previous weekday
      */
     public function getPrevWeekday()
@@ -1271,12 +1261,11 @@ class Date
      *
      * Returns the year field of the date object
      *
-     * @access public
      * @return int the year
      */
-    public function getYear()
+    public function getYear(): int
     {
-        return (int) $this->year;
+        return (int)$this->year;
     }
 
     // }}}
@@ -1287,12 +1276,11 @@ class Date
      *
      * Returns the month field of the date object
      *
-     * @access public
      * @return int the month
      */
-    public function getMonth()
+    public function getMonth(): int
     {
-        return (int) $this->month;
+        return (int)$this->month;
     }
 
     // }}}
@@ -1303,12 +1291,11 @@ class Date
      *
      * Returns the day field of the date object
      *
-     * @access public
      * @return int the day
      */
-    public function getDay()
+    public function getDay(): int
     {
-        return (int) $this->day;
+        return (int)$this->day;
     }
 
     // }}}
@@ -1319,10 +1306,9 @@ class Date
      *
      * Returns the hour field of the date object
      *
-     * @access public
      * @return int the hour
      */
-    public function getHour()
+    public function getHour(): int
     {
         return $this->hour;
     }
@@ -1335,10 +1321,9 @@ class Date
      *
      * Returns the minute field of the date object
      *
-     * @access public
      * @return int the minute
      */
-    public function getMinute()
+    public function getMinute(): int
     {
         return $this->minute;
     }
@@ -1351,10 +1336,9 @@ class Date
      *
      * Returns the second field of the date object
      *
-     * @access public
      * @return int the second
      */
-    public function getSecond()
+    public function getSecond(): int
     {
         return $this->second;
     }
@@ -1367,9 +1351,8 @@ class Date
      *
      * Set the year field of the date object, invalid years (not 0-9999) are set to 0.
      *
-     * @access public
      * @param int $y
-     *        	the year
+     *            the year
      */
     public function setYear($y)
     {
@@ -1388,9 +1371,8 @@ class Date
      *
      * Set the month field of the date object, invalid months (not 1-12) are set to 1.
      *
-     * @access public
      * @param int $m
-     *        	the month
+     *            the month
      */
     public function setMonth($m)
     {
@@ -1409,9 +1391,8 @@ class Date
      *
      * Set the day field of the date object, invalid days (not 1-31) are set to 1.
      *
-     * @access public
      * @param int $d
-     *        	the day
+     *            the day
      */
     public function setDay($d)
     {
@@ -1431,9 +1412,8 @@ class Date
      * Set the hour field of the date object in 24-hour format.
      * Invalid hours (not 0-23) are set to 0.
      *
-     * @access public
      * @param int $h
-     *        	the hour
+     *            the hour
      */
     public function setHour($h)
     {
@@ -1452,9 +1432,8 @@ class Date
      *
      * Set the minute field of the date object, invalid minutes (not 0-59) are set to 0.
      *
-     * @access public
      * @param int $m
-     *        	the minute
+     *            the minute
      */
     public function setMinute($m)
     {
@@ -1473,9 +1452,8 @@ class Date
      *
      * Set the second field of the date object, invalid seconds (not 0-59) are set to 0.
      *
-     * @access public
      * @param int $s
-     *        	the second
+     *            the second
      */
     public function setSecond($s)
     {

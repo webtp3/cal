@@ -8,6 +8,10 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use RuntimeException;
+use TYPO3\CMS\Cal\Model\OrganizerFeUser;
+use TYPO3\CMS\Cal\Utility\Functions;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -25,9 +29,8 @@ namespace TYPO3\CMS\Cal\Service;
  * Base model for the calendar organizer.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- *
  */
-class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
+class OrganizerFeUserService extends BaseService
 {
     public $keyId = 'tx_feuser';
     public $tableId = 'fe_users';
@@ -36,22 +39,27 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
      * Looks for an organizer with a given uid on a certain pid-list
      * @param int $uid
      * @param string $pidList
-     * @return void|\TYPO3\CMS\Cal\Model\OrganizerFeUser
+     * @return OrganizerFeUser
      */
     public function find($uid, $pidList)
     {
-        if (! $this->isAllowedService()) {
-            return;
-        }
-        if ($pidList == '') {
-            $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('*', 'fe_users', 'uid=' . $uid . ' ' . $this->cObj->enableFields('fe_users'));
+        if ($pidList === '') {
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+                '*',
+                'fe_users',
+                'uid=' . $uid . ' ' . $this->cObj->enableFields('fe_users')
+            );
         } else {
-            $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('*', 'fe_users', ' pid IN (' . $pidList . ') AND uid=' . $uid . ' ' . $this->cObj->enableFields('fe_users'));
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+                '*',
+                'fe_users',
+                ' pid IN (' . $pidList . ') AND uid=' . $uid . ' ' . $this->cObj->enableFields('fe_users')
+            );
         }
         if ($result) {
-            $row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result);
-            $GLOBALS ['TYPO3_DB']->sql_free_result($result);
-            return new \TYPO3\CMS\Cal\Model\OrganizerFeUser($row, $pidList);
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
+            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+            return new OrganizerFeUser($row, $pidList);
         }
     }
 
@@ -59,26 +67,34 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
      * Looks for an organizer with a given uid on a certain pid-list
      *
      * @param string $pidList
-     *        	to search in
      * @return array \TYPO3\CMS\Cal\Model\OrganizerFeUser
      */
-    public function findAll($pidList)
+    public function findAll($pidList): array
     {
-        if (! $this->isAllowedService()) {
-            return;
-        }
         $organizer = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy('fe_users');
-        if ($pidList == '') {
-            $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('*', 'fe_users', ' 1 = 1 ' . $this->cObj->enableFields('fe_users'), '', $orderBy);
+        $orderBy = Functions::getOrderBy('fe_users');
+        if ($pidList === '') {
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+                '*',
+                'fe_users',
+                ' 1 = 1 ' . $this->cObj->enableFields('fe_users'),
+                '',
+                $orderBy
+            );
         } else {
-            $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery('*', 'fe_users', ' pid IN (' . $pidList . ') ' . $this->cObj->enableFields('fe_users'), '', $orderBy);
+            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+                '*',
+                'fe_users',
+                ' pid IN (' . $pidList . ') ' . $this->cObj->enableFields('fe_users'),
+                '',
+                $orderBy
+            );
         }
         if ($result) {
-            while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $organizer [] = new \TYPO3\CMS\Cal\Model\OrganizerFeUser($row, $pidList);
+            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                $organizer[] = new OrganizerFeUser($row, $pidList);
             }
-            $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
         return $organizer;
     }
@@ -87,14 +103,11 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
      * Search for organizer
      *
      * @param string $pidList
-     *        	to search in
-     * @return void|array \TYPO3\CMS\Cal\Model\OrganizerFeUser
+     * @param string $searchword
+     * @return array \TYPO3\CMS\Cal\Model\OrganizerFeUser
      */
-    public function search($pidList = '', $searchword)
+    public function search($pidList, $searchword): array
     {
-        if (! $this->isAllowedService()) {
-            return;
-        }
         return $this->getOrganizerFromTable($pidList, $this->searchWhere($searchword));
     }
 
@@ -102,26 +115,27 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
      * Generates the sql query and builds organizer objects out of the result rows
      *
      * @param string $pidList
-     *        	to search in
      * @param string $additionalWhere
-     *        	where clause
      * @return array \TYPO3\CMS\Cal\Model\OrganizerFeUser
      */
-    private function getOrganizerFromTable($pidList = '', $additionalWhere = '')
+    private function getOrganizerFromTable($pidList, $additionalWhere = ''): array
     {
         $organizers = [];
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->tableId);
-        if ($pidList != '') {
+        if ($pidList !== '') {
             $additionalWhere .= ' AND ' . $this->tableId . '.pid IN (' . $pidList . ')';
         }
         $select = $this->tableId . '.*';
         $table = $this->tableId;
         $where = '1=1 ' . $additionalWhere . $this->cObj->enableFields($this->tableId);
         $groupBy = '';
-        $orderBy = \TYPO3\CMS\Cal\Utility\Functions::getOrderBy($this->tableId);
+        $orderBy = Functions::getOrderBy($this->tableId);
         $limit = '';
 
-        $hookObjectsArr = \TYPO3\CMS\Cal\Utility\Functions::getHookObjectsArray('tx_cal_organizer_feuser_service', 'organizerServiceClass', 'service');
+        $hookObjectsArr = Functions::getHookObjectsArray(
+            'tx_cal_organizer_feuser_service',
+            'organizerServiceClass',
+            'service'
+        );
 
         foreach ($hookObjectsArr as $hookObj) {
             if (method_exists($hookObj, 'preGetOrganizerFromTableExec')) {
@@ -129,13 +143,13 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
             }
         }
 
-        $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupBy, $orderBy, $limit);
+        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupBy, $orderBy, $limit);
 
         if ($result) {
-            while ($row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $organizers [] = new \TYPO3\CMS\Cal\Model\OrganizerFeUser($row, $pidList);
+            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                $organizers[] = new OrganizerFeUser($row, $pidList);
             }
-            $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
         return $organizers;
     }
@@ -143,37 +157,34 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
     /**
      * Generates a search where clause.
      *
-     * @param string $sw:
+     * @param string $sw :
      * @return string
      */
-    public function searchWhere($sw)
+    public function searchWhere($sw): string
     {
-        if (! $this->isAllowedService()) {
-            return;
-        }
-        $where = $this->cObj->searchWhere($sw, $this->conf ['view.'] ['search.'] ['searchOrganizerFieldList'], 'fe_users');
+        $where = $this->cObj->searchWhere($sw, $this->conf['view.']['search.']['searchOrganizerFieldList'], 'fe_users');
         return $where;
     }
 
     /**
      * Updates the organizer with the given $uid with the post data
      * @param int $uid
-     * @return void|\TYPO3\CMS\Cal\Model\OrganizerFeUser
+     * @return OrganizerFeUser
      */
-    public function updateOrganizer($uid)
+    public function updateOrganizer($uid): OrganizerFeUser
     {
         $insertFields = [
-                'tstamp' => time()
+            'tstamp' => time()
         ];
         // TODO: Check if all values are correct
 
         $this->retrievePostData($insertFields);
-        $uid = $this->checkUidForLanguageOverlay($uid, 'fe_users');
+        $uid = self::checkUidForLanguageOverlay($uid, 'fe_users');
         // Creating DB records
         $table = 'fe_users';
         $where = 'uid = ' . $uid;
-        $result = $GLOBALS ['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
-        return $this->find($uid, $this->conf ['pidList']);
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+        return $this->find($uid, $this->conf['pidList']);
     }
 
     /**
@@ -182,17 +193,14 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
      */
     public function removeOrganizer($uid)
     {
-        if (! $this->isAllowedService()) {
-            return;
-        }
         if ($this->rightsObj->isAllowedToDeleteOrganizer()) {
             $updateFields = [
-                    'tstamp' => time(),
-                    'deleted' => 1
+                'tstamp' => time(),
+                'deleted' => 1
             ];
             $table = 'fe_users';
             $where = 'uid = ' . $uid;
-            $result = $GLOBALS ['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
         }
     }
 
@@ -202,123 +210,120 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
      */
     private function retrievePostData(&$insertFields)
     {
-        if (! $this->isAllowedService()) {
-            return;
-        }
         $hidden = 0;
-        if ($this->controller->piVars ['hidden'] == 'true' && ($this->rightsObj->isAllowedToEditOrganizerHidden() || $this->rightsObj->isAllowedToCreateOrganizerHidden())) {
+        if ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedToEditOrganizerHidden() || $this->rightsObj->isAllowedToCreateOrganizerHidden())) {
             $hidden = 1;
         }
-        $insertFields ['hidden'] = $hidden;
+        $insertFields['hidden'] = $hidden;
 
         if ($this->rightsObj->isAllowedToEditOrganizerName() || $this->rightsObj->isAllowedToCreateOrganizerName()) {
-            $insertFields ['name'] = strip_tags($this->controller->piVars ['name']);
+            $insertFields['name'] = strip_tags($this->controller->piVars['name']);
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerDescription() || $this->rightsObj->isAllowedToCreateOrganizerDescription()) {
-            $insertFields ['title'] = $this->cObj->removeBadHTML($this->controller->piVars ['title'], $this->conf);
+            $insertFields['title'] = htmlspecialchars($this->controller->piVars['title'], $this->conf);
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerStreet() || $this->rightsObj->isAllowedToCreateOrganizerStreet()) {
-            $insertFields ['address'] = strip_tags($this->controller->piVars ['address']);
+            $insertFields['address'] = strip_tags($this->controller->piVars['address']);
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerZip() || $this->rightsObj->isAllowedToCreateOrganizerZip()) {
-            $insertFields ['zip'] = strip_tags($this->controller->piVars ['zip']);
+            $insertFields['zip'] = strip_tags($this->controller->piVars['zip']);
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerCity() || $this->rightsObj->isAllowedToCreateOrganizerCity()) {
-            $insertFields ['city'] = strip_tags($this->controller->piVars ['city']);
+            $insertFields['city'] = strip_tags($this->controller->piVars['city']);
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerPhone() || $this->rightsObj->isAllowedToCreateOrganizerPhone()) {
-            $insertFields ['phone'] = strip_tags($this->controller->piVars ['phone']);
+            $insertFields['phone'] = strip_tags($this->controller->piVars['phone']);
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerEmail() || $this->rightsObj->isAllowedToCreateOrganizerEmail()) {
-            $insertFields ['email'] = strip_tags($this->controller->piVars ['email']);
+            $insertFields['email'] = strip_tags($this->controller->piVars['email']);
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerImage() || $this->rightsObj->isAllowedToCreateOrganizerImage()) {
-            $insertFields ['image'] = strip_tags($this->controller->piVars ['image']);
+            $insertFields['image'] = strip_tags($this->controller->piVars['image']);
         }
 
         if ($this->rightsObj->isAllowedToEditOrganizerLink() || $this->rightsObj->isAllowedToCreateOrganizerLink()) {
-            $insertFields ['www'] = strip_tags($this->controller->piVars ['www']);
+            $insertFields['www'] = strip_tags($this->controller->piVars['www']);
         }
     }
 
     /**
      * Saves an organizer at the page with the id $pid
      * @param int $pid
-     * @return void|\TYPO3\CMS\Cal\Model\OrganizerFeUser
+     * @return OrganizerFeUser
      */
-    public function saveOrganizer($pid)
+    public function saveOrganizer($pid): OrganizerFeUser
     {
-        if (! $this->isAllowedService()) {
-            return;
-        }
         $crdate = time();
         $insertFields = [
-                'pid' => $pid,
-                'tstamp' => $crdate,
-                'crdate' => $crdate
+            'pid' => $pid,
+            'tstamp' => $crdate,
+            'crdate' => $crdate
         ];
         // TODO: Check if all values are correct
 
         $hidden = 0;
-        if ($this->controller->piVars ['hidden'] == 'true') {
+        if ($this->controller->piVars['hidden'] === 'true') {
             $hidden = 1;
         }
-        $insertFields ['hidden'] = $hidden;
-        if ($this->controller->piVars ['name'] != '') {
-            $insertFields ['name'] = strip_tags($this->controller->piVars ['name']);
+        $insertFields['hidden'] = $hidden;
+        if ($this->controller->piVars['name'] !== '') {
+            $insertFields['name'] = strip_tags($this->controller->piVars['name']);
         }
-        if ($this->controller->piVars ['description'] != '') {
-            $insertFields ['title'] = $this->cObj->removeBadHTML($this->controller->piVars ['title']);
+        if ($this->controller->piVars['description'] !== '') {
+            $insertFields['title'] = htmlspecialchars($this->controller->piVars['title']);
         }
-        if ($this->controller->piVars ['street'] != '') {
-            $insertFields ['address'] = strip_tags($this->controller->piVars ['address']);
+        if ($this->controller->piVars['street'] !== '') {
+            $insertFields['address'] = strip_tags($this->controller->piVars['address']);
         }
-        if ($this->controller->piVars ['zip'] != '') {
-            $insertFields ['zip'] = strip_tags($this->controller->piVars ['zip']);
+        if ($this->controller->piVars['zip'] !== '') {
+            $insertFields['zip'] = strip_tags($this->controller->piVars['zip']);
         }
-        if ($this->controller->piVars ['city'] != '') {
-            $insertFields ['city'] = strip_tags($this->controller->piVars ['city']);
+        if ($this->controller->piVars['city'] !== '') {
+            $insertFields['city'] = strip_tags($this->controller->piVars['city']);
         }
-        if ($this->controller->piVars ['phone'] != '') {
-            $insertFields ['phone'] = strip_tags($this->controller->piVars ['phone']);
+        if ($this->controller->piVars['phone'] !== '') {
+            $insertFields['phone'] = strip_tags($this->controller->piVars['phone']);
         }
-        if ($this->controller->piVars ['email'] != '') {
-            $insertFields ['email'] = strip_tags($this->controller->piVars ['email']);
+        if ($this->controller->piVars['email'] !== '') {
+            $insertFields['email'] = strip_tags($this->controller->piVars['email']);
         }
-        if ($this->controller->piVars ['image'] != '') {
-            $insertFields ['image'] = strip_tags($this->controller->piVars ['image']);
+        if ($this->controller->piVars['image'] !== '') {
+            $insertFields['image'] = strip_tags($this->controller->piVars['image']);
         }
-        if ($this->controller->piVars ['link'] != '') {
-            $insertFields ['www'] = strip_tags($this->controller->piVars ['www']);
+        if ($this->controller->piVars['link'] !== '') {
+            $insertFields['www'] = strip_tags($this->controller->piVars['www']);
         }
 
         // Creating DB records
-        $insertFields ['cruser_id'] = $this->rightsObj->getUserId();
+        $insertFields['cruser_id'] = $this->rightsObj->getUserId();
         $uid = $this->_saveOrganizer($insertFields);
-        return $this->find($uid, $this->conf ['pidList']);
+        return $this->find($uid, $this->conf['pidList']);
     }
 
     /**
      * Does the database save
      * @param array $insertFields
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return int the uid of the saved organizer
      */
-    private function _saveOrganizer(&$insertFields)
+    private function _saveOrganizer(&$insertFields): int
     {
         $table = 'fe_users';
-        $result = $GLOBALS ['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
+        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
-            throw new \RuntimeException('Could not write ' . $table . ' record to database: ' . $GLOBALS ['TYPO3_DB']->sql_error(), 1431458155);
+            throw new RuntimeException(
+                'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                1431458155
+            );
         }
-        $uid = $GLOBALS ['TYPO3_DB']->sql_insert_id();
+        $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
         return $uid;
     }
 
@@ -326,40 +331,39 @@ class OrganizerFeUserService extends \TYPO3\CMS\Cal\Service\BaseService
      * Checks if this service is allowed to be processed
      * @return bool
      */
-    public function isAllowedService()
+    public function isAllowedService(): bool
     {
-        $this->confArr = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
-        $useOrganizerStructure = ($this->confArr ['useOrganizerStructure'] ? $this->confArr ['useOrganizerStructure'] : 'tx_cal_location');
-        if ($useOrganizerStructure == $this->keyId) {
-            return true;
-        }
-        return false;
+        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $useOrganizerStructure = ($confArr['useOrganizerStructure'] ?: 'tx_cal_location');
+        return $useOrganizerStructure === $this->keyId;
     }
 
     /**
      * Creates a translation overlay record for a given organizer with the uid
      * @param int $uid
      * @param int $overlay
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createTranslation($uid, $overlay)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $table = 'fe_users';
         $select = $table . '.*';
         $where = $table . '.uid = ' . $uid;
-        $result = $GLOBALS ['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
+        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
-            $row = $GLOBALS ['TYPO3_DB']->sql_fetch_assoc($result);
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
             if (is_array($row)) {
-                unset($row ['uid']);
+                unset($row['uid']);
                 $crdate = time();
-                $row ['tstamp'] = $crdate;
-                $row ['crdate'] = $crdate;
-                $row ['l18n_parent'] = $uid;
-                $row ['sys_language_uid'] = $overlay;
+                $row['tstamp'] = $crdate;
+                $row['crdate'] = $crdate;
+                $row['l18n_parent'] = $uid;
+                $row['sys_language_uid'] = $overlay;
                 $this->_saveOrganizer($row);
             }
-            $GLOBALS ['TYPO3_DB']->sql_free_result($result);
+            $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
-        return;
     }
 }

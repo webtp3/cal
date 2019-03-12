@@ -20,33 +20,28 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use SJBR\StaticInfoTables\PiBaseApi;
+use TYPO3\CMS\Cal\Model\Location;
+use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * A service which renders a form to create / edit an event location / organizer.
- *
  */
-class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
+class CreateLocationOrganizerView extends FeEditingBaseView
 {
     public $isLocation;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Draws a create location or organizer form.
      *
-     * @param
-     *        	boolean		True if a location should be confirmed
-     * @param
-     *        	string		Comma separated list of pids.
-     * @param
-     *        	object		A location or organizer object to be updated
+     * @param            bool        True if a location should be confirmed
+     * @param            string        Comma separated list of pids.
+     * @param            object        A location or organizer object to be updated
      * @return string HTML output.
      */
-    public function drawCreateLocationOrOrganizer($isLocation = true, $pidList, $object = '')
+    public function drawCreateLocationOrOrganizer($isLocation, $pidList, $object): string
     {
         $this->isLocation = $isLocation;
         if ($isLocation) {
@@ -55,18 +50,17 @@ class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             $this->objectString = 'organizer';
         }
         if (is_object($object)) {
-            $this->conf ['view'] = 'edit_' . $this->objectString;
+            $this->conf['view'] = 'edit_' . $this->objectString;
         } else {
-            $this->conf ['view'] = 'create_' . $this->objectString;
-            unset($this->controller->piVars ['uid']);
+            $this->conf['view'] = 'create_' . $this->objectString;
+            unset($this->controller->piVars['uid']);
         }
-        $requiredFieldSims = [];
         $allRequiredFieldsAreFilled = $this->checkRequiredFields($requiredFieldsSims);
 
         if ($allRequiredFieldsAreFilled) {
-            $this->conf ['lastview'] = $this->controller->extendLastView();
+            $this->conf['lastview'] = $this->controller->extendLastView();
 
-            $this->conf ['view'] = 'confirm_' . $this->objectString;
+            $this->conf['view'] = 'confirm_' . $this->objectString;
             if ($isLocation) {
                 return $this->controller->confirmLocation();
             }
@@ -77,14 +71,15 @@ class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $this->serviceName = 'cal_' . $this->objectString . '_model';
         $this->table = 'tx_cal_' . $this->objectString;
 
-        $page = Functions::getContent($this->conf ['view.'] ['create_location.'] ['template']);
-        if ($page == '') {
-            return '<h3>calendar: no create location template file found:</h3>' . $this->conf ['view.'] ['create_location.'] ['template'];
+        $page = Functions::getContent($this->conf['view.']['create_location.']['template']);
+        if ($page === '') {
+            return '<h3>calendar: no create location template file found:</h3>' . $this->conf['view.']['create_location.']['template'];
         }
 
-        if (is_object($object) && ! $object->isUserAllowedToEdit()) {
+        if (is_object($object) && !$object->isUserAllowedToEdit()) {
             return $this->controller->pi_getLL('l_not_allowed_edit') . $this->objectString;
-        } elseif (! is_object($object) && ! $this->rightsObj->isAllowedTo('create', $this->objectString, '')) {
+        }
+        if (!is_object($object) && !$this->rightsObj->isAllowedTo('create', $this->objectString, '')) {
             return $this->controller->pi_getLL('l_not_allowed_create') . $this->objectString;
         }
 
@@ -94,9 +89,9 @@ class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
             $this->object = $object;
         } else {
             if ($isLocation) {
-                $this->object = new \TYPO3\CMS\Cal\Model\Location(null, '');
+                $this->object = new Location(null, '');
             } else {
-                $this->object = new \TYPO3\CMS\Cal\Model\Organizer(null, '');
+                $this->object = new Organizer(null, '');
             }
             $allValues = array_merge($this->getDefaultValues(), $this->controller->piVars);
             $this->object->updateWithPIVars($allValues);
@@ -106,55 +101,84 @@ class CreateLocationOrganizerView extends \TYPO3\CMS\Cal\View\FeEditingBaseView
         $rems = [];
         $wrapped = [];
 
-        $sims ['###TYPE###'] = $this->object->getType();
-        $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped, $this->conf ['view']);
+        $sims['###TYPE###'] = $this->object->getType();
+        $this->getTemplateSubpartMarker($page, $sims, $rems, $wrapped);
 
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
 
         $sims = [];
         $rems = [];
         $wrapped = [];
 
-        $sims ['###L_CREATE_LOCATION###'] = $this->controller->pi_getLL('l_' . $this->conf ['view']);
-        $this->getTemplateSingleMarker($page, $sims, $rems, $this->conf ['view']);
-        $sims ['###ACTION_URL###'] = htmlspecialchars($this->controller->pi_linkTP_keepPIvars_url([
-                'view' => $this->conf ['view'],
-                'formCheck' => '1'
+        $sims['###L_CREATE_LOCATION###'] = $this->controller->pi_getLL('l_' . $this->conf['view']);
+        $this->getTemplateSingleMarker($page, $sims, $rems, $this->conf['view']);
+        $sims['###ACTION_URL###'] = htmlspecialchars($this->controller->pi_linkTP_keepPIvars_url([
+            'view' => $this->conf['view'],
+            'formCheck' => '1'
         ]));
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
-        $page = \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
-        return \TYPO3\CMS\Cal\Utility\Functions::substituteMarkerArrayNotCached($page, $requiredFieldsSims, [], []);
+        $page = Functions::substituteMarkerArrayNotCached($page, [], $rems, $wrapped);
+        $page = Functions::substituteMarkerArrayNotCached($page, $sims, [], []);
+        return Functions::substituteMarkerArrayNotCached($page, $requiredFieldsSims, [], []);
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCountryMarker(& $template, & $sims, & $rems, $view)
     {
         // Initialise static info library
-        $sims ['###COUNTRY###'] = '';
+        $sims['###COUNTRY###'] = '';
         if ($this->isAllowed('country')) {
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+            if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+                $staticInfo = Functions::makeInstance(PiBaseApi::class);
                 $staticInfo->init();
-                $sims ['###COUNTRY###'] = $this->applyStdWrap($staticInfo->buildStaticInfoSelector('COUNTRIES', 'tx_cal_controller[country]', '', $this->object->getCountry()), 'country_static_info_stdWrap');
+                $sims['###COUNTRY###'] = $this->applyStdWrap($staticInfo->buildStaticInfoSelector(
+                    'COUNTRIES',
+                    'tx_cal_controller[country]',
+                    '',
+                    $this->object->getCountry()
+                ), 'country_static_info_stdWrap');
             } else {
-                $sims ['###COUNTRY###'] = $this->applyStdWrap($this->object->getCountry(), 'country_stdWrap');
-                $sims ['###COUNTRY_VALUE###'] = $this->object->getCountry();
+                $sims['###COUNTRY###'] = $this->applyStdWrap($this->object->getCountry(), 'country_stdWrap');
+                $sims['###COUNTRY_VALUE###'] = $this->object->getCountry();
             }
         }
     }
 
+    /**
+     * @param $template
+     * @param $sims
+     * @param $rems
+     * @param $view
+     */
     public function getCountryzoneMarker(& $template, & $sims, & $rems, $view)
     {
         // Initialise static info library
-        $sims ['###COUNTRYZONE###'] = '';
+        $sims['###COUNTRYZONE###'] = '';
         if ($this->isAllowed('countryzone')) {
-            if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = \TYPO3\CMS\Cal\Utility\Functions::makeInstance('SJBR\\StaticInfoTables\\PiBaseApi');
+            if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+                $staticInfo = Functions::makeInstance(PiBaseApi::class);
                 $staticInfo->init();
-                $sims ['###COUNTRYZONE###'] = $this->applyStdWrap($staticInfo->buildStaticInfoSelector('SUBDIVISIONS', 'tx_cal_controller[countryzone]', '', $this->object->getCountryZone(), $this->object->getCountry()), 'countryzone_static_info_stdWrap');
+                $sims['###COUNTRYZONE###'] = $this->applyStdWrap(
+                    $staticInfo->buildStaticInfoSelector(
+                        'SUBDIVISIONS',
+                        'tx_cal_controller[countryzone]',
+                        '',
+                        $this->object->getCountryZone(),
+                        $this->object->getCountry()
+                    ),
+                    'countryzone_static_info_stdWrap'
+                );
             } else {
-                $sims ['###COUNTRYZONE###'] = $this->applyStdWrap($this->object->getCountryZone(), 'countryzone_stdWrap');
-                $sims ['###COUNTRYZONE_VALUE###'] = $this->object->getCountryZone();
+                $sims['###COUNTRYZONE###'] = $this->applyStdWrap(
+                    $this->object->getCountryZone(),
+                    'countryzone_stdWrap'
+                );
+                $sims['###COUNTRYZONE_VALUE###'] = $this->object->getCountryZone();
             }
         }
     }

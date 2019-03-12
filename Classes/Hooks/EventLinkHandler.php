@@ -20,25 +20,28 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-/**
- * TODO
- *
- */
 class EventLinkHandler
 {
+    /**
+     * @param $linktxt
+     * @param $conf
+     * @param $linkHandlerKeyword
+     * @param $linkHandlerValue
+     * @param $link_param
+     * @param $pObj
+     */
     public function main($linktxt, $conf, $linkHandlerKeyword, $linkHandlerValue, $link_param, & $pObj)
     {
-        if ($linkHandlerKeyword != 'calendar') {
+        if ($linkHandlerKeyword !== 'calendar') {
             return;
         }
 
         $values = explode('|', $linkHandlerValue);
         $lconf = [];
-        if ($values [1]) {
-            $lconf ['parameter'] = $values [1];
+        if ($values[1]) {
+            $lconf['parameter'] = $values[1];
         }
-        $lconf ['additionalParams'] = '&tx_cal_controller[view]=event&tx_cal_controller[type]=tx_cal_phpicalendar&tx_cal_controller[uid]=' . $values [0];
+        $lconf['additionalParams'] = '&tx_cal_controller[view]=event&tx_cal_controller[type]=tx_cal_phpicalendar&tx_cal_controller[uid]=' . $values[0];
         return $pObj->typoLink($linktxt, $lconf);
     }
 }

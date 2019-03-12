@@ -20,15 +20,17 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
-/**
- *
- */
 abstract class AbstractModel
 {
+    /**
+     * @var array
+     */
     public $noAutoFetchMethods = []; // array with method names as array values, where the method has the naming scheme 'getCustomMethodName', where a setter with the same naming and where the get-method itself expects parameters and thus can not be fetched dynamically
 
-    public function getNoAutoFetchMethods()
+    /**
+     * @return array
+     */
+    public function getNoAutoFetchMethods(): array
     {
         return $this->noAutoFetchMethods;
     }

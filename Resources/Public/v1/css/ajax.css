@@ -35,7 +35,7 @@
 .dd-proxy {
 	opacity: 0.4;
 	-moz-opacity: 0.4;
-	filter: alpha(opacity =  40);
+	filter: alpha(opacity=40);
 }
 
 .dd-over {
@@ -108,7 +108,7 @@
 	padding: 2px 4px 2px 2px !important;
 }
 
-.calendar tbody td.selected,.calendar tbody .rowhilite td.selected {
+.calendar tbody td.selected, .calendar tbody .rowhilite td.selected {
 	background-image: url(../img/day.png) !important;
 	background-repeat: repeat-x !important;
 	border: 1px solid #C3D9FF !important;

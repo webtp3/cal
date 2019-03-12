@@ -21,139 +21,167 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Model\CalDate;
 
 /**
- *
+ * Class Labels
  */
 class Labels
 {
+    /**
+     * @param $params
+     * @param $pObj
+     * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
+     */
     public function getEventRecordLabel(&$params, &$pObj)
     {
-        if ($params ['table'] != 'tx_cal_event' && $params ['table'] != 'tx_cal_exception_event') {
+        if ($params['table'] != 'tx_cal_event' && $params['table'] != 'tx_cal_exception_event') {
             return '';
         }
 
         // Get complete record
-        $rec = BackendUtility::getRecordWSOL($params ['table'], $params ['row'] ['uid']);
-        $dateObj = new \TYPO3\CMS\Cal\Model\CalDate($rec ['start_date'] . '000000');
-        $dateObj->setTZbyId('UTC');
+        $rec = BackendUtility::getRecordWSOL($params['table'], $params['row']['uid']);
+        $dateObj = new CalDate($rec['start_date'] . '000000');
+        $dateObj->setTZbyID('UTC');
 
         $format = str_replace([
-                'd',
-                'm',
-                'y',
-                'Y'
+            'd',
+            'm',
+            'y',
+            'Y'
         ], [
-                '%d',
-                '%m',
-                '%y',
-                '%Y'
-        ], $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['ddmmyy']);
-        if ($rec ['allday'] || $params ['table'] == 'tx_cal_exception_event') {
+            '%d',
+            '%m',
+            '%y',
+            '%Y'
+        ], $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy']);
+        if ($rec['allday'] || $params['table'] == 'tx_cal_exception_event') {
             /* If we have an all day event, only show the date */
             $datetime = $dateObj->format($format);
-            $params ['start_date'] = $datetime;
+            $params['start_date'] = $datetime;
         } else {
             /* For normal events, show both the date and time */
             // gmdate is ok, as long as $rec['start_time'] just holds information about 24h.
             $datetime = $dateObj->format($format);
 
-            $params ['start_date'] = $datetime;
+            $params['start_date'] = $datetime;
 
-            $extConf = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal']);
-            if ($extConf ['showTimes'] == 1) {
-                $datetime .= ' ' . gmdate($GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['hhmm'], $rec ['start_time']);
+            $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            if ($extConf['showTimes'] == 1) {
+                $datetime .= ' ' . gmdate($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $rec['start_time']);
             }
         }
         // Assemble the label
-        $label = $datetime . ': ' . $rec ['title'];
+        $label = $datetime . ': ' . $rec['title'];
 
         // Write to the label
-        $params ['title'] = $label;
+        $params['title'] = $label;
     }
+
+    /**
+     * @param $params
+     * @param $pObj
+     * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
+     */
     public function getAttendeeRecordLabel(&$params, &$pObj)
     {
-        if (! $params ['table'] == 'tx_cal_attendee') {
+        if (!$params['table'] == 'tx_cal_attendee') {
             return '';
         }
 
         // Get complete record
-        $rec = BackendUtility::getRecord($params ['table'], $params ['row'] ['uid']);
+        $rec = BackendUtility::getRecord($params['table'], $params['row']['uid']);
 
-        $label = $rec ['email'];
-        if ($rec ['fe_user_id']) {
-            $feUserRec = BackendUtility::getRecord('fe_users', $rec ['fe_user_id']);
-            $label = $feUserRec ['name'] != '' ? $feUserRec ['name'] : $feUserRec ['username'];
+        $label = $rec['email'];
+        if ($rec['fe_user_id']) {
+            $feUserRec = BackendUtility::getRecord('fe_users', $rec['fe_user_id']);
+            $label = $feUserRec['name'] != '' ? $feUserRec['name'] : $feUserRec['username'];
         }
-        $label .= ' (' . $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.attendance.' . $rec ['attendance']) . ' -> ' . $rec ['status'] . ')';
+        $label .= ' (' . $GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.attendance.' . $rec['attendance']) . ' -> ' . $rec['status'] . ')';
 
         // Write to the label
-        $params ['title'] = $label;
+        $params['title'] = $label;
     }
+
+    /**
+     * @param $params
+     * @param $pObj
+     * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
+     */
     public function getMonitoringRecordLabel(&$params, &$pObj)
     {
-        if (! $params ['table'] == 'tx_cal_fe_user_event_monitor_mm') {
+        if (!$params['table'] == 'tx_cal_fe_user_event_monitor_mm') {
             return '';
         }
 
         // Get complete record
-        $rec = BackendUtility::getRecord($params ['table'], $params ['row'] ['uid']);
+        $rec = BackendUtility::getRecord($params['table'], $params['row']['uid']);
 
         $label = '';
-        switch ($rec ['tablenames']) {
+        switch ($rec['tablenames']) {
             case 'fe_users':
-                $feUserRec = BackendUtility::getRecord('fe_users', $rec ['uid_foreign']);
-                $label = $feUserRec ['name'] != '' ? $feUserRec ['name'] : $feUserRec ['username'];
+                $feUserRec = BackendUtility::getRecord('fe_users', $rec['uid_foreign']);
+                $label = $feUserRec['name'] != '' ? $feUserRec['name'] : $feUserRec['username'];
                 break;
             case 'fe_groups':
-                $feUserRec = BackendUtility::getRecord('fe_groups', $rec ['uid_foreign']);
-                $label = $feUserRec ['title'];
+                $feUserRec = BackendUtility::getRecord('fe_groups', $rec['uid_foreign']);
+                $label = $feUserRec['title'];
                 break;
             case 'tx_cal_unknown_users':
-                $feUserRec = BackendUtility::getRecord('tx_cal_unknown_users', $rec ['uid_foreign']);
-                $label = $feUserRec ['email'];
+                $feUserRec = BackendUtility::getRecord('tx_cal_unknown_users', $rec['uid_foreign']);
+                $label = $feUserRec['email'];
                 break;
         }
 
         // Write to the label
-        $params ['title'] = $label . ' (' . $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_fe_user_event.offset') . ': ' . $rec ['offset'] . ')';
+        $params['title'] = $label . ' (' . $GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_fe_user_event.offset') . ': ' . $rec['offset'] . ')';
     }
+
+    /**
+     * @param $params
+     * @param $pObj
+     * @return string
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
+     */
     public function getDeviationRecordLabel(&$params, &$pObj)
     {
-        if (! $params ['table'] == 'tx_cal_event_deviation') {
+        if (!$params['table'] == 'tx_cal_event_deviation') {
             return '';
         }
 
         // Get complete record
-        $rec = BackendUtility::getRecord($params ['table'], $params ['row'] ['uid']);
+        $rec = BackendUtility::getRecord($params['table'], $params['row']['uid']);
 
-        $label = $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.deviation') . ': ';
+        $label = $GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.deviation') . ': ';
 
-        if ($rec ['orig_start_date']) {
-            $dateObj = new \TYPO3\CMS\Cal\Model\CalDate($rec ['orig_start_date'] . '000000');
-            $dateObj->setTZbyId('UTC');
+        if ($rec['orig_start_date']) {
+            $dateObj = new CalDate($rec['orig_start_date'] . '000000');
+            $dateObj->setTZbyID('UTC');
 
             $format = str_replace([
-                    'd',
-                    'm',
-                    'y',
-                    'Y'
+                'd',
+                'm',
+                'y',
+                'Y'
             ], [
-                    '%d',
-                    '%m',
-                    '%y',
-                    '%Y'
-            ], $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['ddmmyy']);
+                '%d',
+                '%m',
+                '%y',
+                '%Y'
+            ], $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy']);
 
             $datetime = $dateObj->format($format);
             $label .= $datetime;
         }
 
-        if ($rec ['orig_start_time']) {
-            $label .= ' (' . gmdate($GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['hhmm'], $rec ['orig_start_time']) . ')';
+        if ($rec['orig_start_time']) {
+            $label .= ' (' . gmdate($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $rec['orig_start_time']) . ')';
         }
 
         // Write to the label
-        $params ['title'] = $label;
+        $params['title'] = $label;
     }
 }
