@@ -42,6 +42,7 @@ class CategoryRepositoryTest extends FunctionalTestCase
 
     /**
      * Test if by import source is done
+     * #todo from cron ICaldendar
      *
      * @test
      */

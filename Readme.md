@@ -49,7 +49,3 @@ to accept only bugfixes if I can reproduce the issue.
 even more complicated in usability for an edge case feature. Please discuss a new feature before.
 
 [1]: https://getcomposer.org/
-
-[Manual](https://web.tp3.de/manual/cal.html)
-
-[Repository](https://bitbucket.org/web-tp3/cal)
