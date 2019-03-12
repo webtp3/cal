@@ -1,5 +1,5 @@
 <?php
-
+namespace TYPO3\CMS\Cal\ViewHelper;
 /*
  * This file is part of the web-tp3/cal.
  * For the full copyright and license information, please read the
@@ -11,7 +11,10 @@
  *
  * @version
  */
-class Tx_Cal_ViewHelpers_TempStoreViewHelper extends Tx_Fluid_Core_ViewHelper_AbstractViewHelper
+
+use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
+
+class TempStoreViewHelper extends AbstractViewHelper
 {
 
     /**
