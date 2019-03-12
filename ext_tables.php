@@ -38,9 +38,10 @@ $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY)
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_cal_organizer', 'EXT:cal/Resources/Private/Help/locallang_csh_txcalorganizer.php');
 
 if (TYPO3_MODE == 'BE') {
-    $GLOBALS ['TBE_MODULES_EXT'] ['xMOD_db_new_content_el'] ['addElClasses'] ['TYPO3\CMS\Cal\Backend\CalWizIcon'] = $extPath . 'Classes/Backend/CalWizIcon.php';
+  //  $GLOBALS ['TBE_MODULES_EXT'] ['xMOD_db_new_content_el'] ['addElClasses'] ['TYPO3\CMS\Cal\Backend\CalWizIcon'] = $extPath . 'Classes/Backend/CalWizIcon.php';
     if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < '8000000') {
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule('tools', 'calrecurrencegenerator', '', $extPath . 'Classes/Backend/Modul/');
+
     } else {
         // Add module
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
@@ -57,4 +58,24 @@ if (TYPO3_MODE == 'BE') {
             ]
         );
     }
+
+// wizards
+    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
+        'mod {
+            wizards.newContentElement.wizardItems.plugins {
+                elements {
+                    tp3micro {
+                        iconIdentifier = cal-controller-plugin
+                        title = LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xlf:pi1_title
+                        description = LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xlf:pi1_plus_wiz_description
+                        tt_content_defValues {
+                            CType = list
+                            list_type = cal_controller
+                        }
+                    }
+                }
+                show = *
+            }
+       }'
+    );
 }

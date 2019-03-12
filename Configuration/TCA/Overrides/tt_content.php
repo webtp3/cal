@@ -16,10 +16,16 @@ $pluginSignature = strtolower($extensionName) . '_controller';
 /***************
  * Plugin
  */
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin([
-        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tt_content.list_type',
-        $_EXTKEY . '_controller'
-], 'list_type');
+//\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin([
+//        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tt_content.list_type',
+//        $_EXTKEY . '_controller'
+//], 'list_type');
+
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
+    'Cal',
+    'Controller',
+    'tp3 typo3 Calendar - ext:cal'
+);
 
 $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist'][$pluginSignature] = 'layout,select_key';
 $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignature] = 'pi_flexform';

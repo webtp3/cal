@@ -9,6 +9,19 @@
 if (! defined('TYPO3_MODE')) {
     die('Access denied.');
 }
+$_EXTKEY = 'cal';
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+    'Cal',
+    'tx_cal_event',
+    [
+        'Controller' => 'list, show',
+    ],
+    // non-cacheable actions
+    [
+
+    ]
+);
+
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPItoST43($_EXTKEY, 'Classes/Controller/Controller.php', '_controller', 'list_type', 1);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig('options.saveDocNew.tx_cal_event=1');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig('options.saveDocNew.tx_cal_exception_event=1');
@@ -1098,6 +1111,15 @@ $confArr = unserialize($GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['cal'])
 ]
 );
 
+
+if (TYPO3_MODE == 'BE') {
+
+    $iconRegistry->registerIcon(
+        'cal-controller-plugin',
+        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+        ['source' => 'EXT:' . $_EXTKEY . '/Resources/Public/Icons/Extension.svg']
+    );
+}
 $GLOBALS ['TYPO3_CONF_VARS'] ['SC_OPTIONS'] ['t3lib/class.t3lib_tcemain.php'] ['processDatamapClass'] ['tx_cal'] = 'TYPO3\\CMS\\Cal\\Hooks\\TceMainProcessdatamap';
 $GLOBALS ['TYPO3_CONF_VARS'] ['SC_OPTIONS'] ['t3lib/class.t3lib_tcemain.php'] ['processCmdmapClass'] ['tx_cal'] = 'TYPO3\\CMS\\Cal\\Hooks\\TceMainProcesscmdmap';
 
