@@ -8,7 +8,7 @@
 
 namespace TYPO3\CMS\Cal\Tests\Unit\Functional\Repository;
 
-use Nimut\TestingFramework\TestCase\FunctionalTestCase;
+use CAG\CagTests\Core\Functional\FunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
