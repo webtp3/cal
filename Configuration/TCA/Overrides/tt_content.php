@@ -35,7 +35,7 @@ $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignat
 $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
     $pluginSignature,
-    'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal_sys_category.xlf'
+    'FILE:EXT:' . 'cal/Configuration/FlexForms/flexform_cal_sys_category.xml'
 );
 
 /***************
