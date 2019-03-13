@@ -7,6 +7,10 @@
         "php": ">=7.0 < 7.3",
         "typo3/cms-core": "^8 || ^9"
     },
+	"require-dev": {
+		"friendsofphp/php-cs-fixer": "^2.0",
+		"nimut/testing-framework": "^1.0 || ^2.0 || ^3.0 || ^4.0"
+	},
     "autoload": {
         "psr-4": {
             "TYPO3\\CMS\\Cal\\": "Classes"
