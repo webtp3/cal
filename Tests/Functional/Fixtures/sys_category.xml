@@ -5,9 +5,7 @@
 	<sys_category>
 		<uid>456</uid>
 		<pid>1</pid>
-		<title>findRecordByImportSource</title>
-		<import_source>functional_test</import_source>
-		<import_id>2</import_id>
+		<title>findRecordByCategory</title>
 		<l10n_diffsource></l10n_diffsource>
 		<description></description>
 	</sys_category>

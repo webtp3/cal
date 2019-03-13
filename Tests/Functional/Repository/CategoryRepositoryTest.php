@@ -8,12 +8,6 @@
 
 namespace TYPO3\CMS\Cal\Tests\Unit\Functional\Repository;
 
-/**
- * This file is part of the "news" Extension for TYPO3 CMS.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- */
 use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -50,6 +44,6 @@ class CategoryRepositoryTest extends FunctionalTestCase
     {
         $category = $this->categoryRepository->findOneByImportSourceAndImportId('functional_test', '2');
 
-        $this->assertEquals($category->getTitle(), 'findRecordByImportSource');
+        $this->assertEquals($category->getTitle(), 'findRecordByCategory');
     }
 }

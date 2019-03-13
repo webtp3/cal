@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<tx_cal_calendar>
+		<!--ICalendarServiceTest-->
+		<uid>1</uid>
+		<pid>1</pid>
+		<tstamp>1546741096</tstamp>
+		<crdate>1454608652</crdate>
+		<cruser_id>1</cruser_id>
+		<deleted>0</deleted>
+		<hidden>0</hidden>
+		<starttime>0</starttime>
+		<endtime>0</endtime>
+		<title>Tai Chi Kurse</title>
+		<owner>0</owner>
+		<activate_fnb>0</activate_fnb>
+		<fnb_user_cnt>0</fnb_user_cnt>
+		<type>1</type>
+		<ext_url>
+			https://calendar.google.com/calendar/ical/9tv213eho9k41t3knn1fmpoobo%40group.calendar.google.com/public/basic.ics
+		</ext_url>
+		<ext_url_notes>Kurse</ext_url_notes>
+		<ics_file/>
+		<refresh>120</refresh>
+		<md5>53d700544a7c4e38674d90329d140278</md5>
+		<headerstyle>green_catheader</headerstyle>
+		<bodystyle>green_catbody</bodystyle>
+		<schedulerId>9</schedulerId>
+	</tx_cal_calendar>
+</dataset>
