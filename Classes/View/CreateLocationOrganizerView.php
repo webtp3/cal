@@ -15,10 +15,12 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use SJBR\StaticInfoTables\PiBaseApi;
+use SJBR\StaticInfoTables\PiBaseApi;
 use TYPO3\CMS\Cal\Model\Location;
 use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A service which renders a form to create / edit an event location / organizer.
@@ -128,7 +130,7 @@ class CreateLocationOrganizerView extends FeEditingBaseView
         $sims['###COUNTRY###'] = '';
         if ($this->isAllowed('country')) {
             if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = Functions::makeInstance(PiBaseApi::class);
+                $staticInfo = GeneralUtility::makeInstance(PiBaseApi::class);
                 $staticInfo->init();
                 $sims['###COUNTRY###'] = $this->applyStdWrap($staticInfo->buildStaticInfoSelector(
                     'COUNTRIES',
@@ -155,7 +157,7 @@ class CreateLocationOrganizerView extends FeEditingBaseView
         $sims['###COUNTRYZONE###'] = '';
         if ($this->isAllowed('countryzone')) {
             if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $staticInfo = Functions::makeInstance(PiBaseApi::class);
+                $staticInfo = GeneralUtility::makeInstance(PiBaseApi::class);
                 $staticInfo->init();
                 $sims['###COUNTRYZONE###'] = $this->applyStdWrap(
                     $staticInfo->buildStaticInfoSelector(

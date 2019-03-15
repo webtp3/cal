@@ -79,14 +79,14 @@ class EventRecDeviationModel extends EventModel
     public function getRRuleMarker(&$template, &$sims, &$rems, &$wrapped, $view)
     {
         $eventStart = $this->origStartDate;
-        if ($this->isAllDay()) {
-            $sims['###RRULE###'] = 'RECURRENCE-ID;VALUE=DATE:' . $eventStart->format('%Y%m%d');
+        if ($this->isAllday()) {
+            $sims['###RRULE###'] = 'RECURRENCE-ID;VALUE=DATE:' . $eventStart->format('Ymd');
         } elseif ($this->conf['view.']['ics.']['timezoneId'] !== '') {
-            $sims['###RRULE###'] = 'RECURRENCE-ID;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('%Y%m%dT%H%M%S');
+            $sims['###RRULE###'] = 'RECURRENCE-ID;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('YmdTHMS');
         } else {
             $offset = Functions::strtotimeOffset($eventStart->getTime());
             $eventStart->subtractSeconds($offset);
-            $sims['###RRULE###'] = 'RECURRENCE-ID:' . $eventStart->format('%Y%m%dT%H%M%SZ');
+            $sims['###RRULE###'] = 'RECURRENCE-ID:' . $eventStart->format('YmdTHMSZ');
             $eventStart->addSeconds($offset);
         }
     }

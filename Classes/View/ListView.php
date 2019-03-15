@@ -318,7 +318,7 @@ class ListView extends BaseView
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['yearSectionMenuFormat']));
-                                $this->local_cObj->data['link_parameter'] = '#' . $calTimeObject->format('%Y');
+                                $this->local_cObj->data['link_parameter'] = '#' . $calTimeObject->format('Y');
                                 $sectionMenu .= $this->local_cObj->cObjGetSingle(
                                     $this->conf['view.']['list.']['sectionMenuItem'],
                                     $this->conf['view.']['list.']['sectionMenuItem.']
@@ -345,8 +345,8 @@ class ListView extends BaseView
                         }
                         // monthwrapper
                         if ($this->conf['view.']['list.']['enableMonthWrapper'] && ($this->hasPeriodChanged(
-                            $lastEventMonth->format('%Y%m'),
-                            $calTimeObject->format('%Y%m'),
+                            $lastEventMonth->format('Ym'),
+                            $calTimeObject->format('Ym'),
                             $this->reverse
                                 ) || $firstTime || $this->hasPeriodChanged(
                                     $lastEventMonth->getYear(),
@@ -356,7 +356,7 @@ class ListView extends BaseView
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['monthSectionMenuFormat']));
-                                $this->local_cObj->data['link_parameter'] = '#' . $calTimeObject->format('%Y%m');
+                                $this->local_cObj->data['link_parameter'] = '#' . $calTimeObject->format('Ym');
                                 $sectionMenu .= $this->local_cObj->cObjGetSingle(
                                     $this->conf['view.']['list.']['sectionMenuItem'],
                                     $this->conf['view.']['list.']['sectionMenuItem.']
@@ -394,7 +394,7 @@ class ListView extends BaseView
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['weekSectionMenuFormat']));
-                                $this->local_cObj->data['link_parameter'] = '#' . $calTimeObject->format('%Y%U');
+                                $this->local_cObj->data['link_parameter'] = '#' . $calTimeObject->format('YU');
                                 $sectionMenu .= $this->local_cObj->cObjGetSingle(
                                     $this->conf['view.']['list.']['sectionMenuItem'],
                                     $this->conf['view.']['list.']['sectionMenuItem.']
@@ -428,7 +428,7 @@ class ListView extends BaseView
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['daySectionMenuFormat']));
-                                $this->local_cObj->data['link_parameter'] = '#' . $calTimeObject->format('%Y%m%d');
+                                $this->local_cObj->data['link_parameter'] = '#' . $calTimeObject->format('Ymd');
                                 $sectionMenu .= $this->local_cObj->cObjGetSingle(
                                     $this->conf['view.']['list.']['sectionMenuItem'],
                                     $this->conf['view.']['list.']['sectionMenuItem.']
@@ -698,36 +698,36 @@ class ListView extends BaseView
         }
 
         if ($this->conf['view.']['list.']['showLongEventsInEachWrapper']) {
-            if ($this->conf['view.']['list.']['enableDayWrapper'] && $eventStart->format('%Y%m%d') !== $eventEnd->format('%Y%m%d')) {
+            if ($this->conf['view.']['list.']['enableDayWrapper'] && $eventStart->format('Ymd') !== $eventEnd->format('Ymd')) {
                 $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y%m%d') !== $eventEnd->format('%Y%m%d')) {
+                while ($tempEventStart->format('Ymd') !== $eventEnd->format('Ymd')) {
                     $tempEventStart->addSeconds(60 * 60 * 24);
-                    $this->objectsInList[$tempEventStart->format('%Y%m%d')][] = &$event;
+                    $this->objectsInList[$tempEventStart->format('Ymd')][] = &$event;
                 }
             }
-            if ($this->conf['view.']['list.']['enableWeekWrapper'] && $eventStart->format('%Y%U') !== $eventEnd->format('%Y%U')) {
+            if ($this->conf['view.']['list.']['enableWeekWrapper'] && $eventStart->format('YU') !== $eventEnd->format('YU')) {
                 $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y%U') !== $eventEnd->format('%Y%U')) {
+                while ($tempEventStart->format('YU') !== $eventEnd->format('YU')) {
                     $tempEventStart->addSeconds(60 * 60 * 24 * 7);
-                    $this->objectsInList[$tempEventStart->format('%Y%m%d')][] = &$event;
+                    $this->objectsInList[$tempEventStart->format('Ymd')][] = &$event;
                 }
             }
-            if ($this->conf['view.']['list.']['enableMonthWrapper'] && $eventStart->format('%Y%m') !== $eventEnd->format('%Y%m')) {
+            if ($this->conf['view.']['list.']['enableMonthWrapper'] && $eventStart->format('Ym') !== $eventEnd->format('Ym')) {
                 $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y%m') !== $eventEnd->format('%Y%m')) {
+                while ($tempEventStart->format('%Y%m') !== $eventEnd->format('Ym')) {
                     $tempEventStart->setMonth($tempEventStart->getMonth() + 1);
-                    $this->objectsInList[$tempEventStart->format('%Y%m01')][] = &$event;
+                    $this->objectsInList[$tempEventStart->format('Ym01')][] = &$event;
                 }
             }
-            if ($this->conf['view.']['list.']['enableYearWrapper'] && $eventStart->format('%Y') !== $eventEnd->format('%Y')) {
+            if ($this->conf['view.']['list.']['enableYearWrapper'] && $eventStart->format('Y') !== $eventEnd->format('Y')) {
                 $tempEventStart = new  CalDate();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y') !== $eventEnd->format('%Y')) {
+                while ($tempEventStart->format('Y') !== $eventEnd->format('Y')) {
                     $tempEventStart->setYear($tempEventStart->getYear() + 1);
-                    $this->objectsInList[$tempEventStart->format('%Y0101')][] = &$event;
+                    $this->objectsInList[$tempEventStart->format('Y0101')][] = &$event;
                 }
             }
         }

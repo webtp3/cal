@@ -121,10 +121,10 @@ class ReminderView extends NotificationView
             $startDateTimeObject = new  CalDate($eventRecord['start_date'] . '000000');
             $startDateTimeObject->setTZbyID('UTC');
             $startDateTimeObject->addSeconds($eventRecord['start_time']);
-            $start_datetime = $startDateTimeObject->format('%Y%m%d%H%M%S');
+            $start_datetime = $startDateTimeObject->format('YmdHMS');
             $select2 = '*';
             $table2 = 'tx_cal_index';
-            $where2 = 'start_datetime >= ' . $now->format('%Y%m%d%H%M%S') . ' AND event_uid = ' . $calEventUID;
+            $where2 = 'start_datetime >= ' . $now->format('YmdHMS') . ' AND event_uid = ' . $calEventUID;
             $orderby2 = 'start_datetime asc';
             $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select2, $table2, $where2, $orderby2);
             if ($result) {
@@ -135,9 +135,9 @@ class ReminderView extends NotificationView
                     $nextOccuranceTime->setTZbyID('UTC');
                     $nextOccuranceEndTime = new  CalDate($tmp['end_datetime']);
                     $nextOccuranceEndTime->setTZbyID('UTC');
-                    $eventRecord['start_date'] = $nextOccuranceTime->format('%Y%m%d');
+                    $eventRecord['start_date'] = $nextOccuranceTime->format('Ymd');
                     $eventRecord['start_time'] = $nextOccuranceTime->getHour() * 3600 + $nextOccuranceTime->getMinute() * 60 + $nextOccuranceTime->getSecond();
-                    $eventRecord['end_date'] = $nextOccuranceEndTime->format('%Y%m%d');
+                    $eventRecord['end_date'] = $nextOccuranceEndTime->format('Ymd');
                     $eventRecord['end_time'] = $nextOccuranceEndTime->getHour() * 3600 + $nextOccuranceEndTime->getMinute() * 60 + $nextOccuranceEndTime->getSecond();
                 }
                 $GLOBALS['TYPO3_DB']->sql_free_result($result2);

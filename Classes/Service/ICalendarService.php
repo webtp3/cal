@@ -659,7 +659,7 @@ class ICalendarService extends BaseService
 
         $indexEntry = BackendUtilityReplacementUtility::getRawRecord(
             'tx_cal_index',
-            'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('%Y%m%d%H%M%S') . '"'
+            'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('YmdHMS') . '"'
         );
 
         if ($indexEntry) {
@@ -1014,8 +1014,8 @@ class ICalendarService extends BaseService
 
                 $dtstart = $this->getDtstart($component);
                 if ($dtstart != null) {
-                    $insertFields['start_date'] = $dtstart->format('%Y%m%d');
-                    $insertFields['start_time'] = $dtstart->hour * 3600 + $dtstart->minute * 60;
+                    $insertFields['start_date'] = $dtstart->format('Ymd');
+                    $insertFields['start_time'] = $dtstart->getHour() * 3600 + $dtstart->getMinute() * 60;
                 } elseif ($component->getType() == 'vEvent') {
                     // a Todo does not need a start, but an event
                     continue;
@@ -1039,8 +1039,8 @@ class ICalendarService extends BaseService
 
                 $dtend = $this->getDtend($component);
                 if ($dtend != null) {
-                    $insertFields['end_date'] = $dtend->format('%Y%m%d');
-                    $insertFields['end_time'] = $dtend->hour * 3600 + $dtend->minute * 60;
+                    $insertFields['end_date'] = $dtend->format('Ymd');
+                    $insertFields['end_time'] = $dtend->getHour() * 3600 + $dtend->getMinute() * 60;
                 }
 
                 if ($component->getAttribute('DURATION')) {
@@ -1052,8 +1052,8 @@ class ICalendarService extends BaseService
                     if ($timezone) {
                         $dateTime->convertTZbyID($timezone);
                     }
-                    $insertFields['end_date'] = $dateTime->format('%Y%m%d');
-                    $insertFields['end_time'] = $dateTime->hour * 3600 + $dateTime->minute * 60;
+                    $insertFields['end_date'] = $dateTime->format('Ymd');
+                    $insertFields['end_time'] = $dateTime->getHour() * 3600 + $dateTime->getMinute() * 60;
                 }
 
                 // Fix for allday events
@@ -1061,7 +1061,7 @@ class ICalendarService extends BaseService
                     $date = new CalDate($insertFields['end_date'] . '000000');
                     $date->setTZbyID('UTC');
                     $date->subtractSeconds(86400);
-                    $insertFields['end_date'] = $date->format('%Y%m%d');
+                    $insertFields['end_date'] = $date->format('Ymd');
                 }
 
                 $insertFields['title'] = $component->getAttribute('SUMMARY');
@@ -1207,8 +1207,8 @@ class ICalendarService extends BaseService
         $insertFields['crdate'] = time();
         $insertFields['pid'] = $pid;
         $insertFields['cruser_id'] = $cruserId;
-        $insertFields['title'] = 'Exception for event ' . $eventUid . ' on ' . $exceptionDate->format('%Y%m%d');
-        $insertFields['start_date'] = $exceptionDate->format('%Y%m%d');
+        $insertFields['title'] = 'Exception for event ' . $eventUid . ' on ' . $exceptionDate->format('Ymd');
+        $insertFields['start_date'] = $exceptionDate->format('Ymd');
 
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_cal_exception_event', $insertFields);
         if (false === $result) {

@@ -87,7 +87,7 @@ class RssView extends BaseView
 
         foreach ($master_array as $eventDate => $eventTimeArray) {
             if (is_object($eventTimeArray)) {
-                if ($eventTimeArray->getEnd()->format('%Y%m%d') < $getdate) {
+                if ($eventTimeArray->getEnd()->format('Ymd') < $getdate) {
                     break;
                 }
                 if ($count < $this->config['limit']) {
@@ -100,7 +100,7 @@ class RssView extends BaseView
                 foreach ($eventTimeArray as $key => $eventArray) {
                     foreach ($eventArray as $eventUid => $event) {
                         if (is_object($event)) {
-                            if ($event->getEnd()->format('%Y%m%d') < $getdate) {
+                            if ($event->getEnd()->format('Ymd') < $getdate) {
                                 break;
                             }
                             if ($count < $this->config['limit']) {

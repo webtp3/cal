@@ -233,7 +233,7 @@ class ConfirmEventView extends FeEditingBaseView
                 $startDate->format($this->conf['view.']['event.']['event.']['timeFormat']),
                 'starttime_stdWrap'
             );
-            $sims['###STARTTIME_VALUE###'] = htmlspecialchars($startDate->format('%H%M'));
+            $sims['###STARTTIME_VALUE###'] = htmlspecialchars($startDate->format('HM'));
         }
     }
 
@@ -251,7 +251,7 @@ class ConfirmEventView extends FeEditingBaseView
                 $endDate->format($this->conf['view.']['event.']['event.']['timeFormat']),
                 'endtime_stdWrap'
             );
-            $sims['###ENDTIME_VALUE###'] = htmlspecialchars($endDate->format('%H%M'));
+            $sims['###ENDTIME_VALUE###'] = htmlspecialchars($endDate->format('HM'));
         }
     }
 

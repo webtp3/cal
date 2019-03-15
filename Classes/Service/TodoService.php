@@ -716,15 +716,15 @@ class TodoService extends EventService
             )) {
             if (is_object($object->getStart())) {
                 $start = $object->getStart();
-                $insertFields['start_date'] = $start->format('%Y%m%d');
-                $insertFields['start_time'] = intval($start->format('%H')) * 3600 + intval($start->format('%M')) * 60;
+                $insertFields['start_date'] = $start->format('Ymd');
+                $insertFields['start_time'] = intval($start->format('H')) * 3600 + intval($start->format('M')) * 60;
             } else {
                 return;
             }
             if (is_object($object->getEnd())) {
                 $end = $object->getEnd();
-                $insertFields['end_date'] = $end->format('%Y%m%d');
-                $insertFields['end_time'] = intval($end->format('%H')) * 3600 + intval($end->format('%M')) * 60;
+                $insertFields['end_date'] = $end->format('Ymd');
+                $insertFields['end_time'] = intval($end->format('H')) * 3600 + intval($end->format('M')) * 60;
             } else {
                 return;
             }
@@ -755,7 +755,7 @@ class TodoService extends EventService
             $insertFields['bymonth'] = implode(',', $object->getByMonth());
             $until = $object->getUntil();
             if (is_object($until)) {
-                $insertFields['until'] = $until->format('%Y%m%d');
+                $insertFields['until'] = $until->format('Ymd');
             }
             $insertFields['cnt'] = $object->getCount();
             $insertFields['intrval'] = $object->getInterval();
@@ -836,15 +836,15 @@ class TodoService extends EventService
             )) {
             if (is_object($object->getStart())) {
                 $start = $object->getStart();
-                $insertFields['start_date'] = $start->format('%Y%m%d');
-                $insertFields['start_time'] = intval($start->format('%H')) * 3600 + intval($start->format('%M')) * 60;
+                $insertFields['start_date'] = $start->format('Ymd');
+                $insertFields['start_time'] = intval($start->format('H')) * 3600 + intval($start->format('M')) * 60;
             } else {
                 return;
             }
             if (is_object($object->getEnd())) {
                 $end = $object->getEnd();
-                $insertFields['end_date'] = $end->format('%Y%m%d');
-                $insertFields['end_time'] = intval($end->format('%H')) * 3600 + intval($end->format('%M')) * 60;
+                $insertFields['end_date'] = $end->format('Ymd');
+                $insertFields['end_time'] = intval($end->format('H')) * 3600 + intval($end->format('M')) * 60;
             } else {
                 return;
             }
@@ -874,7 +874,7 @@ class TodoService extends EventService
             $insertFields['bymonthday'] = implode(',', $object->getByMonthDay());
             $insertFields['bymonth'] = implode(',', $object->getByMonth());
             $until = $object->getUntil();
-            $insertFields['until'] = $until->format('%Y%m%d');
+            $insertFields['until'] = $until->format('Ymd');
             $insertFields['cnt'] = $object->getCount();
             $insertFields['intrval'] = $object->getInterval();
             $insertFields['rdate_type'] = $object->getRdateType();
@@ -939,10 +939,10 @@ class TodoService extends EventService
     {
         $master_array = [];
         $startDate = $event->getStart();
-        $master_array[$startDate->format('%Y%m%d')][$event->isAllDay() ? '-1' : $startDate->format('%H%M')][$event->getUid()] = &$event;
+        $master_array[$startDate->format('Ymd')][$event->isAllDay() ? '-1' : $startDate->format('HM')][$event->getUid()] = &$event;
         $select = '*';
         $table = 'tx_cal_index';
-        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('%Y%m%d%H%M%S') . ' AND start_datetime <= ' . $this->endtime->format('%Y%m%d%H%M%S');
+        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('YmdHMS') . ' AND start_datetime <= ' . $this->endtime->format('YmdHMS');
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
@@ -950,9 +950,9 @@ class TodoService extends EventService
                 $nextOccuranceEndTime = new CalDate($row['end_datetime']);
                 $new_event = new TodoRecModel($event, $nextOccuranceTime, $nextOccuranceEndTime);
                 if ($new_event->isAllDay()) {
-                    $master_array[$nextOccuranceTime->format('%Y%m%d')]['-1'][$event->getUid()] = $new_event;
+                    $master_array[$nextOccuranceTime->format('Ymd')]['-1'][$event->getUid()] = $new_event;
                 } else {
-                    $master_array[$nextOccuranceTime->format('%Y%m%d')][$nextOccuranceTime->format('%H%M')][$event->getUid()] = $new_event;
+                    $master_array[$nextOccuranceTime->format('Ymd')][$nextOccuranceTime->format('HM')][$event->getUid()] = $new_event;
                 }
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($result);

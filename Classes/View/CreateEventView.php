@@ -673,7 +673,7 @@ class CreateEventView extends FeEditingBaseView
             if (!$this->RTEObj && ExtensionManagementUtility::isLoaded('rtehtmlarea') && class_exists('\TYPO3\CMS\Rtehtmlarea\Controller\FrontendRteController')) {
                 $this->RTEObj = new FrontendRteController();
             } elseif (!$this->RTEObj && ExtensionManagementUtility::isLoaded('tinymce_rte')) {
-                $this->RTEObj = Functions::makeInstance('tx_tinymce_rte_pi1'); // load alternative RTE
+                $this->RTEObj = GeneralUtility::makeInstance('tx_tinymce_rte_pi1'); // load alternative RTE
             }
             if (is_object($this->RTEObj) && $this->RTEObj->isAvailable() && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['enableRTE']) {
                 $this->RTEcounter++;
@@ -849,7 +849,7 @@ class CreateEventView extends FeEditingBaseView
         $sims['###UNTIL###'] = '';
         if ($this->isAllowed('recurring')) {
             $until = $this->object->getUntil();
-            if (is_object($until) && $until->getYear() !== 0 && $until->format('%Y%m%d') !== '19700101') {
+            if (is_object($until) && $until->getYear() !== 0 && $until->format('Ymd') !== '19700101') {
                 $untilValue = $until->format(Functions::getFormatStringFromConf($this->conf));
                 $sims['###UNTIL###'] = $this->applyStdWrap($untilValue, 'until_stdWrap');
             } else {
@@ -1262,7 +1262,7 @@ class CreateEventView extends FeEditingBaseView
                             'test',
                             [
                                 'tx_cal_controller[calendar]' => $row['tx_cal_calendar'],
-                                'tx_cal_controller[getdate]' => $start->format('%Y%m%d')
+                                'tx_cal_controller[getdate]' => $start->format('Ymd')
                             ],
                             $this->conf['clear_anyway'],
                             $this->conf['view.'][$this->conf['view'] . '.']['freeAndBusyViewPid']

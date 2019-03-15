@@ -615,24 +615,6 @@ class Functions
     }
 
     /**
-     * Returns a Classname and allows various parameter to be passed to the constructor.
-     *
-     *
-     * @param string        className
-     * @return object reference to the object
-     *
-     * @todo Once TYPO3 4.3 is released and required by cal, remove this method and replace calls to it with GeneralUtility::makeInstance.
-     */
-    public static function &makeInstance($className)
-    {
-        $constructorArguments = func_get_args();
-        return call_user_func_array([
-            GeneralUtility::class,
-            'makeInstance'
-        ], $constructorArguments);
-    }
-
-    /**
      * @param $string
      * @return string|string[]|null
      */
@@ -678,17 +660,16 @@ class Functions
         $date = new CalDate($year . '0101');
         $date->setTZbyID('UTC');
 
-        $offset = $weekday - $date->format('%w');
+        $offset = (int)$weekday - (int)$date->format('w');
 
         // correct weekday
         $date->addSeconds($offset * 86400);
-
         $oldYearWeek = ($date->getWeekOfYear() > 1) ? '0' : '1';
 
         // correct week
         $date->addSeconds((($week - $oldYearWeek) * 7) * 86400);
 
-        return $date->format('%Y%m%d');
+        return $date->format('Ymd');
     }
 
     /**

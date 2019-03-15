@@ -116,9 +116,9 @@ class CalIndexerOld extends BaseScriptClass
                 $this->content .= $this->doc->spacer(20) . $this->doc->section(
                     '',
                     $this->doc->makeShortcutIcon(
-                            'id',
-                            implode(',', array_keys($this->MOD_MENU)),
-                            $this->MCONF['name']
+                        'id',
+                        implode(',', array_keys($this->MOD_MENU)),
+                        $this->MCONF['name']
                         )
                     );
             }
@@ -166,11 +166,11 @@ class CalIndexerOld extends BaseScriptClass
 
                 $starttime = GeneralUtility::_POST('starttime');
                 if ($starttime) {
-                    $starttime = intval($this->getTimeParsed($starttime)->format('%Y%m%d'));
+                    $starttime = intval($this->getTimeParsed($starttime)->format('Ymd'));
                 }
                 $endtime = GeneralUtility::_POST('endtime');
                 if ($endtime) {
-                    $endtime = intval($this->getTimeParsed($endtime)->format('%Y%m%d'));
+                    $endtime = intval($this->getTimeParsed($endtime)->format('Ymd'));
                 }
 
                 if (count($pageIds) > 0 && is_int($starttime) && is_int($endtime)) {

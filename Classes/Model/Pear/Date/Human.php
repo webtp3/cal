@@ -104,9 +104,11 @@ class Human
      *         "hmoy" => -1
      *         Since 0 is a valid month number under the Human Calendar, I have left
      *         the month as -1 for New Years Day.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public static function gregorianToHuman($day = 0, $month = 0, $year = 0): associative
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
         /*
          * Check to see if any of the arguments are empty If they are then populate the $dateinfo array Then check to see which arguments are empty and fill those with the current date info
          */
@@ -188,9 +190,12 @@ class Human
      *
      *
      * @return int unix timestamp of date
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public static function humanToGregorian($day, $month, $year = 0): int
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         /*
          * Check to see if the year has been passed through. If not get current year
          */

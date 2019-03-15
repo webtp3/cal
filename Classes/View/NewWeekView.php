@@ -73,7 +73,7 @@ class NewWeekView extends NewTimeView
             DATE_CALC_BEGIN_WEEKDAY
         ));
 
-        $this->weekStart = $weekStart->format('%Y%m%d');
+        $this->weekStart = $weekStart->format('Ymd');
         $this->setMonth($weekStart->getMonth());
 
         if ($this->getParentMonth() < 0) {
@@ -84,18 +84,18 @@ class NewWeekView extends NewTimeView
         $this->alldays = [];
         $this->dayNums = [];
         for ($i = 0; $i < 7; $i++) {
-            $this->dayNums[$i] = $weekStart->day;
-            $weekStartFormated = $weekStart->format('%Y%m%d');
+            $this->dayNums[$i] = $weekStart->getDay();
+            $weekStartFormated = $weekStart->format('Ymd');
             $this->days[$weekStartFormated] = new NewDayView(
-                $weekStart->day,
-                $weekStart->month,
-                $weekStart->year,
+                $weekStart->getDay(),
+                $weekStart->getMonth(),
+                $weekStart->getYear(),
                 $this->getParentMonth()
             );
             $this->alldays[$weekStartFormated] = [];
             $weekStart->addSeconds(86400);
         }
-        $this->weekEnd = $weekStart->format('%Y%m%d');
+        $this->weekEnd = $weekStart->format('Ymd');
     }
 
     /**
@@ -106,9 +106,9 @@ class NewWeekView extends NewTimeView
     {
         $eventStart = new CalDate();
         $eventStart->copy($event->getStart());
-        $eventStartFormatted = $eventStart->format('%Y%m%d');
-        $eventStartYear = $eventStart->year;
-        $eventEndFormatted = $event->getEnd()->format('%Y%m%d');
+        $eventStartFormatted = $eventStart->format('Ymd');
+        $eventStartYear = $eventStart->getYear();
+        $eventEndFormatted = $event->getEnd()->format('Ymd');
         $eventStartWeek = $event->getStart()->getWeekOfYear();
         if (($eventStartWeek === 52 || $eventStartWeek === 53) && $event->getStart()->month === 1) {
             $eventStartYear--;
@@ -122,7 +122,7 @@ class NewWeekView extends NewTimeView
                 $eventYearEnd++;
             }
 
-            if (!($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) && $eventStart->year . sprintf(
+            if (!($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) && $eventStart->getYear() . sprintf(
                 '%02d',
                 $eventStart->getWeekOfYear()
                 ) < $this->getYear() . sprintf(
@@ -134,16 +134,16 @@ class NewWeekView extends NewTimeView
                 ) >= $this->getYear() . sprintf('%02d', $this->week)) {
                 do {
                     $eventStart->addSeconds(86400);
-                    $eventStartYear = $eventStart->year;
+                    $eventStartYear = $eventStart->getYear();
                     $eventWeek = $eventStart->getWeekOfYear();
-                    if ($eventStart->month === 1 && $eventWeek > 50) {
+                    if ($eventStart->getMonth() === 1 && $eventWeek > 50) {
                         $eventStartYear--;
                     }
                 } while ($eventStartYear . sprintf('%02d', $eventWeek) < $this->getYear() . sprintf(
                     '%02d',
                     $this->week
                 ));
-                $eventStartFormatted = $eventStart->format('%Y%m%d');
+                $eventStartFormatted = $eventStart->format('Ymd');
             }
             if ($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) {
                 $this->alldays[$eventStartFormatted][] = $event;
@@ -151,20 +151,20 @@ class NewWeekView extends NewTimeView
                 $first = true;
                 do {
                     $this->dayHasEvent[$eventStart->getDayOfWeek()] = true;
-                    if (is_object($this->days[$eventStart->format('%Y%m%d')])) {
-                        $this->days[$eventStart->format('%Y%m%d')]->setHasAlldayEvents(true);
+                    if (is_object($this->days[$eventStart->format('Ymd')])) {
+                        $this->days[$eventStart->format('Ymd')]->setHasAlldayEvents(true);
                         if ($first) {
-                            $this->days[$eventStart->format('%Y%m%d')]->addEvent($event);
+                            $this->days[$eventStart->format('Ymd')]->addEvent($event);
                             $first = false;
                         }
                     }
                     $eventStart->addSeconds(86400);
-                    $eventStartYear = $eventStart->year;
+                    $eventStartYear = $eventStart->getYear();
                     $eventWeek = $eventStart->getWeekOfYear();
-                    if ($eventStart->month === 1 && $eventWeek > 50) {
+                    if ($eventStart->getMonth() === 1 && $eventWeek > 50) {
                         $eventStartYear--;
                     }
-                } while ($eventStart->format('%Y%m%d') <= $eventEndFormatted && $eventStartYear . sprintf(
+                } while ($eventStart->format('Ymd') <= $eventEndFormatted && $eventStartYear . sprintf(
                     '%02d',
                     $eventStart->getWeekOfYear()
                 ) <= $this->getYear() . sprintf('%02d', $this->week));
@@ -173,18 +173,18 @@ class NewWeekView extends NewTimeView
             do {
                 if ($eventStartWeek === $this->week || $eventStartYear === $this->getYear()) {
                     $this->dayHasEvent[$eventStart->getDayOfWeek()] = true;
-                    if (is_object($this->days[$eventStart->format('%Y%m%d')])) {
-                        $this->days[$eventStart->format('%Y%m%d')]->addEvent($event);
+                    if (is_object($this->days[$eventStart->format('Ymd')])) {
+                        $this->days[$eventStart->format('Ymd')]->addEvent($event);
                     }
                     $this->weekHasEvent = true;
                 }
                 $eventStart->addSeconds(86400);
-                $eventStartYear = $eventStart->year;
-                if ($eventStart->month === 1 && $eventWeek > 50) {
+                $eventStartYear = $eventStart->getYear();
+                if ($eventStart->getMonth() === 1 && $eventWeek > 50) {
                     $eventStartYear--;
                 }
                 $eventStartWeek = $eventStart->getWeekOfYear();
-            } while ($eventStart->format('%Y%m%d') <= $eventEndFormatted && $eventStartWeek <= $this->week);
+            } while ($eventStart->format('Ymd') <= $eventEndFormatted && $eventStartWeek <= $this->week);
         }
     }
 
@@ -290,8 +290,8 @@ class NewWeekView extends NewTimeView
      */
     private function fillLengthArray(&$lengthArray, &$event)
     {
-        $eventStart = $event->getStart()->format('%Y%m%d');
-        $eventEnd = $event->getEnd()->format('%Y%m%d');
+        $eventStart = $event->getStart()->format('Ymd');
+        $eventEnd = $event->getEnd()->format('Ymd');
         if ($eventStart <= $this->weekStart) {
             if ($eventEnd >= $this->weekEnd) {
                 // lasts the whole week
@@ -796,7 +796,7 @@ class NewWeekView extends NewTimeView
         if ($dateObject->getWeekOfYear() === $this->week && $dateObject->year === $this->getYear()) {
             $this->selected = true;
 
-            $day = $this->days[$dateObject->format('%Y%m%d')];
+            $day = $this->days[$dateObject->format('Ymd')];
             if (is_object($day)) {
                 $day->setSelected($dateObject);
             }
@@ -812,7 +812,7 @@ class NewWeekView extends NewTimeView
         if ($dateObject->getWeekOfYear() === $this->week && $dateObject->year === $this->getYear()) {
             $this->current = true;
 
-            $day = $this->days[$dateObject->format('%Y%m%d')];
+            $day = $this->days[$dateObject->format('Ymd')];
             if (is_object($day)) {
                 $this->currentDayIndex = $dateObject->getDayOfWeek();
                 if (DATE_CALC_BEGIN_WEEKDAY === 1) {

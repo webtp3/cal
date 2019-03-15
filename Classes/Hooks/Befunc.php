@@ -41,10 +41,10 @@ class Befunc
     {
         if ($conf['colConf']['tx_cal_event']) {
             $value = new CalDate($conf['value'] . '000000');
-            if ((int)$GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] === '1') {
-                $conf['value'] = $value->format('%d.%m.%Y');
+            if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] === '1') {
+                $conf['value'] = $value->format('d.m.Y');
             } else {
-                $conf['value'] = $value->format('%d-%m-%Y');
+                $conf['value'] = $value->format('d-m-Y');
             }
         }
         return $conf['value'] ?? '';
