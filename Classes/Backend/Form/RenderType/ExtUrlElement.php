@@ -54,7 +54,7 @@ EOJ;
     public function getExtUrlRow()
     {
         $html = '<div class="cal-row">';
-        $html .= $GLOBALS['LANG']->getLL('tx_cal_calendar.ext_url_note') . ':<input type="text" class="form-control exturlnote" onchange="extUrl.save()" >';
+        $html .= $GLOBALS['LANG']->getLL('tx_cal_calendar.ext_url_notes') . ':<input type="text" class="form-control exturlnotes" onchange="extUrl.save()" >';
         $html .= $GLOBALS['LANG']->getLL('tx_cal_calendar.ext_url_url') . ':<input type="text" class="form-control exturl" onchange="extUrl.save()" >';
         $html .= '<a id="garbage" href="#" onclick="extUrl.removeUrl(this);">' . ElementHelper::getGarbageIcon() . '</a>';
         $html .= '</div>';
