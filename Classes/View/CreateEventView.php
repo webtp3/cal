@@ -849,7 +849,7 @@ class CreateEventView extends FeEditingBaseView
         $sims['###UNTIL###'] = '';
         if ($this->isAllowed('recurring')) {
             $until = $this->object->getUntil();
-            if (is_object($until) && $until->getYear() !== 0 && $until->format('Ymd') !== '19700101') {
+            if (is_object($until) && $until->getYear() != 0 && $until->format('Ymd') != '19700101') {
                 $untilValue = $until->format(Functions::getFormatStringFromConf($this->conf));
                 $sims['###UNTIL###'] = $this->applyStdWrap($untilValue, 'until_stdWrap');
             } else {

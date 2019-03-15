@@ -811,7 +811,7 @@ class Controller extends AbstractPlugin
                                 'datetime',
                                 'period'
                             ]))) {
-                        $this->conf['view.'][$this->conf['view'] . '.']['minDate'] = $event->getStart()->format('%Y%m%d');
+                        $this->conf['view.'][$this->conf['view'] . '.']['minDate'] = $event->start->format('Ymd');
                         $this->conf['view.'][$this->conf['view'] . '.']['maxDate'] = $this->piVars['maxDate'];
 
                         $eventArray = $modelObj->findEvent(

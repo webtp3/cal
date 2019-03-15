@@ -20,6 +20,7 @@ use SJBR\StaticInfoTables\Utility\LocalizationUtility;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use SJBR\StaticInfoTables\PiBaseApi;
 
 /**
  * Base model for the calendar location.

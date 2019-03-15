@@ -15,7 +15,6 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use SJBR\StaticInfoTables\PiBaseApi;
-use SJBR\StaticInfoTables\PiBaseApi;
 use TYPO3\CMS\Cal\Model\Location;
 use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Utility\Functions;

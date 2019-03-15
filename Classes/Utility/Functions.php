@@ -16,11 +16,13 @@ namespace TYPO3\CMS\Cal\Utility;
  */
 use TYPO3\CMS\Cal\Controller\UriHandler;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalDateTime;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * This is a collection of many useful functions

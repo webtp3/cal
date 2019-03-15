@@ -14,6 +14,7 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+
 if (!defined('DATE_CALC_BEGIN_WEEKDAY')) {
     /**
      * Defines what day starts the week
@@ -224,9 +225,9 @@ class CalDate extends \DateTime
      * uses a bytesafe cropping function if possible in order to not destroy multibyte chars from strings (e.g.
      * names in UTF-8)
      *
-     * @param string $value The value to crop
-     * @param bool $length The length
-     * @return string
+     * @param string $value
+     * @param bool $length
+     * @return string the cropped string
      */
     public function crop($value = '', $length = false): string
     {
