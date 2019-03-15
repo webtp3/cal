@@ -112,6 +112,7 @@ CREATE TABLE tx_cal_calendar (
 	md5 varchar(32) DEFAULT '' NOT NULL,
 	headerstyle varchar(30) DEFAULT '' NOT NULL,
 	bodystyle varchar(30) DEFAULT '' NOT NULL,
+	nearby tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	schedulerId int(11) unsigned DEFAULT '0' NOT NULL,
 
 	t3ver_oid int(11) DEFAULT '0' NOT NULL,

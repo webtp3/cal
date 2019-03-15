@@ -23,7 +23,7 @@ class CategoryRepositoryTest extends FunctionalTestCase
     /** @var  \TYPO3\CMS\Cal\Domain\Repository\CategoryRepository */
     protected $categoryRepository;
 
-    protected $testExtensionsToLoad = ['typo3conf/ext/news'];
+    protected $testExtensionsToLoad = ['typo3conf/ext/cal'];
 
     public function setUp()
     {

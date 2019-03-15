@@ -48,6 +48,13 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
 
     }
 
+    /**
+     * Test if tests work fine
+     * @test
+     */
+    public function dummyMethod() {
+        $this->assertTrue(true);
+    }
 
     /**
      * Test find external calendar uid or pid-list

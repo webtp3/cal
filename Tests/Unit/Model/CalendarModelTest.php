@@ -34,6 +34,14 @@ class CalendarModelTest extends UnitTestCase
     }
 
     /**
+     * Test if tests work fine
+     * @test
+     */
+    public function dummyMethod() {
+        $this->assertTrue(true);
+    }
+
+    /**
      * Test if title can be set
      *
      * @test
