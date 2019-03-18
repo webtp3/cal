@@ -1,0 +1,29 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+install:
+  - composer install
+
+script:
+  - >
+    echo;
+    echo "Running unit tests";
+    echo;
+    echo;
+    .Build/bin/phpunit Tests/Unit/;
+
+  - >
+    echo;
+    echo "Running unit tests";
+    echo;
+    echo;
+    .Build/bin/phpunit Tests/Functional/;
+
+

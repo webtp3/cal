@@ -6,7 +6,12 @@
     "require": {
         "php": ">=7.0 < 7.3",
         "typo3/cms-core": "^8 || ^9",
-		"sjbr/static-info-tables": "~6.7"
+		"sjbr/static-info-tables": "~6.7",
+		"typo3/cms-backend": "^8.7 || ^9.5",
+		"typo3/cms-frontend": "^8.7 || ^9.5",
+		"typo3/cms-extbase": "^8.7 || ^9.5",
+		"typo3/cms-fluid": "^8.7 || ^9.5",
+		"typo3/cms-recordlist": "^8.7 || ^9.5"
 	},
 	"require-dev": {
 		"friendsofphp/php-cs-fixer": "^2.0",
@@ -32,6 +37,27 @@
         "typo3/cms": {
             "extension-key": "cal"
         }
-    }
+    },
+	"config": {
+		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin"
+	},
+	"scripts": {
+		"typo3-cms-scripts": [
+			"typo3cms install:fixfolderstructure",
+			"typo3cms install:generatepackagestates"
+		],
+		"post-autoload-dump": [
+			"@typo3-cms-scripts"
+		],
+		"test:php:unit": [
+			"@php -v",
+			"@php bin/phpunit -c Tests/Build/UnitTests.xml"
+		],
+		"test:php:func": [
+			"@php -v",
+			"@php bin/phpunit -c Tests/Build/FunctionalTests.xml"
+		]
 
+	}
 }
