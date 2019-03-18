@@ -30,7 +30,7 @@ class CalendarModelTest extends UnitTestCase
     protected function setUp()
     {
         // * @param string $serviceKey Service key, must be prefixed "tx_", "Tx_" or "user_"
-        $this->calModelInstance = new CalendarModel('tx_cal_calendar');
+        $this->calModelInstance = new CalendarModel('','tx_cal_calendar');
     }
 
     /**
