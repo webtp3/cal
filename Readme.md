@@ -3,7 +3,7 @@
 [![Daily Downloads](https://poser.pugx.org/web-tp3/cal/d/daily)](https://packagist.org/packages/web-tp3/cal)
 [![Total Downloads](https://poser.pugx.org/web-tp3/cal/downloads)](https://packagist.org/packages/web-tp3/cal)
 [![License](https://poser.pugx.org/web-tp3/cal/license)](https://packagist.org/packages/web-tp3/cal)
-
+[![Build Status](https://travis-ci.org/webtp3/cal.svg?branch=master)](https://travis-ci.org/webtp3/cal)
 
 ## Installation
 
