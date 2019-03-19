@@ -95,7 +95,7 @@ class CalIndexerOld extends BaseScriptClass
                 'pages',
                 $this->pageinfo,
                 $this->pageinfo['_thePath']
-                ) . '<br>' . $GLOBALS['LANG']->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.php:labels.path') . ': ' . GeneralUtility::fixed_lgd_cs(
+                ) . '<br>' . $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:labels.path') . ': ' . GeneralUtility::fixed_lgd_cs(
                     $this->pageinfo['_thePath'],
                     -50
                 );
@@ -172,11 +172,11 @@ class CalIndexerOld extends BaseScriptClass
 
                 $starttime = GeneralUtility::_POST('starttime');
                 if ($starttime) {
-                    $starttime = intval($this->getTimeParsed($starttime)->format('%Y%m%d'));
+                    $starttime = intval($this->getTimeParsed($starttime)->format('Ymd'));
                 }
                 $endtime = GeneralUtility::_POST('endtime');
                 if ($endtime) {
-                    $endtime = intval($this->getTimeParsed($endtime)->format('%Y%m%d'));
+                    $endtime = intval($this->getTimeParsed($endtime)->format('Ymd'));
                 }
 
                 if (count($pageIds) > 0 && is_int($starttime) && is_int($endtime)) {

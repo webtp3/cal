@@ -388,8 +388,9 @@ class Controller extends AbstractPlugin
             $dp = GeneralUtility::makeInstance(DateParser::class);
             $dp->parse($this->piVars ['jumpto'], $this->conf ['dateParserConf.']);
             $newGetdate = $dp->getDateObjectFromStack();
-            $this->conf ['getdate'] = $newGetdate->format('%Y%m%d');
-            unset($this->piVars ['getdate'], $this->piVars ['jumpto']);
+            $this->conf['getdate'] = $newGetdate->format('Ymd');
+            unset($this->piVars['getdate']);
+            unset($this->piVars['jumpto']);
         }
 
         // date and strtotime should be ok here
@@ -448,20 +449,20 @@ class Controller extends AbstractPlugin
 
         $this->getDateTimeObject = new CalDate($this->conf ['getdate'] . '000000');
 
-        if ($this->getDateTimeObject->month > 12) {
-            $this->getDateTimeObject->month = 12;
-        } elseif ($this->getDateTimeObject->month < 1) {
-            $this->getDateTimeObject->month = 1;
+        if ($this->getDateTimeObject->getMonth() > 12) {
+            $this->getDateTimeObject->setMinute(12);
+        } elseif ($this->getDateTimeObject->getMonth() < 1) {
+            $this->getDateTimeObject->setMonth(1);
         }
         while (!Calc::isValidDate(
-            $this->getDateTimeObject->day,
-            $this->getDateTimeObject->month,
-            $this->getDateTimeObject->year
+            $this->getDateTimeObject->getDay(),
+            $this->getDateTimeObject->getMonth(),
+            $this->getDateTimeObject->getYear()
         )) {
-            if ($this->getDateTimeObject->day > 28) {
-                $this->getDateTimeObject->day--;
-            } elseif ($this->getDateTimeObject->day < 1) {
-                $this->getDateTimeObject->day = 1;
+            if ($this->getDateTimeObject->getDay() > 28) {
+                $this->getDateTimeObject->setDay($this->getDateTimeObject->getDay()--);
+            } elseif ($this->getDateTimeObject->getDay() < 1) {
+                $this->getDateTimeObject->setDay(1);
             }
         }
 
@@ -816,8 +817,8 @@ class Controller extends AbstractPlugin
                                 'datetime',
                                 'period'
                             ]))) {
-                        $this->conf ['view.'] [$this->conf ['view'] . '.'] ['minDate'] = $event->getStart()->format('%Y%m%d');
-                        $this->conf ['view.'] [$this->conf ['view'] . '.'] ['maxDate'] = $this->piVars ['maxDate'];
+                        $this->conf['view.'][$this->conf['view'] . '.']['minDate'] = $event->start->format('Ymd');
+                        $this->conf['view.'][$this->conf['view'] . '.']['maxDate'] = $this->piVars['maxDate'];
 
                         $eventArray = $modelObj->findEvent(
                             $event->getUid(),
@@ -3890,14 +3891,14 @@ class Controller extends AbstractPlugin
             } else {
                 $date = new CalDate();
                 $date->setTZbyID('UTC');
-                if (!$this->piVars ['year']) {
-                    $this->piVars ['year'] = $date->format('%Y');
+                if (!$this->piVars['year']) {
+                    $this->piVars['year'] = $date->format('Y');
                 }
-                if (!$this->piVars ['month']) {
-                    $this->piVars ['month'] = $date->format('%m');
+                if (!$this->piVars['month']) {
+                    $this->piVars['month'] = $date->format('m');
                 }
-                if (!$this->piVars ['day']) {
-                    $this->piVars ['day'] = $date->format('%d');
+                if (!$this->piVars['day']) {
+                    $this->piVars['day'] = $date->format('d');
                 }
                 if ((int)$this->piVars ['month'] === 2) {
                     if (

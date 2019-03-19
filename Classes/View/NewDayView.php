@@ -53,8 +53,8 @@ class NewDayView extends NewTimeView
         $date->setDay($this->getDay());
         $date->setMonth($this->getMonth());
         $date->setYear($this->getYear());
-        $this->setWeekdayNumber($date->format('%w'));
-        $this->setYmd($date->format('%Y%m%d'));
+        $this->setWeekdayNumber($date->format('w'));
+        $this->setYmd($date->format('Ymd'));
         $this->time = $date->getTime();
         if ($parentMonth >= 0) {
             $this->setParentMonth(intval($parentMonth));
@@ -68,7 +68,7 @@ class NewDayView extends NewTimeView
      */
     public function addEvent(&$event)
     {
-        $this->events[$event->getStart()->format('%H%M')][$event->getUid()] = &$event;
+        $this->events[$event->getStart()->format('HM')][$event->getUid()] = &$event;
     }
 
     /**
@@ -136,8 +136,8 @@ class NewDayView extends NewTimeView
         foreach ($timeKeys as $timeKey) {
             $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
-                if (!$this->events[$timeKey][$eventKey]->isAllday() && ($this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d') === $this->events[$timeKey][$eventKey]->getEnd()->format('%Y%m%d'))) {
-                    $eventMappingKey = $this->events[$timeKey][$eventKey]->getType() . '_' . $this->events[$timeKey][$eventKey]->getUid() . '_' . $this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d%H%M%S');
+                if (!$this->events[$timeKey][$eventKey]->isAllday() && ($this->events[$timeKey][$eventKey]->getStart()->format('Ymd') === $this->events[$timeKey][$eventKey]->getEnd()->format('Ymd'))) {
+                    $eventMappingKey = $this->events[$timeKey][$eventKey]->getType() . '_' . $this->events[$timeKey][$eventKey]->getUid() . '_' . $this->events[$timeKey][$eventKey]->getStart()->format('YmdHMS');
                     $eventArray[$eventMappingKey] = &$this->events[$timeKey][$eventKey];
 
                     $i->copy($this->events[$timeKey][$eventKey]->getStart());
@@ -150,8 +150,8 @@ class NewDayView extends NewTimeView
 
                     $entries = 0;
                     for (; $i->before($this->events[$timeKey][$eventKey]->getEnd()); $i->addSeconds($gridLength * 60)) {
-                        $ymd = $i->format('%Y%m%d');
-                        $hm = $i->format('%H%M');
+                        $ymd = $i->format('Ymd');
+                        $hm = $i->format('HM');
                         $viewArray[$ymd][$hm][] = $eventMappingKey;
                         $entries++;
 
@@ -185,17 +185,17 @@ class NewDayView extends NewTimeView
         $t_array = [];
 
         while ($i->before($d_end)) {
-            $i_formatted = $i->format('%H%M');
+            $i_formatted = $i->format('HM');
 
             if (is_array($viewArray[$this->getYmd()][$i_formatted]) && count($viewArray[$this->getYmd()][$i_formatted]) > 0) {
                 foreach ($viewArray[$this->getYmd()][$i_formatted] as $eventKey) {
                     $event = &$eventArray[$eventKey];
                     $eventStart = $event->getStart();
-                    $eventMappingKey = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M%S');
+                    $eventMappingKey = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHMS');
                     if (array_key_exists($eventMappingKey, $pos_array)) {
                         $eventEnd = $event->getEnd();
                         $eventEnd->subtractSeconds(($eventEnd->getMinute() % $gridLength) * 60);
-                        if ($i_formatted >= $eventEnd->format('%H%M')) {
+                        if ($i_formatted >= $eventEnd->format('HM')) {
                             $t_array[$i_formatted][$pos_array[$eventMappingKey]] = [
                                 'ended' => $eventMappingKey
                             ];
@@ -412,7 +412,7 @@ class NewDayView extends NewTimeView
         foreach ($timeKeys as $timeKey) {
             $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
-                if ($this->events[$timeKey][$eventKey]->isAllday() || ($this->events[$timeKey][$eventKey]->getStart()->format('%Y%m%d') !== $this->events[$timeKey][$eventKey]->getEnd()->format('%Y%m%d'))) {
+                if ($this->events[$timeKey][$eventKey]->isAllday() || ($this->events[$timeKey][$eventKey]->getStart()->format('Ymd') !== $this->events[$timeKey][$eventKey]->getEnd()->format('Ymd'))) {
                     $content .= $this->events[$timeKey][$eventKey]->renderEventFor($view);
                 }
             }

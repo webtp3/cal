@@ -66,7 +66,7 @@ class NewMonthView extends NewTimeView
         $date->setDay(1);
         $date->setMonth($this->getMonth());
         $date->setYear($this->getYear());
-        $this->monthStartWeekdayNum = $date->format('%w');
+        $this->monthStartWeekdayNum = $date->format('w');
         $this->monthLength = $date->getDaysInMonth();
         $monthEnd = Calendar::calculateEndMonthTime($date);
 
@@ -97,7 +97,7 @@ class NewMonthView extends NewTimeView
                 if ($weekNumber !== $weekEnd) {
                     $weekNumberTmp = 0;
                 }
-            } while ($weekNumberTmp <= $weekEnd && $newDate->year === $this->getYear());
+            } while ($weekNumberTmp <= $weekEnd && $newDate->getYear() === $this->getYear());
         } elseif ($this->getMonth() === 1) {
             do {
                 if ($weekNumber > 6) {
@@ -115,7 +115,7 @@ class NewMonthView extends NewTimeView
                 }
                 $newDate->addSeconds(86400 * 7);
                 $weekNumber = $newDate->getWeekOfYear();
-            } while ($weekNumber <= $weekEnd && $newDate->year === $this->getYear());
+            } while ($weekNumber <= $weekEnd && $newDate->getYear() === $this->getYear());
         } else {
             do {
                 $this->weeks[$this->getYear() . '_' . $weekNumber] = new NewWeekView(

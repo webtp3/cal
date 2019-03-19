@@ -57,7 +57,7 @@ $tx_cal_event_deviation = [
     'columns' => [
         'hidden' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
                 'default' => 0
@@ -80,7 +80,7 @@ $tx_cal_event_deviation = [
         ],
         'starttime' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
@@ -92,7 +92,7 @@ $tx_cal_event_deviation = [
         ],
         'endtime' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
@@ -365,7 +365,7 @@ $tx_cal_event_deviation = [
         ],
         'image' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.images',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.images',
             'config' => ExtensionManagementUtility::getFileFieldTCAConfig('image', [
                 'maxitems' => 5,
                 'default' => 0,
@@ -373,12 +373,12 @@ $tx_cal_event_deviation = [
                 'foreign_types' => [
                     '0' => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
                     File::FILETYPE_IMAGE => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ]
                 ]
@@ -393,32 +393,32 @@ $tx_cal_event_deviation = [
                 'foreign_types' => [
                     '0' => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
                     File::FILETYPE_TEXT => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
                     File::FILETYPE_IMAGE => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
                     File::FILETYPE_AUDIO => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
                     File::FILETYPE_VIDEO => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
                     File::FILETYPE_APPLICATION => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ]
                 ]
@@ -427,7 +427,7 @@ $tx_cal_event_deviation = [
         'l18n_parent' => [
             'displayCond' => 'FIELD:sys_language_uid:>:0',
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.l18n_parent',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.l18n_parent',
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
@@ -448,7 +448,7 @@ $tx_cal_event_deviation = [
         ],
         't3ver_label' => [
             'displayCond' => 'FIELD:t3ver_label:REQ:true',
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.versionLabel',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.versionLabel',
             'config' => [
                 'type' => 'none',
                 'cols' => 27

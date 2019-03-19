@@ -65,11 +65,11 @@ class RecurrenceGenerator
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->pageIDForPlugin = $pageIDForPlugin;
         if ($starttime == null) {
-            $starttime = $this->getTimeParsed($this->extConf['recurrenceStart'])->format('%Y%m%d');
+            $starttime = $this->getTimeParsed($this->extConf['recurrenceStart'])->format('Ymd');
         }
         $this->starttime = $starttime;
         if ($endtime == null) {
-            $endtime = $this->getTimeParsed($this->extConf['recurrenceEnd'])->format('%Y%m%d');
+            $endtime = $this->getTimeParsed($this->extConf['recurrenceEnd'])->format('Ymd');
         }
         $this->endtime = $endtime;
     }

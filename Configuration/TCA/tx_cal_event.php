@@ -93,7 +93,7 @@ $tx_cal_event = [
     'columns' => [
         'hidden' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
                 'default' => 0
@@ -111,7 +111,7 @@ $tx_cal_event = [
         ],
         'starttime' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
             'config' => [
                 'type' => 'input',
                 'size' => 12,
@@ -124,7 +124,7 @@ $tx_cal_event = [
         ],
         'endtime' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
@@ -694,19 +694,19 @@ $tx_cal_event = [
         /* new */
         'image' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.images',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.images',
             'config' => ExtensionManagementUtility::getFileFieldTCAConfig('image', [
                 'maxitems' => 5,
                 // Use the imageoverlayPalette instead of the basicoverlayPalette
                 'foreign_types' => [
                     '0' => [
                         'showitem' => '
-											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+											--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
                     File::FILETYPE_IMAGE => [
                         'showitem' => '
-											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+											--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ]
                 ],
@@ -723,32 +723,32 @@ $tx_cal_event = [
                 'foreign_types' => [
                     '0' => [
                         'showitem' => '
-											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+											--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
                     File::FILETYPE_TEXT => [
                         'showitem' => '
-											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+											--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
                     File::FILETYPE_IMAGE => [
                         'showitem' => '
-											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+											--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
                     File::FILETYPE_AUDIO => [
                         'showitem' => '
-											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+											--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
                     File::FILETYPE_VIDEO => [
                         'showitem' => '
-											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+											--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ],
                     File::FILETYPE_APPLICATION => [
                         'showitem' => '
-											--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+											--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 											--palette--;;filePalette'
                     ]
                 ],
@@ -879,7 +879,7 @@ $tx_cal_event = [
         ],
         'sys_language_uid' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.language',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.language',
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
@@ -887,11 +887,11 @@ $tx_cal_event = [
                 'foreign_table_where' => 'ORDER BY sys_language.title',
                 'items' => [
                     [
-                        'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.allLanguages',
+                        'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.allLanguages',
                         -1
                     ],
                     [
-                        'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.default_value',
+                        'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.default_value',
                         0
                     ]
                 ]
@@ -900,7 +900,7 @@ $tx_cal_event = [
         'l18n_parent' => [
             'displayCond' => 'FIELD:sys_language_uid:>:0',
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.l18n_parent',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.l18n_parent',
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
@@ -921,7 +921,7 @@ $tx_cal_event = [
         ],
         't3ver_label' => [
             'displayCond' => 'FIELD:t3ver_label:REQ:true',
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.versionLabel',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.versionLabel',
             'config' => [
                 'type' => 'none',
                 'cols' => 27

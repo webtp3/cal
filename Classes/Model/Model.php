@@ -473,7 +473,7 @@ abstract class Model extends BaseModel
         $d = nl2br($cObj->parseFunc($this->getDescription(), $this->conf['parseFunc.']));
         $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
-        return '<h3>' . $this->getTitle() . '</h3><span style="color: #000000; "><ul>' . '<li>Start: ' . $eventStart->format('%H:%M') . '</li>' . '<li>End: ' . $eventEnd->format('%H:%M') . '</li>' . '<li> Organizer: ' . $this->getOrganizer() . '</li>' . '<li>Location: ' . $this->getLocation() . '</li>' . '<li>Description: ' . $d . '</li></ul></span>';
+        return '<h3>' . $this->getTitle() . '</h3><span color="#000000"><ul>' . '<li>Start: ' . $eventStart->format('H:M') . '</li>' . '<li>End: ' . $eventEnd->format('%H:%M') . '</li>' . '<li> Organizer: ' . $this->getOrganizer() . '</li>' . '<li>Location: ' . $this->getLocation() . '</li>' . '<li>Description: ' . $d . '</li></ul></span>';
     }
 
     /**
@@ -629,7 +629,7 @@ abstract class Model extends BaseModel
     {
         $this->start = new CalDate();
         $this->start->copy($start);
-        $this->row['start_date'] = $start->format('%Y%m%d');
+        $this->row['start_date'] = $start->format('Ymd');
         $this->row['start_time'] = $start->getHour() * 3600 + $start->getMinute() * 60;
     }
 
@@ -642,7 +642,7 @@ abstract class Model extends BaseModel
     {
         $this->end = new CalDate();
         $this->end->copy($end);
-        $this->row['end_date'] = $end->format('%Y%m%d');
+        $this->row['end_date'] = $end->format('Ymd');
         $this->row['end_time'] = $end->getHour() * 3600 + $end->getMinute() * 60;
     }
 
@@ -1821,18 +1821,18 @@ abstract class Model extends BaseModel
         /** @var CalDate $until */
         $until = $this->getUntil();
         if (is_object($until)) {
-            $values['until'] = $until->format('%Y%m%d');
+            $values['until'] = $until->format('Ymd');
         } else {
             $values['until'] = '00000101';
         }
         $values['category_headerstyle'] = $this->getHeaderStyle();
         $values['category_bodystyle'] = $this->getBodyStyle();
         $start = &$this->getStart();
-        $values['start_date'] = $start->format('%Y%m%d');
+        $values['start_date'] = $start->format('Ymd');
         $values['start_time'] = $start->getHour() * 3600 + $start->getMinute() * 60;
         $values['start'] = $this->getStartAsTimestamp();
         $end = &$this->getEnd();
-        $values['end_date'] = $end->format('%Y%m%d');
+        $values['end_date'] = $end->format('Ymd');
         $values['end_time'] = $end->getHour() * 3600 + $end->getMinute() * 60;
         $values['end'] = $this->getEndAsTimestamp();
         $values['allday'] = $this->isAllDay();

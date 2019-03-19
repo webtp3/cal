@@ -144,9 +144,12 @@ class Span
      *            second date set it from a date diff.
      *
      * @see set()
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function __construct($time = 0, $format = null)
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         $this->set($time, $format);
     }
 
@@ -172,9 +175,12 @@ class Span
      * @see setFromString()
      * @see setFromSeconds()
      * @see setFromDateDiff()
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function set($time = 0, $format = null): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if (is_a($time, 'date_span')) {
             return $this->copy($time);
         }
@@ -211,9 +217,12 @@ class Span
      *            absent values.
      *
      * @return bool True on success.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setFromArray($time): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if (!is_array($time)) {
             return false;
         }
@@ -289,9 +298,12 @@ class Span
      *            Format string.
      *
      * @return bool True on success.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setFromString($time, $format = null): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if ($format === null) {
             $format = $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
         }
@@ -462,9 +474,12 @@ class Span
      *            Total number of seconds.
      *
      * @return bool True on success.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setFromSeconds($seconds): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if ($seconds < 0) {
             return false;
         }
@@ -489,9 +504,12 @@ class Span
      *            Total number of minutes.
      *
      * @return bool True on success.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setFromMinutes($minutes): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->setFromSeconds(round($minutes * 60));
     }
 
@@ -505,9 +523,12 @@ class Span
      *            Total number of hours.
      *
      * @return bool True on success.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setFromHours($hours): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->setFromSeconds(round($hours * 3600));
     }
 
@@ -521,9 +542,12 @@ class Span
      *            Total number of days.
      *
      * @return bool True on success.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setFromDays($days): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->setFromSeconds(round($days * 86400));
     }
 
@@ -542,9 +566,12 @@ class Span
      *            object Date $date2 Second Date.
      *
      * @return bool True on success.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setFromDateDiff($date1, $date2): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if (!is_a($date1, 'date') or !is_a($date2, 'date')) {
             return false;
         }
@@ -581,9 +608,12 @@ class Span
      *            object Span $time Source time span object.
      *
      * @return bool True on success.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function copy($time): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if (is_a($time, 'date_span')) {
             $this->second = $time->second;
             $this->minute = $time->minute;
@@ -641,9 +671,12 @@ class Span
      *            The format string for returned time span.
      *
      * @return string The time span in specified format.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function format($format = null): string
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if ($format === null) {
             $format = $GLOBALS['_DATE_SPAN_FORMAT'];
         }
@@ -751,9 +784,12 @@ class Span
      * Convert time span to seconds.
      *
      * @return int Time span as an integer number of seconds.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function toSeconds(): int
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->day * 86400 + $this->hour * 3600 + $this->minute * 60 + $this->second;
     }
 
@@ -764,9 +800,12 @@ class Span
      * Convert time span to minutes.
      *
      * @return float Time span as a decimal number of minutes.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function toMinutes(): float
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->day * 1440 + $this->hour * 60 + $this->minute + $this->second / 60;
     }
 
@@ -777,9 +816,12 @@ class Span
      * Convert time span to hours.
      *
      * @return float Time span as a decimal number of hours.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function toHours(): float
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->day * 24 + $this->hour + $this->minute / 60 + $this->second / 3600;
     }
 
@@ -790,9 +832,12 @@ class Span
      * Convert time span to days.
      *
      * @return float Time span as a decimal number of days.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function toDays(): float
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->day + $this->hour / 24 + $this->minute / 1440 + $this->second / 86400;
     }
 
@@ -804,9 +849,12 @@ class Span
      *
      * @param
      *            object Span $time Time span to add.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function add($time): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->setFromSeconds($this->toSeconds() + $time->toSeconds());
     }
 
@@ -822,9 +870,12 @@ class Span
      *
      * @param
      *            object Span $time Time span to subtract.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function subtract($time)
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         $sub = $this->toSeconds() - $time->toSeconds();
         if ($sub < 0) {
             $this->setFromSeconds(0);
@@ -843,9 +894,12 @@ class Span
      *            object Span $time Time span to compare to.
      *
      * @return bool True if the time spans are equal.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function equal($time): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->toSeconds() == $time->toSeconds();
     }
 
@@ -859,9 +913,12 @@ class Span
      *            object Span $time Time span to compare to.
      *
      * @return bool True if this time span is greater or equal than $time.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function greaterEqual($time): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->toSeconds() >= $time->toSeconds();
     }
 
@@ -875,9 +932,12 @@ class Span
      *            object Span $time Time span to compare to.
      *
      * @return bool True if this time span is lower or equal than $time.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function lowerEqual($time): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->toSeconds() <= $time->toSeconds();
     }
 
@@ -891,9 +951,12 @@ class Span
      *            object Span $time Time span to compare to.
      *
      * @return bool True if this time span is greater than $time.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function greater($time): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->toSeconds() > $time->toSeconds();
     }
 
@@ -907,9 +970,12 @@ class Span
      *            object Span $time Time span to compare to.
      *
      * @return bool True if this time span is lower than $time.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function lower($time): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->toSeconds() < $time->toSeconds();
     }
 
@@ -930,9 +996,12 @@ class Span
      *         than time2, 1 if time1 is greater than time2.
      *
      * @static
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function compare($time1, $time2): int
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if ($time1->equal($time2)) {
             return 0;
         }
@@ -949,9 +1018,12 @@ class Span
      * Tells if the time span is empty (zero length).
      *
      * @return bool True is it's empty.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function isEmpty(): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return !$this->day && !$this->hour && !$this->minute && !$this->second;
     }
 
@@ -967,9 +1039,12 @@ class Span
      * @return mixed Previous default input format.
      *
      * @static
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setDefaultInputFormat($format)
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         $old = $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
         $GLOBALS['_DATE_SPAN_INPUT_FORMAT'] = $format;
         return $old;
@@ -984,9 +1059,12 @@ class Span
      * @return mixed Default input format.
      *
      * @static
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getDefaultInputFormat()
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
     }
 
@@ -1002,9 +1080,12 @@ class Span
      * @return mixed Previous default format.
      *
      * @static
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function setDefaultFormat($format)
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         $old = $GLOBALS['_DATE_SPAN_FORMAT'];
         $GLOBALS['_DATE_SPAN_FORMAT'] = $format;
         return $old;
@@ -1019,9 +1100,12 @@ class Span
      * @return mixed Default format.
      *
      * @static
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getDefaultFormat()
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $GLOBALS['_DATE_SPAN_FORMAT'];
     }
 
@@ -1032,9 +1116,12 @@ class Span
      * Returns a copy of the object (workarround for PHP5 forward compatibility).
      *
      * @return object Span Copy of the object.
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function __clone()
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         $c = get_class($this);
         $s = new $c();
         $s->day = $this->day;

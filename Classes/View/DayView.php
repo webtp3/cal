@@ -45,7 +45,7 @@ class DayView extends BaseView
             $getdate = new  CalDate($getdate);
         }
 
-        $dayModel = new NewDayView($getdate->day, $getdate->month, $getdate->year);
+        $dayModel = new NewDayView($getdate->getDay(), $getdate->getMonth(), $getdate->getYear());
         $today = new  CalDate();
         $dayModel->setCurrent($today);
         $dayModel->setSelected($getdate);
@@ -107,7 +107,7 @@ class DayView extends BaseView
 
         if (!isset($getdate) || $getdate === '') {
             $getdate_obj = new  CalDate();
-            $getdate = $getdate_obj->format('%Y%m%d');
+            $getdate = $getdate_obj->format('Ymd');
         }
 
         $day_array2 = [];
@@ -226,7 +226,7 @@ class DayView extends BaseView
                     /** @var EventModel $event */
                     foreach ($ovl_time_Value as $event) {
                         $eventStart = $event->getStart();
-                        $eventArray[$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')] = $event;
+                        $eventArray[$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM')] = $event;
                         $starttime = new  CalDate();
                         $endtime = new  CalDate();
                         $j = new  CalDate();
@@ -236,7 +236,7 @@ class DayView extends BaseView
                             $endtime->addSeconds(1);
 
                             for ($j->copy($starttime); $j->before($endtime) && $j->before($end_week_time); $j->addSeconds(86400)) {
-                                $view_array[$j->format('%Y%m%d')]['-1'][] = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M');
+                                $view_array[$j->format('Ymd')]['-1'][] = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM');
                             }
                         } else {
                             $starttime->copy($event->getStart());
@@ -252,8 +252,8 @@ class DayView extends BaseView
                             $startOfDay->copy($d_start);
 
                             // $d_start -= $gridLength * 60;
-                            foreach ($view_array[$starttime->format('%Y%m%d')][$starttime->format('%H%M')] as $k => $kValue) {
-                                if (empty($view_array[$starttime->format('%Y%m%d')][$starttime->format('%H%M')][$k])) {
+                            foreach ($view_array[$starttime->format('Ymd')][$starttime->format('HM')] as $k => $kValue) {
+                                if (empty($view_array[$starttime->format('Ymd')][$starttime->format('HM')][$k])) {
                                     break;
                                 }
                             }
@@ -263,25 +263,25 @@ class DayView extends BaseView
                             }
                             while ($j->before($endtime) && $j->before($end_week_time)) {
                                 if ($j->after($endOfDay)) {
-                                    $rowspan_array[$old_day->format('%Y%m%d')][$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')] = $entries - 1;
+                                    $rowspan_array[$old_day->format('Ymd')][$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM')] = $entries - 1;
 
                                     $endOfDay->addSeconds(60 * 60 * 24);
                                     $old_day->copy($endOfDay);
                                     $startOfDay->addSeconds(60 * 60 * 24);
                                     $j->copy($startOfDay);
                                     $entries = 0;
-                                    foreach ($view_array[$d_start->format('%Y%m%d')][$startOfDay->format('%H%M')] as $k => $kValue) {
-                                        if (empty($view_array[$d_start->format('%Y%m%d')][$startOfDay->format('%H%M')][$k])) {
+                                    foreach ($view_array[$d_start->format('Ymd')][$startOfDay->format('HM')] as $k => $kValue) {
+                                        if (empty($view_array[$d_start->format('Ymd')][$startOfDay->format('HM')][$k])) {
                                             break;
                                         }
                                     }
                                 } else {
-                                    $view_array[$j->format('%Y%m%d')][$j->format('%H%M')][] = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M');
+                                    $view_array[$j->format('Ymd')][$j->format('HM')][] = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM');
                                     $j->addSeconds($gridLength * 60);
                                 }
                                 $entries++;
                             }
-                            $rowspan_array[$old_day->format('%Y%m%d')][$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')] = $entries - 1;
+                            $rowspan_array[$old_day->format('Ymd')][$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM')] = $entries - 1;
                         }
                     }
                 }
@@ -324,7 +324,7 @@ class DayView extends BaseView
         $isAllowedToCreateEvent = $this->rightsObj->isAllowedToCreateEvent();
         $start_day = $week_start_day;
         for ($i = 0; $i < 7; $i++) {
-            $daylink = $start_day->format('%Y%m%d');
+            $daylink = $start_day->format('Ymd');
 
             $weekday = $start_day->format($this->conf['view.']['day.']['dateFormatDay']);
 
@@ -415,32 +415,32 @@ class DayView extends BaseView
         $i->copy($d_start);
         $i->setTZbyID('UTC');
         while ($i->before($d_end)) {
-            $i_formatted = $i->format('%H%M');
+            $i_formatted = $i->format('HM');
             if (is_array($view_array[$i_formatted]) && count($view_array[$i_formatted]) > 0) {
                 foreach ($view_array[$i_formatted] as $eventKey) {
                     $event = &$eventArray[$eventKey];
                     $eventStart = $event->getStart();
                     if (array_key_exists(
-                        $event->getType() . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M'),
+                        $event->getType() . $event->getUid() . '_' . $eventStart->format('YmdHM'),
                         $pos_array
                     )) {
                         $eventEnd = $event->getEnd();
                         $nd = $eventEnd->subtractSeconds(($eventEnd->getMinute() % $gridLength) * 60);
                         if ($i_formatted >= $nd) {
-                            $t_array[$i_formatted][$pos_array[$event->getType() . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')]] = [
-                                'ended' => $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')
+                            $t_array[$i_formatted][$pos_array[$event->getType() . $event->getUid() . '_' . $eventStart->format('YmdHM')]] = [
+                                'ended' => $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM')
                             ];
                         } else {
-                            $t_array[$i_formatted][$pos_array[$event->getType() . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')]] = [
-                                'started' => $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')
+                            $t_array[$i_formatted][$pos_array[$event->getType() . $event->getUid() . '_' . $eventStart->format('YmdHM')]] = [
+                                'started' => $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM')
                             ];
                         }
                     } else {
                         foreach ($t_array[$i_formatted] as $j => $jValue) {
                             if (!isset($t_array[$i_formatted][$j]) || count($jValue) === 0) {
-                                $pos_array[$event->getType() . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')] = $j;
+                                $pos_array[$event->getType() . $event->getUid() . '_' . $eventStart->format('YmdHM')] = $j;
                                 $t_array[$i_formatted][$j] = [
-                                    'begin' => $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('%Y%m%d%H%M')
+                                    'begin' => $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM')
                                 ];
                                 break;
                             }

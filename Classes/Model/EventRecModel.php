@@ -279,7 +279,7 @@ class EventRecModel extends Model
         if (substr(
             $viewType,
             -6
-            ) !== 'ALLDAY' && ($this->isAllDay() || $this->getStart()->format('%Y%m%d') !== $this->getEnd()->format('%Y%m%d'))) {
+            ) !== 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('Ymd') !== $this->getEnd()->format('Ymd'))) {
             $subpartSuffix .= 'ALLDAY';
         }
         $hookObjectsArr = Functions::getHookObjectsArray(
@@ -430,7 +430,7 @@ class EventRecModel extends Model
                 $this->parentEvent->conf['view.'][$view . '.']['event.']['startdate'],
                 $this->parentEvent->conf['view.'][$view . '.']['event.']['startdate.']
             );
-            if ($this->parentEvent->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDate'] && $eventEnd->format('%Y%m%d') === $eventStart->format('%Y%m%d')) {
+            if ($this->parentEvent->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDate'] && $eventEnd->format('Ymd') === $eventStart->format('Ymd')) {
                 $sims['###STARTDATE_LABEL###'] = $this->controller->pi_getLL('l_date');
                 $sims['###ENDDATE_LABEL###'] = '';
                 $sims['###ENDDATE###'] = '';
@@ -643,7 +643,7 @@ class EventRecModel extends Model
         $eventStart = $this->getStart();
         $wrapped['###EVENT_LINK###'] = explode(
             '$5&xs2',
-            $this->parentEvent->getLinkToEvent('$5&xs2', $view, $eventStart->format('%Y%m%d'))
+            $this->parentEvent->getLinkToEvent('$5&xs2', $view, $eventStart->format('Ymd'))
         );
     }
 
@@ -660,7 +660,7 @@ class EventRecModel extends Model
         $sims['###EVENT_URL###'] = htmlspecialchars($this->parentEvent->getLinkToEvent(
             '$5&xs2',
             $view,
-            $eventStart->format('%Y%m%d'),
+            $eventStart->format('Ymd'),
             true
         ));
     }
@@ -677,7 +677,7 @@ class EventRecModel extends Model
         $eventStart = $this->getStart();
         $wrapped['###ABSOLUTE_EVENT_LINK###'] = explode(
             '$5&xs2',
-            $this->parentEvent->getLinkToEvent('$5&xs2', $view, $eventStart->format('%Y%m%d'))
+            $this->parentEvent->getLinkToEvent('$5&xs2', $view, $eventStart->format('Ymd'))
         );
     }
 
@@ -723,7 +723,7 @@ class EventRecModel extends Model
             }
             $linkConf['link_no_cache'] = 0;
             //$linkConf['link_useCacheHash'] = 0;
-            $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=edit_event&tx_cal_controller[type]=' . $this->parentEvent->getType() . '&tx_cal_controller[uid]=' . $this->parentEvent->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
+            $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=edit_event&tx_cal_controller[type]=' . $this->parentEvent->getType() . '&tx_cal_controller[uid]=' . $this->parentEvent->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('Ymd') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
             $linkConf['link_section'] = 'default';
             $linkConf['link_parameter'] = $this->parentEvent->conf['view.']['event.']['editEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
@@ -746,7 +746,7 @@ class EventRecModel extends Model
             }
             $linkConf['link_no_cache'] = 0;
             //$linkConf['link_useCacheHash'] = 0;
-            $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=delete_event&tx_cal_controller[type]=' . $this->parentEvent->getType() . '&tx_cal_controller[uid]=' . $this->parentEvent->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
+            $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=delete_event&tx_cal_controller[type]=' . $this->parentEvent->getType() . '&tx_cal_controller[uid]=' . $this->parentEvent->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('Ymd') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
             $linkConf['link_section'] = 'default';
             $linkConf['link_parameter'] = $this->parentEvent->conf['view.']['event.']['deleteEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
@@ -967,7 +967,7 @@ class EventRecModel extends Model
     public function getEventIdMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $start = $this->getStart();
-        $sims['###EVENT_ID###'] = $this->parentEvent->getType() . $this->parentEvent->getUid() . $start->format('%Y%m%d%H%M');
+        $sims['###EVENT_ID###'] = $this->parentEvent->getType() . $this->parentEvent->getUid() . $start->format('YmdHM');
     }
 
     /**
@@ -1194,8 +1194,8 @@ class EventRecModel extends Model
         $values = parent::getAdditionalValuesAsArray();
         $values['start'] = $this->getStartAsTimestamp();
         $values['end'] = $this->getEndAsTimestamp();
-        $values['parent_startdate'] = $this->parentEvent->start->format('%Y%m%d');
-        $values['parent_enddate'] = $this->parentEvent->end->format('%Y%m%d');
+        $values['parent_startdate'] = $this->parentEvent->start->format('Ymd');
+        $values['parent_enddate'] = $this->parentEvent->end->format('Ymd');
         $values['parent_starttime'] = $this->parentEvent->start->getHour() * 60 + $this->parentEvent->start->getMinute();
         $values['parent_endtime'] = $this->parentEvent->end->getHour() * 60 + $this->parentEvent->end->getMinute();
         return $values;

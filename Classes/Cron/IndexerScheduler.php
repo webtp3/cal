@@ -36,8 +36,8 @@ class IndexerScheduler extends AbstractTask
         $success = true;
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
-        $starttime = $this->getTimeParsed($this->starttime)->format('%Y%m%d');
-        $endtime = $this->getTimeParsed($this->endtime)->format('%Y%m%d');
+        $starttime = $this->getTimeParsed($this->starttime)->format('Ymd');
+        $endtime = $this->getTimeParsed($this->endtime)->format('Ymd');
 
         $logger->info('Starting to index cal events from ' . $starttime . ' until ' . $endtime . '. Using Typoscript page ' . $this->typoscriptPage . ' as configuration reference.');
         /** @var \TYPO3\CMS\Cal\Utility\RecurrenceGenerator $rgc */

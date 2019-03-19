@@ -167,7 +167,7 @@
             <label index="tx_cal_calendar.type.I.2">Include iCalendar File</label>
             <label index="tx_cal_calendar.ext_url">External iCalendar URL</label>
             <label index="tx_cal_calendar.ext_url_url">URL</label>
-            <label index="tx_cal_calendar.ext_url_note">Note</label>
+            <label index="tx_cal_calendar.ext_url_notes">Notes</label>
             <label index="tx_cal_calendar.ics_file">ICS File</label>
             <label index="tx_cal_calendar.refresh">Refresh Interval (Minutes) (scheduler needed)</label>
             <label index="tx_cal_calendar.owner">Owner</label>

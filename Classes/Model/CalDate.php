@@ -20,15 +20,45 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use TYPO3\CMS\Cal\Model\Pear\Date;
-use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
-use TYPO3\CMS\Cal\Utility\Registry;
+
+if (!defined('DATE_CALC_BEGIN_WEEKDAY')) {
+    /**
+     * Defines what day starts the week
+     *
+     * Monday (1) is the international standard.
+     * Redefine this to 0 if you want weeks to begin on Sunday.
+     */
+    define('DATE_CALC_BEGIN_WEEKDAY', 1);
+}
+
+if (!defined('DATE_CALC_FORMAT')) {
+    /**
+     * The default value for each method's $format parameter
+     *
+     * The default is '%Y%m%d'. To override this default, define
+     * this constant before including Calc.php.
+     *
+     * @since Constant available since Release 1.4.4
+     */
+    define('DATE_CALC_FORMAT', 'Ymd');
+}
 
 /**
- * Extends the PEAR date class and adds a compareTo method.
+ * This is supposed to be a wrapper class to imitate old PEAR::Date
+ * functions in order to able to leave a lot of function calls untouched
+ * for now.
  */
-class CalDate extends Date
+class CalDate extends \DateTime
 {
+
+    /**
+     * define the default weekday abbreviation length
+     * used by ::format()
+     *
+     * @var int
+     */
+    public $getWeekdayAbbrnameLength = 3;
+
     /**
      * define the default monthname abbreviation length
      * used by ::format()
@@ -38,103 +68,49 @@ class CalDate extends Date
     private $getMonthAbbrnameLength = 3;
     private $conf;
 
-    // @override constructor
-
     /**
-     * CalDate constructor.
-     * @param null $date
-     */
-    public function __construct($date = null)
-    {
-        if (class_exists(Registry::class)) {
-            if (is_object($GLOBALS['TSFE'])) {
-                if (!is_array($GLOBALS['TSFE']->register['cal_shared_conf'])) {
-                    $GLOBALS['TSFE']->register['cal_shared_conf'] = &Registry::Registry('basic', 'conf');
-                }
-                $this->conf = &$GLOBALS['TSFE']->register['cal_shared_conf'];
-                $this->cObj = &$GLOBALS['TSFE']->cObj;
-            } else {
-                $this->conf = &Registry::Registry('basic', 'conf');
-                $this->cObj = &Registry::Registry('basic', 'cobj');
-            }
-        }
-        parent::Date($date);
-    }
-
-    /**
-     * Compare function.
-     *
-     * @param $object
-     * @return int => less, equals, greater
-     */
-    public function compareTo($object): int
-    {
-        if (is_subclass_of($object, Date::class)) {
-            return $this->compare($this, $object);
-        }
-        return -1;
-    }
-
-    // @override
-
-    /**
-     * @param $compareDate
+     * @param CalDate $compareDate
      * @return bool
      */
-    public function equals($compareDate): bool
+    public function equals(CalDate $compareDate): bool
     {
-        $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
-        $b = floatval($this->format('%Y%m%d%H%M%S'));
-        if ($a == $b) {
-            return true;
-        }
-        return false;
+        $a = floatval($compareDate->format('YmdHMS'));
+        $b = floatval($this->format('YmdHMS'));
+        return $a === $b;
     }
-
-    // @override
 
     /**
-     * @param $compareDate
+     * @param CalDate $compareDate
      * @return bool
      */
-    public function before($compareDate): bool
+    public function before(CalDate $compareDate): bool
     {
-        $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
-        $b = floatval($this->format('%Y%m%d%H%M%S'));
-        if ($a > $b) {
-            return true;
-        }
-        return false;
+        $a = floatval($compareDate->format('YmdHMS'));
+        $b = floatval($this->format('YmdHMS'));
+        return $a > $b;
     }
-
-    // @override
 
     /**
-     * @param $compareDate
+     * @param CalDate $compareDate
      * @return bool
      */
-    public function after($compareDate): bool
+    public function after(CalDate $compareDate): bool
     {
-        $a = floatval($compareDate->format('%Y%m%d%H%M%S'));
-        $b = floatval($this->format('%Y%m%d%H%M%S'));
-        if ($a < $b) {
-            return true;
-        }
-        return false;
+        $a = floatval($compareDate->format('YmdHMS'));
+        $b = floatval($this->format('YmdHMS'));
+        return $a < $b;
     }
-
-    // @override
 
     /**
      * @param $compareDateA
      * @param $compareDateB
      * @return int
      */
-    public function compare($compareDateA, $compareDateB): int
+    public function compare(CalDate $compareDateA, CalDate $compareDateB): int
     {
-        $a = floatval($compareDateA->format('%Y%m%d%H%M%S'));
-        $b = floatval($compareDateB->format('%Y%m%d%H%M%S'));
-        if ($a == $b) {
+        $a = floatval($compareDateA->format('YmdHMS'));
+        $b = floatval($compareDateB->format('YmdHMS'));
+        if ($a === $b) {
             return 0;
         }
         if ($a < $b) {
@@ -143,360 +119,38 @@ class CalDate extends Date
         return 1;
     }
 
-    // @override
-
     /**
-     * @param int $seconds
+     * @param int $sec
+     * @throws \Exception
      */
-    public function subtractSeconds($seconds = 0)
+    public function subtractSeconds($sec = 0)
     {
-        if ($seconds != 0) {
-            parent::subtractSeconds($seconds);
-        }
-    }
+        settype($sec, 'int');
 
-    // @override
-
-    /**
-     * @param int $seconds
-     */
-    public function addSeconds($seconds = 0)
-    {
-        if ($seconds != 0) {
-            parent::addSeconds($seconds);
+        // Negative value given.
+        if ($sec < 0) {
+            $this->addSeconds(abs($sec));
+            return;
         }
+        $this->sub(new \DateInterval('PT' . $sec . 'S'));
     }
 
     /**
-     * Date pretty printing, similar to strftime()
-     *
-     * Formats the date in the given format, much like
-     * strftime(). Most strftime() options are supported.<br><br>
-     *
-     * Formatting options:<br><br>
-     *
-     * <code>%a </code> abbreviated weekday name (Sun, Mon, Tue) <br>
-     * <code>%A </code> full weekday name (Sunday, Monday, Tuesday) <br>
-     * <code>%b </code> abbreviated month name (Jan, Feb, Mar) <br>
-     * <code>%B </code> full month name (January, February, March) <br>
-     * <code>%C </code> century number (the year divided by 100 and truncated
-     * to an integer, range 00 to 99) <br>
-     * <code>%d </code> day of month (range 00 to 31) <br>
-     * <code>%D </code> equivalent to "%m/%d/%y" <br>
-     * <code>%e </code> day of month without leading noughts (range 0 to 31) <br>
-     * <code>%E </code> Julian day - no of days since Monday, 24th November,
-     * 4714 B.C. (in the proleptic Gregorian calendar) <br>
-     * <code>%g </code> like %G, but without the century <br>
-     * <code>%G </code> the 4-digit year corresponding to the ISO week
-     * number (see %V). This has the same format and value
-     * as %Y, except that if the ISO week number belongs
-     * to the previous or next year, that year is used
-     * instead. <br>
-     * <code>%h </code> hour as decimal number without leading noughts (0
-     * to 23) <br>
-     * <code>%H </code> hour as decimal number (00 to 23) <br>
-     * <code>%i </code> hour as decimal number on 12-hour clock without
-     * leading noughts (1 to 12) <br>
-     * <code>%I </code> hour as decimal number on 12-hour clock (01 to 12) <br>
-     * <code>%j </code> day of year (range 001 to 366) <br>
-     * <code>%m </code> month as decimal number (range 01 to 12) <br>
-     * <code>%M </code> minute as a decimal number (00 to 59) <br>
-     * <code>%n </code> newline character ("\n") <br>
-     * <code>%o </code> raw timezone offset expressed as '+/-HH:MM' <br>
-     * <code>%O </code> dst-corrected timezone offset expressed as '+/-HH:MM' <br>
-     * <code>%p </code> either 'am' or 'pm' depending on the time <br>
-     * <code>%P </code> either 'AM' or 'PM' depending on the time <br>
-     * <code>%r </code> time in am/pm notation; equivalent to "%I:%M:%S %p" <br>
-     * <code>%R </code> time in 24-hour notation; equivalent to "%H:%M" <br>
-     * <code>%s </code> seconds including the micro-time (the decimal
-     * representation less than one second to six decimal
-     * places<br>
-     * <code>%S </code> seconds as a decimal number (00 to 59) <br>
-     * <code>%t </code> tab character ("\t") <br>
-     * <code>%T </code> current time; equivalent to "%H:%M:%S" <br>
-     * <code>%u </code> day of week as decimal (1 to 7; where 1 = Monday) <br>
-     * <code>%U </code> week number of the current year as a decimal
-     * number, starting with the first Sunday as the first
-     * day of the first week (i.e. the first full week of
-     * the year, and the week that contains 7th January)
-     * (00 to 53) <br>
-     * <code>%V </code> the ISO 8601:1988 week number of the current year
-     * as a decimal number, range 01 to 53, where week 1
-     * is the first week that has at least 4 days in the
-     * current year, and with Monday as the first day of
-     * the week. (Use %G or %g for the year component
-     * that corresponds to the week number for the
-     * specified timestamp.)
-     * <code>%w </code> day of week as decimal (0 to 6; where 0 = Sunday) <br>
-     * <code>%W </code> week number of the current year as a decimal
-     * number, starting with the first Monday as the first
-     * day of the first week (i.e. the first full week of
-     * the year, and the week that contains 7th January)
-     * (00 to 53) <br>
-     * <code>%y </code> year as decimal (range 00 to 99) <br>
-     * <code>%Y </code> year as decimal including century (range 0000 to
-     * 9999) <br>
-     * <code>%Z </code> Abbreviated form of time zone name, e.g. 'GMT', or
-     * the abbreviation for Summer time if the date falls
-     * in Summer time, e.g. 'BST'. <br>
-     * <code>%% </code> literal '%' <br>
-     * <br>
-     *
-     * The following codes render a different output to that of 'strftime()':
-     *
-     * <code>%e</code> in 'strftime()' a single digit is preceded by a space
-     * <code>%h</code> in 'strftime()' is equivalent to '%b'
-     * <code>%U</code> '%U' and '%W' are different in 'strftime()' in that
-     * if week 1 does not start on 1st January, '00' is
-     * returned, whereas this function returns '53', that is,
-     * the week is counted as the last of the previous year.
-     * <code>%W</code>
-     *
-     * @param string $format the format string for returned date/time
-     *
-     * @return string date/time in given format
+     * @param int $sec
+     * @throws \Exception
      */
-    public function format($format): string
+    public function addSeconds($sec = 0)
     {
-        $output = '';
+        settype($sec, 'int');
 
-        $hn_isoyear = null;
-        $hn_isoweek = null;
-        $hn_isoday = null;
-
-        if ($format === '%Y%m%d') {
-            return $this->year . sprintf('%02d%02d', $this->month, $this->day);
-        }
-        if ($format === '%Y%m%d%H%M%S') {
-            return $this->year . sprintf(
-                '%02d%02d%02d%02d%02d',
-                $this->month,
-                $this->day,
-                $this->hour,
-                $this->minute,
-                $this->second
-                );
+        // Negative value given.
+        if ($sec < 0) {
+            $this->subtractSeconds(abs($sec));
+            return;
         }
 
-        for ($strpos = 0, $strposMax = strlen($format); $strpos < $strposMax; $strpos++) {
-            $char = $format[$strpos];
-            if ($char === '%') {
-                $nextchar = $format[$strpos + 1];
-                switch ($nextchar) {
-                    case 'a':
-                        $output .= $this->getDayName(true);
-                        break;
-                    case 'A':
-                        $output .= $this->getDayName();
-                        break;
-                    case 'b':
-                        $output .= $this->getMonthName(true);
-                        break;
-                    case 'B':
-                        $output .= $this->getMonthName();
-                        break;
-                    case 'C':
-                        $output .= sprintf('%02d', intval($this->year / 100));
-                        break;
-                    case 'd':
-                        $output .= sprintf('%02d', $this->day);
-                        break;
-                    case 'D':
-                        $output .= sprintf('%02d/%02d/%02d', $this->month, $this->day, $this->year);
-                        break;
-                    case 'e':
-                        $output .= $this->day * 1;
-                        break;
-                    case 'E':
-                        $output .= Calc::dateToDays($this->day, $this->month, $this->year);
-                        break;
-                    case 'g':
-                        if ($hn_isoyear === null) {
-                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
-                                $this->day,
-                                $this->month,
-                                $this->year
-                            );
-                        }
-
-                        $output .= sprintf('%02d', $hn_isoyear % 100);
-                        break;
-                    case 'G':
-                        if ($hn_isoyear === null) {
-                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
-                                $this->day,
-                                $this->month,
-                                $this->year
-                            );
-                        }
-
-                        $output .= sprintf('%04d', $hn_isoyear);
-                        break;
-                    case 'h':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $output .= sprintf('%d', $this->hour);
-                        break;
-                    case 'H':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $output .= sprintf('%02d', $this->hour);
-                        break;
-                    case 'i':
-                    case 'I':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $hour = $this->hour + 1 > 12 ? $this->hour - 12 : $this->hour;
-                        $output .= $hour == 0 ? 12 : ($nextchar === 'i' ? $hour : sprintf('%02d', $hour));
-                        break;
-                    case 'j':
-                        $output .= sprintf('%03d', Calc::dayOfYear($this->day, $this->month, $this->year));
-                        break;
-                    case 'm':
-                        $output .= sprintf('%02d', $this->month);
-                        break;
-                    case 'M':
-                        $output .= sprintf('%02d', $this->minute);
-                        break;
-                    case 'n':
-                        $output .= "\n";
-                        break;
-                    case 'N':
-                        $output .= $this->month;
-                        break;
-                    case 'O':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $offms = $this->getTZOffset();
-                        $direction = $offms >= 0 ? '+' : '-';
-                        $offmins = abs($offms) / 1000 / 60;
-                        $hours = $offmins / 60;
-                        $minutes = $offmins % 60;
-
-                        $output .= sprintf('%s%02d:%02d', $direction, $hours, $minutes);
-                        break;
-                    case 'o':
-                        $offms = $this->tz->getRawOffset($this);
-                        $direction = $offms >= 0 ? '+' : '-';
-                        $offmins = abs($offms) / 1000 / 60;
-                        $hours = $offmins / 60;
-                        $minutes = $offmins % 60;
-
-                        $output .= sprintf('%s%02d:%02d', $direction, $hours, $minutes);
-                        break;
-                    case 'p':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $output .= $this->hour >= 12 ? 'pm' : 'am';
-                        break;
-                    case 'P':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $output .= $this->hour >= 12 ? 'PM' : 'AM';
-                        break;
-                    case 'r':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $hour = $this->hour + 1 > 12 ? $this->hour - 12 : $this->hour;
-                        $output .= sprintf(
-                            '%02d:%02d:%02d %s',
-                            $hour == 0 ? 12 : $hour,
-                            $this->minute,
-                            $this->second,
-                            $this->hour >= 12 ? 'PM' : 'AM'
-                        );
-                        break;
-                    case 'R':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $output .= sprintf('%02d:%02d', $this->hour, $this->minute);
-                        break;
-                    case 's':
-                        $output .= str_replace(
-                            ',',
-                            '.',
-                            sprintf('%09f', (float)((float)$this->second + $this->partsecond))
-                        );
-                        break;
-                    case 'S':
-                        $output .= sprintf('%02d', $this->second);
-                        break;
-                    case 't':
-                        $output .= "\t";
-                        break;
-                    case 'T':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $output .= sprintf('%02d:%02d:%02d', $this->hour, $this->minute, $this->second);
-                        break;
-                    case 'u':
-                        $hn_dayofweek = $this->getDayOfWeek();
-                        $output .= $hn_dayofweek == 0 ? 7 : $hn_dayofweek;
-                        break;
-                    case 'U':
-                        $output .= Calc::weekOfYear($this->day, $this->month, $this->year);
-                        break;
-                    case 'V':
-                        if ($hn_isoyear === null) {
-                            list($hn_isoyear, $hn_isoweek) = Calc::isoWeekDate(
-                                $this->day,
-                                $this->month,
-                                $this->year
-                            );
-                        }
-
-                        $output .= $hn_isoweek;
-                        break;
-                    case 'w':
-                        $output .= $this->getDayOfWeek();
-                        break;
-                    case 'y':
-                        $output .= sprintf('%0' . ($this->year < 0 ? '3' : '2') . 'd', $this->year % 100);
-                        break;
-                    case 'Y':
-                        $output .= sprintf('%0' . ($this->year < 0 ? '5' : '4') . 'd', $this->year);
-                        break;
-                    case 'Z':
-                        if ($this->ob_invalidtime) {
-                            return $this->_getErrorInvalidTime();
-                        }
-                        $output .= $this->getTZShortName();
-                        break;
-                    case '%':
-                        $output .= '%';
-                        break;
-                    case 'x': // add English day suffix
-                        if (1 == $this->day) {
-                            $output .= 'st';
-                        } elseif (2 == $this->day) {
-                            $output .= 'nd';
-                        } elseif (3 == $this->day) {
-                            $output .= 'rd';
-                        } else {
-                            $output .= 'th';
-                        }
-                        break;
-                    default:
-                        $output .= $char . $nextchar;
-                }
-                $strpos++;
-            } else {
-                $output .= $char;
-            }
-        }
-        return $this->applyStdWrap($output);
+        $this->add(new \DateInterval('PT' . $sec . 'S'));
     }
-
-    // @override
 
     /**
      * @param bool $abbr
@@ -505,7 +159,7 @@ class CalDate extends Date
      */
     public function getDayName($abbr = false, $length = false): string
     {
-        $dayName = parent::getDayName();
+        $dayName = $this->format('F');
         if ($abbr) {
             if ($length === false) {
                 $length = $this->getWeekdayAbbreviationLength();
@@ -515,8 +169,6 @@ class CalDate extends Date
         return $this->applyStdWrap($dayName);
     }
 
-    // @override
-
     /**
      * @param bool $abbr
      * @param bool $length
@@ -524,7 +176,7 @@ class CalDate extends Date
      */
     public function getMonthName($abbr = false, $length = false): string
     {
-        $monthName = Calc::getMonthFullname($this->month);
+        $monthName = $this->format('l');
         if ($abbr) {
             if ($length === false) {
                 $length = $this->getMonthAbbreviationLength();
@@ -563,7 +215,7 @@ class CalDate extends Date
     /**
      * Applys the default date_stdWrap to the given string.
      *
-     * @param string $value string that should be processed
+     * @param string $value
      * @return string
      */
     public function applyStdWrap($value = ''): string
@@ -575,29 +227,13 @@ class CalDate extends Date
         return $value;
     }
 
-    // FIX for: getWeekOfYear doesn't recognize sunday as weekstartday.
-    // @override
-    /**
-     * @return int
-     */
-    public function getWeekOfYear(): int
-    {
-        if (DATE_CALC_BEGIN_WEEKDAY == 0 && $this->getDayOfWeek() == 0) {
-            $this->addSeconds(86400);
-            $week = parent::getWeekOfYear();
-            $this->subtractSeconds(86400);
-            return $week;
-        }
-        return parent::getWeekOfYear();
-    }
-
     /**
      * uses a bytesafe cropping function if possible in order to not destroy multibyte chars from strings (e.g.
      * names in UTF-8)
      *
-     * @param string $value The value to crop
-     * @param bool $length The length
-     * @return string
+     * @param string $value
+     * @param bool $length
+     * @return string the cropped string
      */
     public function crop($value = '', $length = false): string
     {
@@ -605,8 +241,142 @@ class CalDate extends Date
             return $value;
         }
         if (TYPO3_MODE === 'FE') {
-            return mb_substr($value, 0, $length);
+            return $GLOBALS['TSFE']->csConvObj->substr($GLOBALS['TSFE']->renderCharset, $value, 0, $length);
         }
         return mb_substr($value, 0, $length);
+    }
+
+    /**
+     * @param $id
+     */
+    public function setTZbyID($id)
+    {
+        $this->setTimezone(new \DateTimeZone($id));
+    }
+
+    /**
+     * @return string
+     */
+    public function getDayOfWeek(): string
+    {
+        return $this->format('w');
+    }
+
+    /**
+     * @return string
+     */
+    public function getWeekOfYear(): string
+    {
+        return $this->format('W');
+    }
+
+    /**
+     * @param $date
+     */
+    public function copy(CalDate $date)
+    {
+        $this->setYear($date->getYear());
+        $this->setMonth($date->getMonth());
+        $this->setDay($date->getDay());
+        $this->setHour($date->getHour());
+        $this->setMinute($date->getMinute());
+        $this->setSecond($date->getSecond());
+        $this->setTimezone($date->getTimezone());
+    }
+
+    /**
+     * @return int
+     */
+    public function getYear(): int
+    {
+        return (int)$this->format('Y');
+    }
+
+    /**
+     * @return int
+     */
+    public function getMonth(): int
+    {
+        return (int)$this->format('m');
+    }
+
+    /**
+     * @return int
+     */
+    public function getDay(): int
+    {
+        return (int)$this->format('d');
+    }
+
+    /**
+     * @return int
+     */
+    public function getHour(): int
+    {
+        return (int)$this->format('H');
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinute(): int
+    {
+        return (int)$this->format('i');
+    }
+
+    /**
+     * @return int
+     */
+    public function getSecond(): int
+    {
+        return (int)$this->format('s');
+    }
+
+    /**
+     * @param int $y
+     */
+    public function setYear(int $y)
+    {
+        $this->setDate($y, $this->format('m'), $this->format('d'));
+    }
+
+    /**
+     * @param int $m
+     */
+    public function setMonth(int $m)
+    {
+        $this->setDate($this->format('Y'), $m, $this->format('d'));
+    }
+
+    /**
+     * @param int $d
+     */
+    public function setDay(int $d)
+    {
+        $this->setDate($this->format('Y'), $this->format('m'), $d);
+    }
+
+    /**
+     * @param int $h
+     */
+    public function setHour(int $h)
+    {
+        $this->setTime($h, $this->format('i'), $this->format('s'));
+    }
+
+    /**
+     * @param int $m
+     */
+    public function setMinute(int $m)
+    {
+        $this->setTime($this->format('H'), $m, $this->format('s'));
+    }
+
+    /**
+     * @param int $s
+     */
+    public function setSecond(int $s)
+    {
+        $this->setTime($this->format('H'), $this->format('i'), $s);
     }
 }

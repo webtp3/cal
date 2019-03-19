@@ -936,7 +936,7 @@ class EventModel extends Model
         if (substr(
             $viewType,
             -6
-            ) !== 'ALLDAY' && ($this->isAllDay() || $this->getStart()->format('%Y%m%d') !== $this->getEnd()->format('%Y%m%d'))) {
+            ) !== 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('Ymd') !== $this->getEnd()->format('Ymd'))) {
             $subpartSuffix .= 'ALLDAY';
         }
         $hookObjectsArr = Functions::getHookObjectsArray(
@@ -1123,7 +1123,7 @@ class EventModel extends Model
                                                 'tx_cal_controller[view]' => 'event',
                                                 'tx_cal_controller[uid]' => $this->getUid(),
                                                 'tx_cal_controller[type]' => $this->getType(),
-                                                'tx_cal_controller[getdate]' => $this->getStart()->format('%Y%m%d')
+                                                'tx_cal_controller[getdate]' => $this->getStart()->format('Ymd')
                                             ]
                                         );
                                     $htmlTemplate = Functions::substituteMarkerArrayNotCached(
@@ -1435,7 +1435,7 @@ class EventModel extends Model
                 $this->conf['view.'][$view . '.']['event.']['startdate'],
                 $this->conf['view.'][$view . '.']['event.']['startdate.']
             );
-            if ($this->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDate'] && $eventEnd->format('%Y%m%d') === $eventStart->format('%Y%m%d')) {
+            if ($this->conf['view.'][$view . '.']['event.']['dontShowEndDateIfEqualsStartDate'] && $eventEnd->format('Ymd') === $eventStart->format('Ymd')) {
                 $sims['###STARTDATE_LABEL###'] = $this->controller->pi_getLL('l_date');
                 $sims['###ENDDATE_LABEL###'] = '';
                 $sims['###ENDDATE###'] = '';
@@ -1730,7 +1730,7 @@ class EventModel extends Model
         $eventStart = $this->getStart();
         $wrapped['###EVENT_LINK###'] = explode(
             '$5&xs2',
-            $this->getLinkToEvent('$5&xs2', $view, $eventStart->format('%Y%m%d'))
+            $this->getLinkToEvent('$5&xs2', $view, $eventStart->format('Ymd'))
         );
     }
 
@@ -1747,7 +1747,7 @@ class EventModel extends Model
         $sims['###EVENT_URL###'] = htmlspecialchars($this->getLinkToEvent(
             '$5&xs2',
             $view,
-            $eventStart->format('%Y%m%d'),
+            $eventStart->format('Ymd'),
             true
         ));
     }
@@ -1764,7 +1764,7 @@ class EventModel extends Model
         $eventStart = $this->getStart();
         $wrapped['###ABSOLUTE_EVENT_LINK###'] = explode(
             '$5&xs2',
-            $this->getLinkToEvent('$5&xs2', $view, $eventStart->format('%Y%m%d'))
+            $this->getLinkToEvent('$5&xs2', $view, $eventStart->format('Ymd'))
         );
     }
 
@@ -1810,7 +1810,7 @@ class EventModel extends Model
             }
             $linkConf['link_no_cache'] = 0;
             //$linkConf['link_useCacheHash'] = 0;
-            $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=edit_event&tx_cal_controller[type]=' . $this->getType() . '&tx_cal_controller[uid]=' . $this->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
+            $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=edit_event&tx_cal_controller[type]=' . $this->getType() . '&tx_cal_controller[uid]=' . $this->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('Ymd') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
             $linkConf['link_section'] = 'default';
             $linkConf['link_parameter'] = $this->conf['view.']['event.']['editEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
@@ -1832,7 +1832,7 @@ class EventModel extends Model
                 $linkConf['link_ATagParams'] = ' onclick="' . $temp . '"';
             }
             $linkConf['link_no_cache'] = 0;
-            $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=delete_event&tx_cal_controller[type]=' . $this->getType() . '&tx_cal_controller[uid]=' . $this->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
+            $linkConf['link_additionalParams'] = '&tx_cal_controller[view]=delete_event&tx_cal_controller[type]=' . $this->getType() . '&tx_cal_controller[uid]=' . $this->getUid() . '&tx_cal_controller[getdate]=' . $eventStart->format('Ymd') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView();
             $linkConf['link_section'] = 'default';
             $linkConf['link_parameter'] = $this->conf['view.']['event.']['deleteEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
@@ -2381,7 +2381,7 @@ class EventModel extends Model
     public function getEventIdMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $start = $this->getStart();
-        $sims['###EVENT_ID###'] = $this->getType() . $this->getUid() . $start->format('%Y%m%d%H%M');
+        $sims['###EVENT_ID###'] = $this->getType() . $this->getUid() . $start->format('YmdHM');
     }
 
     /**
@@ -2426,14 +2426,14 @@ class EventModel extends Model
     public function getDtstartYearMonthDayHourMinuteMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $eventStart = $this->getStart();
-        if ($this->isAllDay()) {
-            $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART;VALUE=DATE:' . $eventStart->format('%Y%m%d');
+        if ($this->isAllday()) {
+            $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART;VALUE=DATE:' . $eventStart->format('Ymd');
         } elseif ($this->conf['view.']['ics.']['timezoneId'] !== '') {
-            $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('%Y%m%dT%H%M%S');
+            $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('YmdTHMS');
         } else {
             $offset = Functions::strtotimeOffset($eventStart->getTime());
             $eventStart->subtractSeconds($offset);
-            $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART:' . $eventStart->format('%Y%m%dT%H%M%SZ');
+            $sims['###DTSTART_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTSTART:' . $eventStart->format('YmdTHMSZ');
             $eventStart->addSeconds($offset);
         }
     }
@@ -2450,13 +2450,13 @@ class EventModel extends Model
         $eventEnd = $this->getEnd();
         if ($this->isAllDay()) {
             $eventEnd->addSeconds(84600);
-            $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND;VALUE=DATE:' . $eventEnd->format('%Y%m%d');
+            $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND;VALUE=DATE:' . $eventEnd->format('Ymd');
         } elseif ($this->conf['view.']['ics.']['timezoneId'] !== '') {
-            $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventEnd->format('%Y%m%dT%H%M%S');
+            $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventEnd->format('YmdTHMS');
         } else {
             $offset = Functions::strtotimeOffset($eventEnd->getTime());
             $eventEnd->subtractSeconds($offset);
-            $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND:' . $eventEnd->format('%Y%m%dT%H%M%SZ');
+            $sims['###DTEND_YEAR_MONTH_DAY_HOUR_MINUTE###'] = 'DTEND:' . $eventEnd->format('YmdTHMSZ');
             $eventEnd->addSeconds($offset);
         }
     }
@@ -2545,11 +2545,11 @@ class EventModel extends Model
             }
             /** @var CalDate $until */
             $until = $event->getUntil();
-            if (is_object($until) && $until->format('%Y%m%d') > 19700101) {
+            if (is_object($until) && $until->format('Ymd') > 19700101) {
                 $eventEnd = $this->getEnd();
                 $offset = Functions::strtotimeOffset($eventEnd->getTime());
                 $eventEnd->subtractSeconds($offset);
-                $rruleConfiguration['UNTIL'] = 'UNTIL=' . $until->format('%Y%m%dT') . $eventEnd->format('%H%M%SZ');
+                $rruleConfiguration['UNTIL'] = 'UNTIL=' . $until->format('YmdT') . $eventEnd->format('HMSZ');
                 $eventEnd->addSeconds($offset);
             }
             $rrule = implode(';', $rruleConfiguration);
@@ -2590,7 +2590,7 @@ class EventModel extends Model
         foreach ($this->getExceptionEvents() as $exceptionEvent) {
             $exceptionEventStart->copy($exceptionEvent->getStart());
             $exceptionEventStart->addSeconds($offset);
-            $exceptionDates[] = 'EXDATE:' . $exceptionEventStart->format('%Y%m%dT%H%M%SZ');
+            $exceptionDates[] = 'EXDATE:' . $exceptionEventStart->format('YmdTHMSZ');
         }
 
         if (count($exceptionDates)) {
@@ -2811,7 +2811,7 @@ class EventModel extends Model
     public function getAjaxEditLink(): string
     {
         if ($this->conf['view.']['enableAjax'] && $this->isUserAllowedToEdit()) {
-            return 'dragZones[\'dragZone' . $this->getUid() . '\'] = new CalEvent.dd.MyDragZone(' . '\'cal_event_' . $this->getUid() . '\',' . '{ddGroup: \'cal_event\',' . 'scroll: false,' . 'start_time:\'' . ($this->getStart()->getHour() * 3600 + $this->getStart()->getMinute() * 60) . '\',' . 'start_day:\'' . $this->getStart()->format('%Y%m%d') . '\',' . 'end_time:\'' . ($this->getEnd()->getHour() * 3600 + $this->getEnd()->getMinute() * 60) . '\',' . 'end_day:\'' . $this->getEnd()->format('%Y%m%d') . '\',' . 'uid:\'' . $this->getUid() . '\',' . 'eventType:\'' . $this->getType() . '\'});';
+            return 'dragZones[\'dragZone' . $this->getUid() . '\'] = new CalEvent.dd.MyDragZone(' . '\'cal_event_' . $this->getUid() . '\',' . '{ddGroup: \'cal_event\',' . 'scroll: false,' . 'start_time:\'' . ($this->getStart()->getHour() * 3600 + $this->getStart()->getMinute() * 60) . '\',' . 'start_day:\'' . $this->getStart()->format('Ymd') . '\',' . 'end_time:\'' . ($this->getEnd()->getHour() * 3600 + $this->getEnd()->getMinute() * 60) . '\',' . 'end_day:\'' . $this->getEnd()->format('Ymd') . '\',' . 'uid:\'' . $this->getUid() . '\',' . 'eventType:\'' . $this->getType() . '\'});';
         }
         return '';
     }

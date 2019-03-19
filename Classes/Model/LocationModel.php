@@ -21,11 +21,12 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use SJBR\StaticInfoTables\PiBaseApi;
+use SJBR\StaticInfoTables\PiBaseApi;
 use SJBR\StaticInfoTables\Utility\LocalizationUtility;
-use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use SJBR\StaticInfoTables\PiBaseApi;
 
 /**
  * Base model for the calendar location.
@@ -383,7 +384,7 @@ abstract class LocationModel extends BaseModel
     {
         $this->initLocalCObject();
         if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
-            $staticInfo = Functions::makeInstance(PiBaseApi::class);
+            $staticInfo = GeneralUtility::makeInstance(PiBaseApi::class);
             $staticInfo->init();
             $current = LocalizationUtility::translate(
                 ['uid' => $this->getCountry()],
@@ -416,7 +417,7 @@ abstract class LocationModel extends BaseModel
     {
         $this->initLocalCObject();
         if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
-            $staticInfo = Functions::makeInstance(PiBaseApi::class);
+            $staticInfo = GeneralUtility::makeInstance(PiBaseApi::class);
             $staticInfo->init();
             $current = LocalizationUtility::translate(
                 ['uid' => $this->getCountryZone()],

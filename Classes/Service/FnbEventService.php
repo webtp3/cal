@@ -11,7 +11,6 @@ namespace TYPO3\CMS\Cal\Service;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -76,9 +75,13 @@ class FnbEventService extends EventService
             $this->starttime->copy($start_date);
             $this->endtime->copy($end_date);
         }
-        $formattedStarttime = $this->starttime->format('%Y%m%d');
-        $formattedEndtime = $this->endtime->format('%Y%m%d');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $formattedStarttime = $this->starttime->format('Ymd');
+        $formattedEndtime = $this->endtime->format('Ymd');
+        $categoryService = &$this->modelObj->getServiceObjByKey(
+            'cal_category_model',
+            'category',
+            $this->extConf['categoryService']
+        );
 
         $calendarSearchString = $this->getFreeAndBusyCalendarSearchString(
             $pidList,
@@ -92,7 +95,7 @@ class FnbEventService extends EventService
             // get the uids of recurring events from index
             $select = 'event_uid';
             $table = 'tx_cal_index';
-            $where = 'start_datetime >= ' . $this->starttime->format('%Y%m%d%H%M%S') . ' AND start_datetime <= ' . $this->endtime->format('%Y%m%d%H%M%S');
+            $where = 'start_datetime >= ' . $this->starttime->format('YmdHMS') . ' AND start_datetime <= ' . $this->endtime->format('YmdHMS');
             $group = 'event_uid';
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $group);
             $tmpUids = [];

@@ -154,8 +154,8 @@ class EventService extends BaseService
             $this->starttime->copy($start_date);
             $this->endtime->copy($end_date);
         }
-        $formattedStarttime = $this->starttime->format('%Y%m%d');
-        $formattedEndtime = $this->endtime->format('%Y%m%d');
+        $formattedStarttime = $this->starttime->format('Ymd');
+        $formattedEndtime = $this->endtime->format('Ymd');
 
         $recurringClause = '';
         // only include the recurring clause if we don't use the new recurring model or a view not needing recurring events.
@@ -163,7 +163,7 @@ class EventService extends BaseService
             // get the uids of recurring events from index
             $select = 'event_uid';
             $table = 'tx_cal_index';
-            $where = '(start_datetime >= ' . $this->starttime->format('%Y%m%d%H%M%S') . ' AND start_datetime <= ' . $this->endtime->format('%Y%m%d%H%M%S') . ') OR (start_datetime < ' . $this->starttime->format('%Y%m%d%H%M%S') . ' AND end_datetime > ' . $this->starttime->format('%Y%m%d%H%M%S') . ')  OR (start_datetime < ' . $this->endtime->format('%Y%m%d%H%M%S') . ' AND end_datetime > ' . $this->endtime->format('%Y%m%d%H%M%S') . ')';
+            $where = '(start_datetime >= ' . $this->starttime->format('YmdHMS') . ' AND start_datetime <= ' . $this->endtime->format('YmdHMS') . ') OR (start_datetime < ' . $this->starttime->format('YmdHMS') . ' AND end_datetime > ' . $this->starttime->format('YmdHMS') . ')  OR (start_datetime < ' . $this->endtime->format('YmdHMS') . ' AND end_datetime > ' . $this->endtime->format('YmdHMS') . ')';
             $group = 'event_uid';
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $group);
             $tmpUids = [];
@@ -472,14 +472,14 @@ class EventService extends BaseService
                 $this->endtime->copy($tmp_endtime);
 
                 $eventStart = $event->getStart();
-                $events_tmp[$eventStart->format('%Y%m%d')][$event->isAllDay() ? '-1' : $eventStart->format('%H%M')][$event->getUid()] = $event;
+                $events_tmp[$eventStart->format('Ymd')][$event->isAllday() ? '-1' : $eventStart->format('HM')][$event->getUid()] = $event;
 
                 $eventStart = $event->getStart();
                 foreach ($ex_events_group as $ex_events) {
                     foreach ($ex_events as $ex_event_day) {
                         foreach ($ex_event_day as $ex_event_array) {
                             foreach ($ex_event_array as $ex_event) {
-                                $events_tmp[$eventStart->format('%Y%m%d')][$event->isAllDay() ? '-1' : $eventStart->format('%H%M')][$event->getUid()]->addExceptionEvent($ex_event);
+                                $events_tmp[$eventStart->format('Ymd')][$event->isAllday() ? '-1' : $eventStart->format('HM')][$event->getUid()]->addExceptionEvent($ex_event);
                             }
                         }
                     }
@@ -493,7 +493,7 @@ class EventService extends BaseService
                             foreach ($ex_event_day as $ex_event_array) {
                                 foreach ($ex_event_array as $ex_event) {
                                     /** @var EventModel $ex_event */
-                                    $ex_events_dates[$ex_event->getStart()->format('%Y%m%d')] = 1;
+                                    $ex_events_dates[$ex_event->getStart()->format('Ymd')] = 1;
                                 }
                             }
                         }
@@ -501,7 +501,7 @@ class EventService extends BaseService
                     $events_tmp = $this->getRecurringEventsFromIndex($event, $ex_events_dates);
                 } else {
                     $eventStart = $event->getStart();
-                    $events_tmp[$eventStart->format('%Y%m%d')][$event->isAllDay() ? '-1' : $eventStart->format('%H%M')][$event->getUid()] = $event;
+                    $events_tmp[$eventStart->format('Ymd')][$event->isAllday() ? '-1' : $eventStart->format('HM')][$event->getUid()] = $event;
                 }
             }
 
@@ -587,8 +587,8 @@ class EventService extends BaseService
         $this->endtime->setHour(0);
         $this->endtime->setMinute(0);
 
-        $formattedStarttime = $this->starttime->format('%Y%m%d');
-        $formattedEndtime = $this->endtime->format('%Y%m%d');
+        $formattedStarttime = $this->starttime->format('Ymd');
+        $formattedEndtime = $this->endtime->format('Ymd');
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
         $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
@@ -767,7 +767,7 @@ class EventService extends BaseService
                         /** @var EventModel $event */
                         $eventStart = $event->getStart();
                         $eventEnd = $event->getEnd();
-                        if ($eventStart->format('%Y%m%d') <= strtotime($this->conf['getdate']) && $eventEnd->format('%Y%m%d') >= strtotime($this->conf['getdate']) && $event->getUid() === $uid) {
+                        if ($eventStart->format('Ymd') <= strtotime($this->conf['getdate']) && $eventEnd->format('Ymd') >= strtotime($this->conf['getdate']) && $event->getUid() === $uid) {
                             return $event;
                         }
                     }
@@ -1133,14 +1133,14 @@ class EventService extends BaseService
                 if (is_object($event->getStart())) {
                     /** @var CalDate $start */
                     $start = $event->getStart();
-                    $insertFields['start_date'] = $start->format('%Y%m%d');
-                    $insertFields['start_time'] = intval($start->format('%H')) * 3600 + intval($start->format('%M')) * 60;
+                    $insertFields['start_date'] = $start->format('Ymd');
+                    $insertFields['start_time'] = intval($start->format('H')) * 3600 + intval($start->format('M')) * 60;
                 }
                 if (is_object($event->getEnd())) {
                     /** @var CalDate $end */
                     $end = $event->getEnd();
-                    $insertFields['end_date'] = $end->format('%Y%m%d');
-                    $insertFields['end_time'] = intval($end->format('%H')) * 3600 + intval($end->format('%M')) * 60;
+                    $insertFields['end_date'] = $end->format('Ymd');
+                    $insertFields['end_time'] = intval($end->format('H')) * 3600 + intval($end->format('M')) * 60;
                 }
             }
         } else {
@@ -1533,15 +1533,15 @@ class EventService extends BaseService
         if ($this->rightsObj->isAllowedToCreateEventDateTime()) {
             if (is_object($object->getStart())) {
                 $start = $object->getStart();
-                $insertFields['start_date'] = $start->format('%Y%m%d');
-                $insertFields['start_time'] = intval($start->format('%H')) * 3600 + intval($start->format('%M')) * 60;
+                $insertFields['start_date'] = $start->format('Ymd');
+                $insertFields['start_time'] = intval($start->format('H')) * 3600 + intval($start->format('M')) * 60;
             } else {
                 return;
             }
             if (is_object($object->getEnd())) {
                 $end = $object->getEnd();
-                $insertFields['end_date'] = $end->format('%Y%m%d');
-                $insertFields['end_time'] = intval($end->format('%H')) * 3600 + intval($end->format('%M')) * 60;
+                $insertFields['end_date'] = $end->format('Ymd');
+                $insertFields['end_time'] = intval($end->format('H')) * 3600 + intval($end->format('M')) * 60;
             } else {
                 return;
             }
@@ -1581,7 +1581,7 @@ class EventService extends BaseService
             $insertFields['bymonth'] = implode(',', $object->getByMonth());
             $until = $object->getUntil();
             if (is_object($until)) {
-                $insertFields['until'] = $until->format('%Y%m%d');
+                $insertFields['until'] = $until->format('Ymd');
             }
             $insertFields['cnt'] = $object->getCount();
             $insertFields['intrval'] = $object->getInterval();
@@ -1641,15 +1641,15 @@ class EventService extends BaseService
         if ($this->rightsObj->isAllowedToEditEventDateTime()) {
             if (is_object($object->getStart())) {
                 $start = $object->getStart();
-                $insertFields['start_date'] = $start->format('%Y%m%d');
-                $insertFields['start_time'] = intval($start->format('%H')) * 3600 + intval($start->format('%M')) * 60;
+                $insertFields['start_date'] = $start->format('Ymd');
+                $insertFields['start_time'] = intval($start->format('H')) * 3600 + intval($start->format('M')) * 60;
             } else {
                 return;
             }
             if (is_object($object->getEnd())) {
                 $end = $object->getEnd();
-                $insertFields['end_date'] = $end->format('%Y%m%d');
-                $insertFields['end_time'] = intval($end->format('%H')) * 3600 + intval($end->format('%M')) * 60;
+                $insertFields['end_date'] = $end->format('Ymd');
+                $insertFields['end_time'] = intval($end->format('H')) * 3600 + intval($end->format('M')) * 60;
             } else {
                 return;
             }
@@ -1682,7 +1682,7 @@ class EventService extends BaseService
             $insertFields['bymonthday'] = implode(',', $object->getByMonthDay());
             $insertFields['bymonth'] = implode(',', $object->getByMonth());
             $until = $object->getUntil();
-            $insertFields['until'] = $until->format('%Y%m%d');
+            $insertFields['until'] = $until->format('Ymd');
             $insertFields['cnt'] = $object->getCount();
             $insertFields['intrval'] = $object->getInterval();
             $insertFields['rdate_type'] = $object->getRdateType();
@@ -1732,8 +1732,8 @@ class EventService extends BaseService
         $this->starttime->copy($start_date);
         $this->endtime->copy($end_date);
 
-        $formattedStarttime = $this->starttime->format('%Y%m%d');
-        $formattedEndtime = $this->endtime->format('%Y%m%d');
+        $formattedStarttime = $this->starttime->format('Ymd');
+        $formattedEndtime = $this->endtime->format('Ymd');
 
         $additionalSearch = '';
         if ($searchword !== '') {
@@ -1821,7 +1821,7 @@ class EventService extends BaseService
                 }
                 $origStartDate = new CalDate($deviationRow['orig_start_date']);
                 $origStartDate->addSeconds($deviationRow['orig_start_time']);
-                $deviations[$origStartDate->format('%Y%m%d%H%M%S')] = $deviationRow;
+                $deviations[$origStartDate->format('YmdHMS')] = $deviationRow;
             }
             $GLOBALS['TYPO3_DB']->sql_free_result($deviationResult);
         }
@@ -1852,10 +1852,10 @@ class EventService extends BaseService
         }
         /* If starttime is before or at the same time as the event date, add the event */
         if ($this->starttime->compare($this->starttime, $eventStart) !== 1 || $event->getFreq() === 'none') {
-            if ($event->isAllDay()) {
-                $master_array[$eventStart->format('%Y%m%d')]['-1'][$event->getUid()] = $event;
+            if ($event->isAllday()) {
+                $master_array[$eventStart->format('Ymd')]['-1'][$event->getUid()] = $event;
             } else {
-                $master_array[$eventStart->format('%Y%m%d')][$eventStart->format('%H%M')][$event->getUid()] = $event;
+                $master_array[$eventStart->format('Ymd')][$eventStart->format('HM')][$event->getUid()] = $event;
             }
         }
 
@@ -1899,8 +1899,8 @@ class EventService extends BaseService
             case 'year':
                 $bymonth = $event->getByMonth();
                 $byday = $event->getByDay();
-                $hour = $eventStart->format('%H');
-                $minute = $eventStart->format('%M');
+                $hour = $eventStart->format('H');
+                $minute = $eventStart->format('M');
                 // 2007, 2008...
                 foreach ($byyear as $year) {
                     if ($counter < $count && $until->after($nextOccuranceTime) && $added < $maxRecurringEvents) {
@@ -1916,7 +1916,7 @@ class EventService extends BaseService
                                         2,
                                         '0',
                                         STR_PAD_LEFT
-                                    )) >= intval($nextOccuranceTime->format('%Y') . $nextOccuranceTime->format('%m')) && $added < $maxRecurringEvents) {
+                                    )) >= intval($nextOccuranceTime->format('Y') . $nextOccuranceTime->format('m')) && $added < $maxRecurringEvents) {
                                 $bymonthday = $this->getMonthDaysAccordingly($event, $month, $year);
                                 // 1,2,3,4....31
                                 foreach ($bymonthday as $day) {
@@ -1983,24 +1983,24 @@ class EventService extends BaseService
                 $now->setSecond(0);
             }
 
-            if ($startDate->getTime() > $now->getTime() && !$ex_event_dates[$startDate->format('%Y%m%d')]) {
-                $master_array[$startDate->format('%Y%m%d')][$event->isAllDay() ? '-1' : $startDate->format('%H%M')][$event->getUid()] = &$event;
+            if ($startDate->getTime() > $now->getTime() && !$ex_event_dates[$startDate->format('Ymd')]) {
+                $master_array[$startDate->format('Ymd')][$event->isAllday() ? '-1' : $startDate->format('HM')][$event->getUid()] = &$event;
             }
-        } elseif (!$ex_event_dates[$startDate->format('%Y%m%d')]
+        } elseif (!$ex_event_dates[$startDate->format('Ymd')]
             && (!$event->getStart()->after($this->endtime))
             && (!$event->getEnd()->before($this->starttime))) {
-            $master_array[$startDate->format('%Y%m%d')][$event->isAllDay() ? '-1' : $startDate->format('%H%M')][$event->getUid()] = &$event;
+            $master_array[$startDate->format('Ymd')][$event->isAllday() ? '-1' : $startDate->format('HM')][$event->getUid()] = &$event;
         }
 
         $added = 0;
         // if the 'parent' event is still in future, set $added to 1, because we already have one instance of this event
         $now = new CalDate();
-        if (intval($now->format('%Y%m%d%H%M%S')) < intval($event->getStart()->format('%Y%m%d%H%M%S'))) {
+        if (intval($now->format('YmdHMS')) < intval($event->getStart()->format('YmdHMS'))) {
             $added = 1;
         }
         $select = '*';
         $table = 'tx_cal_index';
-        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('%Y%m%d%H%M%S') . ' AND start_datetime <= ' . $this->endtime->format('%Y%m%d%H%M%S') . ' AND tablename = "' . ($event->getType() === 'tx_cal_phpicalendar' ? ($event->isException ? 'tx_cal_exception_event' : 'tx_cal_event') : $event->getType()) . '"';
+        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('YmdHMS') . ' AND start_datetime <= ' . $this->endtime->format('YmdHMS') . ' AND tablename = "' . ($event->getType() === 'tx_cal_phpicalendar' ? ($event->isException ? 'tx_cal_exception_event' : 'tx_cal_event') : $event->getType()) . '"';
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, '', 'start_datetime');
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
@@ -2031,11 +2031,11 @@ class EventService extends BaseService
                             $nextOccuranceEndTime
                         );
                     }
-                    if (!$ex_event_dates[$new_event->getStart()->format('%Y%m%d')]) {
-                        if ($new_event->isAllDay()) {
-                            $master_array[$nextOccuranceTime->format('%Y%m%d')]['-1'][$event->getUid()] = $new_event;
+                    if (!$ex_event_dates[$new_event->getStart()->format('Ymd')]) {
+                        if ($new_event->isAllday()) {
+                            $master_array[$nextOccuranceTime->format('Ymd')]['-1'][$event->getUid()] = $new_event;
                         } else {
-                            $master_array[$nextOccuranceTime->format('%Y%m%d')][$nextOccuranceTime->format('%H%M')][$event->getUid()] = $new_event;
+                            $master_array[$nextOccuranceTime->format('Ymd')][$nextOccuranceTime->format('HM')][$event->getUid()] = $new_event;
                         }
                         $added++;
                     }
@@ -2072,8 +2072,8 @@ class EventService extends BaseService
                     if ($end->after($this->starttime) && $start->before($this->endtime)) {
                         $table = 'tx_cal_index';
                         $eventData = [
-                            'start_datetime' => $start->format('%Y%m%d') . $start->format('%H%M%S'),
-                            'end_datetime' => $end->format('%Y%m%d') . $end->format('%H%M%S'),
+                            'start_datetime' => $start->format('Ymd') . $start->format('HMS'),
+                            'end_datetime' => $end->format('Ymd') . $end->format('HMS'),
                             'event_uid' => $event->getUid(),
                             'tablename' => $event->isException ? 'tx_cal_exception_event' : 'tx_cal_event'
                         ];
@@ -2149,8 +2149,8 @@ class EventService extends BaseService
                     if ($end->after($this->starttime) && $start->before($this->endtime)) {
                         $table = 'tx_cal_index';
                         $eventData = [
-                            'start_datetime' => $start->format('%Y%m%d') . $start->format('%H%M%S'),
-                            'end_datetime' => $end->format('%Y%m%d') . $end->format('%H%M%S'),
+                            'start_datetime' => $start->format('Ymd') . $start->format('HMS'),
+                            'end_datetime' => $end->format('Ymd') . $end->format('HMS'),
                             'event_uid' => $event->getUid(),
                             'tablename' => $event->isException ? 'tx_cal_exception_event' : 'tx_cal_event'
                         ];
@@ -2191,8 +2191,8 @@ class EventService extends BaseService
                     if ($end->after($this->starttime) && $start->before($this->endtime)) {
                         $table = 'tx_cal_index';
                         $eventData = [
-                            'start_datetime' => $start->format('%Y%m%d%H%M%S'),
-                            'end_datetime' => $end->format('%Y%m%d%H%M%S'),
+                            'start_datetime' => $start->format('YmdHMS'),
+                            'end_datetime' => $end->format('YmdHMS'),
                             'event_uid' => $event->getUid(),
                             'tablename' => $event->isException ? 'tx_cal_exception_event' : 'tx_cal_event'
                         ];
@@ -2685,17 +2685,17 @@ class EventService extends BaseService
                         $table = 'tx_cal_index';
                         if ($event->isException) {
                             $eventData = [
-                                'start_datetime' => $nextOccuranceTime->format('%Y%m%d') . $nextOccuranceTime->format('%H%M%S'),
-                                'end_datetime' => $nextOccuranceEndTime->format('%Y%m%d') . $nextOccuranceEndTime->format('%H%M%S'),
+                                'start_datetime' => $nextOccuranceTime->format('Ymd') . $nextOccuranceTime->format('HMS'),
+                                'end_datetime' => $nextOccuranceEndTime->format('Ymd') . $nextOccuranceEndTime->format('HMS'),
                                 'event_uid' => $event->getUid(),
-                                'tablename' => $event->getType() === 'tx_cal_phpicalendar' ? 'tx_cal_exception_event' : $event->getType()
+                                'tablename' => $event->getType() === 'tx_cal_phpicalendar' ? ('tx_cal_exception_event') : $event->getType()
                             ];
                         } else {
                             $eventData = [
-                                'start_datetime' => $nextOccuranceTime->format('%Y%m%d') . $nextOccuranceTime->format('%H%M%S'),
-                                'end_datetime' => $nextOccuranceEndTime->format('%Y%m%d') . $nextOccuranceEndTime->format('%H%M%S'),
+                                'start_datetime' => $nextOccuranceTime->format('Ymd') . $nextOccuranceTime->format('HMS'),
+                                'end_datetime' => $nextOccuranceEndTime->format('Ymd') . $nextOccuranceEndTime->format('HMS'),
                                 'event_uid' => $event->getUid(),
-                                'tablename' => $event->getType() === 'tx_cal_phpicalendar' ? 'tx_cal_event' : $event->getType()
+                                'tablename' => $event->getType() === 'tx_cal_phpicalendar' ? ('tx_cal_event') : $event->getType()
                             ];
                         }
                         $this->updateEventDataWithDeviations($event, $eventData);
@@ -2745,8 +2745,8 @@ class EventService extends BaseService
             }
 
             $eventData['event_deviation_uid'] = $deviationDates[$eventData['start_datetime']]['uid'];
-            $eventData['start_datetime'] = $startDate->format('%Y%m%d') . $startDate->format('%H%M%S');
-            $eventData['end_datetime'] = $endDate->format('%Y%m%d') . $endDate->format('%H%M%S');
+            $eventData['start_datetime'] = $startDate->format('Ymd') . $startDate->format('HMS');
+            $eventData['end_datetime'] = $endDate->format('Ymd') . $endDate->format('HMS');
         }
     }
 
@@ -2925,8 +2925,8 @@ class EventService extends BaseService
             $end_date->addSeconds($this->conf['view.'][$this->conf['view'] . '.']['event.']['meeting.']['lookingAhead']);
             $this->setStartAndEndPoint($start_date, $end_date);
 
-            $formattedStarttime = $this->starttime->format('%Y%m%d');
-            $formattedEndtime = $this->endtime->format('%Y%m%d');
+            $formattedStarttime = $this->starttime->format('Ymd');
+            $formattedEndtime = $this->endtime->format('Ymd');
 
             $calendarService = &$this->modelObj->getServiceObjByKey(
                 'cal_calendar_model',

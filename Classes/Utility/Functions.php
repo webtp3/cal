@@ -22,11 +22,13 @@ namespace TYPO3\CMS\Cal\Utility;
  */
 use TYPO3\CMS\Cal\Controller\UriHandler;
 use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalDateTime;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * This is a collection of many useful functions
@@ -621,24 +623,6 @@ class Functions
     }
 
     /**
-     * Returns a Classname and allows various parameter to be passed to the constructor.
-     *
-     *
-     * @param string        className
-     * @return object reference to the object
-     *
-     * @todo Once TYPO3 4.3 is released and required by cal, remove this method and replace calls to it with GeneralUtility::makeInstance.
-     */
-    public static function &makeInstance($className)
-    {
-        $constructorArguments = func_get_args();
-        return call_user_func_array([
-            GeneralUtility::class,
-            'makeInstance'
-        ], $constructorArguments);
-    }
-
-    /**
      * @param $string
      * @return string|string[]|null
      */
@@ -684,17 +668,16 @@ class Functions
         $date = new CalDate($year . '0101');
         $date->setTZbyID('UTC');
 
-        $offset = $weekday - $date->format('%w');
+        $offset = (int)$weekday - (int)$date->format('w');
 
         // correct weekday
         $date->addSeconds($offset * 86400);
-
         $oldYearWeek = ($date->getWeekOfYear() > 1) ? '0' : '1';
 
         // correct week
         $date->addSeconds((($week - $oldYearWeek) * 7) * 86400);
 
-        return $date->format('%Y%m%d');
+        return $date->format('Ymd');
     }
 
     /**

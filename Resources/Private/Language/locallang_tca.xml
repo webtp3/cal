@@ -60,6 +60,7 @@
             <label index="cal.pi_flexform.itemsHeader">Special options:</label>
             <label index="cal.pi_flexform.category_selection_notCategorized">[not categorized]</label>
             <label index="cal.pi_flexform.calendarMode">Calendar selection mode</label>
+            <label index="cal.pi_flexform.calendarDistance">Calendar distance</label>
             <label index="cal.pi_flexform.calendarMode.showAll">Show all calendars (don't care about selection
                 below)
             </label>

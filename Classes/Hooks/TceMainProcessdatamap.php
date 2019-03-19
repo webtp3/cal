@@ -41,10 +41,27 @@ define('ICALENDAR_PATH', ExtensionManagementUtility::extPath('cal') . 'Classes/M
  */
 class TceMainProcessdatamap
 {
+    /**
+     * @param $status
+     * @param $table
+     * @param $id
+     * @param $fieldArray
+     * @param $tce
+     * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     * @throws \TYPO3\CMS\Core\Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     */
     public static function processDatamap_postProcessFieldArray($status, $table, $id, &$fieldArray, &$tce)
     {
         /* If we have an existing calendar event */
-        if ($table == 'tx_cal_event' && count($fieldArray) > 1) {
+        if ($table === 'tx_cal_event' && count($fieldArray) > 1) {
             if ($fieldArray ['start_date']) {
                 $fieldArray ['start_date'] = self::convertBackendDateToYMD($fieldArray ['start_date']);
             }
@@ -62,22 +79,22 @@ class TceMainProcessdatamap
                 $fieldArray ['until'] = self::convertBackendDateToYMD($fieldArray ['until']);
             }
 
-            if ($status != 'new') {
+            if ($status !== 'new') {
                 $event = BackendUtility::getRecord('tx_cal_event', $id);
 
                 // Do to our JS, these values get recalculated each time, but they may not have changed!
-                if ($event ['start_date'] == $fieldArray ['start_date']) {
+                if ($event ['start_date'] === $fieldArray ['start_date']) {
                     unset($fieldArray ['start_date']);
                 }
-                if ($event ['end_date'] == $fieldArray ['end_date']) {
+                if ($event ['end_date'] === $fieldArray ['end_date']) {
                     unset($fieldArray ['end_date']);
                 }
-                if ($event ['until'] == $fieldArray ['until']) {
+                if ($event ['until'] === $fieldArray ['until']) {
                     unset($fieldArray ['until']);
                 }
                 /* If we're in a workspace, don't notify anyone about the event */
                 if ($event ['pid'] > 0 && count($fieldArray) > 1 && !$GLOBALS['BE_USER']->workspace) {
-                    if ($fieldArray ['calendar_id'] && $event ['calendar_id'] != $fieldArray ['calendar_id']) {
+                    if ($fieldArray ['calendar_id'] && $event ['calendar_id'] !== $fieldArray ['calendar_id']) {
                         /** @var ConnectionPool $connectionPool */
                         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
                         $connectionPool->getConnectionForTable('tx_cal_event_category_mm')
@@ -88,7 +105,7 @@ class TceMainProcessdatamap
                     $pageIDForPlugin = self::getPageIDForPlugin($event ['pid']);
                     $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
-                    if ($page ['doktype'] != 254) {
+                    if ($page ['doktype'] !== 254) {
                         /* Notify of changes to existing event */
                         $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                         $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
@@ -121,7 +138,7 @@ class TceMainProcessdatamap
             }
         }
 
-        if ($table == 'tx_cal_exception_event' && count($fieldArray) > 1) {
+        if ($table === 'tx_cal_exception_event' && count($fieldArray) > 1) {
             if ($fieldArray ['start_date']) {
                 $fieldArray ['start_date'] = self::convertBackendDateToYMD($fieldArray ['start_date']);
             }
@@ -141,30 +158,47 @@ class TceMainProcessdatamap
         }
 
         /* If we're working with a calendar and an ICS file or URL has been posted, try to import it */
-        if ($table == 'tx_cal_calendar') {
+        if ($table === 'tx_cal_calendar') {
             $calendar = BackendUtility::getRecord('tx_cal_calendar', $id);
 
             /** @var ICalendarService $service */
             $service = GeneralUtility::makeInstance(ICalendarService::class);
 
-            if ($calendar ['type'] == 1 or $calendar ['type'] == 2) {
+            if ($calendar ['type'] === 1 || $calendar ['type'] === 2) {
                 self::processICS($calendar, $fieldArray, $service);
             }
         }
 
-        if ($table == 'tx_cal_fe_user_event_monitor_mm') {
+        if ($table === 'tx_cal_fe_user_event_monitor_mm') {
             $values = explode('_', $fieldArray ['uid_foreign']);
             $fieldArray ['uid_foreign'] = array_pop($values);
             $fieldArray ['tablenames'] = implode('_', $values);
         }
     }
 
+    /**
+     * @param $status
+     * @param $table
+     * @param $id
+     * @param $fieldArray
+     * @param $tcemain
+     * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     * @throws \TYPO3\CMS\Core\Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Exception
+     */
     public static function processDatamap_afterDatabaseOperations($status, $table, $id, &$fieldArray, &$tcemain)
     {
 
         /* If we have a new calendar event */
-        if (($table == 'tx_cal_event' || $table == 'tx_cal_exception_event') && count($fieldArray) > 1) {
-            $event = BackendUtility::getRecord($table, $status == 'new' ? $tcemain->substNEWwithIDs [$id] : $id);
+        if (($table === 'tx_cal_event' || $table === 'tx_cal_exception_event') && count($fieldArray) > 1) {
+            $event = BackendUtility::getRecord($table, $status === 'new' ? $tcemain->substNEWwithIDs [$id] : $id);
 
             /* If we're in a workspace, don't notify anyone about the event */
             if ($event ['pid'] > 0 && !$GLOBALS['BE_USER']->workspace) {
@@ -173,16 +207,16 @@ class TceMainProcessdatamap
                 $pageIDForPlugin = self::getPageIDForPlugin($event ['pid']);
                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
-                if ($page ['doktype'] != 254) {
+                if ($page ['doktype'] !== 254) {
                     $tx_cal_api = new Api();
                     $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
 
-                    if ($event ['event_type'] == 3 && ! $event ['ref_event_id']) {
+                    if ($event ['event_type'] === 3 && ! $event ['ref_event_id']) {
                         $modelObj = &Registry::Registry('basic', 'modelcontroller');
                         $modelObj->updateEventAttendees($event ['uid'], 'tx_cal_phpicalendar');
                     }
 
-                    if ($table == 'tx_cal_event' && ($status == 'new' || $fieldArray ['send_invitation'])) {
+                    if ($table === 'tx_cal_event' && ($status === 'new' || $fieldArray ['send_invitation'])) {
                         /* Notify of new event */
                         $notificationService = & Functions::getNotificationService();
 
@@ -200,7 +234,7 @@ class TceMainProcessdatamap
 
                         $notificationService->controller->getDateTimeObject = new CalDate($event ['start_date'] . '000000');
 
-                        if ($status == 'new') {
+                        if ($status === 'new') {
                             $notificationService->notify($event);
                         }
                         if ($fieldArray ['send_invitation']) {
@@ -215,7 +249,7 @@ class TceMainProcessdatamap
                     $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
                     $rgc->generateIndexForUid($event ['uid'], $table);
 
-                    if ($table == 'tx_cal_event' && $tx_cal_api->conf ['view.'] ['event.'] ['remind']) {
+                    if ($table === 'tx_cal_event' && $tx_cal_api->conf ['view.'] ['event.'] ['remind']) {
                         /* Schedule reminders for new and changed events */
                         $reminderService = &Functions::getReminderService();
                         $reminderService->scheduleReminder($event ['uid']);
@@ -225,7 +259,7 @@ class TceMainProcessdatamap
         }
 
         // t3ver_stage is always in the $fieldArray
-        if ($table == 'tx_cal_event_deviation' && count($fieldArray) > 0) {
+        if ($table === 'tx_cal_event_deviation' && count($fieldArray) > 0) {
             $deviationRow = BackendUtility::getRecord('tx_cal_event_deviation', $id);
             if (is_array($deviationRow)) {
                 $startDate = null;
@@ -253,16 +287,15 @@ class TceMainProcessdatamap
                 $table = 'tx_cal_index';
                 $where = ['event_deviation_uid' => $id];
                 $insertFields = [
-                        'start_datetime' => $startDate->format('%Y%m%d') . $startDate->format('%H%M%S'),
-                        'end_datetime' => $endDate->format('%Y%m%d') . $endDate->format('%H%M%S')
-                        ];
-
+                    'start_datetime' => $startDate->format('Ymd') . $startDate->format('HMS'),
+                    'end_datetime' => $endDate->format('Ymd') . $endDate->format('HMS')
+                ];
                 /** @var ConnectionPool $connectionPool */
                 $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
                 $connectionPool->getConnectionForTable($table)->update($table, $insertFields, $where);
             }
         }
-        if ($table == 'pages' && $status == 'new') {
+        if ($table === 'pages' && $status === 'new') {
             $GLOBALS ['BE_USER']->setAndSaveSessionData('cal_itemsProcFunc', []);
         }
     }
@@ -272,6 +305,11 @@ class TceMainProcessdatamap
      * @param $table
      * @param $id
      * @param $tce
+     * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     * @throws \TYPO3\CMS\Core\Exception
+     * @throws \Exception
+     * @throws \Exception
      */
     public static function processDatamap_preProcessFieldArray(&$incomingFieldArray, $table, $id, &$tce)
     {
@@ -282,12 +320,8 @@ class TceMainProcessdatamap
          * saved but a bad combination of start date and end date will generate an error message.
          */
 
-        /*
-         * if($table == 'tx_cal_event') { $startTimestamp = $incomingFieldArray['start_date'] + $incomingFieldArray['start_time']; $endTimestamp = $incomingFieldArray['end_date'] + $incomingFieldArray['end_time']; if ($startTimestamp > $endTimestamp) { $tce->log('tx_cal_event', 2, $id, 0, 1, "Event end (".BackendUtility::datetime($endTimestamp).") is earlier than event start (".BackendUtility::datetime($startTimestamp).").", 1); } }
-         */
-
         /* preview events on eventViewPid on "save and preview" calls. but only if it's a regular event and the user is in live workspace */
-        if ($table == 'tx_cal_event' && isset($GLOBALS ['_POST'] ['_savedokview_x']) && ! $incomingFieldArray ['type'] && ! $GLOBALS ['BE_USER']->workspace) {
+        if (! $incomingFieldArray ['type'] && $table === 'tx_cal_event' && isset($GLOBALS ['_POST'] ['_savedokview_x']) && ! $GLOBALS ['BE_USER']->workspace) {
             $pagesTSConfig = BackendUtility::getPagesTSconfig($GLOBALS ['_POST'] ['popViewId']);
             if ($pagesTSConfig ['options.'] ['tx_cal_controller.'] ['eventViewPid']) {
                 $GLOBALS ['_POST'] ['popViewId_addParams'] = ($incomingFieldArray ['sys_language_uid'] > 0 ? '&L=' . $incomingFieldArray ['sys_language_uid'] : '') .
@@ -296,9 +330,9 @@ class TceMainProcessdatamap
             }
         }
 
-        if ($table == 'tx_cal_event' || $table == 'tx_cal_exeption_event') {
+        if ($table === 'tx_cal_event' || $table === 'tx_cal_exeption_event') {
             $event = BackendUtility::getRecord($table, $id);
-            if (intval($event ['start_date']) == 0) {
+            if (intval($event ['start_date']) === 0) {
                 return;
             }
 
@@ -308,8 +342,8 @@ class TceMainProcessdatamap
              */
             if (array_key_exists('start_time', $incomingFieldArray) &&
                 array_key_exists('end_time', $incomingFieldArray) &&
-                $incomingFieldArray ['start_time'] == 0 &&
-                $incomingFieldArray ['end_time'] == 0) {
+                $incomingFieldArray ['start_time'] === 0 &&
+                $incomingFieldArray ['end_time'] === 0) {
                 $incomingFieldArray ['allday'] = 1;
             }
 
@@ -319,7 +353,7 @@ class TceMainProcessdatamap
              *
              * @todo Default date calculations do not take any timezone information into account.
              */
-            if ($incomingFieldArray ['freq'] != $event ['freq']) {
+            if ($incomingFieldArray ['freq'] !== $event ['freq']) {
                 $date = self::convertBackendDateToPear($incomingFieldArray ['start_date']);
                 $date->addSeconds($incomingFieldArray ['start_time']);
                 $dayArray = self::getWeekdayOccurrence($date);
@@ -356,7 +390,7 @@ class TceMainProcessdatamap
             $pageIDForPlugin = self::getPageIDForPlugin($event ['pid']);
             $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
-            if ($page ['doktype'] != 254) {
+            if ($page ['doktype'] !== 254) {
                 /* Notify of changes to existing event */
                 $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                 $tx_cal_api = &$tx_cal_api->tx_cal_api_without($pageIDForPlugin);
@@ -365,18 +399,18 @@ class TceMainProcessdatamap
             }
         }
 
-        if ($table == 'tx_cal_category' && array_key_exists('calendar_id', $incomingFieldArray) && false === strpos(
+        if ($table === 'tx_cal_category' && array_key_exists('calendar_id', $incomingFieldArray) && false === strpos(
             $id,
             'NEW'
         )) {
             $category = BackendUtility::getRecord('tx_cal_category', $id);
-            if ($incomingFieldArray ['calendar_id'] != $category ['calendar_id']) {
+            if ($incomingFieldArray ['calendar_id'] !== $category ['calendar_id']) {
                 $incomingFieldArray ['parent_category'] = 0;
             }
         }
 
         /* If an existing calendar is updated */
-        if ($table == 'tx_cal_calendar' && array_key_exists('type', $incomingFieldArray) && false === strpos(
+        if ($table === 'tx_cal_calendar' && array_key_exists('type', $incomingFieldArray) && false === strpos(
             $id,
             'NEW'
         )) {
@@ -390,7 +424,7 @@ class TceMainProcessdatamap
             switch ($incomingFieldArray ['type']) {
                 case 0: /* Standard */
                     /* Delete any temporary events previously associated with this calendar */
-                    if ($calendar ['type'] != 0) {
+                    if ($calendar ['type'] !== 0) {
                         $service->deleteTemporaryEvents($id);
                         $service->deleteSchedulerTask($id);
                         $calendar['schedulerId'] = 0;
@@ -407,7 +441,7 @@ class TceMainProcessdatamap
             }
         }
 
-        if ($table == 'tx_cal_exception_event_group' && false === strpos($id, 'NEW')) {
+        if ($table === 'tx_cal_exception_event_group' && false === strpos($id, 'NEW')) {
             $exceptionEvent = BackendUtility::getRecord('tx_cal_exception_event_group', $id);
 
             /* If we're in a workspace, don't notify anyone about the event */
@@ -415,7 +449,7 @@ class TceMainProcessdatamap
                 $pageIDForPlugin = self::getPageIDForPlugin($exceptionEvent ['pid']);
                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
-                if ($page ['doktype'] != 254) {
+                if ($page ['doktype'] !== 254) {
                     $tx_cal_api = GeneralUtility::makeInstance(Api::class);
                     $tx_cal_api = $tx_cal_api->tx_cal_api_without($pageIDForPlugin);
                     /** @var RecurrenceGenerator $rgc */
@@ -425,7 +459,7 @@ class TceMainProcessdatamap
             }
         }
 
-        if ($table == 'tx_cal_attendee') {
+        if ($table === 'tx_cal_attendee') {
             $incomingFieldArray ['fe_user_id'] = str_replace([
                     ',',
                     'fe_users_'
@@ -445,9 +479,8 @@ class TceMainProcessdatamap
                 $groups = [
                         0
                 ];
-                $serviceObj = null;
                 $serviceObj = GeneralUtility::makeInstanceService('auth', $subType);
-                if ($serviceObj == null) {
+                if ($serviceObj === null) {
                     return;
                 }
 
@@ -508,13 +541,15 @@ class TceMainProcessdatamap
     }
 
     /**
-     *  @param array $calendar
-     *  @param array $fieldArray
-     *  @param ICalendarService $service
-     **/
+     * @param array $calendar
+     * @param array $fieldArray
+     * @param ICalendarService $service
+     * @throws \TYPO3\CMS\Core\Exception
+     */
     public static function processICS($calendar, &$fieldArray, &$service)
     {
-        if ($fieldArray ['ics_file'] or $fieldArray ['ext_url']) {
+        if ($fieldArray ['ics_file'] || $fieldArray ['ext_url']) {
+            $url = '';
             if ($fieldArray ['ics_file']) {
                 $url = GeneralUtility::getFileAbsFileName('uploads/tx_cal/ics/' . $fieldArray ['ics_file']);
             } elseif ($fieldArray ['ext_url']) {
@@ -529,7 +564,7 @@ class TceMainProcessdatamap
                 $pageIDForPlugin = self::getPageIDForPlugin($calendar ['pid']);
                 $page = BackendUtility::getRecord('pages', intval($pageIDForPlugin), 'doktype');
 
-                if ($page ['doktype'] != 254) {
+                if ($page ['doktype'] !== 254) {
                     /** @var RecurrenceGenerator $rgc */
                     $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
                     $rgc->generateIndexForCalendarUid($calendar ['uid']);
@@ -555,8 +590,9 @@ class TceMainProcessdatamap
     /**
      * Converts a date from the backend (m-d-Y or d-m-Y) into a PEAR Date object.
      *
-     * @param  string	The date to convert.
+     * @param  string    The date to convert.
      * @return CalDate  the date object
+     * @throws \Exception
      */
     public static function convertBackendDateToPear($dateString): CalDate
     {
@@ -568,12 +604,13 @@ class TceMainProcessdatamap
      * Converts a date from the backend (m-d-Y or d-m-Y or in TYPO3 v.
      * >= 4.3 timestamp) into the Ymd format.
      *
-     * @param  string	The date to convert.
+     * @param  string    The date to convert.
      * @return string   date in Ymd format.
+     * @throws \Exception
      */
     public static function convertBackendDateToYMD($dateString): string
     {
         $date = new CalDate($dateString);
-        return $date->format('%Y%m%d');
+        return $date->format('Ymd');
     }
 }

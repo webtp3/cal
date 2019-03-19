@@ -43,7 +43,7 @@ $tx_cal_organizer = [
 
         'hidden' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
                 'default' => 0
@@ -148,12 +148,12 @@ $tx_cal_organizer = [
                 'foreign_types' => [
                     '0' => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ],
                     File::FILETYPE_IMAGE => [
                         'showitem' => '
-												--palette--;LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
+												--palette--;LLL:EXT:lang/Resources/Private/Language/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
 												--palette--;;filePalette'
                     ]
                 ]
@@ -199,7 +199,7 @@ $tx_cal_organizer = [
         ],
         'sys_language_uid' => [
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.language',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.language',
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
@@ -208,11 +208,11 @@ $tx_cal_organizer = [
                 'default' => 0,
                 'items' => [
                     [
-                        'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.allLanguages',
+                        'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.allLanguages',
                         -1
                     ],
                     [
-                        'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.default_value',
+                        'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.default_value',
                         0
                     ]
                 ]
@@ -221,7 +221,7 @@ $tx_cal_organizer = [
         'l18n_parent' => [
             'displayCond' => 'FIELD:sys_language_uid:>:0',
             'exclude' => 1,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.l18n_parent',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.l18n_parent',
             'config' => [
                 'renderType' => 'selectSingle',
                 'type' => 'select',
@@ -242,7 +242,7 @@ $tx_cal_organizer = [
         ],
         't3ver_label' => [
             'displayCond' => 'FIELD:t3ver_label:REQ:true',
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.versionLabel',
+            'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.versionLabel',
             'config' => [
                 'type' => 'none',
                 'cols' => 27

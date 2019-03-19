@@ -529,7 +529,7 @@ class BaseView extends BaseService
             $now = new CalDate();
             $now->setTZbyID('UTC');
 
-            if ($this->conf['getdate'] !== $now->format('%Y%m%d')) {
+            if ($this->conf['getdate'] !== $now->format('Ymd')) {
                 $cal_time_obj = new CalDate($this->conf['getdate'] . '000000');
                 $cal_time_obj->setTZbyID('UTC');
             } else {
@@ -593,11 +593,11 @@ class BaseView extends BaseService
                 $this->local_cObj->data['link_ATagParams'] = sprintf(
                     ' onclick="' . $this->conf['view.'][$view . '.']['event.']['addLinkOnClick'] . '"',
                     $time,
-                    $cal_time_obj->format('%Y%m%d')
+                    $cal_time_obj->format('Ymd')
                 );
                 $this->controller->getParametersForTyposcriptLink(
                     $this->local_cObj->data,
-                    ['gettime' => $time, 'getdate' => $cal_time_obj->format('%Y%m%d'), 'view' => 'create_event'],
+                    ['gettime' => $time, 'getdate' => $cal_time_obj->format('Ymd'), 'view' => 'create_event'],
                     0,
                     $this->conf['clear_anyway'],
                     $this->conf['view.']['event.']['createEventViewPid']
@@ -609,17 +609,17 @@ class BaseView extends BaseService
                 if ($wrap) {
                     $tmp = sprintf(
                         $wrap,
-                        'id="cell_' . $cal_time_obj->format('%Y%m%d') . $time . '" ondblclick="javascript:eventUid=0;eventTime=\'' . $time . '\';eventDate=' . $cal_time_obj->format('%Y%m%d') . ';EventDialog.showDialog(this);" ',
+                        'id="cell_' . $cal_time_obj->format('Ymd') . $time . '" ondblclick="javascript:eventUid=0;eventTime=\'' . $time . '\';eventDate=' . $cal_time_obj->format('Ymd') . ';EventDialog.showDialog(this);" ',
                         $remember,
                         $class,
                         $tmp,
-                        $cal_time_obj->format('%Y %m %d %H %M %s')
+                        $cal_time_obj->format('Y m d H M s')
                     );
                 }
             } else {
                 $this->local_cObj->setCurrentVal($this->conf['view.'][$view . '.']['event.']['addIcon']);
                 $this->local_cObj->data['link_no_cache'] = 1;
-                $this->local_cObj->data['link_additionalParams'] = '&tx_cal_controller[gettime]=' . $time . '&tx_cal_controller[getdate]=' . $cal_time_obj->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView() . '&tx_cal_controller[view]=create_event';
+                $this->local_cObj->data['link_additionalParams'] = '&tx_cal_controller[gettime]=' . $time . '&tx_cal_controller[getdate]=' . $cal_time_obj->format('Ymd') . '&tx_cal_controller[lastview]=' . $this->controller->extendLastView() . '&tx_cal_controller[view]=create_event';
                 $this->local_cObj->data['link_section'] = 'default';
                 $this->local_cObj->data['link_parameter'] = $this->conf['view.']['event.']['createEventViewPid'] ?: $GLOBALS['TSFE']->id;
                 $tmp .= $this->local_cObj->cObjGetSingle(
@@ -627,7 +627,7 @@ class BaseView extends BaseService
                     $this->conf['view.'][$view . '.']['event.']['addLink.']
                 );
                 if ($wrap) {
-                    $tmp = sprintf($wrap, $remember, $class, $tmp, $cal_time_obj->format('%Y %m %d %H %M %s'));
+                    $tmp = sprintf($wrap, $remember, $class, $tmp, $cal_time_obj->format('Y m d H M s'));
                 }
             }
         } elseif ($this->conf['view.']['enableAjax']) {
@@ -1027,8 +1027,8 @@ class BaseView extends BaseService
         ));
         $startOfPrevMonth->setDay($this->conf['day']);
 
-        $next_month = $endOfNextMonth->format('%Y%m%d');
-        $prev_month = $startOfPrevMonth->format('%Y%m%d');
+        $next_month = $endOfNextMonth->format('Ymd');
+        $prev_month = $startOfPrevMonth->format('Ymd');
 
         $startOfThisWeek = new CalDate(Calc::beginOfWeek(
             $this->conf['day'],
@@ -1054,7 +1054,7 @@ class BaseView extends BaseService
         $nextdaylinktext = $this->markerBasedTemplateService->getSubpart($page, '###NEXT_DAYLINKTEXT###');
         $this->local_cObj->setCurrentVal($nextdaylinktext);
         $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
-            'getdate' => $next_day->format('%Y%m%d'),
+            'getdate' => $next_day->format('Ymd'),
             'view' => $this->conf['view.']['dayLinkTarget'],
             $this->pointerName => null
         ], $this->conf['cache'], $this->conf['clear_anyway'], $dayViewPid);
@@ -1067,7 +1067,7 @@ class BaseView extends BaseService
         $prevdaylinktext = $this->markerBasedTemplateService->getSubpart($page, '###PREV_DAYLINKTEXT###');
         $this->local_cObj->setCurrentVal($prevdaylinktext);
         $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
-            'getdate' => $prev_day->format('%Y%m%d'),
+            'getdate' => $prev_day->format('Ymd'),
             'view' => $this->conf['view.']['dayLinkTarget'],
             $this->pointerName => null
         ], $this->conf['cache'], $this->conf['clear_anyway'], $dayViewPid);
@@ -1080,7 +1080,7 @@ class BaseView extends BaseService
         $nextweeklinktext = $this->markerBasedTemplateService->getSubpart($page, '###NEXT_WEEKLINKTEXT###');
         $this->local_cObj->setCurrentVal($nextweeklinktext);
         $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
-            'getdate' => $next_week->format('%Y%m%d'),
+            'getdate' => $next_week->format('Ymd'),
             'view' => $this->conf['view.']['weekLinkTarget'],
             $this->pointerName => null
         ], $this->conf['cache'], $this->conf['clear_anyway'], $weekViewPid);
@@ -1093,7 +1093,7 @@ class BaseView extends BaseService
         $prevweeklinktext = $this->markerBasedTemplateService->getSubpart($page, '###PREV_WEEKLINKTEXT###');
         $this->local_cObj->setCurrentVal($prevweeklinktext);
         $this->controller->getParametersForTyposcriptLink($this->local_cObj->data, [
-            'getdate' => $prev_week->format('%Y%m%d'),
+            'getdate' => $prev_week->format('Ymd'),
             'view' => $this->conf['view.']['weekLinkTarget'],
             $this->pointerName => null
         ], $this->conf['cache'], $this->conf['clear_anyway'], $weekViewPid);
@@ -1288,12 +1288,12 @@ class BaseView extends BaseService
             $this->local_cObj->data['view'] = $viewTarget;
             if ($viewTarget === 'week' && DATE_CALC_BEGIN_WEEKDAY === 0) {
                 $date = new CalDate($this->conf['getdate']);
-                if ((int)$date->format('%w') === 0) {
+                if ($date->format('w') === 0) {
                     $date->addSeconds(86400);
                 }
                 $this->controller->getParametersForTyposcriptLink(
                     $this->local_cObj->data,
-                    ['getdate' => $date->format('%Y%m%d'), 'view' => $viewTarget, $this->pointerName => null],
+                    ['getdate' => $date->format('Ymd'), 'view' => $viewTarget, $this->pointerName => null],
                     $this->conf['cache'],
                     $this->conf['clear_anyway'],
                     $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']
@@ -1463,7 +1463,7 @@ class BaseView extends BaseService
 
         $return = '';
         for ($i = 0; $i < $conf['count']; $i++) {
-            $monthdate = $month_time->format('%Y%m%d');
+            $monthdate = $month_time->format('Ymd');
             $select_month = $month_time->format($conf['format']);
 
             $this->initLocalCObject();
@@ -1509,7 +1509,7 @@ class BaseView extends BaseService
         }
         $return = '';
         for ($i = 0; $i < $conf['count']; $i++) {
-            $yeardate = $year_time->format('%Y%m%d');
+            $yeardate = $year_time->format('Ymd');
             $select_year = $year_time->format($conf['format']);
 
             $this->initLocalCObject();
@@ -1755,7 +1755,7 @@ class BaseView extends BaseService
         $return = '';
 
         for ($i = 0; $i < $monthSize; $i++) {
-            $monthdate = $month_time->format('%Y%m%d');
+            $monthdate = $month_time->format('Ymd');
             $month_month = $month_time->getMonth();
             $select_month = $month_time->format($dateFormat_month);
 
@@ -1883,7 +1883,7 @@ class BaseView extends BaseService
         $return = '';
 
         for ($i = 0; $i < $weekSize; $i++) {
-            $weekdate = $start_week_time->format('%Y%m%d');
+            $weekdate = $start_week_time->format('Ymd');
             $select_week1 = $start_week_time->format($dateFormat_week_jump);
             $select_week2 = $end_week_time->format($dateFormat_week_jump);
 
@@ -1906,8 +1906,8 @@ class BaseView extends BaseService
                 ], $this->conf['cache'], $this->conf['clear_anyway']);
             }
             $link = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $link;
-            $formattedStart = $start_week_time->format('%Y%m%d');
-            $formattedEnd = $end_week_time->format('%Y%m%d');
+            $formattedStart = $start_week_time->format('Ymd');
+            $formattedEnd = $end_week_time->format('Ymd');
             if (($formattedGetdate >= $formattedStart) && ($formattedGetdate <= $formattedEnd)) {
                 $tmp = $this->cObj->stdWrap($link, $this->conf['view.']['other.']['listWeeksSelected_stdWrap.']);
                 $tmp = str_replace('###WEEK1###', $select_week1, $tmp);
@@ -1934,7 +1934,7 @@ class BaseView extends BaseService
         $starttime->setTZbyID('UTC');
 
         $starttime->addSeconds(86400);
-        $next_day = $starttime->format('%Y%m%d');
+        $next_day = $starttime->format('Ymd');
 
         $match1 = $this->markerBasedTemplateService->getSubpart($template, '###T_ALLDAY_SWITCH###');
         $match2 = $this->markerBasedTemplateService->getSubpart($template, '###T_EVENT_SWITCH###');
@@ -2041,7 +2041,7 @@ class BaseView extends BaseService
 
         $page = Functions::getContent($this->conf['view.']['month.']['new' . ucwords($type) . 'MonthTemplate']);
 
-        $monthModel = NewMonthView::getMonthView($monthDate->month, $monthDate->year);
+        $monthModel = NewMonthView::getMonthView($monthDate->getMonth(), $monthDate->getYear());
 
         $today = new CalDate();
         $monthModel->setCurrent($today);
@@ -2115,7 +2115,7 @@ class BaseView extends BaseService
             $this->local_cObj->data['view'] = $viewTarget;
             $this->controller->getParametersForTyposcriptLink(
                 $this->local_cObj->data,
-                ['getdate' => $fake_getdate_time->format('%Y%m%d'), 'view' => $viewTarget, $this->pointerName => null],
+                ['getdate' => $fake_getdate_time->format('Ymd'), 'view' => $viewTarget, $this->pointerName => null],
                 $this->conf['cache'],
                 $this->conf['clear_anyway'],
                 $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewPid']
@@ -2124,7 +2124,7 @@ class BaseView extends BaseService
                 $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewLink'],
                 $this->conf['view.'][$viewTarget . '.'][$viewTarget . 'ViewLink.']
             );
-            $month_date = $fake_getdate_time->format('%Y%m%d');
+            $month_date = $fake_getdate_time->format('Ymd');
 
             $view_array = [];
 
@@ -2142,7 +2142,7 @@ class BaseView extends BaseService
                             foreach ($eventKeys as $eventKey) {
                                 /** @var EventModel $event */
                                 $event = &$arrayOfEvents[$eventKey];
-                                $eventReferenceKey = $dateKey . '_' . $event->getType() . '_' . $event->getUid() . '_' . $event->getStart()->format('%Y%m%d%H%M%S');
+                                $eventReferenceKey = $dateKey . '_' . $event->getType() . '_' . $event->getUid() . '_' . $event->getStart()->format('YmdHMS');
                                 $this->eventArray[$eventReferenceKey] = &$event;
                                 $starttime = new CalDate();
                                 $starttime->copy($event->getStart());
@@ -2157,7 +2157,7 @@ class BaseView extends BaseService
                                 $j->setMinute(0);
                                 $j->setSecond(0);
                                 for (; $j->before($endtime); $j->addSeconds(60 * 60 * 24)) {
-                                    $view_array[$j->format('%Y%m%d')]['000000'][count($view_array[$j->format('%Y%m%d')]['000000'])] = $eventReferenceKey;
+                                    $view_array[$j->format('Ymd')]['000000'][count($view_array[$j->format('Ymd')]['000000'])] = $eventReferenceKey;
                                 }
                             }
                         }
@@ -2189,7 +2189,7 @@ class BaseView extends BaseService
 
             for ($i = 0; $i < 7; $i++) {
                 $weekday = $start_day->format($langtype);
-                $weekdayLong = $start_day->format('%A');
+                $weekdayLong = $start_day->format('A');
                 if ($typeSize) {
                     $weekday = mb_substr(
                         $weekday,
@@ -2202,7 +2202,7 @@ class BaseView extends BaseService
 
                 $additionalClasses = trim(sprintf(
                     $this->conf['view.']['month.']['monthDayOfWeekStyle'],
-                    $start_day->format('%w')
+                    $start_day->format('w')
                 ));
                 $markerArray = [
                     '###WEEKDAY###' => $weekday,
@@ -2230,15 +2230,13 @@ class BaseView extends BaseService
             $startWeekTime = Calendar::calculateStartWeekTime($getdate);
             $endWeekTime = Calendar::calculateEndWeekTime($getdate);
 
-            $formattedWeekStartTime = $startWeekTime->format('%Y%m%d');
-            $formattedWeekEndTime = $endWeekTime->format('%Y%m%d');
-            $middle = '';
-
+            $formattedWeekStartTime = $startWeekTime->format('Ymd');
+            $formattedWeekEndTime = $endWeekTime->format('Ymd');
             do {
                 $daylink = new CalDate();
                 $daylink->copy($start_day);
 
-                $formatedGetdate = $daylink->format('%Y%m%d');
+                $formatedGetdate = $daylink->format('Ymd');
                 $formatedDayDate = $daylink->format($this->conf['view.']['month.']['dateFormatDay']);
 
                 $isCurrentWeek = false;
@@ -2247,7 +2245,7 @@ class BaseView extends BaseService
                     $isSelectedWeek = true;
                 }
 
-                if ($start_day->format('%Y%U') === $today->format('%Y%U')) {
+                if ($start_day->format('YU') === $today->format('YU')) {
                     $isCurrentWeek = true;
                 }
 
@@ -2257,7 +2255,7 @@ class BaseView extends BaseService
                     $hasEvent = false;
                     $start_day->subtractSeconds(86400);
                     for ($j = 0; $j < 7; $j++) {
-                        if ($isAllowedToCreateEvent || is_array($this->viewarray[$start_day->format('%Y%m%d')])) {
+                        if ($isAllowedToCreateEvent || is_array($this->viewarray[$start_day->format('Ymd')])) {
                             $hasEvent = true;
                             break;
                         }
@@ -2356,7 +2354,7 @@ class BaseView extends BaseService
                 if ($check_month !== $minical_month) {
                     $style[] = $this->conf['view.']['month.']['monthOffStyle'];
                 }
-                if ($start_day->format('%w') === '0' || $start_day->format('%w') === '6') {
+                if ($start_day->format('w') === 0 || $start_day->format('w') === 6) {
                     $style[] = $this->conf['view.']['month.']['monthDayWeekendStyle'];
                 }
                 if ($isSelectedWeek) {
@@ -2368,11 +2366,11 @@ class BaseView extends BaseService
                 if ($isCurrentWeek) {
                     $style[] = $this->conf['view.']['month.']['monthDayCurrentWeekStyle'];
                 }
-                if ($formatedGetdate === $today->format('%Y%m%d')) {
+                if ($formatedGetdate === $today->format('Ymd')) {
                     $style[] = $this->conf['view.']['month.']['monthTodayStyle'];
                 }
                 if ($this->conf['view.']['month.']['monthDayOfWeekStyle']) {
-                    $style[] = sprintf($this->conf['view.']['month.']['monthDayOfWeekStyle'], $start_day->format('%w'));
+                    $style[] = sprintf($this->conf['view.']['month.']['monthDayOfWeekStyle'], $start_day->format('w'));
                 }
 
                 //clean up empty styles (code beautify)

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model\Pear\Date;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -39,6 +33,8 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
+ * @author Baba Buehler <baba@babaz.com>
+ * @author Pierre-Alain Joye <pajoye@php.net>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -66,6 +62,7 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * This class includes time zone data (from zoneinfo) in the form of a
  * global array, $_DATE_TIMEZONE_DATA.
  *
+ * @author Baba Buehler <baba@babaz.com>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -145,11 +142,14 @@ class TimeZone
      * @param string $id
      *            the time zone id
      * @return object TimeZone the new TimeZone object
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function __construct($id)
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         $_DATE_TIMEZONE_DATA = &$GLOBALS['_DATE_TIMEZONE_DATA'];
-        if (self::isValidID($id)) {
+        if (TimeZone::isValidID($id)) {
             $this->id = $id;
             $this->longname = $_DATE_TIMEZONE_DATA[$id]['longname'];
             $this->shortname = $_DATE_TIMEZONE_DATA[$id]['shortname'];
@@ -182,10 +182,13 @@ class TimeZone
      * which is initialized during the loading of TimeZone.php.
      *
      * @return object TimeZone the default time zone
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public static function getDefault()
     {
-        return new self($GLOBALS['_DATE_TIMEZONE_DEFAULT']);
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
+        return new TimeZone($GLOBALS['_DATE_TIMEZONE_DEFAULT']);
     }
 
     // }}}
@@ -201,7 +204,9 @@ class TimeZone
      */
     public static function setDefault($id)
     {
-        if (self::isValidID($id)) {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
+        if (TimeZone::isValidID($id)) {
             $GLOBALS['_DATE_TIMEZONE_DEFAULT'] = $id;
         }
     }
@@ -217,9 +222,12 @@ class TimeZone
      * @param string $id
      *            the id to test
      * @return bool true if the supplied ID is valid
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public static function isValidID($id): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if (isset($GLOBALS['_DATE_TIMEZONE_DATA'][$id])) {
             return true;
         }
@@ -238,9 +246,12 @@ class TimeZone
      * @param
      *            object TimeZone $tz the timezone to test
      * @return bool true if this time zone is equal to the supplied time zone
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function isEqual($tz): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if (strcasecmp($this->id, $tz->id) == 0) {
             return true;
         }
@@ -264,9 +275,12 @@ class TimeZone
      * @param
      *            object TimeZone $tz the timezone object to test
      * @return bool true if this time zone is equivalent to the supplied time zone
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function isEquivalent($tz): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if ($this->offset == $tz->offset && $this->hasdst == $tz->hasdst) {
             return true;
         }
@@ -282,9 +296,12 @@ class TimeZone
      * Returns true if this zone observes daylight savings time
      *
      * @return bool true if this time zone has DST
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function hasDaylightTime(): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->hasdst;
     }
 
@@ -305,9 +322,12 @@ class TimeZone
      * @param
      *            object Date $date the date/time to test
      * @return bool true if this date is in DST for this time zone
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function inDaylightTime($date): bool
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         $env_tz = '';
         if (isset($_ENV['TZ']) && getenv('TZ')) {
             $env_tz = getenv('TZ');
@@ -332,9 +352,12 @@ class TimeZone
      * DST offset is hard-coded to one hour.
      *
      * @return int the DST offset, in milliseconds or zero if the zone does not observe DST
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getDSTSavings(): int
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if ($this->hasdst) {
             return 3600000;
         }
@@ -355,9 +378,12 @@ class TimeZone
      * @param
      *            object Date $date the Date to test
      * @return int the corrected offset to UTC in milliseconds
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getOffset($date): int
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         if ($this->inDaylightTime($date)) {
             return $this->offset + $this->getDSTSavings();
         }
@@ -373,9 +399,12 @@ class TimeZone
      * Returns the list of valid time zone id strings
      *
      * @return mixed an array of strings with the valid time zone IDs
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getAvailableIDs()
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return array_keys($GLOBALS['_DATE_TIMEZONE_DATA']);
     }
 
@@ -388,9 +417,12 @@ class TimeZone
      * Returns the time zone id for this time zone, i.e. "America/Chicago"
      *
      * @return string the id
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getID(): string
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->id;
     }
 
@@ -404,9 +436,12 @@ class TimeZone
      * i.e. "Central Standard Time"
      *
      * @return string the long name
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getLongName(): string
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->longname;
     }
 
@@ -419,9 +454,12 @@ class TimeZone
      * Returns the short name for this time zone, i.e. "CST"
      *
      * @return string the short name
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getShortName(): string
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->shortname;
     }
 
@@ -434,9 +472,12 @@ class TimeZone
      * Returns the DST long name for this time zone, i.e. "Central Daylight Time"
      *
      * @return string the daylight savings time long name
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getDSTLongName(): string
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->dstlongname;
     }
 
@@ -449,9 +490,12 @@ class TimeZone
      * Returns the DST short name for this time zone, i.e. "CDT"
      *
      * @return string the daylight savings time short name
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getDSTShortName(): string
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->dstshortname;
     }
 
@@ -464,9 +508,12 @@ class TimeZone
      * Returns the raw (non-DST-corrected) offset from UTC/GMT for this time zone
      *
      * @return int the offset, in milliseconds
+     * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      */
     public function getRawOffset(): int
     {
+        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+
         return $this->offset;
     }
 

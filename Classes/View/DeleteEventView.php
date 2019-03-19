@@ -159,7 +159,7 @@ class DeleteEventView extends FeEditingBaseView
     {
         $startDate = $this->object->getStart();
         $split = $this->conf['dateConfig.']['splitSymbol'];
-        $startDateFormatted = $startDate->format('%Y' . $split . '%m' . $split . '%d');
+        $startDateFormatted = $startDate->format('Y' . $split . 'm' . $split . 'd');
         $sims['###STARTDATE###'] = $this->cObj->stdWrap(
             $startDateFormatted,
             $this->conf['view.'][$this->conf['view'] . '.']['startdate_stdWrap.']
@@ -175,7 +175,7 @@ class DeleteEventView extends FeEditingBaseView
     {
         $endDate = $this->object->getEnd();
         $split = $this->conf['dateConfig.']['splitSymbol'];
-        $endDateFormatted = $endDate->format('%Y' . $split . '%m' . $split . '%d');
+        $endDateFormatted = $endDate->format('Y' . $split . 'm' . $split . 'd');
         $sims['###ENDDATE###'] = $this->cObj->stdWrap(
             $endDateFormatted,
             $this->conf['view.'][$this->conf['view'] . '.']['enddate_stdWrap.']
@@ -389,7 +389,7 @@ class DeleteEventView extends FeEditingBaseView
         $untilDate = $this->object->getUntil();
         if (is_object($untilDate)) {
             $split = $this->conf['dateConfig.']['splitSymbol'];
-            $untilDateFormatted = $untilDate->format('%Y' . $split . '%m' . $split . '%d');
+            $untilDateFormatted = $untilDate->format('Y' . $split . 'm' . $split . 'd');
             $sims['###UNTIL###'] = $this->cObj->stdWrap(
                 $untilDateFormatted,
                 $this->conf['view.'][$this->conf['view'] . '.']['until_stdWrap.']
@@ -521,10 +521,10 @@ class DeleteEventView extends FeEditingBaseView
             $local_sims['###L_TITLE###'] = $this->controller->pi_getLL('l_event_title');
             $eventStart = $this->object->getStart();
             $eventEnd = $this->object->getEnd();
-            $local_sims['###EVENT_START_DAY###'] = $eventStart->format('%Y%m%d');
-            $local_sims['###EVENT_END_DAY###'] = $eventEnd->format('%Y%m%d');
-            $local_sims['###EVENT_START_TIME###'] = $eventStart->format('%H%M');
-            $local_sims['###EVENT_END_TIME###'] = $eventEnd->format('%H%M');
+            $local_sims['###EVENT_START_DAY###'] = $eventStart->format('Ymd');
+            $local_sims['###EVENT_END_DAY###'] = $eventEnd->format('Ymd');
+            $local_sims['###EVENT_START_TIME###'] = $eventStart->format('HM');
+            $local_sims['###EVENT_END_TIME###'] = $eventEnd->format('HM');
             $local_sims['###EVENT_UID###'] = $this->object->getUid();
             $rems['###CREATE_EXCEPTION###'] = $this->markerBasedTemplateService->getSubpart($template, '###CREATE_EXCEPTION###');
             $rems['###CREATE_EXCEPTION###'] = Functions::substituteMarkerArrayNotCached(

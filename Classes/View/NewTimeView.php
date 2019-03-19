@@ -441,11 +441,11 @@ abstract class NewTimeView
                 $local_cObj->data['link_ATagParams'] = sprintf(
                     ' onclick="' . $conf['view.'][$view . '.']['event.']['addLinkOnClick'] . '"',
                     $time,
-                    $date->format('%Y%m%d')
+                    $date->format('Ymd')
                 );
                 $controller->getParametersForTyposcriptLink($local_cObj->data, [
                     'gettime' => $time,
-                    'getdate' => $date->format('%Y%m%d'),
+                    'getdate' => $date->format('Ymd'),
                     'view' => 'create_event'
                 ], 0, $conf['clear_anyway'], $conf['view.']['event.']['createEventViewPid']);
                 $tmp .= $local_cObj->cObjGetSingle(
@@ -455,17 +455,17 @@ abstract class NewTimeView
                 if ($wrap) {
                     $tmp = sprintf(
                         $wrap,
-                        'id="cell_' . $date->format('%Y%m%d') . $time . '" ondblclick="javascript:eventUid=0;eventTime=\'' . $time . '\';eventDate=' . $date->format('%Y%m%d') . ';EventDialog.showDialog(this);" ',
+                        'id="cell_' . $date->format('Ymd') . $time . '" ondblclick="javascript:eventUid=0;eventTime=\'' . $time . '\';eventDate=' . $date->format('Ymd') . ';EventDialog.showDialog(this);" ',
                         $remember,
                         $class,
                         $tmp,
-                        $date->format('%Y %m %d %H %M %s')
+                        $date->format('Y m d H M s')
                     );
                 }
             } else {
                 $local_cObj->setCurrentVal($conf['view.'][$view . '.']['event.']['addIcon']);
                 $local_cObj->data['link_no_cache'] = 1;
-                $local_cObj->data['link_additionalParams'] = '&tx_cal_controller[gettime]=' . $time . '&tx_cal_controller[getdate]=' . $date->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $controller->extendLastView() . '&tx_cal_controller[view]=create_event';
+                $local_cObj->data['link_additionalParams'] = '&tx_cal_controller[gettime]=' . $time . '&tx_cal_controller[getdate]=' . $date->format('Ymd') . '&tx_cal_controller[lastview]=' . $controller->extendLastView() . '&tx_cal_controller[view]=create_event';
                 $local_cObj->data['link_section'] = 'default';
                 $local_cObj->data['link_parameter'] = $conf['view.']['event.']['createEventViewPid'] ?: $GLOBALS['TSFE']->id;
                 $tmp .= $local_cObj->cObjGetSingle(
@@ -473,7 +473,7 @@ abstract class NewTimeView
                     $conf['view.'][$view . '.']['event.']['addLink.']
                 );
                 if ($wrap) {
-                    $tmp = sprintf($wrap, $remember, $class, $tmp, $date->format('%Y %m %d %H %M %s'));
+                    $tmp = sprintf($wrap, $remember, $class, $tmp, $date->format('Y m d H M s'));
                 }
             }
         } elseif ($conf['view.']['enableAjax']) {
@@ -568,7 +568,7 @@ abstract class NewTimeView
                     true,
                     '',
                     '',
-                    $d_start->format('%H%M')
+                    $d_start->format('HM')
                 );
             } else {
                 $createLink = '';
@@ -667,16 +667,16 @@ abstract class NewTimeView
             $local_cObj = $this->getLocalCObject();
             $timeParams = '';
             if ($view === 'day' || $view === 'week') {
-                $timeParams = '&tx_cal_controller[gettime]=' . $date->format('%H%M');
+                $timeParams = '&tx_cal_controller[gettime]=' . $date->format('HM');
             } elseif ($conf['rights.']['create.']['event.']['fields.']['starttime.']['default'] === 'now') {
                 $now = new CalDate();
                 $than->setTZbyID('UTC');
-                $timeParams = '&tx_cal_controller[gettime]=' . $now->format('%H%M');
+                $timeParams = '&tx_cal_controller[gettime]=' . $now->format('HM');
             }
 
             $local_cObj->setCurrentVal($conf['view.'][$view . '.']['event.']['addIcon']);
             $local_cObj->data['link_no_cache'] = 1;
-            $local_cObj->data['link_additionalParams'] = $timeParams . '&tx_cal_controller[startdate]=' . $date->format('%Y%m%d') . '&tx_cal_controller[lastview]=' . $controller->extendLastView() . '&tx_cal_controller[view]=create_event';
+            $local_cObj->data['link_additionalParams'] = $timeParams . '&tx_cal_controller[startdate]=' . $date->format('Ymd') . '&tx_cal_controller[lastview]=' . $controller->extendLastView() . '&tx_cal_controller[view]=create_event';
             $local_cObj->data['link_section'] = 'default';
             $local_cObj->data['link_parameter'] = $conf['view.']['event.']['createEventViewPid'] ?: $GLOBALS['TSFE']->id;
 
