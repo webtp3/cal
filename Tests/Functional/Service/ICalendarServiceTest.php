@@ -113,9 +113,14 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
 
     }
 
-//    /**
-//
-//    /**
+    /**
+     * Test Updates an existing calendar events
+     *
+     * @test
+     */
+    public function camUpdateEventsTest()
+    {
+        /**
 //     * Updates an existing calendar
 //     *
 //     * @param int $uid
@@ -130,601 +135,398 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
 //     *            The create user id
 //     * @return string|bool False or the new md5 hash
 //     */
-//    public function updateEvents($uid, $pid, $urlString, $md5, $cruser_id)
-//    {
-//        $urls = GeneralUtility::trimExplode("\n", $urlString, 1);
-//        $mD5Array = [];
-//        $contentArray = [];
-//
-//        foreach ($urls as $key => $url) {
-//            /* If the calendar has a URL, get a checksum on the contents */
-//            if ($url != '') {
-//                $contents = GeneralUtility::getUrl($url);
-//
-//                $hookObjectsArr = Functions::getHookObjectsArray(
-//                    'tx_cal_icalendar_service',
-//                    'importIcsContent',
-//                    'service'
-//                );
-//
-//                // Hook: configuration
-//                foreach ($hookObjectsArr as $hookObj) {
-//                    if (method_exists($hookObj, 'importIcsContent')) {
-//                        $hookObj->importIcsContent($contents);
-//                    }
-//                }
-//
-//                $mD5Array[$key] = md5($contents);
-//                $contentArray[$key] = $contents;
-//            }
-//        }
-//
-//        $newMD5 = md5(implode('', $mD5Array));
-//
-//        /* If the calendar has changed */
-//        if ($newMD5 != $md5) {
-//            $notInUids = [];
-//
-//            foreach ($contentArray as $contents) {
-//                /* Parse the contents into ICS data structure */
-//                $iCalendar = $this->getiCalendarFromIcsFile($contents);
-//
-//                /* Create new events belonging to the specified calendar */
-//                $notInUids = array_merge(
-//                    $notInUids,
-//                    $this->insertCalEventsIntoDB($iCalendar->_components, $uid, $pid, $cruser_id)
-//                );
-//            }
-//
-//            $notInUids = array_unique($notInUids);
-//
-//            /* Delete old events, that have not been updated */
-//            $this->deleteTemporaryEvents($uid, $notInUids);
-//
-//            Functions::clearCache();
-//
-//            return $newMD5;
-//        }
-//        return false;
-//    }
-//
-//    /**
-//     * Schedules future updates using the scheduling engine.
-//     *
-//     * @param int $refreshInterval
-//     *            Frequency (in minutes) between calendar updates.
-//     * @param int $uid
-//     *            UID of the calendar to be updated.
-//     */
-//    public function scheduleUpdates($refreshInterval, $uid)
-//    {
-//        if (ExtensionManagementUtility::isLoaded('scheduler')) {
-//            $recurring = $refreshInterval * 60;
-//            /* If calendar has a refresh time, schedule recurring gabriel event for refresh */
-//            if ($recurring) {
-//                $calendarRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_calendar', 'uid=' . $uid);
-//                $taskId = $calendarRow['schedulerId'];
-//
-//                $scheduler = new Scheduler();
-//
-//                if ($taskId > 0) {
-//                    try {
-//                        $task = $scheduler->fetchTask($taskId);
-//                        $execution = new Execution();
-//                        $execution->setStart(time() + $recurring);
-//                        $execution->setIsNewSingleExecution(true);
-//                        $execution->setMultiple(true);
-//                        $task->setExecution($execution);
-//                        $scheduler->saveTask($task);
-//                    } catch (OutOfBoundsException $e) {
-//                        $this->createSchedulerTask($scheduler, $recurring, $uid);
-//                    }
-//                } else {
-//                    $this->createSchedulerTask($scheduler, $recurring, $uid);
-//                }
-//            }
-//        }
-//    }
-//
-//    /**
-//     * @param $scheduler
-//     * @param $offset
-//     * @param $calendarUid
-//     * @throws RuntimeException
-//     */
-//    public function createSchedulerTask(&$scheduler, $offset, $calendarUid)
-//    {
-//        /* Set up the scheduler event */
-//        $task = new CalendarScheduler();
-//        $task->setUID($calendarUid);
-//        $taskGroup = BackendUtilityReplacementUtility::getRawRecord('tx_scheduler_task_group', 'groupName="cal"');
-//        if ($taskGroup['uid']) {
-//            $task->setTaskGroup($taskGroup['uid']);
-//        } else {
-//            $crdate = time();
-//            $insertFields = [];
-//            $insertFields['pid'] = 0;
-//            $insertFields['tstamp'] = $crdate;
-//            $insertFields['crdate'] = $crdate;
-//            $insertFields['cruser_id'] = 0;
-//            $insertFields['groupName'] = 'cal';
-//            $insertFields['description'] = 'Calendar Base';
-//            $table = 'tx_scheduler_task_group';
-//            $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
-//            if (false === $result) {
-//                throw new RuntimeException(
-//                    'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
-//                    1431458142
-//                );
-//            }
-//            $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
-//            $task->setTaskGroup($uid);
-//        }
-//        $task->setDescription('Import of external calendar (calendar_id=' . $calendarUid . ')');
-//        /* Schedule the event */
-//        $execution = new Execution();
-//        $execution->setStart(time() + ($offset));
-//        $execution->setIsNewSingleExecution(true);
-//        $execution->setMultiple(true);
-//        $task->setExecution($execution);
-//        $scheduler->addTask($task);
-//        $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_cal_calendar', 'uid=' . $calendarUid, [
-//            'schedulerId' => $task->getTaskUid()
-//        ]);
-//    }
-//
-//    /**
-//     * @param int $calendarUid
-//     *            The calendar uid to get the task id from (database)
-//     */
-//    public function deleteSchedulerTask($calendarUid)
-//    {
-//        if (ExtensionManagementUtility::isLoaded('scheduler')) {
-//            $calendarRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_calendar', 'uid=' . $calendarUid);
-//            $taskId = $calendarRow['schedulerId'];
-//            if ($taskId > 0) {
-//                $scheduler = new Scheduler();
-//
-//                $task = $scheduler->fetchTask($taskId);
-//
-//                $task->setDisabled(true);
-//                $task->remove();
-//                $task->save();
-//            }
-//        }
-//    }
-//
-//    /**
-//     * @param int $uid
-//     *            The crid of the gabriel record
-//     */
-//    public function deleteScheduledUpdates($uid)
-//    {
-//    }
-//
-//    /**
-//     * Deletes temporary events on a given calendar.
-//     *
-//     * @param int $uid
-//     *            The uid of the calendar
-//     * @param array $eventUidsNotIn
-//     *            Event uids not to be deleted
-//     */
-//    public function deleteTemporaryEvents($uid, $eventUidsNotIn = [])
-//    {
-//        if (intval($uid) > 0) {
-//            $additionalWhere = '';
-//            if (!empty($eventUidsNotIn)) {
-//                $additionalWhere = ' AND uid NOT IN (' . implode(',', $eventUidsNotIn) . ')';
-//            }
-//            /* Delete the calendar events */
-//            $where = ' calendar_id=' . $uid . ' AND isTemp=1' . $additionalWhere;
-//            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_cal_event', $where);
-//            $uids = [];
-//            if ($result) {
-//                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-//                    $uids[] = $row['uid'];
-//                    $this->clearAllImagesAndAttachments($row['uid']);
-//                }
-//                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-//            }
-//            $this->deleteExceptions($uids);
-//            $this->deleteDeviations($uids);
-//            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event', $where);
-//
-//            /* Delete any scheduled events (tasks) in gabriel */
-//            $this->deleteScheduledUpdates($uid);
-//        }
-//    }
-//
-//    /**
-//     * Deletes all deviation relations to the given event uids
-//     *
-//     * @param array $eventUidArray
-//     *            The given event uids
-//     */
-//    private function deleteDeviations($eventUidArray = [])
-//    {
-//        if (!empty($eventUidArray)) {
-//            $where = 'tx_cal_event_deviation.parentid in (' . implode(',', $eventUidArray) . ')';
-//            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_deviation', $where);
-//        }
-//    }
-//
-//    /**
-//     * Deletes all exception relations to the given event uids
-//     *
-//     * @param array $eventUidArray
-//     *            The given event uids
-//     */
-//    private function deleteExceptions($eventUidArray = [])
-//    {
-//        if (!empty($eventUidArray)) {
-//            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-//                'tx_cal_exception_event.uid',
-//                'tx_cal_exception_event_mm inner join tx_cal_exception_event on tx_cal_exception_event_mm.uid_foreign = tx_cal_exception_event.uid',
-//                'tx_cal_exception_event_mm.uid_local in (' . implode(
-//                    ',',
-//                    $eventUidArray
-//                ) . ') and tx_cal_exception_event_mm.tablenames = "tx_cal_exception_event"'
-//            );
-//            $exceptionEventUids = [];
-//            if ($result) {
-//                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-//                    $exceptionEventUids[] = $row['uid'];
-//                }
-//                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-//            }
-//            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-//                'tx_cal_exception_event_group.uid',
-//                'tx_cal_exception_event_group_mm inner join tx_cal_exception_event_group on tx_cal_exception_event_group_mm.uid_foreign = tx_cal_exception_event_group.uid',
-//                'tx_cal_exception_event_group_mm.uid_local in (' . implode(
-//                    ',',
-//                    $eventUidArray
-//                ) . ') and tx_cal_exception_event_group_mm.tablenames = "tx_cal_exception_group"'
-//            );
-//            $exceptionGroupUids = [];
-//            if ($result) {
-//                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-//                    $exceptionGroupUids[] = $row['uid'];
-//                }
-//                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-//            }
-//            if (!empty($exceptionEventUids)) {
-//                $where = 'tx_cal_exception_event.uid in (' . implode(',', $exceptionEventUids) . ')';
-//                $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event', $where);
-//                $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-//                    ',',
-//                    $exceptionEventUids
-//                    ) . ') and tablenames="tx_cal_exception_event"';
-//                $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
-//            }
-//            if (!empty($exceptionGroupUids)) {
-//                $where = 'tx_cal_exception_group.uid in (' . implode(',', $exceptionGroupUids) . ')';
-//                $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_group', $where);
-//                $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-//                    ',',
-//                    $exceptionGroupUids
-//                    ) . ') and tablenames="tx_cal_exception_group"';
-//                $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Deletes temporary categories on a given calendar
-//     *
-//     * @param int $uid
-//     *            The uid of the calendar
-//     */
-//    public function deleteTemporaryCategories($uid)
-//    {
-//        /* Delete the calendar categories */
-//        $where = ' calendar_id=' . $uid;
-//        $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_category', $where);
-//    }
-//
-//    /**
-//     * @param int $uid
-//     *            The calendar uid
-//     */
-//    public function deleteScheduledUpdatesFromCalendar($uid)
-//    {
-//        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_cal_event', 'calendar_id=' . $uid);
-//        $resultUids = [];
-//        if ($result) {
-//            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-//                $resultUids[] = $row['uid'];
-//            }
-//            $GLOBALS['TYPO3_DB']->sql_free_result($result);
-//        }
-//    }
-//
-//    /**
-//     * Returns a parsed ICalendar object of some ics content
-//     *
-//     * @param string $text
-//     *            The ics content
-//     * @return ICalendar
-//     * @throws RuntimeException
-//     */
-//    public function getiCalendarFromIcsFile($text): ICalendar
-//    {
-//        require_once(ICALENDAR_PATH);
-//        $iCalendar = new ICalendar();
-//        if (!$iCalendar->parsevCalendar($text)) {
-//            throw new RuntimeException('Could not parse vCalendar data ' . $text, 1451245373);
-//        }
-//        return $iCalendar;
-//    }
-//
-//    /**
-//     * @param $component
-//     * @return CalDate|null
-//     */
-//    private function getDtstart($component)
-//    {
-//        return $this->getDateValue($component, 'DTSTART');
-//    }
-//
-//    /**
-//     * @param $component
-//     * @return CalDate|null
-//     */
-//    private function getDtend($component)
-//    {
-//        return $this->getDateValue($component, 'DTEND');
-//    }
-//
-//    /**
-//     * @param $component
-//     * @return CalDate|null
-//     */
-//    private function getTstamp($component)
-//    {
-//        return $this->getDateValue($component, 'TSTAMP');
-//    }
-//
-//    /**
-//     * @param $component
-//     * @param $attribute
-//     * @return CalDate|null
-//     */
-//    private function getDateValue($component, $attribute)
-//    {
-//        if ($component->getAttribute($attribute)) {
-//            $value = $component->getAttribute($attribute);
-//            if (is_array($value)) {
-//                $dateTime = new CalDate($value['year'] . $value['month'] . $value['mday'] . '000000');
-//            } else {
-//                $dateTime = new CalDate($value);
-//            }
-//            $params = $component->getAttributeParameters($attribute);
-//            $timezone = $params['TZID'];
-//            if ($timezone) {
-//                $dateTime->convertTZbyID($timezone);
-//            }
-//            return $dateTime;
-//        }
-//        return null;
-//    }
-//
-//    /**
-//     * @param $component
-//     * @param $insertFields
-//     * @param $pid
-//     * @param $calId
-//     * @return array
-//     */
-//    private function setCategories($component, $insertFields, $pid, $calId): array
-//    {
-//        $categories = [];
-//        $categoryString = $component->getAttribute('CATEGORY');
-//        if ($categoryString == '') {
-//            if (is_array($component->getAttribute('CATEGORIES'))) {
-//                foreach ($component->getAttribute('CATEGORIES') as $cat) {
-//                    $categories[] = $cat;
-//                }
-//            } else {
-//                $categoryString = $component->getAttribute('CATEGORIES');
-//                $categories = GeneralUtility::trimExplode(',', $categoryString, 1);
-//            }
-//        } else {
-//            $categories = GeneralUtility::trimExplode(',', $categoryString, 1);
-//        }
-//
-//        $categoryUids = [];
-//        foreach ($categories as $category) {
-//            $category = trim($category);
-//            $categorySelect = '*';
-//            $categoryTable = 'sys_category';
-//            $categoryWhere = 'calendar_id = ' . intval($calId) . ' AND title =' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
-//                $category,
-//                $categoryTable
-//                );
-//            $foundCategory = false;
-//            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($categorySelect, $categoryTable, $categoryWhere);
-//            if ($result) {
-//                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-//                    $foundCategory = true;
-//                    $categoryUids[] = $row['uid'];
-//                }
-//                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-//            }
-//
-//            if (!$foundCategory) {
-//                $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($categoryTable, [
-//                    'tstamp' => $insertFields['crdate'],
-//                    'crdate' => $insertFields['crdate'],
-//                    'pid' => $pid,
-//                    'title' => $category,
-//                    'calendar_id' => $calId
-//                ]);
-//                if (false === $result) {
-//                    throw new RuntimeException(
-//                        'Could not write ' . $categoryTable . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
-//                        1431458143
-//                    );
-//                }
-//                $categoryUids[] = $GLOBALS['TYPO3_DB']->sql_insert_id();
-//            }
-//        }
-//        return $categoryUids;
-//    }
-//
-//    /**
-//     * @param $component
-//     * @param $insertFields
-//     */
-//    private function setRecurrence($component, &$insertFields)
-//    {
-//        if ($component->getAttribute('RRULE')) {
-//            $rrule = $component->getAttribute('RRULE');
-//
-//            $this->insertRuleValues($rrule, $insertFields);
-//        }
-//
-//        if ($component->getAttribute('RDATE')) {
-//            $rdate = $component->getAttribute('RDATE');
-//            if (is_array($rdate)) {
-//                $insertFields['rdate'] = implode(',', $rdate);
-//            } else {
-//                $insertFields['rdate'] = $rdate;
-//            }
-//            if ($component->getAttributeParameters('RDATE')) {
-//                $parameterArray = $component->getAttributeParameters('RDATE');
-//                $keys = array_keys($parameterArray);
-//                $insertFields['rdate_type'] = strtolower($keys[0]);
-//            } else {
-//                $insertFields['rdate_type'] = 'date_time';
-//            }
-//        }
-//    }
-//
-//    /**
-//     * @param $component
-//     * @param $eventUid
-//     * @param $insertFields
-//     */
-//    private function setRecurrenceId($component, $eventUid, &$insertFields)
-//    {
-//        $recurrenceIdStart = new CalDate($component->getAttribute('RECURRENCE-ID'));
-//        $params = $component->getAttributeParameters('RECURRENCE-ID');
-//        $timezone = $params['TZID'];
-//        if ($timezone) {
-//            $recurrenceIdStart->convertTZbyID($timezone);
-//        }
-//
-//        $indexEntry = BackendUtilityReplacementUtility::getRawRecord(
-//            'tx_cal_index',
-//            'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('%Y%m%d%H%M%S') . '"'
-//        );
-//
-//        if ($indexEntry) {
-//            $table = 'tx_cal_event_deviation';
-//            $insertFields['parentid'] = $eventUid;
-//            $insertFields['orig_start_time'] = $recurrenceIdStart->getHour() * 3600 + $recurrenceIdStart->getMinute() * 60;
-//            $recurrenceIdStart->setHour(0);
-//            $recurrenceIdStart->setMinute(0);
-//            $recurrenceIdStart->setSecond(0);
-//            $insertFields['orig_start_date'] = $recurrenceIdStart->getTime();
-//            unset($insertFields['calendar_id']);
-//
-//            if ($indexEntry['event_deviation_uid'] > 0) {
-//                $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-//                    $table,
-//                    'uid=' . $indexEntry['event_deviation_uid'],
-//                    $insertFields
-//                );
-//                $eventDeviationUid = $indexEntry['event_deviation_uid'];
-//            } else {
-//                $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
-//                if (false === $result) {
-//                    throw new RuntimeException(
-//                        'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
-//                        1431458145
-//                    );
-//                }
-//                $eventDeviationUid = $GLOBALS['TYPO3_DB']->sql_insert_id();
-//            }
-//            $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_cal_index', 'uid=' . $indexEntry['uid'], [
-//                'event_deviation_uid' => $eventDeviationUid
-//            ]);
-//        }
-//    }
-//
-//    /**
-//     * @param $component
-//     * @param $eventUid
-//     * @param $pid
-//     * @param $cruserId
-//     */
-//    private function setExceptions($component, $eventUid, $pid, $cruserId)
-//    {
-//        /* Delete the old exception relations */
-//        $exceptionEventUidsToBeDeleted = [];
-//        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-//            'tx_cal_exception_event.uid',
-//            'tx_cal_exception_event,tx_cal_exception_event_mm',
-//            'tx_cal_exception_event.uid = tx_cal_exception_event_mm.uid_foreign AND tx_cal_exception_event_mm.uid_local=' . $eventUid
-//        );
-//        if ($result) {
-//            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-//                $exceptionEventUidsToBeDeleted[] = $row['uid'];
-//            }
-//            $GLOBALS['TYPO3_DB']->sql_free_result($result);
-//        }
-//        if (!empty($exceptionEventUidsToBeDeleted)) {
-//            $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-//                'tx_cal_exception_event',
-//                'uid in (' . implode(',', $exceptionEventUidsToBeDeleted) . ')'
-//            );
-//        }
-//
-//        $exceptionEventGroupUidsToBeDeleted = [];
-//        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-//            'tx_cal_exception_event_group.uid',
-//            'tx_cal_exception_event_group,tx_cal_exception_event_group_mm',
-//            'tx_cal_exception_event_group.uid = tx_cal_exception_event_group_mm.uid_foreign AND tx_cal_exception_event_group_mm.uid_local=' . $eventUid
-//        );
-//        if ($result) {
-//            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-//                $exceptionEventGroupUidsToBeDeleted[] = $row['uid'];
-//            }
-//            $GLOBALS['TYPO3_DB']->sql_free_result($result);
-//        }
-//        if (!empty($exceptionEventGroupUidsToBeDeleted)) {
-//            $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-//                'tx_cal_exception_event_group',
-//                'uid in (' . implode(',', $exceptionEventGroupUidsToBeDeleted) . ')'
-//            );
-//        }
-//
-//        $where = ' uid_local=' . $eventUid;
-//        $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
-//        $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_group_mm', $where);
-//
-//        // Exceptions:
-//        if ($component->getAttribute('EXDATE')) {
-//            if (is_array($component->getAttribute('EXDATE'))) {
-//                foreach ($component->getAttribute('EXDATE') as $exceptionDescription) {
-//                    $this->createException($pid, $cruserId, $eventUid, $exceptionDescription);
-//                }
-//            } else {
-//                $this->createException($pid, $cruserId, $eventUid, $component->getAttribute('EXDATE'));
-//            }
-//        }
-//        if ($component->getAttribute('EXRULE')) {
-//            if (is_array($component->getAttribute('EXRULE'))) {
-//                foreach ($component->getAttribute('EXRULE') as $exceptionDescription) {
-//                    $this->createExceptionRule($pid, $cruserId, $eventUid, $exceptionDescription);
-//                }
-//            } else {
-//                $this->createExceptionRule($pid, $cruserId, $eventUid, $component->getAttribute('EXRULE'));
-//            }
-//        }
-//    }
-//
+        $urlString = 'https://calendar.google.com/calendar/ical/9tv213eho9k41t3knn1fmpoobo%40group.calendar.google.com/public/basic.ics';
+        $md5 = '53d700544a7c4e38674d90329d140278';
+        $c = $this->calService->updateEvents(1, 0, $urlString, $md5, 1);
+        $this->assertEquals($c["uid"], 1);
+
+    }
+
+
+    /**
+     * Test ScheduleUpdates an existing calendar events
+     *
+     * @test
+     *
+     */
+    public function canScheduleUpdatesTest()
+    {
+
+        if (ExtensionManagementUtility::isLoaded('scheduler')) {
+            /**
+             * Schedules future updates using the scheduling engine.
+             *
+             * @param int $refreshInterval
+             *            Frequency (in minutes) between calendar updates.
+             * @param int $uid
+             *            UID of the calendar to be updated.
+             */
+            $refreshInterval = 120;
+            $uid = 1;
+            $this->calService->scheduleUpdates($refreshInterval, $uid);
+        }
+        else{
+            // ignore Test
+            $this->assertTrue(true);
+
+        }
+
+    }
+    /**
+     * Test CreateSchedulerTask an existing calendar events
+     *
+     * @test
+     *
+     */
+
+    public function canCreateSchedulerTaskTest()
+    {
+        /**
+         * @param $scheduler
+         * @param $offset
+         * @param $calendarUid
+         * @throws RuntimeException
+         */
+        if (ExtensionManagementUtility::isLoaded('scheduler')) {
+            $offset = 1;
+
+        $calendarUid = 1;
+        $this->calService->createSchedulerTask($scheduler, $offset, $calendarUid);
+        } else{
+            // ignore Test
+            $this->assertTrue(true);
+
+        }
+    }
+
+      /**
+     * Test DeleteSchedulerTask an existing calendar events
+     *
+     * @test
+     *
+     */
+    public function canDeleteSchedulerTaskTest()
+    {
+        if (ExtensionManagementUtility::isLoaded('scheduler')) {
+            $calendarUid = 1;
+            $this->calService->deleteSchedulerTask($calendarUid);
+        }
+        else{
+            // ignore Test
+            $this->assertTrue(true);
+
+        }
+
+    }
+    /**
+     * Test deleteScheduledUpdatesFromCalendar an existing calendar events
+     *
+     * @test
+     *
+     */
+    public function canDeleteScheduledUpdatesFromCalendarTest($uid)
+    {
+        /**
+         * @param int $uid
+         *            The calendar uid
+         */
+        if (ExtensionManagementUtility::isLoaded('scheduler')) {
+            $calendarUid = 1;
+            $this->calService->deleteScheduledUpdatesFromCalendar($calendarUid);
+        }
+        else{
+            // ignore Test
+            $this->assertTrue(true);
+
+        }
+    }
+    //#todo further functional Tests if work
+
+    //    /**
+    //     * Returns a parsed ICalendar object of some ics content
+    //     *
+    //     * @param string $text
+    //     *            The ics content
+    //     * @return ICalendar
+    //     * @throws RuntimeException
+    //     */
+    //    public function getiCalendarFromIcsFile($text): ICalendar
+    //    {
+    //        require_once(ICALENDAR_PATH);
+    //        $iCalendar = new ICalendar();
+    //        if (!$iCalendar->parsevCalendar($text)) {
+    //            throw new RuntimeException('Could not parse vCalendar data ' . $text, 1451245373);
+    //        }
+    //        return $iCalendar;
+    //    }
+    //
+    //    /**
+    //     * @param $component
+    //     * @return CalDate|null
+    //     */
+    //    private function getDtstart($component)
+    //    {
+    //        return $this->getDateValue($component, 'DTSTART');
+    //    }
+    //
+    //    /**
+    //     * @param $component
+    //     * @return CalDate|null
+    //     */
+    //    private function getDtend($component)
+    //    {
+    //        return $this->getDateValue($component, 'DTEND');
+    //    }
+    //
+    //    /**
+    //     * @param $component
+    //     * @return CalDate|null
+    //     */
+    //    private function getTstamp($component)
+    //    {
+    //        return $this->getDateValue($component, 'TSTAMP');
+    //    }
+    //
+    //    /**
+    //     * @param $component
+    //     * @param $attribute
+    //     * @return CalDate|null
+    //     */
+    //    private function getDateValue($component, $attribute)
+    //    {
+    //        if ($component->getAttribute($attribute)) {
+    //            $value = $component->getAttribute($attribute);
+    //            if (is_array($value)) {
+    //                $dateTime = new CalDate($value['year'] . $value['month'] . $value['mday'] . '000000');
+    //            } else {
+    //                $dateTime = new CalDate($value);
+    //            }
+    //            $params = $component->getAttributeParameters($attribute);
+    //            $timezone = $params['TZID'];
+    //            if ($timezone) {
+    //                $dateTime->convertTZbyID($timezone);
+    //            }
+    //            return $dateTime;
+    //        }
+    //        return null;
+    //    }
+    //
+    //    /**
+    //     * @param $component
+    //     * @param $insertFields
+    //     * @param $pid
+    //     * @param $calId
+    //     * @return array
+    //     */
+    //    private function setCategories($component, $insertFields, $pid, $calId): array
+    //    {
+    //        $categories = [];
+    //        $categoryString = $component->getAttribute('CATEGORY');
+    //        if ($categoryString == '') {
+    //            if (is_array($component->getAttribute('CATEGORIES'))) {
+    //                foreach ($component->getAttribute('CATEGORIES') as $cat) {
+    //                    $categories[] = $cat;
+    //                }
+    //            } else {
+    //                $categoryString = $component->getAttribute('CATEGORIES');
+    //                $categories = GeneralUtility::trimExplode(',', $categoryString, 1);
+    //            }
+    //        } else {
+    //            $categories = GeneralUtility::trimExplode(',', $categoryString, 1);
+    //        }
+    //
+    //        $categoryUids = [];
+    //        foreach ($categories as $category) {
+    //            $category = trim($category);
+    //            $categorySelect = '*';
+    //            $categoryTable = 'sys_category';
+    //            $categoryWhere = 'calendar_id = ' . intval($calId) . ' AND title =' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
+    //                $category,
+    //                $categoryTable
+    //                );
+    //            $foundCategory = false;
+    //            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($categorySelect, $categoryTable, $categoryWhere);
+    //            if ($result) {
+    //                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+    //                    $foundCategory = true;
+    //                    $categoryUids[] = $row['uid'];
+    //                }
+    //                $GLOBALS['TYPO3_DB']->sql_free_result($result);
+    //            }
+    //
+    //            if (!$foundCategory) {
+    //                $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($categoryTable, [
+    //                    'tstamp' => $insertFields['crdate'],
+    //                    'crdate' => $insertFields['crdate'],
+    //                    'pid' => $pid,
+    //                    'title' => $category,
+    //                    'calendar_id' => $calId
+    //                ]);
+    //                if (false === $result) {
+    //                    throw new RuntimeException(
+    //                        'Could not write ' . $categoryTable . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+    //                        1431458143
+    //                    );
+    //                }
+    //                $categoryUids[] = $GLOBALS['TYPO3_DB']->sql_insert_id();
+    //            }
+    //        }
+    //        return $categoryUids;
+    //    }
+    //
+    //    /**
+    //     * @param $component
+    //     * @param $insertFields
+    //     */
+    //    private function setRecurrence($component, &$insertFields)
+    //    {
+    //        if ($component->getAttribute('RRULE')) {
+    //            $rrule = $component->getAttribute('RRULE');
+    //
+    //            $this->insertRuleValues($rrule, $insertFields);
+    //        }
+    //
+    //        if ($component->getAttribute('RDATE')) {
+    //            $rdate = $component->getAttribute('RDATE');
+    //            if (is_array($rdate)) {
+    //                $insertFields['rdate'] = implode(',', $rdate);
+    //            } else {
+    //                $insertFields['rdate'] = $rdate;
+    //            }
+    //            if ($component->getAttributeParameters('RDATE')) {
+    //                $parameterArray = $component->getAttributeParameters('RDATE');
+    //                $keys = array_keys($parameterArray);
+    //                $insertFields['rdate_type'] = strtolower($keys[0]);
+    //            } else {
+    //                $insertFields['rdate_type'] = 'date_time';
+    //            }
+    //        }
+    //    }
+    //
+    //    /**
+    //     * @param $component
+    //     * @param $eventUid
+    //     * @param $insertFields
+    //     */
+    //    private function setRecurrenceId($component, $eventUid, &$insertFields)
+    //    {
+    //        $recurrenceIdStart = new CalDate($component->getAttribute('RECURRENCE-ID'));
+    //        $params = $component->getAttributeParameters('RECURRENCE-ID');
+    //        $timezone = $params['TZID'];
+    //        if ($timezone) {
+    //            $recurrenceIdStart->convertTZbyID($timezone);
+    //        }
+    //
+    //        $indexEntry = BackendUtilityReplacementUtility::getRawRecord(
+    //            'tx_cal_index',
+    //            'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('%Y%m%d%H%M%S') . '"'
+    //        );
+    //
+    //        if ($indexEntry) {
+    //            $table = 'tx_cal_event_deviation';
+    //            $insertFields['parentid'] = $eventUid;
+    //            $insertFields['orig_start_time'] = $recurrenceIdStart->getHour() * 3600 + $recurrenceIdStart->getMinute() * 60;
+    //            $recurrenceIdStart->setHour(0);
+    //            $recurrenceIdStart->setMinute(0);
+    //            $recurrenceIdStart->setSecond(0);
+    //            $insertFields['orig_start_date'] = $recurrenceIdStart->getTime();
+    //            unset($insertFields['calendar_id']);
+    //
+    //            if ($indexEntry['event_deviation_uid'] > 0) {
+    //                $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+    //                    $table,
+    //                    'uid=' . $indexEntry['event_deviation_uid'],
+    //                    $insertFields
+    //                );
+    //                $eventDeviationUid = $indexEntry['event_deviation_uid'];
+    //            } else {
+    //                $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
+    //                if (false === $result) {
+    //                    throw new RuntimeException(
+    //                        'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+    //                        1431458145
+    //                    );
+    //                }
+    //                $eventDeviationUid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+    //            }
+    //            $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_cal_index', 'uid=' . $indexEntry['uid'], [
+    //                'event_deviation_uid' => $eventDeviationUid
+    //            ]);
+    //        }
+    //    }
+    //
+    //    /**
+    //     * @param $component
+    //     * @param $eventUid
+    //     * @param $pid
+    //     * @param $cruserId
+    //     */
+    //    private function setExceptions($component, $eventUid, $pid, $cruserId)
+    //    {
+    //        /* Delete the old exception relations */
+    //        $exceptionEventUidsToBeDeleted = [];
+    //        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+    //            'tx_cal_exception_event.uid',
+    //            'tx_cal_exception_event,tx_cal_exception_event_mm',
+    //            'tx_cal_exception_event.uid = tx_cal_exception_event_mm.uid_foreign AND tx_cal_exception_event_mm.uid_local=' . $eventUid
+    //        );
+    //        if ($result) {
+    //            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+    //                $exceptionEventUidsToBeDeleted[] = $row['uid'];
+    //            }
+    //            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+    //        }
+    //        if (!empty($exceptionEventUidsToBeDeleted)) {
+    //            $GLOBALS['TYPO3_DB']->exec_DELETEquery(
+    //                'tx_cal_exception_event',
+    //                'uid in (' . implode(',', $exceptionEventUidsToBeDeleted) . ')'
+    //            );
+    //        }
+    //
+    //        $exceptionEventGroupUidsToBeDeleted = [];
+    //        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+    //            'tx_cal_exception_event_group.uid',
+    //            'tx_cal_exception_event_group,tx_cal_exception_event_group_mm',
+    //            'tx_cal_exception_event_group.uid = tx_cal_exception_event_group_mm.uid_foreign AND tx_cal_exception_event_group_mm.uid_local=' . $eventUid
+    //        );
+    //        if ($result) {
+    //            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+    //                $exceptionEventGroupUidsToBeDeleted[] = $row['uid'];
+    //            }
+    //            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+    //        }
+    //        if (!empty($exceptionEventGroupUidsToBeDeleted)) {
+    //            $GLOBALS['TYPO3_DB']->exec_DELETEquery(
+    //                'tx_cal_exception_event_group',
+    //                'uid in (' . implode(',', $exceptionEventGroupUidsToBeDeleted) . ')'
+    //            );
+    //        }
+    //
+    //        $where = ' uid_local=' . $eventUid;
+    //        $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
+    //        $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_group_mm', $where);
+    //
+    //        // Exceptions:
+    //        if ($component->getAttribute('EXDATE')) {
+    //            if (is_array($component->getAttribute('EXDATE'))) {
+    //                foreach ($component->getAttribute('EXDATE') as $exceptionDescription) {
+    //                    $this->createException($pid, $cruserId, $eventUid, $exceptionDescription);
+    //                }
+    //            } else {
+    //                $this->createException($pid, $cruserId, $eventUid, $component->getAttribute('EXDATE'));
+    //            }
+    //        }
+    //        if ($component->getAttribute('EXRULE')) {
+    //            if (is_array($component->getAttribute('EXRULE'))) {
+    //                foreach ($component->getAttribute('EXRULE') as $exceptionDescription) {
+    //                    $this->createExceptionRule($pid, $cruserId, $eventUid, $exceptionDescription);
+    //                }
+    //            } else {
+    //                $this->createExceptionRule($pid, $cruserId, $eventUid, $component->getAttribute('EXRULE'));
+    //            }
+    //        }
+    //    }
+
 //    /**
 //     * @param $eventUid
 //     * @param $pid
@@ -930,156 +732,42 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
 //        $this->controller->piVars[$type] = $tempType;
 //    }
 //
-//    /**
-//     * @param array $iCalendarComponentArray
-//     *            component array
-//     * @param int $calId
-//     *            The calendar uid to add the events/todos to
-//     * @param string $pid
-//     *            The save page id
-//     * @param string $cruserId
-//     *            The create user id
-//     * @param number $isTemp
-//     *            are the records only temporary (1 == true, 0 == false)
-//     * @param string $deleteNotUsedCategories
-//     *            Should not assigned categories be deleted
-//     * @return array The inserted or updated event uids
-//     * @throws RuntimeException
-//     */
-//    public function insertCalEventsIntoDB(
-//        $iCalendarComponentArray = [],
-//        $calId,
-//        $pid = '',
-//        $cruserId = '',
-//        $isTemp = 1,
-//        $deleteNotUsedCategories = true
-//    ): array {
-//        $insertedOrUpdatedEventUids = [];
-//        $insertedOrUpdatedCategoryUids = [];
-//        if (empty($iCalendarComponentArray)) {
-//            return $insertedOrUpdatedEventUids;
-//        }
-//
-//        foreach ($iCalendarComponentArray as $component) {
-//            $insertFields = [];
-//            $insertFields['isTemp'] = $isTemp;
-//            $insertFields['tstamp'] = time();
-//            $insertFields['crdate'] = time();
-//            $insertFields['pid'] = $pid;
-//            if ($component->getType() == 'vEvent' || $component->getType() == 'vTodo') {
-//                $insertFields['cruser_id'] = $cruserId;
-//                $insertFields['calendar_id'] = $calId;
-//
-//                $dtstart = $this->getDtstart($component);
-//                if ($dtstart != null) {
-//                    $insertFields['start_date'] = $dtstart->format('%Y%m%d');
-//                    $insertFields['start_time'] = $dtstart->hour * 3600 + $dtstart->minute * 60;
-//                } elseif ($component->getType() == 'vEvent') {
-//                    // a Todo does not need a start, but an event
-//                    continue;
-//                }
-//
-//                $insertFields['icsUid'] = $component->getAttribute('UID');
-//
-//                $eventRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_event', 'icsUid="' . $insertFields['icsUid'] . '"');
-//
-//                $tstamp = $this->getTstamp($component);
-//
-//                // Update only events that have changed!
-//                if ($tstamp != null && $tstamp->getTime() == $eventRow['tstamp']) {
-//                    $insertedOrUpdatedEventUids[] = $eventRow['uid'];
-//                    continue;
-//                }
-//
-//                if (isset($eventRow['tstamp']) && $tstamp != null) {
-//                    $insertFields['tstamp'] = $tstamp->getTime();
-//                }
-//
-//                $dtend = $this->getDtend($component);
-//                if ($dtend != null) {
-//                    $insertFields['end_date'] = $dtend->format('%Y%m%d');
-//                    $insertFields['end_time'] = $dtend->hour * 3600 + $dtend->minute * 60;
-//                }
-//
-//                if ($component->getAttribute('DURATION')) {
-//                    $enddate = $insertFields['start_time'] + $component->getAttribute('DURATION');
-//                    $dateTime = new CalDate($insertFields['start_date']);
-//                    $dateTime->addSeconds($enddate);
-//                    $params = $component->getAttributeParameters('DURATION');
-//                    $timezone = $params['TZID'];
-//                    if ($timezone) {
-//                        $dateTime->convertTZbyID($timezone);
-//                    }
-//                    $insertFields['end_date'] = $dateTime->format('%Y%m%d');
-//                    $insertFields['end_time'] = $dateTime->hour * 3600 + $dateTime->minute * 60;
-//                }
-//
-//                // Fix for allday events
-//                if ($insertFields['start_time'] == 0 && $insertFields['end_time'] == 0 && $insertFields['start_date'] != 0) {
-//                    $date = new CalDate($insertFields['end_date'] . '000000');
-//                    $date->setTZbyID('UTC');
-//                    $date->subtractSeconds(86400);
-//                    $insertFields['end_date'] = $date->format('%Y%m%d');
-//                }
-//
-//                $insertFields['title'] = $component->getAttribute('SUMMARY');
-//
-//                if ($component->getAttribute('URL')) {
-//                    $insertFields['ext_url'] = $component->getAttribute('URL');
-//                }
-//
-//                if ($component->getType() == 'vEvent' && $component->organizerName()) {
-//                    $insertFields['organizer'] = str_replace('"', '', $component->organizerName());
-//                }
-//
-//                $insertFields['location'] = $component->getAttribute('LOCATION');
-//                if ($insertFields['location'] == null) {
-//                    $insertFields['location'] = '';
-//                }
-//
-//                $insertFields['description'] = $component->getAttribute('DESCRIPTION');
-//
-//                $categoryUids = $this->setCategories($component, $insertFields, $pid, $calId);
-//
-//                $this->setRecurrence($component, $insertFields);
-//
-//                $eventUid = $this->saveOrUpdate($eventRow, $insertFields);
-//
-//                if ($component->getAttribute('RECURRENCE-ID')) {
-//                    $this->setRecurrenceId($component, $eventUid, $insertFields);
-//                } else {
-//                    $this->setExceptions($component, $eventUid, $pid, $cruserId);
-//                }
-//
-//                $this->generateIndexEntries($eventUid, $pid);
-//
-//                $this->sendReminders($eventUid, $pid, $insertFields);
-//
-//                $this->connectCategories($categoryUids, $eventUid);
-//
-//                $this->setAttachments($component, $insertFields, $pid, $eventUid);
-//
-//                $insertedOrUpdatedEventUids[] = $eventUid;
-//                $insertedOrUpdatedCategoryUids = array_merge($insertedOrUpdatedCategoryUids, $categoryUids);
-//
-//                // Hook: insertCalEventsIntoDB
-//                $hookObjectsArr = Functions::getHookObjectsArray(
-//                    'tx_cal_icalendar_service',
-//                    'iCalendarServiceClass',
-//                    'service'
-//                );
-//
-//                foreach ($hookObjectsArr as $hookObj) {
-//                    if (method_exists($hookObj, 'insertCalEventsIntoDB')) {
-//                        $hookObj->insertCalEventsIntoDB($this, $eventUid, $component);
-//                    }
-//                }
-//            }
-//        }
-//
-//        $this->cleanupCategories($deleteNotUsedCategories, $calId, $insertedOrUpdatedCategoryUids);
-//        return $insertedOrUpdatedEventUids;
-//    }
+    /**
+     * Test insertCalEventsIntoDB an existing calendar events
+     *
+     * @test
+     *
+     */
+    public function canInsertCalEventsIntoDBTest() {
+        /**
+         * @param array $iCalendarComponentArray
+         *            component array
+         * @param int $calId
+         *            The calendar uid to add the events/todos to
+         * @param string $pid
+         *            The save page id
+         * @param string $cruserId
+         *            The create user id
+         * @param number $isTemp
+         *            are the records only temporary (1 == true, 0 == false)
+         * @param string $deleteNotUsedCategories
+         *            Should not assigned categories be deleted
+         * @return array The inserted or updated event uids
+         * @throws RuntimeException
+         */
+        $calId = 1;
+        $this->calService->update(1);
+        $c = $this->calService->insertCalEventsIntoDB(
+            $iCalendarComponentArray = [],
+            $calId,
+            $pid = '1',
+            $cruserId = '1',
+            $isTemp = 1,
+            $deleteNotUsedCategories = true
+        );
+        $this->assertEquals($calId, $c);
+
+    }
 //
 //    /**
 //     * @param $rule

@@ -15,50 +15,49 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Functional\ViewHelpers;
  * LICENSE.txt file that was distributed with this source code.
  */
 use DateTime;
-use TYPO3\CMS\Cal\Domain\Model\News;
+use TYPO3\CMS\Cal\Model\EventModel;
 use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
-use Nimut\TestingFramework\TestCase\FunctionalTestCase;
+use Nimut\TestingFramework\TestCase\ViewHelperBaseTestcase;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Class SimplePrevNextViewHelperTest
+ * Class TempStoreViewHelperTestTest
  *
  */
-class TempStoreViewHelperTest extends FunctionalTestCase
+class TempStoreViewHelperTest extends ViewHelperBaseTestcase
 {
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AccessibleMockObjectInterface|\TYPO3\CMS\Cal\ViewHelpers\SimplePrevNextViewHelper */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AccessibleMockObjectInterface|\TYPO3\CMS\Cal\ViewHelpers\TempStoreViewHelperTest */
     protected $mockedViewHelper;
 
     /** @var News */
-    protected $news;
+    protected $calevent;
 
-    protected $testExtensionsToLoad = ['typo3conf/ext/news'];
+    protected $testExtensionsToLoad = ['typo3conf/ext/cal'];
     protected $coreExtensionsToLoad = ['extbase', 'fluid'];
 
     public function setUp()
     {
         parent::setUp();
-        $this->mockedViewHelper = $this->getAccessibleMock('TYPO3\\CMS\\Cal\\ViewHelpers\\SimplePrevNextViewHelper', ['dummy'], [], '', true, true, false);
+        $this->mockedViewHelper = $this->getAccessibleMock('TYPO3\\CMS\\Cal\\ViewHelpers\\TempStoreViewHelperTest', ['dummy'], [], '', true, true, false);
 
-        $this->news = new News();
-        $this->news->setPid(9);
+        $this->calevent = new EventModel();
+        $this->calevent->setPid(9);
 
-        $this->importDataSet(__DIR__ . '/../Fixtures/tx_news_domain_model_news.xml');
+        $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_events.xml');
     }
 
     /**
      * @test
      */
-    public function allNeighboursCanBeFound()
+    public function canRender()
     {
         $this->setDate(1396035186);
-        $actual = $this->mockedViewHelper->_call('getNeighbours', $this->news, '', 'datetime');
+        $actual = $this->mockedViewHelper->_call('render', 'tx_cal_events','', $this->calevent);
 
         $exp = [
-            'prev' => $this->getRow(102),
-            'next' => $this->getRow(104)
+            'prev' => $this->getRow(1)
         ];
         $this->assertEquals($exp, $actual);
     }
@@ -70,7 +69,7 @@ class TempStoreViewHelperTest extends FunctionalTestCase
     {
         $this->setDate(1395516730);
 
-        $actual = $this->mockedViewHelper->_call('getNeighbours', $this->news, '', 'datetime');
+        $actual = $this->mockedViewHelper->_call('getNeighbours', $this->calevent, '', 'datetime');
 
         $exp = [
             'next' => $this->getRow(102)
@@ -84,7 +83,7 @@ class TempStoreViewHelperTest extends FunctionalTestCase
     public function previousNeighbourCanBeFound()
     {
         $this->setDate(1396640035);
-        $actual = $this->mockedViewHelper->_call('getNeighbours', $this->news, '', 'datetime');
+        $actual = $this->mockedViewHelper->_call('getNeighbours', $this->calevent, '', 'datetime');
         $exp = [
             'prev' => $this->getRow(105)
         ];
@@ -98,7 +97,7 @@ class TempStoreViewHelperTest extends FunctionalTestCase
     {
         $date = new DateTime();
         $date->setTimestamp($timestamp);
-        $this->news->_setProperty('datetime', $date);
+        $this->calevent->_setProperty('datetime', $date);
     }
 
     protected function getRow($id)
