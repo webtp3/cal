@@ -36,17 +36,24 @@ use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\Execution;
 use TYPO3\CMS\Scheduler\Scheduler;
+use TYPO3\CMS\Cal\Controller\ModelController;
 
-define(
-    'ICALENDAR_PATH',
-    ExtensionManagementUtility::extPath('cal') . 'Classes/Model/ICalendar.php'
-);
+//
+//define(
+//    'ICALENDAR_PATH',
+//    ExtensionManagementUtility::extPath('cal') . 'Classes/Model/ICalendar.php'
+//);
 
 /**
  * Class ICalendarService
  */
 class ICalendarService extends BaseService
 {
+    /** @var ICalendar  */
+    public $ICalendarModel;
+    /** @var ModelController  */
+    public $modelController;
+
     /**
      * Looks for an external calendar with a given uid on a certain pid-list
      *
@@ -63,23 +70,82 @@ class ICalendarService extends BaseService
         } else {
             $enableFields = $this->cObj->enableFields('tx_cal_calendar');
         }
+        $connection = $this->connectionPool->getConnectionForTable("tx_cal_calendar");
+
+        $queryBuilder = $connection->createQueryBuilder();
+
+        //#todo split enable fields
         if ($pidList == '') {
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                '*',
-                'tx_cal_calendar',
-                ' type IN (1,2) AND uid=' . $uid . ' ' . $enableFields
-            );
+
+            $result =  $queryBuilder->select('*')
+                ->from('tx_cal_calendar')
+                ->where(
+                    $queryBuilder->expr()->eq(
+                        'deleted',
+                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'hidden',
+                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+
+                    ),
+                    $queryBuilder->expr()->in(
+                        'type',[1,2]
+                    )
+                )
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC);
+
+//            $result = $connection->exec_SELECTquery(
+//                '*',
+//                'tx_cal_calendar',
+//                '  AND uid=' . $uid . ' ' . $enableFields
+//            );
         } else {
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                '*',
-                'tx_cal_calendar',
-                ' type IN (1,2) AND pid IN (' . $pidList . ') AND uid=' . $uid . ' ' . $enableFields
-            );
+
+            $where = [
+                'tx_cal_calendar.type' => [1,2],
+                'tx_cal_calendar.deleted'   => 0,
+                'tx_cal_calendar.pid'   => [$pidList],
+                'tx_cal_calendar.uid' => $uid,
+
+            ];
+            $result =  $queryBuilder->select('*')
+                ->from('tx_cal_calendar')
+                ->where(
+                    $queryBuilder->expr()->eq(
+                        'deleted',
+                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'hidden',
+                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+
+                    ),
+                    $queryBuilder->expr()->in(
+                        'type',[1,2]
+                    ),
+                    $queryBuilder->expr()->in(
+                        'pid',[$pidList]
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'uid',$uid
+                    )
+                )
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC);
+//            $result = $connection->exec_SELECTquery(
+//                '*',
+//                'tx_cal_calendar',
+//                ' type IN (1,2) AND pid IN (' . $pidList . ') AND uid=' . $uid . ' ' . $enableFields
+//            );
         }
         if ($result) {
-            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
-            return $row;
+//            $row = $connection->sql_fetch_assoc($result);
+//            $connection->sql_free_result($result);
+            return $result;
         }
         return [];
     }
@@ -100,28 +166,74 @@ class ICalendarService extends BaseService
             $enableFields = $this->cObj->enableFields('tx_cal_calendar');
         }
         $return = [];
+        $connection = $this->connectionPool->getConnectionForTable('tx_cal_calendar');
+        $queryBuilder = $connection->createQueryBuilder();
+
+
         if ($pidList == '') {
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                '*',
-                'tx_cal_calendar',
-                ' type IN (1,2) ' . $enableFields,
-                '',
-                $orderBy
-            );
+            $result =  $queryBuilder->select('*')
+                ->from('tx_cal_calendar')
+                ->where(
+                    $queryBuilder->expr()->eq(
+                        'deleted',
+                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'hidden',
+                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+
+                    ),
+                    $queryBuilder->expr()->in(
+                        'type',[1,2]
+                    )
+                )
+                ->orderBy($orderBy)
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC);
+
+//            $result = $connection->exec_SELECTquery(
+//                '*',
+//                'tx_cal_calendar',
+//                ' type IN (1,2) ' . $enableFields,
+//                '',
+//                $orderBy
+//            );
         } else {
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                '*',
-                'tx_cal_calendar',
-                ' type IN (1,2) AND pid IN (' . $pidList . ') ' . $enableFields,
-                '',
-                $orderBy
-            );
+            $result =  $queryBuilder->select('*')
+                ->from('tx_cal_calendar')
+                ->where(
+                    $queryBuilder->expr()->eq(
+                        'deleted',
+                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'hidden',
+                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+
+                    ),
+                    $queryBuilder->expr()->in(
+                        'type',[1,2]
+                    )
+                    ,
+                    $queryBuilder->expr()->in(
+                        'pid',[$pidList]
+                    )
+                )
+                ->orderBy($orderBy)
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC);
+//            $result = $connection->exec_SELECTquery(
+//                '*',
+//                'tx_cal_calendar',
+//                ' type IN (1,2) AND pid IN (' . $pidList . ') ' . $enableFields,
+//                '',
+//                $orderBy
+//            );
         }
         if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $return[] = $row;
-            }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+            return $result;
         }
 
         return $return;

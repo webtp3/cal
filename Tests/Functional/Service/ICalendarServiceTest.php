@@ -6,7 +6,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\CMS\Cal\Tests\Service;
+namespace TYPO3\CMS\Cal\Tests\Functional\Service;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -72,7 +72,7 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
     */
 
        $c =  $this->calService->find(1);
-        $this->assertEquals($c["uid"], 1);
+        $this->assertEquals(1, $c["uid"]);
     }
     /**
      * Test find external calendar uid or pid-list

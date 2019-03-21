@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace TYPO3\CMS\Cal\Tests\Unit\Services;
 
 use TYPO3\CMS\Cal\Utility\Functions;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 use CAG\CagTests\Core\Functional\FunctionalTestCase;
 
 /**

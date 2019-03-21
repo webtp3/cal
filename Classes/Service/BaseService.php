@@ -31,12 +31,17 @@ use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-
+use PDO;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 /**
  * Class BaseService
  */
 abstract class BaseService extends AbstractService
 {
+    /** @var ConnectionPool $connectionPool */
+    public $connectionPool;
+
+
     public $cObj; // The backReference to the mother cObj object set at call time
     /**
      * The rights service object
@@ -121,6 +126,8 @@ abstract class BaseService extends AbstractService
         $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->extConf['categoryService'] = 'sys_category';
+        $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+
     }
 
     /**

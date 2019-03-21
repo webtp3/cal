@@ -8,13 +8,12 @@
 
 namespace TYPO3\CMS\Cal\Tests\Unit\Functional\Repository;
 
-use CAG\CagTests\Core\Functional\FunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Functional test for the DataHandler
  */
-class CategoryRepositoryTest extends FunctionalTestCase
+class CategoryRepositoryTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
 {
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
@@ -37,7 +36,7 @@ class CategoryRepositoryTest extends FunctionalTestCase
     /**
      * Test if by import source is done
      * #todo from cron ICaldendar
-     *
+     * #todo repository categories?
      * @test
      */
     public function findRecordByImportSource()
