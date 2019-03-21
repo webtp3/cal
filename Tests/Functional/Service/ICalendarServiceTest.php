@@ -61,7 +61,7 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
      * @test
      *
      */
-    public function canFindByUidTest(): array
+    public function canFindByUidTest()
     {
        /*
      * @param int $uid
@@ -79,7 +79,7 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
      *
      * @test
      */
-    public function canFindByPidTest(): array
+    public function canFindByPidTest()
     {
         /*
       * @param int $uid
