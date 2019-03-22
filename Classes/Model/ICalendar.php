@@ -120,7 +120,7 @@ class ICalendar
 
         $class =    '\\TYPO3\\CMS\\Cal\\Model\\ICalendar\\'.$type;
 
-        if (class_exists($class)) {
+        if (class_exists($class)){
             $component = new $class();
             if ($container !== false) {
                 $component->_container = &$container;
@@ -636,6 +636,7 @@ class ICalendar
                 if ($type != 'VTIMEZONE') {
                     continue;
                 }
+
                 $component = &self::newComponent($type, $this);
                 if ($component === false) {
                     // return PEAR::raiseError("Unable to create object for type $type");
@@ -1337,7 +1338,7 @@ class ICalendar
     /**
      * Parse a Time field.
      */
-    public function _parseTime($text): bool
+    public function _parseTime($text): array
     {
         $timeParts = [];
         if (preg_match('/([0-9]{2})([0-9]{2})([0-9]{2})(Z)?/', $text, $timeParts)) {

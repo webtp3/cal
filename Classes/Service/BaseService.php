@@ -23,6 +23,7 @@ namespace TYPO3\CMS\Cal\Service;
 use RuntimeException;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Controller\ModelController;
+use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -116,6 +117,8 @@ abstract class BaseService extends AbstractService
 
     public $fileFunc;
     public $extConf;
+    /** @var CalDate  */
+    public $calDate;
 
     public function __construct()
     {
@@ -127,6 +130,7 @@ abstract class BaseService extends AbstractService
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->extConf['categoryService'] = 'sys_category';
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $this->calDate = GeneralUtility::makeInstance(CalDate::class);
 
     }
 
@@ -255,9 +259,9 @@ abstract class BaseService extends AbstractService
         );
         foreach ($fields as $field) {
             if (($isSave && $this->rightsObj->isAllowedTo(
-                'create',
-                $object,
-                $field
+                        'create',
+                        $object,
+                        $field
                     )) || (!$isSave && $this->rightsObj->isAllowedTo('edit', $object, $field))) {
                 if ($this->conf['view.'][$this->conf['view'] . '.']['additional_fields.'][$field . '_stdWrap.']) {
                     $insertFields[$field] = $this->cObj->stdWrap(
@@ -335,8 +339,8 @@ abstract class BaseService extends AbstractService
         $removeFiles = $this->controller->piVars['remove_' . $type] ?: [];
         if (!empty($removeFiles)) {
             $where = 'uid_foreign = ' . $uid . ' AND  tablenames=\'' . $objectType . '\' AND fieldname=\'' . $type . '\' AND uid in (' . implode(
-                ',',
-                array_values($removeFiles)
+                    ',',
+                    array_values($removeFiles)
                 ) . ')';
             $result = $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_file_reference', $where);
             if (false === $result) {
@@ -365,8 +369,8 @@ abstract class BaseService extends AbstractService
             $configuration = $tmpStorage->getConfiguration();
             $isLocalDriver = $storageRecord['driver'] === 'Local';
             $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
-                $configuration['basePath'],
-                $fileadminDirectory
+                    $configuration['basePath'],
+                    $fileadminDirectory
                 );
             if ($isLocalDriver && $isOnFileadmin) {
                 $storage = $tmpStorage;

@@ -10,7 +10,6 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Model;
  */
 use CAG\CagTests\Core\Unit\UnitTestCase;
 use TYPO3\CMS\Cal\Model\CalDate;
-use TYPO3\CMS\Cal\Model\EventModel;
 
 /**
  * Tests for domains model Cal
@@ -50,17 +49,17 @@ class CalDateModelTest extends UnitTestCase
         $this->assertTrue(true);
     }
 
-//    /**
-//     * Test if title can be set
-//     *
-//     * @test
-//     */
-//    public function titleCanBeSet()
-//    {
-//        $title = 'Cal title';
-//        $this->calDateInstance->setTitle($title);
-//        $this->assertEquals($title, $this->calDateInstance->getTitle());
-//    }
+    /**
+     * Test if title can be set
+     *
+     * @test
+     */
+    public function titleCanBeSet()
+    {
+        $title = 'Cal title';
+        $this->calDateInstance->setTitle($title);
+        $this->assertEquals($title, $this->calDateInstance->getTitle());
+    }
 
 
 //

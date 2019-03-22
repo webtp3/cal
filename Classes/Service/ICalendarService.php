@@ -36,11 +36,9 @@ use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\Execution;
 use TYPO3\CMS\Scheduler\Scheduler;
-use TYPO3\CMS\Cal\Controller\ModelController;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
-
-
+use TYPO3\CMS\Cal\Model\Pear\Date;
 //
 //define(
 //    'ICALENDAR_PATH',
@@ -54,8 +52,9 @@ class ICalendarService extends BaseService
 {
     /** @var ICalendar  */
     public $ICalendarModel;
-    /** @var ModelController  */
-    public $modelController;
+
+    /** @var Date  */
+    public $date;
 
     /**
      * Looks for an external calendar with a given uid on a certain pid-list

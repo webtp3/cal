@@ -22,6 +22,7 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Service;
  */
 
 use TYPO3\CMS\Cal\Service\ICalendarService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class ICalendarServiceTest
@@ -137,10 +138,26 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
 //     */
         $urlString = 'https://calendar.google.com/calendar/ical/9tv213eho9k41t3knn1fmpoobo%40group.calendar.google.com/public/basic.ics';
         $md5 = '53d700544a7c4e38674d90329d140278';
-        $c = $this->calService->updateEvents(1, 0, $urlString, $md5, 1);
-        $this->assertEquals($c["uid"], 1);
+        $cmd5 = $this->calService->updateEvents(1, 0, $urlString, $md5, 1);
+//        $urls = GeneralUtility::trimExplode("\n", $urlString, 1);
+//        $mD5Array = [];
+//        $contentArray = [];
+//
+//        foreach ($urls as $key => $url) {
+//            /* If the calendar has a URL, get a checksum on the contents */
+//            if ($url != '') {
+//                $contents = GeneralUtility::getUrl($url);
+//
+//                $mD5Array[$key] = md5($contents);
+//            }
+//        }
+//
+//        $newMD5 = md5(implode('', $mD5Array));
+        $this->assertEquals(1,preg_match('/^[a-f0-9]{32}$/', $cmd5));
 
     }
+
+
 
 
     /**
