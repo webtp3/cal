@@ -37,6 +37,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\Execution;
 use TYPO3\CMS\Scheduler\Scheduler;
 use TYPO3\CMS\Cal\Controller\ModelController;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
+
 
 //
 //define(
@@ -65,33 +68,46 @@ class ICalendarService extends BaseService
      */
     public function find($uid, $pidList = ''): array
     {
-        if (TYPO3_MODE == 'BE') {
-            $enableFields = BackendUtility::BEenableFields('tx_cal_calendar') . ' AND tx_cal_calendar.deleted = 0';
-        } else {
-            $enableFields = $this->cObj->enableFields('tx_cal_calendar');
-        }
         $connection = $this->connectionPool->getConnectionForTable("tx_cal_calendar");
 
         $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
 
-        //#todo split enable fields
+
         if ($pidList == '') {
 
             $result =  $queryBuilder->select('*')
                 ->from('tx_cal_calendar')
                 ->where(
-                    $queryBuilder->expr()->eq(
-                        'deleted',
-                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
 
-                    ),
-                    $queryBuilder->expr()->eq(
-                        'hidden',
-                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
-
-                    ),
                     $queryBuilder->expr()->in(
                         'type',[1,2]
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'uid',$uid
+                    )
+                )
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC);
+
+        } elseif ($uid < 1) {
+
+            $result =  $queryBuilder->select('*')
+                ->from('tx_cal_calendar')
+                ->where(
+
+                    $queryBuilder->expr()->in(
+                        'type',[1,2]
+                    ),
+                    $queryBuilder->expr()->in(
+                        'pid',$pidList
                     )
                 )
                 ->execute()
@@ -104,13 +120,6 @@ class ICalendarService extends BaseService
 //            );
         } else {
 
-            $where = [
-                'tx_cal_calendar.type' => [1,2],
-                'tx_cal_calendar.deleted'   => 0,
-                'tx_cal_calendar.pid'   => [$pidList],
-                'tx_cal_calendar.uid' => $uid,
-
-            ];
             $result =  $queryBuilder->select('*')
                 ->from('tx_cal_calendar')
                 ->where(
@@ -128,7 +137,7 @@ class ICalendarService extends BaseService
                         'type',[1,2]
                     ),
                     $queryBuilder->expr()->in(
-                        'pid',[$pidList]
+                        'pid',$pidList
                     ),
                     $queryBuilder->expr()->eq(
                         'uid',$uid
@@ -157,33 +166,27 @@ class ICalendarService extends BaseService
      *            to search in
      * @return array array of array (array of $rows)
      */
-    public function findAll($pidList): array
+    public function findAll($pidList = ''): array
     {
         $orderBy = Functions::getOrderBy('tx_cal_calendar');
-        if (TYPO3_MODE == 'BE') {
-            $enableFields = BackendUtility::BEenableFields('tx_cal_calendar') . ' AND tx_cal_calendar.deleted = 0';
-        } else {
-            $enableFields = $this->cObj->enableFields('tx_cal_calendar');
-        }
-        $return = [];
-        $connection = $this->connectionPool->getConnectionForTable('tx_cal_calendar');
-        $queryBuilder = $connection->createQueryBuilder();
+        $connection = $this->connectionPool->getConnectionForTable("tx_cal_calendar");
 
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+
+        $return = [];
 
         if ($pidList == '') {
             $result =  $queryBuilder->select('*')
                 ->from('tx_cal_calendar')
                 ->where(
-                    $queryBuilder->expr()->eq(
-                        'deleted',
-                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
-
-                    ),
-                    $queryBuilder->expr()->eq(
-                        'hidden',
-                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
-
-                    ),
                     $queryBuilder->expr()->in(
                         'type',[1,2]
                     )
@@ -203,22 +206,13 @@ class ICalendarService extends BaseService
             $result =  $queryBuilder->select('*')
                 ->from('tx_cal_calendar')
                 ->where(
-                    $queryBuilder->expr()->eq(
-                        'deleted',
-                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
 
-                    ),
-                    $queryBuilder->expr()->eq(
-                        'hidden',
-                        $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
-
-                    ),
                     $queryBuilder->expr()->in(
                         'type',[1,2]
                     )
                     ,
                     $queryBuilder->expr()->in(
-                        'pid',[$pidList]
+                        'pid',$pidList
                     )
                 )
                 ->orderBy($orderBy)
@@ -253,6 +247,17 @@ class ICalendarService extends BaseService
         } else {
             $url = $calendar['ext_url'];
         }
+        $connection = $this->connectionPool->getConnectionForTable("tx_cal_calendar");
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
 
         $newMD5 = $this->updateEvents($uid, $calendar['pid'], $url, $calendar['md5'], $calendar['cruser_id']);
 
@@ -263,10 +268,10 @@ class ICalendarService extends BaseService
                 'tstamp' => time(),
                 'md5' => $newMD5
             ];
-            $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_cal_calendar', 'uid=' . $uid, $insertFields);
+            $result = $connection->update('tx_cal_calendar',  $insertFields, ['uid' => $uid]);
             if (false === $result) {
                 throw new RuntimeException(
-                    'Could not write new md5 hash to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                    'Could not write new md5 hash to database: ' . debug($queryBuilder->getSQL()),
                     1456171285
                 );
             }
@@ -410,14 +415,14 @@ class ICalendarService extends BaseService
             $insertFields['groupName'] = 'cal';
             $insertFields['description'] = 'Calendar Base';
             $table = 'tx_scheduler_task_group';
-            $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
+            $result = $connection->exec_INSERTquery($table, $insertFields);
             if (false === $result) {
                 throw new RuntimeException(
-                    'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                    'Could not write ' . $table . ' record to database: ' . $connection->sql_error(),
                     1431458142
                 );
             }
-            $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+            $uid = $connection->sql_insert_id();
             $task->setTaskGroup($uid);
         }
         $task->setDescription('Import of external calendar (calendar_id=' . $calendarUid . ')');
@@ -428,7 +433,7 @@ class ICalendarService extends BaseService
         $execution->setMultiple(true);
         $task->setExecution($execution);
         $scheduler->addTask($task);
-        $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_cal_calendar', 'uid=' . $calendarUid, [
+        $connection->exec_UPDATEquery('tx_cal_calendar', 'uid=' . $calendarUid, [
             'schedulerId' => $task->getTaskUid()
         ]);
     }
@@ -479,18 +484,18 @@ class ICalendarService extends BaseService
             }
             /* Delete the calendar events */
             $where = ' calendar_id=' . $uid . ' AND isTemp=1' . $additionalWhere;
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid', 'tx_cal_event', $where);
+            $result = $connection->exec_SELECTquery('uid', 'tx_cal_event', $where);
             $uids = [];
             if ($result) {
-                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                while ($row = $connection->sql_fetch_assoc($result)) {
                     $uids[] = $row['uid'];
                     $this->clearAllImagesAndAttachments($row['uid']);
                 }
-                $GLOBALS['TYPO3_DB']->sql_free_result($result);
+                $connection->sql_free_result($result);
             }
             $this->deleteExceptions($uids);
             $this->deleteDeviations($uids);
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event', $where);
+            $connection->exec_DELETEquery('tx_cal_event', $where);
 
             /* Delete any scheduled events (tasks) in gabriel */
             $this->deleteScheduledUpdates($uid);
@@ -506,6 +511,7 @@ class ICalendarService extends BaseService
     private function deleteDeviations($eventUidArray = [])
     {
         if (!empty($eventUidArray)) {
+
             $where = 'tx_cal_event_deviation.parentid in (' . implode(',', $eventUidArray) . ')';
             $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_event_deviation', $where);
         }
@@ -554,8 +560,8 @@ class ICalendarService extends BaseService
                 $where = 'tx_cal_exception_event.uid in (' . implode(',', $exceptionEventUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                    ',',
-                    $exceptionEventUids
+                        ',',
+                        $exceptionEventUids
                     ) . ') and tablenames="tx_cal_exception_event"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
@@ -563,8 +569,8 @@ class ICalendarService extends BaseService
                 $where = 'tx_cal_exception_group.uid in (' . implode(',', $exceptionGroupUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_group', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                    ',',
-                    $exceptionGroupUids
+                        ',',
+                        $exceptionGroupUids
                     ) . ') and tablenames="tx_cal_exception_group"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
@@ -610,7 +616,8 @@ class ICalendarService extends BaseService
      */
     public function getiCalendarFromIcsFile($text): ICalendar
     {
-        require_once(ICALENDAR_PATH);
+        //require_once( );
+        //$this->ICalendarModel =  GeneralUtility::makeInstance(ICalendar::class);
         $iCalendar = new ICalendar();
         if (!$iCalendar->parsevCalendar($text)) {
             throw new RuntimeException('Could not parse vCalendar data ' . $text, 1451245373);
@@ -699,8 +706,8 @@ class ICalendarService extends BaseService
             $categorySelect = '*';
             $categoryTable = 'sys_category';
             $categoryWhere = 'calendar_id = ' . intval($calId) . ' AND title =' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
-                $category,
-                $categoryTable
+                    $category,
+                    $categoryTable
                 );
             $foundCategory = false;
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($categorySelect, $categoryTable, $categoryWhere);
@@ -948,14 +955,30 @@ class ICalendarService extends BaseService
      */
     private function cleanupCategories($deleteNotUsedCategories, $calId, $insertedOrUpdatedCategoryUids)
     {
+        $table = 'sys_category';
+        $connection = $this->connectionPool->getConnectionForTable($table);
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
         if ($deleteNotUsedCategories) {
             /* Delete the categories */
             $where = ' calendar_id=' . $calId;
             if (!empty($insertedOrUpdatedCategoryUids)) {
                 array_unique($insertedOrUpdatedCategoryUids);
-                $where .= ' AND uid NOT IN (' . implode(',', $insertedOrUpdatedCategoryUids) . ')';
+                // $where .= ' AND uid NOT IN (' . implode(',', $insertedOrUpdatedCategoryUids) . ')';
+                $connection->delete('sys_category')
+                    ->where(
+                        $queryBuilder->expr()->notIn('uid', $queryBuilder->createNamedParameter(implode(',', $insertedOrUpdatedCategoryUids)))
+                    );
             }
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_category', $where);
+
         }
     }
 
@@ -964,21 +987,33 @@ class ICalendarService extends BaseService
      * @param $insertFields
      * @return mixed
      */
-    private function saveOrUpdate($eventRow, $insertFields)
+    private function saveOrUpdate($eventRow, array $insertFields)
     {
         $table = 'tx_cal_event';
+        $connection = $this->connectionPool->getConnectionForTable($table);
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+
         if ($eventRow['uid']) {
-            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid=' . $eventRow['uid'], $insertFields);
+            $connection->update($table, $insertFields, ['uid' => $eventRow['uid']]);
             return $eventRow['uid'];
         }
-        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
+        $result = $connection->insert($table, $insertFields);
         if (false === $result) {
             throw new RuntimeException(
-                'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                'Could not write ' . $table . ' record to database: ' .debug($queryBuilder->getSQL()),
                 1431458144
             );
         }
-        return $GLOBALS['TYPO3_DB']->sql_insert_id();
+        return (int)$connection->lastInsertId($table);
     }
 
     /**
@@ -1014,9 +1049,9 @@ class ICalendarService extends BaseService
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($GLOBALS['TYPO3_DB']->exec_SELECTcountRows(
-                    '*',
-                    'sys_file_reference',
-                    'uid_local=' . $row['uid_local']
+                        '*',
+                        'sys_file_reference',
+                        'uid_local=' . $row['uid_local']
                     ) == 1) {
                     $fileIndexRepository->remove($row['uid_local']);
                 }
@@ -1064,8 +1099,8 @@ class ICalendarService extends BaseService
         }
 
         if ((string)$content === '' || (!empty($denyExt) && in_array(
-            $ext,
-            $denyExt
+                    $ext,
+                    $denyExt
                 )) || (!empty($allowedExt) && !in_array($ext, $allowedExt))) {
             return;
         }
