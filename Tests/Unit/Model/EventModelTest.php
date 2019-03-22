@@ -47,15 +47,15 @@ class EventModelTest extends UnitTestCase
     }
 
     /**
-     * Test if title can be set
+     * Test if Teaser can be set
      *
      * @test
      */
-    public function titleCanBeSet()
+    public function canTeaserBeSet()
     {
         $title = 'Cal title';
-        $this->eventModelInstance->setTitle($title);
-        $this->assertEquals($title, $this->eventModelInstance->getTitle());
+        $this->eventModelInstance->setTeaser($title);
+        $this->assertEquals($title, $this->eventModelInstance->getTeaser());
     }
 
 

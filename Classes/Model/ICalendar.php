@@ -1369,6 +1369,7 @@ class ICalendar
 
     /**
      * Parse a Date field.
+     * @param  string $text
      */
     public function _parseDate($text)
     {

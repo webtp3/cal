@@ -49,17 +49,17 @@ class CalDateModelTest extends UnitTestCase
         $this->assertTrue(true);
     }
 
-    /**
-     * Test if title can be set
-     *
-     * @test
-     */
-    public function titleCanBeSet()
-    {
-        $title = 'Cal title';
-        $this->calDateInstance->setTitle($title);
-        $this->assertEquals($title, $this->calDateInstance->getTitle());
-    }
+//    /**
+//     * Test if title can be set
+//     *
+//     * @test
+//     */
+//    public function titleCanBeSet()
+//    {
+//        $title = 'Cal title';
+//        $this->calDateInstance->setTitle($title);
+//        $this->assertEquals($title, $this->calDateInstance->getTitle());
+//    }
 
 
 //

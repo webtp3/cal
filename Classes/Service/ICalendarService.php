@@ -477,25 +477,70 @@ class ICalendarService extends BaseService
     public function deleteTemporaryEvents($uid, $eventUidsNotIn = [])
     {
         if (intval($uid) > 0) {
-            $additionalWhere = '';
-            if (!empty($eventUidsNotIn)) {
-                $additionalWhere = ' AND uid NOT IN (' . implode(',', $eventUidsNotIn) . ')';
-            }
-            /* Delete the calendar events */
-            $where = ' calendar_id=' . $uid . ' AND isTemp=1' . $additionalWhere;
-            $result = $connection->exec_SELECTquery('uid', 'tx_cal_event', $where);
-            $uids = [];
-            if ($result) {
-                while ($row = $connection->sql_fetch_assoc($result)) {
-                    $uids[] = $row['uid'];
-                    $this->clearAllImagesAndAttachments($row['uid']);
-                }
-                $connection->sql_free_result($result);
-            }
-            $this->deleteExceptions($uids);
-            $this->deleteDeviations($uids);
-            $connection->exec_DELETEquery('tx_cal_event', $where);
+            $connection = $this->connectionPool->getConnectionForTable("tx_cal_event");
 
+            $queryBuilder = $connection->createQueryBuilder();
+            if (TYPO3_MODE == 'BE') {
+                $queryBuilder
+                    ->getRestrictions()
+                    ->removeAll()
+                    ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            } else {
+                $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+            }
+            if (!empty($eventUidsNotIn)) {
+                $result =  $queryBuilder->select('*')
+                ->from('tx_cal_event')
+                ->where(
+                    $queryBuilder->expr()->notIn(
+                        'uid',implode(',', $eventUidsNotIn)
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'calendar_id',$uid
+                    )
+                )
+                ->execute();
+            }
+            else {
+                $result =  $queryBuilder->select('*')
+                    ->from('tx_cal_event')
+                    ->where(
+                        $queryBuilder->expr()->eq(
+                            'calendar_id',$uid
+                        ),
+                        $queryBuilder->expr()->eq(
+                            'isTemp',1
+                        )
+                    )
+                    ->execute();
+            }
+            debug($queryBuilder->getSQL());
+
+            /* Delete the calendar events */
+            $uids = [];
+            while ($row = $result->fetch()) {
+                $uids[] = $row['uid'];
+                $this->clearAllImagesAndAttachments($row['uid']);
+            }
+               // $connection->sql_free_result($result);
+            if (count($uids)>0) {
+
+                $this->deleteExceptions($uids);
+                $this->deleteDeviations($uids);
+                $queryBuilder->delete('tx_cal_event')
+                    ->where(
+                        $queryBuilder->expr()->eq(
+                            'calendar_id', $uid
+                        ),
+                        $queryBuilder->expr()->in(
+                            'uid', implode(",", $uids)
+                        ),
+                        $queryBuilder->expr()->eq(
+                            'isTemp', 1
+                        )
+                    )
+                    ->execute();
+            }
             /* Delete any scheduled events (tasks) in gabriel */
             $this->deleteScheduledUpdates($uid);
         }
@@ -660,16 +705,17 @@ class ICalendarService extends BaseService
     {
         if ($component->getAttribute($attribute)) {
             $value = $component->getAttribute($attribute);
+            $this->date = GeneralUtility::makeInstance(Date::class);
             if (is_array($value)) {
-                $dateTime = new CalDate($value['year'] . $value['month'] . $value['mday'] . '000000');
+                $dateTime = $this->calDate->getTimestamp($value['year'] . $value['month'] . $value['mday'] . '000000');
             } else {
-                $dateTime = new CalDate($value);
+                $dateTime = $this->calDate->getTimestamp($value);
             }
             $params = $component->getAttributeParameters($attribute);
-            $timezone = $params['TZID'];
-            if ($timezone) {
-                $dateTime->convertTZbyID($timezone);
-            }
+//            $timezone = $params['TZID'];
+//            if ($timezone) {
+//                $this->date->convertTZbyID($timezone);
+//            }
             return $dateTime;
         }
         return null;
@@ -774,7 +820,7 @@ class ICalendarService extends BaseService
      */
     private function setRecurrenceId($component, $eventUid, &$insertFields)
     {
-        $recurrenceIdStart = new CalDate($component->getAttribute('RECURRENCE-ID'));
+        $recurrenceIdStart = $this->calDate->setTimestamp($component->getAttribute('RECURRENCE-ID'));
         $params = $component->getAttributeParameters('RECURRENCE-ID');
         $timezone = $params['TZID'];
         if ($timezone) {
@@ -972,7 +1018,7 @@ class ICalendarService extends BaseService
             if (!empty($insertedOrUpdatedCategoryUids)) {
                 array_unique($insertedOrUpdatedCategoryUids);
                // $where .= ' AND uid NOT IN (' . implode(',', $insertedOrUpdatedCategoryUids) . ')';
-                $connection->delete('sys_category')
+                $queryBuilder->delete('sys_category')
                     ->where(
                         $queryBuilder->expr()->notIn('uid', $queryBuilder->createNamedParameter(implode(',', $insertedOrUpdatedCategoryUids)))
                     );
@@ -1002,10 +1048,10 @@ class ICalendarService extends BaseService
         }
 
         if ($eventRow['uid']) {
-            $connection->update($table, $insertFields, ['uid' => $eventRow['uid']]);
+            $queryBuilder->update($table, $insertFields, ['uid' => $eventRow['uid']]);
             return $eventRow['uid'];
         }
-        $result = $connection->insert($table, $insertFields);
+        $result = $queryBuilder->insert($table, $insertFields);
         if (false === $result) {
             throw new RuntimeException(
                 'Could not write ' . $table . ' record to database: ' .debug($queryBuilder->getSQL()),
@@ -1197,7 +1243,7 @@ class ICalendarService extends BaseService
 
                 if ($component->getAttribute('DURATION')) {
                     $enddate = $insertFields['start_time'] + $component->getAttribute('DURATION');
-                    $dateTime = new CalDate($insertFields['start_date']);
+                    $dateTime = $this->calDate->setTimestamp($insertFields['start_date']);
                     $dateTime->addSeconds($enddate);
                     $params = $component->getAttributeParameters('DURATION');
                     $timezone = $params['TZID'];
@@ -1210,7 +1256,7 @@ class ICalendarService extends BaseService
 
                 // Fix for allday events
                 if ($insertFields['start_time'] == 0 && $insertFields['end_time'] == 0 && $insertFields['start_date'] != 0) {
-                    $date = new CalDate($insertFields['end_date'] . '000000');
+                    $date = $this->calDate->setTimestamp($insertFields['end_date'] . '000000');
                     $date->setTZbyID('UTC');
                     $date->subtractSeconds(86400);
                     $insertFields['end_date'] = $date->format('Ymd');
@@ -1352,7 +1398,7 @@ class ICalendarService extends BaseService
      */
     private function createException($pid, $cruserId, $eventUid, $exceptionDescription)
     {
-        $exceptionDate = new CalDate($exceptionDescription);
+        $exceptionDate = $this->calDate->setTimestamp($exceptionDescription);
 
         $insertFields = [];
         $insertFields['tstamp'] = time();
