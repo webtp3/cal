@@ -29,7 +29,7 @@ class vfreebusy extends ICalendar
     /**
      * @return string
      */
-    public function getType()
+    public function getType() : string
     {
         return 'vFreebusy';
     }
@@ -40,10 +40,10 @@ class vfreebusy extends ICalendar
      * @param string $data
      *            The data to parse.
      */
-    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true) : bool
     {
         parent::parsevCalendar($data, 'VFREEBUSY');
-
+        $rtn = false;
         // Do something with all the busy periods.
         foreach ($this->_attributes as $key => $attribute) {
             if ($attribute['name'] === 'FREEBUSY') {
@@ -55,14 +55,16 @@ class vfreebusy extends ICalendar
                     }
                 }
                 unset($this->_attributes[$key]);
+                $rtn = true;
             }
         }
+        return $rtn;
     }
 
     /**
      * @return string
      */
-    public function exportvCalendar()
+    public function exportvCalendar() : string
     {
         foreach ($this->_busyPeriods as $start => $end) {
             $periods = [

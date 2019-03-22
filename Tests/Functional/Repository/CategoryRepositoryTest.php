@@ -36,7 +36,7 @@ class CategoryRepositoryTest extends \CAG\CagTests\Core\Functional\FunctionalTes
     /**
      * Test if by import source is done
      * #todo from cron ICaldendar
-     * #todo repository categories?
+     *
      * @test
      */
     public function findRecordByImportSource()

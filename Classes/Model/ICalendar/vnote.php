@@ -28,12 +28,12 @@ class vnote extends ICalendar
         return parent::__construct($version);
     }
 
-    public function getType()
+    public function getType() : string
     {
         return 'vNote';
     }
 
-    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true) : bool
     {
         return parent::parsevCalendar($data, 'VNOTE');
     }
@@ -43,7 +43,7 @@ class vnote extends ICalendar
      * iCalendar container.
      * (BEGIN..END)
      */
-    public function exportvCalendar()
+    public function exportvCalendar() : string
     {
         $requiredAttributes = [];
         $requiredAttributes['BODY'] = '';

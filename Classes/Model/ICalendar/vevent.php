@@ -24,17 +24,17 @@ use TYPO3\CMS\Cal\Model\ICalendar;
  */
 class vevent extends ICalendar
 {
-    public function getType()
+    public function getType() : string
     {
         return 'vEvent';
     }
 
-    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true) : bool
     {
-        parent::parsevCalendar($data, 'VEVENT');
+        return parent::parsevCalendar($data, 'VEVENT');
     }
 
-    public function exportvCalendar()
+    public function exportvCalendar() : string
     {
         // Default values.
         $requiredAttributes = [];

@@ -117,7 +117,9 @@ class ICalendar
     public function newComponent($type, &$container)
     {
         $type = strtolower($type);
-        $class = __CLASS__ . $type;
+
+        $class =    '\\TYPO3\\CMS\\Cal\\Model\\ICalendar\\'.$type;
+
         if (class_exists($class)) {
             $component = new $class();
             if ($container !== false) {

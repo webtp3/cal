@@ -57,4 +57,5 @@ class FunctionsTest extends FunctionalTestCase
             Functions::getDayByWeek($parameter['year'], $parameter['week'], $parameter['dayOfTheWeek'])
         );
     }
+
 }

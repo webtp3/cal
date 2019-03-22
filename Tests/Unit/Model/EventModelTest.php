@@ -19,7 +19,7 @@ class EventModelTest extends UnitTestCase
 {
 
     /**
-     * @var Cal
+     * @var EventModel
      */
     protected $eventModelInstance;
 
@@ -29,8 +29,13 @@ class EventModelTest extends UnitTestCase
      */
     protected function setUp()
     {
-        // * @param string $serviceKey Service key, must be prefixed "tx_", "Tx_" or "user_"
-        $this->eventModelInstance = new EventModel('','tx_cal_event');
+        /**
+         * EventModel constructor.
+         * @param $row
+         * @param $isException
+         * @param $serviceKey
+         */
+        $this->eventModelInstance = new EventModel('',0,'tx_cal_event');
     }
 
     /**
@@ -42,15 +47,15 @@ class EventModelTest extends UnitTestCase
     }
 
     /**
-     * Test if title can be set
+     * Test if Teaser can be set
      *
      * @test
      */
-    public function titleCanBeSet()
+    public function canTeaserBeSet()
     {
         $title = 'Cal title';
-        $this->eventModelInstance->setTitle($title);
-        $this->assertEquals($title, $this->eventModelInstance->getTitle());
+        $this->eventModelInstance->setTeaser($title);
+        $this->assertEquals($title, $this->eventModelInstance->getTeaser());
     }
 
 
@@ -61,23 +66,11 @@ class EventModelTest extends UnitTestCase
      */
     public function canSetTstamp()
     {
-        $title = 'Cal title';
-        $this->eventModelInstance->setTstamp($title);
-        $this->assertEquals($title, $this->eventModelInstance->getTstamp());
+        $ts = time();
+        $this->eventModelInstance->setTstamp($ts);
+        $this->assertEquals($ts, $this->eventModelInstance->getTstamp());
     }
-    /**
-     * Test setSequence
-     *
-     * @test
-     */
-    public function canSetSequence()
-    {
-        //    * @param $sequence Array
 
-        $title = [];
-        $this->eventModelInstance->setSequence($title);
-        $this->assertEquals($title, $this->eventModelInstance->getSequence());
-    }
     /**
      * Test setOrganizer
      *
@@ -91,24 +84,13 @@ class EventModelTest extends UnitTestCase
         $this->assertEquals($title, $this->eventModelInstance->getOrganizer());
     }
 
-    /**
-     * Test setCreationDate
-     *
-     * @test
-     */
-    public function caSetCreationDate()
-    {
-        //    * @param $sequence Array
-        $title = 'Cal title';
-        $this->eventModelInstance->setCreationDate($title);
-        $this->assertEquals($title, $this->eventModelInstance->getCreationDate());
-    }
+
     /**
      * Test setLocation
      *
      * @test
      */
-    public function CanSetLocation()
+    public function canSetLocation()
     {
         $title = 'Cal title';
         $this->eventModelInstance->setLocation($title);
@@ -130,9 +112,9 @@ class EventModelTest extends UnitTestCase
      *
      * @test
      */
-    public function setLocationPage()
+    public function cansetLocationPage()
     {
-        $title = 'Cal title';
+        $title = 1;
         $this->eventModelInstance->setLocationPage($title);
         $this->assertEquals($title, $this->eventModelInstance->getLocationPage());
     }

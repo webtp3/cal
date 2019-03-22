@@ -49,12 +49,12 @@ class vcard extends ICalendar
         return parent::__construct($version);
     }
 
-    public function getType()
+    public function getType() : string
     {
         return 'vcard';
     }
 
-    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true) :string
     {
         return parent::parsevCalendar($data, 'vcard');
     }

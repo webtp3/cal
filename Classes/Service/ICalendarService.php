@@ -560,8 +560,8 @@ class ICalendarService extends BaseService
                 $where = 'tx_cal_exception_event.uid in (' . implode(',', $exceptionEventUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                        ',',
-                        $exceptionEventUids
+                    ',',
+                    $exceptionEventUids
                     ) . ') and tablenames="tx_cal_exception_event"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
@@ -569,8 +569,8 @@ class ICalendarService extends BaseService
                 $where = 'tx_cal_exception_group.uid in (' . implode(',', $exceptionGroupUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_group', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                        ',',
-                        $exceptionGroupUids
+                    ',',
+                    $exceptionGroupUids
                     ) . ') and tablenames="tx_cal_exception_group"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
@@ -706,8 +706,8 @@ class ICalendarService extends BaseService
             $categorySelect = '*';
             $categoryTable = 'sys_category';
             $categoryWhere = 'calendar_id = ' . intval($calId) . ' AND title =' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
-                    $category,
-                    $categoryTable
+                $category,
+                $categoryTable
                 );
             $foundCategory = false;
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($categorySelect, $categoryTable, $categoryWhere);
@@ -972,7 +972,7 @@ class ICalendarService extends BaseService
             $where = ' calendar_id=' . $calId;
             if (!empty($insertedOrUpdatedCategoryUids)) {
                 array_unique($insertedOrUpdatedCategoryUids);
-                // $where .= ' AND uid NOT IN (' . implode(',', $insertedOrUpdatedCategoryUids) . ')';
+               // $where .= ' AND uid NOT IN (' . implode(',', $insertedOrUpdatedCategoryUids) . ')';
                 $connection->delete('sys_category')
                     ->where(
                         $queryBuilder->expr()->notIn('uid', $queryBuilder->createNamedParameter(implode(',', $insertedOrUpdatedCategoryUids)))
@@ -1049,9 +1049,9 @@ class ICalendarService extends BaseService
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($GLOBALS['TYPO3_DB']->exec_SELECTcountRows(
-                        '*',
-                        'sys_file_reference',
-                        'uid_local=' . $row['uid_local']
+                    '*',
+                    'sys_file_reference',
+                    'uid_local=' . $row['uid_local']
                     ) == 1) {
                     $fileIndexRepository->remove($row['uid_local']);
                 }
@@ -1099,8 +1099,8 @@ class ICalendarService extends BaseService
         }
 
         if ((string)$content === '' || (!empty($denyExt) && in_array(
-                    $ext,
-                    $denyExt
+            $ext,
+            $denyExt
                 )) || (!empty($allowedExt) && !in_array($ext, $allowedExt))) {
             return;
         }

@@ -46,7 +46,7 @@ class standard extends ICalendar
      */
     public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true): bool
     {
-        parent::parsevCalendar($data, 'STANDARD');
+        return parent::parsevCalendar($data, 'STANDARD');
     }
 
     /**

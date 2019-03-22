@@ -24,17 +24,17 @@ use TYPO3\CMS\Cal\Model\ICalendar;
  */
 class vtodo extends ICalendar
 {
-    public function getType()
+    public function getType() : string
     {
         return 'vTodo';
     }
 
-    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true) : bool
     {
         parent::parsevCalendar($data, 'VTODO');
     }
 
-    public function exportvCalendar()
+    public function exportvCalendar() : string
     {
         return parent::_exportvData('VTODO');
     }

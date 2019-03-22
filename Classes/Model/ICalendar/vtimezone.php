@@ -24,17 +24,17 @@ use TYPO3\CMS\Cal\Model\ICalendar;
  */
 class vtimezone extends ICalendar
 {
-    public function getType()
+    public function getType() : string
     {
         return 'vTimeZone';
     }
 
-    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true)
+    public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true): bool
     {
-        parent::parsevCalendar($data, 'VTIMEZONE');
+        return parent::parsevCalendar($data, 'VTIMEZONE');
     }
 
-    public function exportvCalendar()
+    public function exportvCalendar(): string
     {
         return parent::_exportvData('VTIMEZONE');
     }
