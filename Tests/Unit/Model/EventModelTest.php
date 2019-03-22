@@ -12,7 +12,7 @@ use CAG\CagTests\Core\Unit\UnitTestCase;
 use TYPO3\CMS\Cal\Model\EventModel;
 
 /**
- * Tests for domains model Cal
+ * Tests for domains model EventModel
  *
  */
 class EventModelTest extends UnitTestCase
