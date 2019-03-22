@@ -23,6 +23,7 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Service;
 
 use TYPO3\CMS\Cal\Service\ICalendarService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * Class ICalendarServiceTest
