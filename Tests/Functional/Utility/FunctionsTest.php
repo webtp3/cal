@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace TYPO3\CMS\Cal\Tests\Unit\Services;
+namespace TYPO3\CMS\Cal\Tests\Functional\Utility;
 
 use TYPO3\CMS\Cal\Utility\Functions;
 use CAG\CagTests\Core\Functional\FunctionalTestCase;
