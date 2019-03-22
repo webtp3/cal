@@ -38,7 +38,7 @@ class CalDateModelTest extends UnitTestCase
         //DateTime::__construct(): Failed to parse time string (1541622600) at position 8 (0): Unexpected character
         //1541622600
         //$dateTime = new CalDate($value);
-        $this->calDateInstance = new CalDate('1541622600');
+        $this->calDateInstance = new CalDate();
     }
 
     /**
@@ -46,20 +46,21 @@ class CalDateModelTest extends UnitTestCase
      * @test
      */
     public function dummyMethod() {
+
         $this->assertTrue(true);
     }
 
-//    /**
-//     * Test if title can be set
-//     *
-//     * @test
-//     */
-//    public function titleCanBeSet()
-//    {
-//        $title = 'Cal title';
-//        $this->calDateInstance->setTitle($title);
-//        $this->assertEquals($title, $this->calDateInstance->getTitle());
-//    }
+    /**
+     * Test if title can be set
+     *
+     * @test
+     */
+    public function canGetTimeFromTimestamp()
+    {
+        $ts = '1541622600';
+        $this->calDateInstance->setTimestamp($ts);
+        $this->assertEquals(2018, $this->calDateInstance->getYear());
+    }
 
 
 //
