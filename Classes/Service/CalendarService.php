@@ -22,6 +22,7 @@ namespace TYPO3\CMS\Cal\Service;
  */
 use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Cal\Domain\Repository\CalendarRepository;
 use TYPO3\CMS\Cal\Domain\Repository\FnbUserGroupMMRepository;
 use TYPO3\CMS\Cal\Domain\Repository\UserGroupMMRepository;
 use TYPO3\CMS\Cal\Hooks\TceMainProcessdatamap;
@@ -50,13 +51,19 @@ class CalendarService extends BaseService
     protected $fnbUserGroupMMRepository;
 
     /**
+     * @var CalendarRepository
+     */
+    protected $calendarRepository;
+
+    /**
      * Constructor.
      */
     public function __construct()
     {
         parent::__construct();
-        $this->userGroupMMRepository = GeneralUtility::makeInstance(UserGroupMMRepository::class);
-        $this->fnbUserGroupMMRepository = GeneralUtility::makeInstance(FnbUserGroupMMRepository::class);
+        $this->userGroupMMRepository = $this->objectManager->get(UserGroupMMRepository::class);
+        $this->fnbUserGroupMMRepository = $this->objectManager->get(FnbUserGroupMMRepository::class);
+        $this->calendarRepository = $this->objectManager->get(CalendarRepository::class);
     }
 
     /**
@@ -174,13 +181,13 @@ class CalendarService extends BaseService
             ), $insertFields, $service);
 
             /** @var RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
+            $rgc = $this->objectManager->get(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
             $rgc->generateIndexForCalendarUid($uid);
         } else {
             $service->deleteTemporaryEvents($uid);
 
             /** @var RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $uid);
+            $rgc = $this->objectManager->get(RecurrenceGenerator::class, $uid);
             $rgc->cleanIndexTableOfCalendarUid($uid);
         }
 
@@ -240,7 +247,7 @@ class CalendarService extends BaseService
         $this->unsetPiVars();
         Functions::clearCache();
         /** @var RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $uid);
+        $rgc = $this->objectManager->get(RecurrenceGenerator::class, $uid);
         $rgc->cleanIndexTableOfCalendarUid($uid);
     }
 
@@ -355,7 +362,7 @@ class CalendarService extends BaseService
             ), $insertFields, $service);
 
             /** @var RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
+            $rgc = $this->objectManager->get(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
             $rgc->generateIndexForCalendarUid($uid);
         }
 
@@ -389,19 +396,19 @@ class CalendarService extends BaseService
     /**
      * @param $pidList
      * @param $includePublic
-     * @param $linkIds
-     * @return mixed|string
+     * @param $limitationList
+     * @return string
      */
-    public function getCalendarSearchString($pidList, $includePublic, $linkIds)
+    public function getCalendarSearchString($pidList, $includePublic, $limitationList): string
     {
-        $hash = md5($pidList . ' ' . $includePublic . ' ' . $linkIds);
+        $hash = md5($pidList . ' ' . $includePublic . ' ' . $limitationList);
         if ($this->calendarSearchStringCache[$hash]) {
             return $this->calendarSearchStringCache[$hash];
         }
 
         $calendarSearchString = '';
 
-        $idArray = $this->getIdsFromTable($linkIds, $pidList, $includePublic);
+        $idArray = $this->calendarRepository->getAccessibleCalendars($limitationList, $pidList, $includePublic);
 
         $ids = array_keys($this->getCalendarOwner());
 
@@ -418,9 +425,9 @@ class CalendarService extends BaseService
         // Check the results
         if (empty($idArray)) {
             // No calendar ids specified for this user -> show default
-        } elseif ($linkIds !== '') {
-            // compair the allowed ids with the ids available and retrieve the intersects
-            $calendarIds = array_intersect($idArray, explode(',', $linkIds));
+        } elseif ($limitationList !== '') {
+            // compare the allowed ids with the ids available and retrieve the intersects
+            $calendarIds = array_intersect($idArray, explode(',', $limitationList));
             if (!empty($calendarIds)) {
                 // create a string for the query
                 $calendarIds = implode(',', $calendarIds);
@@ -445,9 +452,12 @@ class CalendarService extends BaseService
      * @param bool $includeData
      * @param bool $onlyPublic
      * @return array
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Use $this->calendarRepository->getIdsFromTable instead.', E_USER_DEPRECATED);
+
         $userId = 0;
         $groupIds = '';
         $this->calendarIds = [];

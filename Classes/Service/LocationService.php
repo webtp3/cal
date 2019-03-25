@@ -29,6 +29,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Base model for the calendar organizer.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class LocationService extends BaseService
 {
@@ -42,9 +43,12 @@ class LocationService extends BaseService
      * @param string $pidList
      *            to search in
      * @return Location
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function find($uid, $pidList): Location
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $locationArray = $this->getLocationFromTable($pidList, ' AND tx_cal_location.uid=' . $uid);
         return $locationArray[0];
     }
@@ -54,9 +58,12 @@ class LocationService extends BaseService
      *
      * @param string $pidList
      * @return array
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function findAll($pidList): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->getLocationFromTable($pidList);
     }
 
@@ -66,9 +73,12 @@ class LocationService extends BaseService
      * @param string $pidList
      * @param string $searchword
      * @return array containing the location objects
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function search($pidList, $searchword): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         if (!$this->isAllowedService()) {
             return [];
         }
@@ -81,9 +91,12 @@ class LocationService extends BaseService
      * @param string $pidList
      * @param string $additionalWhere
      * @return array containing the location objects
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getLocationFromTable($pidList, $additionalWhere = ''): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $locations = [];
         $orderBy = Functions::getOrderBy('tx_cal_location');
         if ($pidList !== '') {
@@ -150,9 +163,11 @@ class LocationService extends BaseService
     /**
      * @param $location
      * @param $event_uid
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function _addEventLinkToLocation(&$location, $event_uid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
     }
 
     /**
@@ -160,9 +175,12 @@ class LocationService extends BaseService
      *
      * @param string $sw :
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function searchWhere($sw): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         if (!$this->isAllowedService()) {
             $where = '';
         } else {
@@ -178,9 +196,12 @@ class LocationService extends BaseService
     /**
      * @param $uid
      * @return Location
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function updateLocation($uid): Location
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $insertFields = [
             'tstamp' => time()
         ];
@@ -282,9 +303,12 @@ class LocationService extends BaseService
 
     /**
      * @param $uid
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function removeLocation($uid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         if ($this->rightsObj->isAllowedToDeleteLocation()) {
             $updateFields = [
                 'tstamp' => time(),
@@ -299,9 +323,12 @@ class LocationService extends BaseService
 
     /**
      * @param $insertFields
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function retrievePostData(&$insertFields)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $hidden = 0;
         if (
             !$this->rightsObj->isAllowedTo('create', 'location', 'hidden')
@@ -381,9 +408,12 @@ class LocationService extends BaseService
     /**
      * @param $pid
      * @return Location
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function saveLocation($pid): Location
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $crdate = time();
         $insertFields = [
             'pid' => $pid,
@@ -404,9 +434,12 @@ class LocationService extends BaseService
     /**
      * @param $insertFields
      * @return mixed
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function _saveLocation(&$insertFields)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $table = 'tx_cal_location';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
@@ -522,9 +555,12 @@ class LocationService extends BaseService
 
     /**
      * @return bool
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function isAllowedService(): bool
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
         return $useLocationStructure === $this->keyId;
@@ -558,8 +594,13 @@ class LocationService extends BaseService
         }
     }
 
+    /**
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
+     */
     public function unsetPiVars()
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         unset($this->controller->piVars['hidden'], $this->controller->piVars['_TRANSFORM_description'], $this->controller->piVars['uid'], $this->controller->piVars['type'], $this->controller->piVars['formCheck'], $this->controller->piVars['name'], $this->controller->piVars['description'], $this->controller->piVars['street'], $this->controller->piVars['zip'], $this->controller->piVars['city'], $this->controller->piVars['country'], $this->controller->piVars['countryzone'], $this->controller->piVars['phone'], $this->controller->piVars['email'], $this->controller->piVars['link'], $this->controller->piVars['image'], $this->controller->piVars['image_caption'], $this->controller->piVars['image_title'], $this->controller->piVars['image_alt']);
     }
 }

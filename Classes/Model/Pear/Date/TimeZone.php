@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model\Pear\Date;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -33,8 +39,6 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
- * @author Baba Buehler <baba@babaz.com>
- * @author Pierre-Alain Joye <pajoye@php.net>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -62,7 +66,6 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * This class includes time zone data (from zoneinfo) in the form of a
  * global array, $_DATE_TIMEZONE_DATA.
  *
- * @author Baba Buehler <baba@babaz.com>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -149,7 +152,7 @@ class TimeZone
         trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $_DATE_TIMEZONE_DATA = &$GLOBALS['_DATE_TIMEZONE_DATA'];
-        if (TimeZone::isValidID($id)) {
+        if (self::isValidID($id)) {
             $this->id = $id;
             $this->longname = $_DATE_TIMEZONE_DATA[$id]['longname'];
             $this->shortname = $_DATE_TIMEZONE_DATA[$id]['shortname'];
@@ -188,7 +191,7 @@ class TimeZone
     {
         trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        return new TimeZone($GLOBALS['_DATE_TIMEZONE_DEFAULT']);
+        return new self($GLOBALS['_DATE_TIMEZONE_DEFAULT']);
     }
 
     // }}}
@@ -206,7 +209,7 @@ class TimeZone
     {
         trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        if (TimeZone::isValidID($id)) {
+        if (self::isValidID($id)) {
             $GLOBALS['_DATE_TIMEZONE_DEFAULT'] = $id;
         }
     }

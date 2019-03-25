@@ -36,9 +36,12 @@ class Location extends LocationModel
      *
      * @param array $row
      * @param string $pidList
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function __construct($row, $pidList)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->setObjectType('location');
         $this->setType('tx_cal_location');
         parent::__construct($this->controller, $this->getType());
@@ -48,17 +51,23 @@ class Location extends LocationModel
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function renderLocation(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->fillTemplate('###TEMPLATE_LOCATION_LOCATION###');
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function renderOrganizer(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_ORGANIZER###');
     }
 
@@ -66,9 +75,12 @@ class Location extends LocationModel
      * @param string $feUserUid
      * @param array $feGroupsArray
      * @return bool
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_location')) {
             return false;
@@ -98,9 +110,12 @@ class Location extends LocationModel
      * @param string $feUserUid
      * @param array $feGroupsArray
      * @return bool
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_location')) {
             return false;
@@ -132,9 +147,12 @@ class Location extends LocationModel
      * @param $wrapped
      * @param $view
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $editlink = '';
         if ($this->isUserAllowedToEdit()) {
             $this->initLocalCObject($this->getValuesAsArray());
@@ -183,9 +201,12 @@ class Location extends LocationModel
      * @param $viewType
      * @param string $subpartSuffix
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function renderLocationFor($viewType, $subpartSuffix = ''): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->fillTemplate('###TEMPLATE_LOCATION_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }
 
@@ -193,9 +214,12 @@ class Location extends LocationModel
      * @param $viewType
      * @param string $subpartSuffix
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function renderOrganizerFor($viewType, $subpartSuffix = ''): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }
 }

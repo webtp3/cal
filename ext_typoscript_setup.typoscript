@@ -1,0 +1,14 @@
+config {
+  tx_extbase {
+    persistence {
+      classes {
+        TYPO3\CMS\Cal\Domain\Model\Location {
+          mapping {
+            tableName = tx_cal_location
+            recordType = \TYPO3\CMS\Cal\Domain\Model\Location
+          }
+        }
+      }
+    }
+  }
+}

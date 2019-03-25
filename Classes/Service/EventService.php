@@ -24,6 +24,7 @@ use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\DateParser;
+use TYPO3\CMS\Cal\Domain\Repository\EventRepository;
 use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
 use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
@@ -81,13 +82,19 @@ class EventService extends BaseService
     protected $subscriptionRepository;
 
     /**
+     * @var EventRepository
+     */
+    protected $eventRepository;
+
+    /**
      * EventModel constructor.
      */
     public function __construct()
     {
         parent::__construct();
-        $this->eventSharedUserMMRepository = GeneralUtility::makeInstance(EventSharedUserMMRepository::class);
-        $this->subscriptionRepository = GeneralUtility::makeInstance(SubscriptionRepository::class);
+        $this->eventSharedUserMMRepository = $this->objectManager->get(EventSharedUserMMRepository::class);
+        $this->subscriptionRepository = $this->objectManager->get(SubscriptionRepository::class);
+        $this->eventRepository = $this->objectManager->get(EventRepository::class);
     }
 
     /**
@@ -160,26 +167,14 @@ class EventService extends BaseService
         $recurringClause = '';
         // only include the recurring clause if we don't use the new recurring model or a view not needing recurring events.
         if ($includeRecurring) {
-            // get the uids of recurring events from index
-            $select = 'event_uid';
-            $table = 'tx_cal_index';
-            $where = '(start_datetime >= ' . $this->starttime->format('YmdHMS') . ' AND start_datetime <= ' . $this->endtime->format('YmdHMS') . ') OR (start_datetime < ' . $this->starttime->format('YmdHMS') . ' AND end_datetime > ' . $this->starttime->format('YmdHMS') . ')  OR (start_datetime < ' . $this->endtime->format('YmdHMS') . ' AND end_datetime > ' . $this->endtime->format('YmdHMS') . ')';
-            $group = 'event_uid';
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $group);
-            $tmpUids = [];
-            if ($result) {
-                while ($tmp = $GLOBALS['TYPO3_DB']->sql_fetch_row($result)) {
-                    $tmpUids[] = $tmp[0];
-                }
-                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-            }
+            $tmpUids = $this->eventRepository->findUidsOfRecurringEvents($this->starttime, $this->endtime);
             if (count($tmpUids)) {
                 $recurringClause = ' OR (tx_cal_event.uid IN (' . implode(',', $tmpUids) . ')) ';
             }
         }
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -238,7 +233,7 @@ class EventService extends BaseService
         $eventType = '0,1,2,3'
     ): array {
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $events = [];
 
@@ -591,7 +586,7 @@ class EventService extends BaseService
         $formattedEndtime = $this->endtime->format('Ymd');
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -642,7 +637,7 @@ class EventService extends BaseService
     protected function getTimeParsed($timeString): CalDate
     {
         /** @var DateParser $dp */
-        $dp = GeneralUtility::makeInstance(DateParser::class);
+        $dp = $this->objectManager->get(DateParser::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }
@@ -704,7 +699,7 @@ class EventService extends BaseService
 
         $categories = [];
 
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $categoryService->getCategoryArray($pidList, $categories);
 
@@ -846,7 +841,7 @@ class EventService extends BaseService
         self::_scheduleReminder($uid);
 
         /** @var RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
+        $rgc = $this->objectManager->get(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
         $rgc->generateIndexForUid($uid, 'tx_cal_event');
 
         // Hook: saveEvent
@@ -1174,7 +1169,7 @@ class EventService extends BaseService
         $this->unsetPiVars();
 
         /** @var RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
+        $rgc = $this->objectManager->get(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
         $rgc->generateIndexForUid($uid, 'tx_cal_event');
 
         // Hook: updateEvent
@@ -1484,7 +1479,7 @@ class EventService extends BaseService
             self::stopReminder($uid);
 
             /** @var RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
+            $rgc = $this->objectManager->get(RecurrenceGenerator::class);
             $rgc->cleanIndexTableOfUid($uid, $table);
 
             // Hook: removeEvent
@@ -1750,7 +1745,7 @@ class EventService extends BaseService
         $includePublic = 1;
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -2933,7 +2928,7 @@ class EventService extends BaseService
                 'calendar',
                 'tx_cal_calendar'
             );
-            $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+            $categoryService = $this->objectManager->get(SysCategoryService::class);
 
             $calendarSearchString = $calendarService->getCalendarSearchString(
                 $pidList,
@@ -3093,7 +3088,7 @@ class EventService extends BaseService
      */
     public function findAllWithAdditionalWhere($where = ''): array
     {
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         // putting everything together
         //

@@ -42,7 +42,6 @@ class Daylight extends ICalendar
     public function parsevCalendar($data, $base = 'VCALENDAR', $charset = 'utf8', $clear = true): bool
     {
         return parent::parsevCalendar($data, 'DAYLIGHT');
-
     }
 
     /**

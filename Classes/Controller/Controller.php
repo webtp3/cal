@@ -21,6 +21,7 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use PDO;
+use TYPO3\CMS\Cal\Domain\Repository\LocationRepository;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Model\EventModel;
@@ -33,6 +34,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
 
@@ -128,10 +130,17 @@ class Controller extends AbstractPlugin
      */
     protected $markerBasedTemplateService;
 
+    /**
+     * @var LocationRepository
+     */
+    protected $locationRepository;
+
     public function __construct()
     {
         parent::__construct();
-        $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->markerBasedTemplateService = $objectManager->get(MarkerBasedTemplateService::class);
+        $this->locationRepository = $objectManager->get(LocationRepository::class);
     }
 
     /**
@@ -1503,11 +1512,13 @@ class Controller extends AbstractPlugin
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_location_model', 'location');
 
-        if (!in_array($type, $availableTypes, true)) {
-            $type = '';
-        }
+        $location = $this->locationRepository->getObject(
+            $this->locationRepository->findByUid(
+                $uid
+            )
+        );
 
-        $location = $modelObj->findLocation($uid, $type, $pidList);
+        //  $location = $modelObj->findLocation($uid, $type, $pidList);
         if (!is_object($location)) {
             if (is_string($location)) {
                 return $location;
@@ -2050,12 +2061,15 @@ class Controller extends AbstractPlugin
     public function editLocation(): string
     {
         $uid = $this->conf ['uid'];
-        $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('editLocationClass');
-        $modelObj = &Registry::Registry('basic', 'modelcontroller');
-        $location = $modelObj->findLocation($uid, $type, $pidList);
+
+        $location = $this->locationRepository->getObject(
+            $this->locationRepository->findByUid(
+                $uid
+            )
+        );
 
         // Hook: preEditLocationRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -2082,14 +2096,15 @@ class Controller extends AbstractPlugin
     public function deleteLocation(): string
     {
         $uid = $this->conf ['uid'];
-        $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('deleteLocationClass');
 
-        $modelObj = &Registry::Registry('basic', 'modelcontroller');
-        $location = $modelObj->findLocation($uid, $type, $pidList);
-
+        $location = $this->locationRepository->getObject(
+            $this->locationRepository->findByUid(
+                $uid
+            )
+        );
         // Hook: preDeleteLocationRendering
         foreach ($hookObjectsArr as $hookObj) {
             if (method_exists($hookObj, 'preDeleteLocationRendering')) {

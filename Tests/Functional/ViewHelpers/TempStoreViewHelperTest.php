@@ -15,9 +15,9 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Functional\ViewHelpers;
  * LICENSE.txt file that was distributed with this source code.
  */
 use DateTime;
-use TYPO3\CMS\Cal\Model\EventModel;
 use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
 use Nimut\TestingFramework\TestCase\ViewHelperBaseTestcase;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -54,7 +54,7 @@ class TempStoreViewHelperTest extends ViewHelperBaseTestcase
     public function canRender()
     {
         $this->setDate(1396035186);
-        $actual = $this->mockedViewHelper->_call('render', 'tx_cal_events','', $this->calevent);
+        $actual = $this->mockedViewHelper->_call('render', 'tx_cal_events', '', $this->calevent);
 
         $exp = [
             'prev' => $this->getRow(1)

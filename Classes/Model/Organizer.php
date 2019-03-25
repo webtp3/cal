@@ -36,9 +36,12 @@ class Organizer extends LocationModel
      *
      * @param array $row
      * @param string $pidList
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function __construct($row, $pidList)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->setObjectType('organizer');
         $this->setType('tx_cal_organizer');
         parent::__construct($this->getType());
@@ -48,17 +51,23 @@ class Organizer extends LocationModel
 
     /**
      * @param $row
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createOrganizer($row)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->createLocation($row);
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function renderOrganizer(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_ORGANIZER###');
     }
 
@@ -66,9 +75,12 @@ class Organizer extends LocationModel
      * @param string $feUserUid
      * @param array $feGroupsArray
      * @return bool
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function isUserAllowedToEdit($feUserUid = '', $feGroupsArray = []): bool
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('edit_organizer')) {
             return false;
@@ -98,9 +110,12 @@ class Organizer extends LocationModel
      * @param string $feUserUid
      * @param array $feGroupsArray
      * @return bool
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function isUserAllowedToDelete($feUserUid = '', $feGroupsArray = []): bool
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $rightsObj = &Registry::Registry('basic', 'rightscontroller');
         if (!$rightsObj->isViewEnabled('delete_organizer')) {
             return false;
@@ -131,9 +146,12 @@ class Organizer extends LocationModel
      * @param $rems
      * @param $view
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getEditLink(& $template, & $sims, & $rems, $view): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $editlink = '';
         if ($this->isUserAllowedToEdit()) {
             $this->initLocalCObject($this->getValuesAsArray());
@@ -181,9 +199,12 @@ class Organizer extends LocationModel
      * @param $viewType
      * @param string $subpartSuffix
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function renderOrganizerFor($viewType, $subpartSuffix = ''): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->fillTemplate('###TEMPLATE_ORGANIZER_' . strtoupper($viewType) . ($subpartSuffix ? '_' : '') . $subpartSuffix . '###');
     }
 }

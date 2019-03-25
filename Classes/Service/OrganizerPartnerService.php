@@ -25,6 +25,7 @@ namespace TYPO3\CMS\Cal\Service;
  * Base model for the calendar organizer.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class OrganizerPartnerService extends BaseService
 {

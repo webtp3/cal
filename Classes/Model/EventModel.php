@@ -23,6 +23,8 @@ namespace TYPO3\CMS\Cal\Model;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
 use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
+use TYPO3\CMS\Cal\Domain\Repository\UnknownUserRepository;
+use TYPO3\CMS\Cal\Domain\Repository\UserRepository;
 use TYPO3\CMS\Cal\Service\RightsService;
 use TYPO3\CMS\Cal\Service\SysCategoryService;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -92,6 +94,16 @@ class EventModel extends Model
     protected $subscriptionRepository;
 
     /**
+     * @var UnknownUserRepository
+     */
+    protected $unknownUserRepository;
+
+    /**
+     * @var UserRepository
+     */
+    protected $userRepository;
+
+    /**
      * EventModel constructor.
      * @param $row
      * @param $isException
@@ -101,8 +113,11 @@ class EventModel extends Model
     {
         parent::__construct($serviceKey);
 
-        $this->eventSharedUserMMRepository = GeneralUtility::makeInstance(EventSharedUserMMRepository::class);
-        $this->subscriptionRepository = GeneralUtility::makeInstance(SubscriptionRepository::class);
+        $this->eventSharedUserMMRepository = $this->objectManager->get(EventSharedUserMMRepository::class);
+        $this->subscriptionRepository = $this->objectManager->get(SubscriptionRepository::class);
+        $this->unknownUserRepository = $this->objectManager->get(UnknownUserRepository::class);
+        $this->userRepository = $this->objectManager->get(UserRepository::class);
+
         if (is_array($row)) {
             $this->createEvent($row, $isException);
         }
@@ -161,7 +176,7 @@ class EventModel extends Model
                 case 'category_ids':
                     $this->setCategories([]);
                     $categories = [];
-                    $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+                    $categoryService = $this->objectManager->get(SysCategoryService::class);
                     $categoryService->getCategoryArray($this->conf['pidList'], $categories);
                     $piVarsCaregoryArray = explode(
                         ',',
@@ -684,11 +699,10 @@ class EventModel extends Model
     {
         $locationLink = '';
         if ($this->getLocationId() > 0) {
-            /** @var LocationModel $location */
+            /** @var \TYPO3\CMS\Cal\Domain\Model\Location $location */
             $location = $this->getLocationObject();
-
             if (is_object($location)) {
-                $tempData = $location->getValuesAsArray();
+                $tempData = $location->_getProperties();
                 $this->initLocalCObject($tempData);
                 unset($tempData);
                 $this->local_cObj->setCurrentVal($location->getName());
@@ -1180,16 +1194,8 @@ class EventModel extends Model
 
                                 if (($captchaStr && $this->controller->piVars['captcha'] === $captchaStr) || ((int)$this->conf['subscribeWithCaptcha'] === 0)) {
                                     $email = $this->controller->piVars['email'];
-                                    $table = 'tx_cal_unknown_users';
-                                    $select = 'crdate';
-                                    $where = 'email = "' . $email . '"';
-                                    $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-                                    $crdate = 0;
-                                    if ($result) {
-                                        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
-                                        $crdate = $row['crdate'];
-                                        $GLOBALS['TYPO3_DB']->sql_free_result($result);
-                                    }
+                                    $unknownUser = $this->unknownUserRepository->findByEmailAddress($email);
+                                    $crdate = $unknownUser['crdate'] ?? 0;
 
                                     $mailer = $mail = new MailMessage();
                                     $mailer->setFrom([
@@ -2167,22 +2173,16 @@ class EventModel extends Model
             foreach ($globalAttendeeArray as $serviceKey => $attendeeArray) {
                 foreach ($attendeeArray as $attendee) {
                     if ($attendee->getFeUserId()) {
-                        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                            '*',
-                            'fe_users',
-                            'pid in (' . $this->conf['pidList'] . ')' . $cObj->enableFields('fe_users') . ' AND uid =' . $attendee->getFeUserId()
-                        );
-                        if ($result) {
-                            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                                $this->initLocalCObject($row);
-                                $displayConfig = $this->conf['view.'][$view . '.']['event.']['attendeeFeUserDisplayName'] ? 'attendeeFeUserDisplayName' : 'defaultFeUserDisplayName';
-                                $attendee->setName($this->local_cObj->cObjGetSingle(
-                                    $this->conf['view.'][$view . '.']['event.'][$displayConfig],
-                                    $this->conf['view.'][$view . '.']['event.'][$displayConfig . '.']
-                                ));
-                                $attendee->setEmail($row['email']);
-                            }
-                            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+                        $user = $this->userRepository->findByUid($attendee->getFeUserId());
+
+                        if (!empty($user)) {
+                            $this->initLocalCObject($user);
+                            $displayConfig = $this->conf['view.'][$view . '.']['event.']['attendeeFeUserDisplayName'] ? 'attendeeFeUserDisplayName' : 'defaultFeUserDisplayName';
+                            $attendee->setName($this->local_cObj->cObjGetSingle(
+                                $this->conf['view.'][$view . '.']['event.'][$displayConfig],
+                                $this->conf['view.'][$view . '.']['event.'][$displayConfig . '.']
+                            ));
+                            $attendee->setEmail($user['email']);
                         }
                         $finalString = $attendee->getName() . ' ';
                     } else {

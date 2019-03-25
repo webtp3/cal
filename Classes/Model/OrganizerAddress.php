@@ -36,9 +36,12 @@ class OrganizerAddress extends Organizer
      *
      * @param array $row
      * @param string $pidList
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function __construct($row, $pidList)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         parent::__construct($row, $pidList);
         $this->setObjectType('organizer');
         $this->setType('tx_tt_address');
@@ -48,9 +51,12 @@ class OrganizerAddress extends Organizer
 
     /**
      * @param $row
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createOrganizer($row)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->setUid($row['uid']);
         $this->setName($row['name']);
         $this->setDescription($row['description']);

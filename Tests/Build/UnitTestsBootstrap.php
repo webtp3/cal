@@ -1,15 +1,9 @@
 <?php
+
 /*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
+ * This file is part of the web-tp3/cal.
  * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
+ * LICENSE file that was distributed with this source code.
  */
 
 /**
@@ -45,16 +39,16 @@ call_user_func(function () {
 
     // Retrieve an instance of class loader and inject to core bootstrap
     // selftest
-    if (file_exists($classLoaderFilepath = dirname(PATH_site). '/Build/vendor/autoload.php')) {
+    if (file_exists($classLoaderFilepath = dirname(PATH_site) . '/Build/vendor/autoload.php')) {
         // Console is root package, thus vendor folder is .Build/vendor
         $classLoader = require $classLoaderFilepath;
-    } elseif (file_exists($classLoaderFilepath = dirname(PATH_site). '/.Build/vendor/autoload.php')) {
+    } elseif (file_exists($classLoaderFilepath = dirname(PATH_site) . '/.Build/vendor/autoload.php')) {
         // Console is root package, thus vendor folder is .Build/vendor
         $classLoader = require $classLoaderFilepath;
     } elseif (file_exists($vendorAutoLoadFile = dirname(dirname(dirname(__DIR__))) . '/autoload.php')) {
         // Console is a dependency, thus located in vendor/helhum/typo3-console
         $classLoader = require $vendorAutoLoadFile;
-    } elseif (file_exists($typo3AutoLoadFile = $_SERVER["PWD"] . '/.Build/vendor/autoload.php')) {
+    } elseif (file_exists($typo3AutoLoadFile = $_SERVER['PWD'] . '/.Build/vendor/autoload.php')) {
         // Console is extension CAG
         $classLoader = require $typo3AutoLoadFile;
     } else {
@@ -64,7 +58,7 @@ call_user_func(function () {
     if (!file_exists($classLoaderFilepath)) {
         die('ClassLoader can\'t be loaded. Please check your path or set an environment variable \'TYPO3_PATH_ROOT\' to your root path.');
     }
-   // $classLoader = require $classLoaderFilepath;
+    // $classLoader = require $classLoaderFilepath;
     \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
         ->initializeClassLoader($classLoader)
         ->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI)

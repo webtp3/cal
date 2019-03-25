@@ -1,10 +1,16 @@
 <?php
 declare(strict_types = 1);
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Tests\Unit;
 
-use TYPO3\CMS\Cal\Utility\Functions;
 use CAG\CagTests\Core\Functional\UnitTestCase;
+use TYPO3\CMS\Cal\Utility\Functions;
 
 /**
  * Class FunctionsTest
@@ -57,5 +63,4 @@ class FunctionsTest extends UnitTestCase
             Functions::getDayByWeek($parameter['year'], $parameter['week'], $parameter['dayOfTheWeek'])
         );
     }
-
 }

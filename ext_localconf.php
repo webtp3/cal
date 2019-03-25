@@ -6,7 +6,6 @@
  * LICENSE file that was distributed with this source code.
  */
 
-
 use TYPO3\CMS\Cal\Backend\Form\FormDateDataProvider;
 use TYPO3\CMS\Cal\Backend\Form\RenderType\ByDayElement;
 use TYPO3\CMS\Cal\Backend\Form\RenderType\ByMonthDayElement;
@@ -14,13 +13,11 @@ use TYPO3\CMS\Cal\Backend\Form\RenderType\ByMonthElement;
 use TYPO3\CMS\Cal\Backend\Form\RenderType\ExtUrlElement;
 use TYPO3\CMS\Cal\Backend\Form\RenderType\RDateElement;
 use TYPO3\CMS\Cal\Backend\Form\RenderType\StylesElement;
-use TYPO3\CMS\Cal\Controller\EventLinkHandler;
 use TYPO3\CMS\Cal\Cron\CalendarScheduler;
 use TYPO3\CMS\Cal\Cron\IndexerScheduler;
 use TYPO3\CMS\Cal\Cron\IndexerSchedulerAdditionalFieldProvider;
 use TYPO3\CMS\Cal\Cron\ReminderScheduler;
 use TYPO3\CMS\Cal\Hooks\Befunc;
-use TYPO3\CMS\Cal\Hooks\DateEval;
 use TYPO3\CMS\Cal\Hooks\RealUrl;
 use TYPO3\CMS\Cal\Hooks\TceMainProcesscmdmap;
 use TYPO3\CMS\Cal\Hooks\TceMainProcessdatamap;
@@ -79,7 +76,6 @@ use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-
 if (! defined('TYPO3_MODE')) {
     die('Access denied.');
 }
@@ -99,7 +95,6 @@ $_EXTKEY = 'cal';
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPItoST43($_EXTKEY, 'Classes/Controller/Controller.php', '_controller', 'list_type', 1);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig('options.saveDocNew.tx_cal_event=1');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig('options.saveDocNew.tx_cal_exception_event=1');
-
 
 ExtensionManagementUtility::addPItoST43(
     'cal',

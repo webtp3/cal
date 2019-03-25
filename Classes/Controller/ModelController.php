@@ -21,6 +21,8 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use PDO;
+use TYPO3\CMS\Cal\Domain\Repository\AttendeeRepository;
+use TYPO3\CMS\Cal\Domain\Repository\LocationRepository;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
@@ -49,6 +51,16 @@ class ModelController extends BaseController
 
     private $todoSubtype;
 
+    /**
+     * @var AttendeeRepository
+     */
+    protected $attendeeRepository;
+
+    /**
+     * @var LocationRepository
+     */
+    protected $locationRepository;
+
     public function __construct()
     {
         parent::__construct();
@@ -56,6 +68,7 @@ class ModelController extends BaseController
         $this->todoSubtype = $confArr ['todoSubtype'];
 
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $this->locationRepository = GeneralUtility::makeInstance(LocationRepository::class);
     }
 
     /**
@@ -309,10 +322,9 @@ class ModelController extends BaseController
      */
     public function findLocation($uid, $type = 'tx_cal_location', $pidList = ''): Location
     {
-        /** @var LocationService $service */
-        $service = $this->getServiceObjByKey('cal_location_model', 'location', $type);
-        $location = $service->find($uid, $pidList);
-        return $location;
+        return $this->locationRepository->getObject(
+            $this->locationRepository->findByUid($uid)
+        );
     }
 
     /**

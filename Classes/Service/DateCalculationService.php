@@ -1,5 +1,11 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
 
 namespace TYPO3\CMS\Cal\Service;
 
@@ -35,9 +41,6 @@ use DateTime;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
- * @author Monte Ohrt <monte@ispi.net>
- * @author Pierre-Alain Joye <pajoye@php.net>
- * @author Daniel Convissor <danielc@php.net>
  * @copyright 1999-2006 Monte Ohrt, Pierre-Alain Joye, Daniel Convissor
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -45,7 +48,6 @@ use DateTime;
  * @link http://pear.php.net/package/Date
  * @since File available since Release 1.2
  */
-
 if (!defined('DATE_CALC_BEGIN_WEEKDAY')) {
     /**
      * Defines what day starts the week
@@ -74,8 +76,6 @@ if (!defined('DATE_CALC_FORMAT')) {
  * It does not rely on 32-bit system time stamps, so it works dates
  * before 1970 and after 2038.
  *
- * @author Monte Ohrt <monte@ispi.net>
- * @author Daniel Convissor <danielc@php.net>
  * @copyright 1999-2006 Monte Ohrt, Pierre-Alain Joye, Daniel Convissor
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -435,7 +435,6 @@ class DateCalculationService
         return $julian;
     }
 
-
     /**
      * Returns the full weekday name for the given date
      *
@@ -465,7 +464,6 @@ class DateCalculationService
         $weekday = self::dayOfWeek($day, $month, $year);
         return $weekday_names[$weekday];
     }
-
 
     /**
      * Returns the abbreviated weekday name for the given date
@@ -498,7 +496,6 @@ class DateCalculationService
         }
         return substr(self::getWeekdayFullname($day, $month, $year), 0, $length);
     }
-
 
     /**
      * Returns the full month name for the given month
@@ -563,7 +560,6 @@ class DateCalculationService
         return $months;
     }
 
-
     /**
      * Returns an array of week days
      *
@@ -583,7 +579,6 @@ class DateCalculationService
         }
         return $weekdays;
     }
-
 
     /**
      * Returns day of week for given date (0 = Sunday)
@@ -625,7 +620,6 @@ class DateCalculationService
         return (int)$weekday_number;
     }
 
-
     /**
      * Returns week of the year, first Sunday is first day of first week
      *
@@ -656,7 +650,6 @@ class DateCalculationService
         $week_number = intval($parts[1]);
         return $week_number;
     }
-
 
     /**
      * Find the number of days in the given month
@@ -694,7 +687,6 @@ class DateCalculationService
         }
         return 31;
     }
-
 
     /**
      * Returns the number of rows on a calendar month
@@ -786,7 +778,6 @@ class DateCalculationService
         return self::daysToDate($days, $format);
     }
 
-
     /**
      * Returns date of the next specific day of the week
      * from the given date
@@ -874,10 +865,11 @@ class DateCalculationService
         }
         $this_weekday = self::dayOfWeek($day, $month, $year);
         $interval = (7 - DATE_CALC_BEGIN_WEEKDAY + $this_weekday) % 7;
-        return self::daysToDate(self::dateToDays($day, $month, $year) - $interval,
-            $format);
+        return self::daysToDate(
+            self::dateToDays($day, $month, $year) - $interval,
+            $format
+        );
     }
-
 
     /**
      * Find the month day of the end of week for given date,
@@ -911,10 +903,11 @@ class DateCalculationService
         }
         $this_weekday = self::dayOfWeek($day, $month, $year);
         $interval = (6 + DATE_CALC_BEGIN_WEEKDAY - $this_weekday) % 7;
-        return self::daysToDate(self::dateToDays($day, $month, $year) + $interval,
-            $format);
+        return self::daysToDate(
+            self::dateToDays($day, $month, $year) + $interval,
+            $format
+        );
     }
-
 
     /**
      * Find the month day of the beginning of week before given date,
@@ -947,8 +940,10 @@ class DateCalculationService
             $day = self::dateNow('%d');
         }
 
-        $date = self::daysToDate(self::dateToDays($day - 7, $month, $year),
-            '%Y%m%d');
+        $date = self::daysToDate(
+            self::dateToDays($day - 7, $month, $year),
+            '%Y%m%d'
+        );
 
         $prev_week_year = substr($date, 0, 4);
         $prev_week_month = substr($date, 4, 2);
@@ -956,7 +951,6 @@ class DateCalculationService
 
         return self::beginOfWeek($prev_week_day, $prev_week_month, $prev_week_year, $format);
     }
-
 
     /**
      * Find the month day of the beginning of week after given date,
@@ -989,8 +983,10 @@ class DateCalculationService
             $day = self::dateNow('%d');
         }
 
-        $date = self::daysToDate(self::dateToDays($day + 7, $month, $year),
-            '%Y%m%d');
+        $date = self::daysToDate(
+            self::dateToDays($day + 7, $month, $year),
+            '%Y%m%d'
+        );
 
         $next_week_year = substr($date, 0, 4);
         $next_week_month = substr($date, 4, 2);
@@ -1039,7 +1035,6 @@ class DateCalculationService
         return self::dateFormat($day, $month, $year, $format);
     }
 
-
     /**
      * Returns date of the last day of next month of given date
      *
@@ -1079,7 +1074,6 @@ class DateCalculationService
         $day = self::daysInMonth($month, $year);
         return self::dateFormat($day, $month, $year, $format);
     }
-
 
     /**
      * Returns date of the first day of the month in the number of months
@@ -1141,7 +1135,6 @@ class DateCalculationService
         return self::dateFormat(1, $month, $year, $format);
     }
 
-
     /**
      * Returns date of the last day of the month in the number of months
      * from the given date
@@ -1198,10 +1191,13 @@ class DateCalculationService
                 $year += floor($tmp_mo / 12);
             }
         }
-        return self::dateFormat(self::daysInMonth($month, $year), $month, $year,
-            $format);
+        return self::dateFormat(
+            self::daysInMonth($month, $year),
+            $month,
+            $year,
+            $format
+        );
     }
-
 
     /**
      * Find the day of the week for the first of the month of given date
@@ -1233,7 +1229,6 @@ class DateCalculationService
     {
         return checkdate($month, $day, $year);
     }
-
 
     /**
      * Returns true for a leap year, else false
@@ -1281,5 +1276,4 @@ class DateCalculationService
     {
         return new DateTime($year . '-' . $month . '-' . $day);
     }
-
 }

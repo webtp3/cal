@@ -20,7 +20,6 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 if (!defined('DATE_CALC_BEGIN_WEEKDAY')) {
     /**
      * Defines what day starts the week
@@ -72,7 +71,7 @@ class CalDate extends \DateTime
      * @param CalDate $compareDate
      * @return bool
      */
-    public function equals(CalDate $compareDate): bool
+    public function equals(self $compareDate): bool
     {
         $a = floatval($compareDate->format('YmdHMS'));
         $b = floatval($this->format('YmdHMS'));
@@ -83,7 +82,7 @@ class CalDate extends \DateTime
      * @param CalDate $compareDate
      * @return bool
      */
-    public function before(CalDate $compareDate): bool
+    public function before(self $compareDate): bool
     {
         $a = floatval($compareDate->format('YmdHMS'));
         $b = floatval($this->format('YmdHMS'));
@@ -94,7 +93,7 @@ class CalDate extends \DateTime
      * @param CalDate $compareDate
      * @return bool
      */
-    public function after(CalDate $compareDate): bool
+    public function after(self $compareDate): bool
     {
         $a = floatval($compareDate->format('YmdHMS'));
         $b = floatval($this->format('YmdHMS'));
@@ -106,7 +105,7 @@ class CalDate extends \DateTime
      * @param $compareDateB
      * @return int
      */
-    public function compare(CalDate $compareDateA, CalDate $compareDateB): int
+    public function compare(self $compareDateA, self $compareDateB): int
     {
         $a = floatval($compareDateA->format('YmdHMS'));
         $b = floatval($compareDateB->format('YmdHMS'));
@@ -273,7 +272,7 @@ class CalDate extends \DateTime
     /**
      * @param $date
      */
-    public function copy(CalDate $date)
+    public function copy(self $date)
     {
         $this->setYear($date->getYear());
         $this->setMonth($date->getMonth());

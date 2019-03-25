@@ -29,6 +29,7 @@ use TYPO3\CMS\Cal\Utility\Functions;
  * Base model for the calendar location.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class LocationAddressService extends BaseService
 {
@@ -41,9 +42,12 @@ class LocationAddressService extends BaseService
      * @param int $uid
      * @param string $pidList
      * @return OrganizerPartnerService tx_cal_organizer_partner object
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function find($uid, $pidList): OrganizerPartnerService
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $locationArray = $this->getLocationFromTable($pidList, ' AND ' . $this->tableId . '.uid=' . $uid);
         return $locationArray[0];
     }
@@ -52,10 +56,12 @@ class LocationAddressService extends BaseService
      * Looks for an location with a given uid on a certain pid-list
      *
      * @param string $pidList
-     * @return array tx_cal_location_address object array
+     * @return array tx_cal_location_address object array#@deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function findAll($pidList): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->getLocationFromTable($pidList);
     }
 
@@ -65,9 +71,12 @@ class LocationAddressService extends BaseService
      * @param string $pidList
      * @param string $searchword
      * @return array containing the location objects
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function search($pidList, $searchword): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->getLocationFromTable($pidList, $this->searchWhere($searchword));
     }
 
@@ -77,9 +86,12 @@ class LocationAddressService extends BaseService
      * @param string $pidList
      * @param string $additionalWhere
      * @return array containing the location objects
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getLocationFromTable($pidList, $additionalWhere = ''): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $locations = [];
         if ($pidList !== '') {
             $additionalWhere .= ' AND ' . $this->tableId . '.pid IN (' . $pidList . ')';
@@ -120,9 +132,12 @@ class LocationAddressService extends BaseService
      *
      * @param string $sw :
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function searchWhere($sw): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $where = $this->cObj->searchWhere(
             $sw,
             $this->conf['view.']['search.']['searchLocationFieldList'],
@@ -134,9 +149,12 @@ class LocationAddressService extends BaseService
     /**
      * @param $uid
      * @return object
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function updateLocation($uid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $insertFields = [
             'tstamp' => time()
         ];
@@ -153,9 +171,12 @@ class LocationAddressService extends BaseService
 
     /**
      * @param $uid
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function removeLocation($uid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         if ($this->rightsObj->isAllowedToDeleteLocation()) {
             $updateFields = [
                 'tstamp' => time(),
@@ -169,9 +190,12 @@ class LocationAddressService extends BaseService
 
     /**
      * @param $insertFields
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function retrievePostData(&$insertFields)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $hidden = 0;
         if ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedToEditLocationHidden() || $this->rightsObj->isAllowedToCreateLocationHidden())) {
             $hidden = 1;
@@ -222,9 +246,12 @@ class LocationAddressService extends BaseService
     /**
      * @param $pid
      * @return object
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function saveLocation($pid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $crdate = time();
         $insertFields = [
             'pid' => $pid,
@@ -278,9 +305,12 @@ class LocationAddressService extends BaseService
     /**
      * @param $insertFields
      * @return mixed
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function _saveLocation(&$insertFields)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $table = 'tt_address';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
@@ -295,9 +325,12 @@ class LocationAddressService extends BaseService
 
     /**
      * @return bool
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function isAllowedService(): bool
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
         return $useLocationStructure === $this->keyId;

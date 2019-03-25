@@ -22,13 +22,11 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Service;
  */
 use TYPO3\CMS\Cal\Controller\Api;
 
-
 /**
  * API for calendar base (cal)
  */
 class ApiControllerTests extends \CAG\CagTests\Core\Functional\FunctionalTestCase
 {
-
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
     protected $objectManager;
@@ -45,14 +43,14 @@ class ApiControllerTests extends \CAG\CagTests\Core\Functional\FunctionalTestCas
         $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_calendar.xml');
         $this->apiController = $this->objectManager->get(Api::class);
-
     }
 
     /**
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod() {
+    public function dummyMethod()
+    {
         $this->assertTrue(true);
     }
 
@@ -130,8 +128,7 @@ class ApiControllerTests extends \CAG\CagTests\Core\Functional\FunctionalTestCas
     public function canFindWithoutApi()
     {
         $c =  $this->apiController->tx_cal_api_without(1);
-        $this->assertEquals($c["uid"], 1);
-
+        $this->assertEquals($c['uid'], 1);
     }
 
     /**
@@ -144,13 +141,12 @@ class ApiControllerTests extends \CAG\CagTests\Core\Functional\FunctionalTestCas
         $evt = new \TYPO3\CMS\Cal\Model\EventModel;
         $evt->setPid(1);
         $evt->setUid(111);
-        $type = "testtype";
+        $type = 'testtype';
         $evt->setType($type);
-        $title = "testtype event";
+        $title = 'testtype event';
         $evt->setTitle($title);
         $this->apiController->saveEvent($evt);
         $this->assertEquals($evt, $this->apiController->findEvent(1, $type, [1]));
-
     }
 
 //    /**

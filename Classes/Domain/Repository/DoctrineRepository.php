@@ -19,18 +19,28 @@ namespace TYPO3\CMS\Cal\Domain\Repository;
  */
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
  * Class DoctrineRepository
  */
-class DoctrineRepository
+class DoctrineRepository extends Repository
 {
 
     /**
      * @var string
      */
     protected $table = '';
+
+    /**
+     * @var string
+     */
+    protected $model = '';
 
     /**
      * @return QueryBuilder
@@ -40,34 +50,6 @@ class DoctrineRepository
         return GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable($this->table)
             ->createQueryBuilder();
-    }
-
-    /**
-     * @return array
-     */
-    public function findAll(): array
-    {
-        $queryBuilder = $this->getQueryBuilder();
-        return $queryBuilder
-            ->select('*')
-            ->from($this->table)
-            ->execute()
-            ->fetchAll();
-    }
-
-    /**
-     * @param int $uid
-     * @return array
-     */
-    public function findOneByUid(int $uid): array
-    {
-        $queryBuilder = $this->getQueryBuilder();
-        return $queryBuilder
-            ->select('*')
-            ->from($this->table)
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))
-            ->execute()
-            ->fetch();
     }
 
     /**
@@ -83,5 +65,21 @@ class DoctrineRepository
             ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))
             ->values($values)
             ->execute();
+    }
+
+    /**
+     * This function creates an extbase object from the database result.
+     *
+     * @param array $row
+     * @return AbstractEntity
+     */
+    public function getObject(array $row): AbstractEntity
+    {
+        if ($this->model === '') {
+            throw new Exception('No model is defined to handle objects from table ' . $this->table . '.', 1550607468);
+        }
+        return GeneralUtility::makeInstance(ObjectManager::class)
+            ->get(DataMapper::class)
+            ->map($this->model, [$row])[0];
     }
 }

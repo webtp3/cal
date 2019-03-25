@@ -29,6 +29,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Base model for the calendar organizer.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class OrganizerService extends BaseService
 {
@@ -43,6 +44,8 @@ class OrganizerService extends BaseService
      */
     public function find($uid, $pidList): Organizer
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $organizerArray = $this->getOrganizerFromTable($pidList, ' AND tx_cal_organizer.uid=' . $uid);
         return $organizerArray[0];
     }
@@ -55,6 +58,8 @@ class OrganizerService extends BaseService
      */
     public function findAll($pidList): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->getOrganizerFromTable($pidList);
     }
 
@@ -67,6 +72,8 @@ class OrganizerService extends BaseService
      */
     public function search($pidList, $searchword): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->getOrganizerFromTable($pidList, $this->searchWhere($searchword));
     }
 
@@ -79,6 +86,8 @@ class OrganizerService extends BaseService
      */
     public function getOrganizerFromTable($pidList, $additionalWhere = ''): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $organizers = [];
         $orderBy = Functions::getOrderBy('tx_cal_organizer');
         if ($pidList !== '') {
@@ -148,6 +157,8 @@ class OrganizerService extends BaseService
      */
     public function searchWhere($sw): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $where = $this->cObj->searchWhere(
             $sw,
             $this->conf['view.']['search.']['searchOrganizerFieldList'],
@@ -162,6 +173,8 @@ class OrganizerService extends BaseService
      */
     public function updateOrganizer($uid): Organizer
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $insertFields = [
             'tstamp' => time()
         ];
@@ -266,6 +279,8 @@ class OrganizerService extends BaseService
      */
     public function removeOrganizer($uid)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         if ($this->rightsObj->isAllowedToDeleteOrganizer()) {
             $updateFields = [
                 'tstamp' => time(),
@@ -283,6 +298,8 @@ class OrganizerService extends BaseService
      */
     public function retrievePostData(&$insertFields)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $hidden = 0;
         if ($this->controller->piVars['hidden'] === 'true' && ($this->rightsObj->isAllowedToEditOrganizerHidden() || $this->rightsObj->isAllowedToCreateOrganizerHidden())) {
             $hidden = 1;
@@ -359,6 +376,8 @@ class OrganizerService extends BaseService
      */
     public function saveOrganizer($pid): Organizer
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $crdate = time();
         $insertFields = [
             'pid' => $pid,
@@ -388,6 +407,8 @@ class OrganizerService extends BaseService
      */
     public function _saveOrganizer(&$insertFields)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $table = 'tx_cal_organizer';
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
@@ -502,6 +523,8 @@ class OrganizerService extends BaseService
      */
     public function isAllowedService(): bool
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $useOrganizerStructure = ($confArr['useOrganizerStructure'] ?: 'tx_cal_organizer');
         return $useOrganizerStructure === $this->keyId;
@@ -535,8 +558,13 @@ class OrganizerService extends BaseService
         }
     }
 
+    /**
+     *
+     */
     public function unsetPiVars()
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         unset($this->controller->piVars['hidden'], $this->controller->piVars['_TRANSFORM_description'], $this->controller->piVars['uid'], $this->controller->piVars['type'], $this->controller->piVars['formCheck'], $this->controller->piVars['name'], $this->controller->piVars['description'], $this->controller->piVars['street'], $this->controller->piVars['zip'], $this->controller->piVars['city'], $this->controller->piVars['country'], $this->controller->piVars['countryzone'], $this->controller->piVars['phone'], $this->controller->piVars['email'], $this->controller->piVars['link'], $this->controller->piVars['image'], $this->controller->piVars['image_caption'], $this->controller->piVars['image_title'], $this->controller->piVars['image_alt']);
     }
 }

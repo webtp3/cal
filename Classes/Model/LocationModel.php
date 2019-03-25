@@ -21,17 +21,16 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use SJBR\StaticInfoTables\PiBaseApi;
-use SJBR\StaticInfoTables\PiBaseApi;
 use SJBR\StaticInfoTables\Utility\LocalizationUtility;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use SJBR\StaticInfoTables\PiBaseApi;
 
 /**
  * Base model for the calendar location.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 abstract class LocationModel extends BaseModel
 {
@@ -112,97 +111,133 @@ abstract class LocationModel extends BaseModel
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getName(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->name;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setName($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->name = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getDescription(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->description;
     }
 
     /**
      * @param $d
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setDescription($d)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->description = $d;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getStreet(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->street;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setStreet($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->street = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getZip(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->zip;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setZip($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->zip = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getCity(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->city;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setCity($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->city = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getCountryZone(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->countryzone;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setCountryZone($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         if ($t) {
             $this->countryzone = $t;
         }
@@ -210,17 +245,23 @@ abstract class LocationModel extends BaseModel
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getCountry(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->country;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setCountry($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         if ($t) {
             $this->country = $t;
         }
@@ -228,121 +269,166 @@ abstract class LocationModel extends BaseModel
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getPhone(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->phone;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setPhone($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->phone = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getMobilephone(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->mobilephone;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setMobilephone($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->mobilephone = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getFax(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->fax;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setFax($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->fax = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getLink(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->link;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setLink($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->link = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getEmail(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->email;
     }
 
     /**
      * @param $t
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setEmail($t)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->email = $t;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getLongitude(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->longitude;
     }
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getLatitude(): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->latitude;
     }
 
     /**
      * @param $l
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setLongitude($l)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->longitude = $l;
     }
 
     /**
      * @param $l
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function setLatitude($l)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->latitude = $l;
     }
 
     /**
      * @param $row
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createLocation($row)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->row = $row;
         $this->setUid($row['uid']);
         $this->setName($row['name']);
@@ -366,10 +452,12 @@ abstract class LocationModel extends BaseModel
      * @param $rems
      * @param $wrapped
      * @param $view
-     * @deprecated
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getMapMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $sims['###MAP###'] = 'The mapping abilities are currently unavailable.';
     }
 
@@ -379,9 +467,12 @@ abstract class LocationModel extends BaseModel
      * @param $rems
      * @param $wrapped
      * @param $view
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getCountryMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->initLocalCObject();
         if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
             $staticInfo = GeneralUtility::makeInstance(PiBaseApi::class);
@@ -412,9 +503,12 @@ abstract class LocationModel extends BaseModel
      * @param $rems
      * @param $wrapped
      * @param $view
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getCountryZoneMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->initLocalCObject();
         if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
             $staticInfo = GeneralUtility::makeInstance(PiBaseApi::class);
@@ -445,9 +539,12 @@ abstract class LocationModel extends BaseModel
      * @param $rems
      * @param $wrapped
      * @param $view
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getLocationLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $wrapped['###LOCATION_LINK###'] = explode('$5&xs2', $this->getLinkToLocation('$5&xs2'));
     }
 
@@ -457,9 +554,12 @@ abstract class LocationModel extends BaseModel
      * @param $rems
      * @param $wrapped
      * @param $view
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getOrganizerLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $wrapped['###ORGANIZER_LINK###'] = explode('$5&xs2', $this->getLinkToOrganizer('$5&xs2'));
     }
 
@@ -469,9 +569,12 @@ abstract class LocationModel extends BaseModel
      * @param $rems
      * @param $wrapped
      * @param $view
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getEditLinkMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $sims['###EDIT_LINK###'] = '';
         if ($this->isUserAllowedToEdit()) {
             $linkConf = $this->getValuesAsArray();
@@ -534,35 +637,47 @@ abstract class LocationModel extends BaseModel
     /**
      * @param $key
      * @param $link
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function addEventLink($key, $link)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         $this->eventLinks[$key] = $link;
     }
 
     /**
      * @return array
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getEventLinks(): array
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->eventLinks;
     }
 
     /**
      * @param $linktext
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getLinkToOrganizer($linktext): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return $this->getLinkToLocation($linktext);
     }
 
     /**
      * @param string $linktext
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function getLinkToLocation($linktext): string
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         if ($linktext === '') {
             $linktext = 'no title';
         }
@@ -585,9 +700,12 @@ abstract class LocationModel extends BaseModel
 
     /**
      * @param $piVars
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function updateWithPIVars(&$piVars)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         foreach ($piVars as $key => $value) {
             switch ($key) {
                 case 'uid':
@@ -687,9 +805,12 @@ abstract class LocationModel extends BaseModel
 
     /**
      * @return string
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function __toString()
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         return get_class($this) . ': ' . implode(', ', $this->row);
     }
 }

@@ -20,6 +20,7 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+use TYPO3\CMS\Cal\Domain\Repository\LocationRepository;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -412,6 +413,11 @@ abstract class Model extends BaseModel
     private $calendarObject;
 
     /**
+     * @var LocationRepository
+     */
+    protected $locationRepository;
+
+    /**
      * Constructor.
      *
      * @param string $serviceKey
@@ -420,6 +426,7 @@ abstract class Model extends BaseModel
     {
         $this->setObjectType('event');
         parent::__construct($serviceKey);
+        $this->locationRepository = GeneralUtility::makeInstance(LocationRepository::class);
     }
 
     /**
@@ -1532,13 +1539,8 @@ abstract class Model extends BaseModel
     public function getLocationObject()
     {
         if (!$this->locationObject) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-            $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
-            $modelObj = &Registry::Registry('basic', 'modelcontroller');
-            $this->locationObject = $modelObj->findLocation(
-                $this->getLocationId(),
-                $useLocationStructure,
-                $this->conf['pidList']
+            $this->locationRepository->findByUid(
+                $this->getLocationId()
             );
         }
         return $this->locationObject;

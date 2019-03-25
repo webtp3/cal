@@ -27,6 +27,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Base model for the calendar location.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
+ * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class LocationAddress extends Location
 {
@@ -36,9 +37,12 @@ class LocationAddress extends Location
      *
      * @param $row
      * @param string $pidList
+     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function __construct($row, $pidList)
     {
+        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+
         parent::__construct($row, $pidList);
         $this->setObjectType('location');
         $this->setType('tx_tt_address');

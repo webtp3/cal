@@ -27,13 +27,14 @@ use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use PDO;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+
 /**
  * Class BaseService
  */
@@ -41,7 +42,6 @@ abstract class BaseService extends AbstractService
 {
     /** @var ConnectionPool $connectionPool */
     public $connectionPool;
-
 
     public $cObj; // The backReference to the mother cObj object set at call time
     /**
@@ -117,11 +117,18 @@ abstract class BaseService extends AbstractService
 
     public $fileFunc;
     public $extConf;
+
     /** @var CalDate  */
     public $calDate;
 
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
     public function __construct()
     {
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->controller = &Registry::Registry('basic', 'controller');
         $this->conf = &Registry::Registry('basic', 'conf');
         $this->rightsObj = &Registry::Registry('basic', 'rightscontroller');
@@ -131,7 +138,6 @@ abstract class BaseService extends AbstractService
         $this->extConf['categoryService'] = 'sys_category';
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $this->calDate = GeneralUtility::makeInstance(CalDate::class);
-
     }
 
     /**
@@ -259,9 +265,9 @@ abstract class BaseService extends AbstractService
         );
         foreach ($fields as $field) {
             if (($isSave && $this->rightsObj->isAllowedTo(
-                        'create',
-                        $object,
-                        $field
+                'create',
+                $object,
+                $field
                     )) || (!$isSave && $this->rightsObj->isAllowedTo('edit', $object, $field))) {
                 if ($this->conf['view.'][$this->conf['view'] . '.']['additional_fields.'][$field . '_stdWrap.']) {
                     $insertFields[$field] = $this->cObj->stdWrap(
@@ -339,8 +345,8 @@ abstract class BaseService extends AbstractService
         $removeFiles = $this->controller->piVars['remove_' . $type] ?: [];
         if (!empty($removeFiles)) {
             $where = 'uid_foreign = ' . $uid . ' AND  tablenames=\'' . $objectType . '\' AND fieldname=\'' . $type . '\' AND uid in (' . implode(
-                    ',',
-                    array_values($removeFiles)
+                ',',
+                array_values($removeFiles)
                 ) . ')';
             $result = $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_file_reference', $where);
             if (false === $result) {
@@ -369,8 +375,8 @@ abstract class BaseService extends AbstractService
             $configuration = $tmpStorage->getConfiguration();
             $isLocalDriver = $storageRecord['driver'] === 'Local';
             $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
-                    $configuration['basePath'],
-                    $fileadminDirectory
+                $configuration['basePath'],
+                $fileadminDirectory
                 );
             if ($isLocalDriver && $isOnFileadmin) {
                 $storage = $tmpStorage;

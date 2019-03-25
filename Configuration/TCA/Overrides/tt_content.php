@@ -6,8 +6,6 @@
  * LICENSE file that was distributed with this source code.
  */
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }

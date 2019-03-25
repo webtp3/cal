@@ -26,6 +26,7 @@ use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -200,17 +201,23 @@ abstract class BaseModel extends AbstractModel
     public $sharedGroups = [];
 
     /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
+    /**
      * Constructor.
      *
      * @param string $serviceKey serviceKey for this model
      */
     public function __construct($serviceKey)
     {
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->controller = &Registry::Registry('basic', 'controller');
         $this->conf = &Registry::Registry('basic', 'conf');
         $this->serviceKey = &$serviceKey;
 
-        $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+        $this->markerBasedTemplateService = $this->objectManager->get(MarkerBasedTemplateService::class);
 
         $this->initObjectStorage();
     }
@@ -390,7 +397,7 @@ abstract class BaseModel extends AbstractModel
      */
     public function getImages()
     {
-        $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
+        $fileRepository = $this->objectManager->get(FileRepository::class);
         return $fileRepository->findByRelation('tx_cal_' . $this->getObjectType(), 'image', $this->getUid());
     }
 
@@ -434,7 +441,7 @@ abstract class BaseModel extends AbstractModel
      */
     public function getAttachments()
     {
-        $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
+        $fileRepository = $this->objectManager->get(FileRepository::class);
         return $fileRepository->findByRelation('tx_cal_' . $this->getObjectType(), 'attachment', $this->getUid());
     }
 
