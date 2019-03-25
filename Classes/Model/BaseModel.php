@@ -202,8 +202,20 @@ abstract class BaseModel extends AbstractModel
 
     /**
      * @var ObjectManager
+     * @inject
      */
-    protected $objectManager;
+    protected $objectManager = null;
+
+    /**
+     * Injects the object manager
+     *
+     * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
+     * @return void
+     */
+    public function injectObjectManager(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager)
+    {
+        $this->objectManager = $objectManager;
+    }
 
     /**
      * Constructor.
@@ -212,12 +224,14 @@ abstract class BaseModel extends AbstractModel
      */
     public function __construct($serviceKey)
     {
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        if ($this->objectManager === null) {
+            $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        }
         $this->controller = &Registry::Registry('basic', 'controller');
         $this->conf = &Registry::Registry('basic', 'conf');
         $this->serviceKey = &$serviceKey;
 
-        $this->markerBasedTemplateService = $this->objectManager->get(MarkerBasedTemplateService::class);
+        //$this->markerBasedTemplateService = $this->objectManager->get(MarkerBasedTemplateService::class);
 
         $this->initObjectStorage();
     }
@@ -877,7 +891,7 @@ abstract class BaseModel extends AbstractModel
     public function fillTemplate($subpartMarker): string
     {
         $page = Functions::getContent($this->templatePath);
-
+        $this->markerBasedTemplateService = $this->objectManager->get(MarkerBasedTemplateService::class);
         if ($page === '') {
             return Functions::createErrorMessage(
                 'No ' . $this->objectType . ' template file found at: >' . $this->templatePath . '<.',

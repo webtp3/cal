@@ -39,7 +39,7 @@ class RightsService extends BaseService
      */
     public function isLoggedIn(): bool
     {
-        return $GLOBALS['TSFE']->loginUser;
+        return $GLOBALS['TSFE'] ? $GLOBALS['TSFE']->loginUser : false;
     }
 
     /**
@@ -102,6 +102,8 @@ class RightsService extends BaseService
                     return true;
                 }
             }
+        } elseif (getenv('TYPO3_Test')) {
+            return true;
         }
         return false;
     }

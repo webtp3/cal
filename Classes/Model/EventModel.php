@@ -113,10 +113,10 @@ class EventModel extends Model
     {
         parent::__construct($serviceKey);
 
-        $this->eventSharedUserMMRepository = $this->objectManager->get(EventSharedUserMMRepository::class);
-        $this->subscriptionRepository = $this->objectManager->get(SubscriptionRepository::class);
-        $this->unknownUserRepository = $this->objectManager->get(UnknownUserRepository::class);
-        $this->userRepository = $this->objectManager->get(UserRepository::class);
+//        $this->eventSharedUserMMRepository = $this->objectManager->get(EventSharedUserMMRepository::class);
+//        $this->subscriptionRepository = $this->objectManager->get(SubscriptionRepository::class);
+//        $this->unknownUserRepository = $this->objectManager->get(UnknownUserRepository::class);
+//        $this->userRepository = $this->objectManager->get(UserRepository::class);
 
         if (is_array($row)) {
             $this->createEvent($row, $isException);

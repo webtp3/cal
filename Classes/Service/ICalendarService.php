@@ -145,15 +145,8 @@ class ICalendarService extends BaseService
                 )
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
-//            $result = $connection->exec_SELECTquery(
-//                '*',
-//                'tx_cal_calendar',
-//                ' type IN (1,2) AND pid IN (' . $pidList . ') AND uid=' . $uid . ' ' . $enableFields
-//            );
         }
         if ($result) {
-//            $row = $connection->sql_fetch_assoc($result);
-//            $connection->sql_free_result($result);
             return $result;
         }
         return [];

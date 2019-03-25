@@ -29,6 +29,7 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\TimeTracker\TimeTracker;
 use TYPO3\CMS\Core\TypoScript\ExtendedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
@@ -56,10 +57,16 @@ class Api
     public $unsetTSFEOnDestruct = false;
     /** @var ConnectionPool $connectionPool */
     public $connectionPool;
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
 
     public function __construct()
     {
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $this->modelObj = $this->objectManager->get(ModelController::class);
     }
 
     /**
@@ -101,7 +108,7 @@ class Api
         $this->rightsObj->setDefaultSaveToPage();
 
         $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
-        $this->modelObj = new ModelController();
+        // $this->modelObj = new ModelController();
 
         $this->viewObj = &Registry::Registry('basic', 'viewcontroller');
         $this->viewObj = GeneralUtility::makeInstance(ViewController::class);

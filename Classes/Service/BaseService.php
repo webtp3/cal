@@ -131,9 +131,13 @@ abstract class BaseService extends AbstractService
         $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->controller = &Registry::Registry('basic', 'controller');
         $this->conf = &Registry::Registry('basic', 'conf');
-        $this->rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        // -> cant load your self
+        //// $this->rightsObj = &Registry::Registry('basic', 'rightscontroller');
+
         $this->cObj = &Registry::Registry('basic', 'cobj');
-        $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
+        // $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
+        $this->modelObj =  $this->objectManager->get(ModelController::class);
+
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->extConf['categoryService'] = 'sys_category';
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
@@ -156,6 +160,18 @@ abstract class BaseService extends AbstractService
         $additionalParams = [],
         $switchUidLocalForeign = false
     ) {
+        $connection =  GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($mm_table);
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+
         $uid_local = 'uid_local';
         $uid_foreign = 'uid_foreign';
         if ($switchUidLocalForeign) {
@@ -170,10 +186,10 @@ abstract class BaseService extends AbstractService
                     'tablenames' => $tablename,
                     'sorting' => $key + 1
                 ], $additionalParams);
-                $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($mm_table, $insertFields);
+                $result = $queryBuilder->insert($mm_table, $insertFields);
                 if (false === $result) {
                     throw new RuntimeException(
-                        'Could not write ' . $mm_table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                        'Could not write ' . $mm_table . ' record to database: ' . $connection->errorCode(),
                         1431458138
                     );
                 }

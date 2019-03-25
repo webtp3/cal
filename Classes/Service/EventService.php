@@ -95,6 +95,7 @@ class EventService extends BaseService
         $this->eventSharedUserMMRepository = $this->objectManager->get(EventSharedUserMMRepository::class);
         $this->subscriptionRepository = $this->objectManager->get(SubscriptionRepository::class);
         $this->eventRepository = $this->objectManager->get(EventRepository::class);
+        $this->rightsObj =  $this->objectManager->get(RightsService::class);
     }
 
     /**

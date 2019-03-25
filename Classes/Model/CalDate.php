@@ -73,8 +73,8 @@ class CalDate extends \DateTime
      */
     public function equals(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHMS'));
-        $b = floatval($this->format('YmdHMS'));
+        $a = ((float)$compareDate->format('YmdHMS'));
+        $b = ((float)$this->format('YmdHMS'));
         return $a === $b;
     }
 
@@ -84,8 +84,8 @@ class CalDate extends \DateTime
      */
     public function before(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHMS'));
-        $b = floatval($this->format('YmdHMS'));
+        $a = ((float)$compareDate->format('YmdHMS'));
+        $b = ((float)$this->format('YmdHMS'));
         return $a > $b;
     }
 
@@ -95,8 +95,8 @@ class CalDate extends \DateTime
      */
     public function after(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHMS'));
-        $b = floatval($this->format('YmdHMS'));
+        $a = ((float)$compareDate->format('YmdHMS'));
+        $b = ((float)$this->format('YmdHMS'));
         return $a < $b;
     }
 
@@ -107,8 +107,8 @@ class CalDate extends \DateTime
      */
     public function compare(self $compareDateA, self $compareDateB): int
     {
-        $a = floatval($compareDateA->format('YmdHMS'));
-        $b = floatval($compareDateB->format('YmdHMS'));
+        $a = ((float)$compareDateA->format('YmdHMS'));
+        $b = ((float)$compareDateB->format('YmdHMS'));
         if ($a === $b) {
             return 0;
         }
@@ -140,7 +140,7 @@ class CalDate extends \DateTime
      */
     public function addSeconds($sec = 0)
     {
-        settype($sec, 'int');
+        $sec = (int)$sec;
 
         // Negative value given.
         if ($sec < 0) {

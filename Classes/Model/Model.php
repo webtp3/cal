@@ -426,7 +426,7 @@ abstract class Model extends BaseModel
     {
         $this->setObjectType('event');
         parent::__construct($serviceKey);
-        $this->locationRepository = GeneralUtility::makeInstance(LocationRepository::class);
+//        $this->locationRepository = GeneralUtility::makeInstance(LocationRepository::class);
     }
 
     /**

@@ -68,7 +68,7 @@ class ModelController extends BaseController
         $this->todoSubtype = $confArr ['todoSubtype'];
 
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        $this->locationRepository = GeneralUtility::makeInstance(LocationRepository::class);
+        // $this->locationRepository = GeneralUtility::makeInstance(LocationRepository::class);
     }
 
     /**
