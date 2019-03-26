@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+	<pages>
+		<uid>1</uid>
+		<pid>0</pid>
+		<t3ver_oid>0</t3ver_oid>
+		<t3ver_id>0</t3ver_id>
+		<t3ver_label></t3ver_label>
+		<t3ver_state>0</t3ver_state>
+		<t3ver_stage>0</t3ver_stage>
+		<t3ver_count>0</t3ver_count>
+		<t3ver_tstamp>0</t3ver_tstamp>
+		<t3ver_move_id>0</t3ver_move_id>
+		<t3_origuid>0</t3_origuid>
+		<tstamp>1553605779</tstamp>
+		<sorting>256</sorting>
+		<deleted>0</deleted>
+		<perms_userid>2</perms_userid>
+		<perms_groupid>1</perms_groupid>
+		<perms_user>31</perms_user>
+		<perms_group>27</perms_group>
+		<perms_everybody>0</perms_everybody>
+		<editlock>0</editlock>
+		<crdate>1553165984</crdate>
+		<cruser_id>2</cruser_id>
+		<hidden>0</hidden>
+		<title>Congratulations</title>
+		<doktype>1</doktype>
+		<TSconfig></TSconfig>
+		<is_siteroot>1</is_siteroot>
+		<php_tree_stop>0</php_tree_stop>
+		<url></url>
+		<starttime>0</starttime>
+		<endtime>0</endtime>
+		<urltype>1</urltype>
+		<shortcut>54</shortcut>
+		<shortcut_mode>0</shortcut_mode>
+		<no_cache>0</no_cache>
+		<fe_group></fe_group>
+		<subtitle>you have succesfully installed TYPO3</subtitle>
+		<layout>0</layout>
+		<target></target>
+		<media>0</media>
+		<lastUpdated>0</lastUpdated>
+		<keywords>typo3, introduction package, install, example setup</keywords>
+		<alias></alias>
+		<l18n_cfg>0</l18n_cfg>
+		<fe_login_mode>0</fe_login_mode>
+	</pages>
+</dataset>

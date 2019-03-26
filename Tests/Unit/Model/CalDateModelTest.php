@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Tests\Unit\Model;
 
 /**
@@ -51,8 +45,8 @@ class CalDateModelTest extends UnitTestCase
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod()
-    {
+    public function dummyMethod() {
+
         $this->assertTrue(true);
     }
 
@@ -68,5 +62,7 @@ class CalDateModelTest extends UnitTestCase
         $this->assertEquals(2018, $this->calDateInstance->getYear());
     }
 
+
 //
+
 }

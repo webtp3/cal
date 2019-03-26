@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Tests\Unit\Model;
 
 /**
@@ -36,15 +30,14 @@ class CalendarModelTest extends UnitTestCase
     protected function setUp()
     {
         // * @param string $serviceKey Service key, must be prefixed "tx_", "Tx_" or "user_"
-        $this->calModelInstance = new CalendarModel('', 'tx_cal_calendar');
+        $this->calModelInstance = new CalendarModel('','tx_cal_calendar');
     }
 
     /**
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod()
-    {
+    public function dummyMethod() {
         $this->assertTrue(true);
     }
 
@@ -59,6 +52,8 @@ class CalendarModelTest extends UnitTestCase
         $this->calModelInstance->setTitle($title);
         $this->assertEquals($title, $this->calModelInstance->getTitle());
     }
+
+
 
     /**
      * Test if ActivateFreeAndBusy can be set
@@ -94,17 +89,21 @@ class CalendarModelTest extends UnitTestCase
         $this->assertEquals($url, $this->calModelInstance->getExtUrl());
     }
 
+
+
     /**
      * Test if IcsFile can be set
      *
      * @test
      */
+
     public function canSetIcsFile()
     {
         $url = 'https://www.typotest.de';
         $this->calModelInstance->setIcsFile($url);
         $this->assertEquals($url, $this->calModelInstance->getIcsFile());
     }
+
 
     //#todo model testing cal
 
@@ -178,4 +177,7 @@ class CalendarModelTest extends UnitTestCase
 //    {
 //        $this->freeAndBusyUser[$table][] = $freeAndBusyUser;
 //    }
+
+
+
 }

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Tests\Unit\Model;
 
 /**
@@ -41,15 +35,14 @@ class EventModelTest extends UnitTestCase
          * @param $isException
          * @param $serviceKey
          */
-        $this->eventModelInstance = new EventModel('', 0, 'tx_cal_event');
+        $this->eventModelInstance = new EventModel('',0,'tx_cal_event');
     }
 
     /**
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod()
-    {
+    public function dummyMethod() {
         $this->assertTrue(true);
     }
 
@@ -64,6 +57,7 @@ class EventModelTest extends UnitTestCase
         $this->eventModelInstance->setTeaser($title);
         $this->assertEquals($title, $this->eventModelInstance->getTeaser());
     }
+
 
     /**
      * Test setTstamp
@@ -89,6 +83,7 @@ class EventModelTest extends UnitTestCase
         $this->eventModelInstance->setOrganizer($title);
         $this->assertEquals($title, $this->eventModelInstance->getOrganizer());
     }
+
 
     /**
      * Test setLocation
@@ -182,4 +177,5 @@ class EventModelTest extends UnitTestCase
 //    public function setPriority($priority)
 //    public function setCompleted($completed)
 //    public function setDeviationDates($deviationDates)
+
 }

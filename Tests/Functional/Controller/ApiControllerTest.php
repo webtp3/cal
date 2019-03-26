@@ -6,7 +6,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\CMS\Cal\Tests\Functional\Service;
+namespace TYPO3\CMS\Cal\Tests\Functional\Controller;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -22,11 +22,13 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Service;
  */
 use TYPO3\CMS\Cal\Controller\Api;
 
+
 /**
  * API for calendar base (cal)
  */
-class ApiControllerTests extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class ApiControllerTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
 {
+
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
     protected $objectManager;
@@ -41,84 +43,43 @@ class ApiControllerTests extends \CAG\CagTests\Core\Functional\FunctionalTestCas
         parent::setUp();
         $success = true;
         $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+        $this->importDataSet(__DIR__ . '/../Fixtures/pages.xml');
+        $this->importDataSet(__DIR__ . '/../Fixtures/tt_content.xml');
         $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_calendar.xml');
+        $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_event.xml');
         $this->apiController = $this->objectManager->get(Api::class);
+        //$this->setUpFrontendRootPage(1, ['EXT:cal/Configuration/TypoScript/']);
+
+
     }
 
     /**
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod()
-    {
+    public function dummyMethod() {
         $this->assertTrue(true);
     }
 
-//    /**
-//     * Test find external calendar uid or pid-list
-//     * @test
-//     *
-//     */
-//    public function canFindByUidTest(): array
-//    {
-//        /*
-//      * @param int $uid
-//      *            to search for
-//      * @param string $pidList
-//      *            to search in
-//      * @return array array ($row)
-//     */
-//
-//        $c =  $this->apiController->find(1);
-//        $this->assertEquals($c["uid"], 1);
-//    }
+    /**
+     * Test find external calendar uid or pid-list
+     * @test
+     *
+     */
+    public function canFindByUidTest(): array
+    {
+        /*
+      * @param int $uid
+      *            to search for
+      * @param string $pidList
+      *            to search in
+      * @return array array ($row)
+     */
 
-//    /**
-//     * Example:
-//     * require_once ('class.tx_cal_api.php');
-//     * $calAPI = new Api($this->cObj, &$conf);
-//     * $event = $calAPI->findEvent('2','tx_cal_phpicalendar');
-//     * @param $cObj
-//     * @param $conf
-//     * @return Api
-//     */
-//    public function tx_cal_api_with(&$cObj, &$conf): self
-//    {
-//        $this->cObj = &$cObj;
-//        $this->conf = &$conf;
-//        if (!$GLOBALS ['TCA']) {
-//            $GLOBALS ['TSFE']->includeTCA();
-//        }
-//
-//        $this->conf ['useInternalCaching'] = 1;
-//        $this->conf ['cachingEngine'] = 'cachingFramework';
-//
-//        $GLOBALS ['TSFE']->settingLocale();
-//
-//        $this->controller = GeneralUtility::makeInstance(Controller::class);
-//        $this->controller->cObj = &$this->cObj;
-//        $this->controller->conf = &$this->conf;
-//
-//        $this->controller->setWeekStartDay();
-//
-//        $this->controller->cleanPiVarParam($this->piVars);
-//        $this->controller->clearPiVarParams();
-//        $this->controller->getParamsFromSession();
-//        $this->controller->initCaching();
-//        $this->controller->initConfigs();
-//
-//        $this->rightsObj = &Registry::Registry('basic', 'rightscontroller');
-//        $this->rightsObj = GeneralUtility::makeInstanceService('cal_rights_model', 'rights');
-//        $this->rightsObj->setDefaultSaveToPage();
-//
-//        $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
-//        $this->modelObj = new ModelController();
-//
-//        $this->viewObj = &Registry::Registry('basic', 'viewcontroller');
-//        $this->viewObj = GeneralUtility::makeInstance(ViewController::class);
-//
-//        return $this;
-//    }
+        $c =  $this->apiController->findEvent(1,'tx_cal_phpicalendar','1');
+        $this->assertEquals($c["uid"], 1);
+    }
+
 
     /**
      * Test find tx_cal_api_without event by pid
@@ -128,7 +89,8 @@ class ApiControllerTests extends \CAG\CagTests\Core\Functional\FunctionalTestCas
     public function canFindWithoutApi()
     {
         $c =  $this->apiController->tx_cal_api_without(1);
-        $this->assertEquals($c['uid'], 1);
+        $this->assertEquals($c["uid"], 1);
+
     }
 
     /**
@@ -138,15 +100,16 @@ class ApiControllerTests extends \CAG\CagTests\Core\Functional\FunctionalTestCas
      */
     public function canCreateFindEvent()
     {
-        $evt = new \TYPO3\CMS\Cal\Model\EventModel;
+        $evt = new \TYPO3\CMS\Cal\Model\EventModel('',0,'tx_cal_phpicalendar');
         $evt->setPid(1);
         $evt->setUid(111);
-        $type = 'testtype';
+        $type = "tx_cal_phpicalendar";
         $evt->setType($type);
-        $title = 'testtype event';
+        $title = "testtype event";
         $evt->setTitle($title);
-        $this->apiController->saveEvent($evt);
-        $this->assertEquals($evt, $this->apiController->findEvent(1, $type, [1]));
+        $this->apiController->saveEvent('','tx_cal_phpicalendar',1);
+        $this->assertEquals($evt, $this->apiController->findEvent(111, $type, [1]));
+
     }
 
 //    /**

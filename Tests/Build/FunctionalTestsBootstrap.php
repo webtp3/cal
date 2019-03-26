@@ -12,6 +12,7 @@
  * with phpunit parameter --bootstrap if executing single test case classes.
  */
 call_user_func(function () {
+    putenv('TYPO3_Test=true');
     $testbase = new \CAG\CagTests\Core\Testbase();
     $testbase->enableDisplayErrors();
     $testbase->defineBaseConstants();
