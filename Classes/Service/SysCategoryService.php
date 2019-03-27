@@ -38,6 +38,12 @@ class SysCategoryService extends BaseService
     protected $categoryArrayCached = [];
     public static $categoryToFilter;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->rightsObj =  $this->objectManager->get(RightsService::class);
+    }
+
     /**
      * Looks for a category with a given uid on a certain pid-list
      *
@@ -69,6 +75,20 @@ class SysCategoryService extends BaseService
      */
     public function updateCategory($uid): CategoryModel
     {
+        $table = 'sys_category';
+
+        $connection = $this->connectionPool->getConnectionForTable($table);
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+
         $insertFields = [
             'tstamp' => time()
         ];
@@ -77,11 +97,12 @@ class SysCategoryService extends BaseService
         $this->retrievePostData($insertFields);
         $uid = $this->checkUidForLanguageOverlay($uid, 'sys_category');
         // Creating DB records
-        $table = 'sys_category';
-        $where = 'uid = ' . $uid;
-
-        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
-
+        $result = $queryBuilder->update($table,$insertFields,['uid' => $uid])
+            ->execute();
+       // $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+        if(!$result){
+            return $result;
+        }
         $this->unsetPiVars();
         return $this->find($uid, $this->conf['pidList']);
     }
@@ -92,6 +113,18 @@ class SysCategoryService extends BaseService
     public function removeCategory($uid)
     {
         if ($this->rightsObj->isAllowedToDeleteCategory()) {
+            $table = 'sys_category';
+            $connection = $this->connectionPool->getConnectionForTable($table);
+            $queryBuilder = $connection->createQueryBuilder();
+            if (TYPO3_MODE == 'BE') {
+                $queryBuilder
+                    ->getRestrictions()
+                    ->removeAll()
+                    ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            } else {
+                $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+            }
+
             // 'delete' the category object
             $updateFields = [
                 'tstamp' => time(),
@@ -99,8 +132,13 @@ class SysCategoryService extends BaseService
             ];
             $table = 'sys_category';
             $where = 'uid = ' . $uid;
-            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
-
+           // $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $result = $queryBuilder->update($table,$updateFields,['uid' => $uid])
+                ->execute();
+            // $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+            if(!$result){
+                return $result;
+            }
             $this->unsetPiVars();
         }
     }
@@ -121,11 +159,11 @@ class SysCategoryService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedToEditCategoryCalendar() || $this->rightsObj->isAllowedToCreateCategoryCalendar()) {
-            $insertFields['calendar_id'] = intval($this->controller->piVars['calendar_id']);
+            $insertFields['calendar_id'] = (int)$this->controller->piVars['calendar_id'];
         }
 
         if ($this->rightsObj->isAllowedToEditCategoryParent() || $this->rightsObj->isAllowedToCreateCategoryParent()) {
-            $insertFields['parent_category'] = intval($this->controller->piVars['parent_category']);
+            $insertFields['parent_category'] = (int)$this->controller->piVars['parent_category'];
         }
 
         if ($this->rightsObj->isAllowedToEditCategoryHeaderstyle() || $this->rightsObj->isAllowedToCreateCategoryHeaderstyle()) {
@@ -137,7 +175,7 @@ class SysCategoryService extends BaseService
         }
 
         if ($this->rightsObj->isAllowedToEditCategorySharedUser() || $this->rightsObj->isAllowedToCreateCategorySharedUser()) {
-            $insertFields['shared_user_allowed'] = intval($this->controller->piVars['shared_user_allowed']);
+            $insertFields['shared_user_allowed'] = (int)$this->controller->piVars['shared_user_allowed'];
         }
     }
 
@@ -170,14 +208,27 @@ class SysCategoryService extends BaseService
     private function _saveCategory(&$insertFields)
     {
         $table = 'sys_category';
-        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
+        $connection = $this->connectionPool->getConnectionForTable($table);
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+
+       // $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
+        $result = $queryBuilder->insert($table, $insertFields)
+            ->execute();
         if (false === $result) {
             throw new RuntimeException(
                 'Could not write ' . $table . ' record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
                 1431458158
             );
         }
-        $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+        $uid = $connection->lastInsertId($table);
         return $uid;
     }
 
@@ -188,6 +239,18 @@ class SysCategoryService extends BaseService
      */
     public function getCategorySearchString($pidList, $includePublic): string
     {
+        $table = 'sys_category';
+        $connection = $this->connectionPool->getConnectionForTable($table);
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+
         $categorySearchString = '';
         if ($this->conf['category'] !== '') {
             $categorySearchString .= ' AND sys_category_record_mm.tablenames = "tx_cal_event" AND sys_category_record_mm.uid_local IN (' . $this->conf['category'] . ')';
@@ -247,6 +310,7 @@ class SysCategoryService extends BaseService
      */
     public function getCategoryArray($pidList, &$categoryArrayToBeFilled, $showPublicCategories = true)
     {
+
         if (!empty($this->categoryArrayCached[md5($this->conf['view.']['categoryMode'] . $this->conf['view.']['allowedCategories'])])) {
             $categoryArrayToBeFilled[] = $this->categoryArrayCached[md5($this->conf['view.']['categoryMode'] . $this->conf['view.']['allowedCategories'])];
             return;
@@ -333,7 +397,8 @@ class SysCategoryService extends BaseService
         $orderby = 'calendar_id,sys_category.title ASC';
         $where = '1=1 ';
         $where .= $calendarSearchString;
-        $where .= $this->cObj->enableFields('tx_cal_calendar') . ' AND tx_cal_calendar.pid IN (' . $pidList . ') ' . $this->cObj->enableFields('sys_category');
+        //$where .= $this->cObj->enableFields('tx_cal_calendar') .  . $this->cObj->enableFields('sys_category');
+        $where .= ' AND tx_cal_calendar.pid IN (' . $pidList . ') ';
         $where .= $additionalWhere . $filterWhere;
 
         $where .= $this->getAdditionalWhereForLocalizationAndVersioning('sys_category');
@@ -551,10 +616,37 @@ class SysCategoryService extends BaseService
      */
     private function getCategoriesFromTable($select, $table, $where, $groupby = ''): array
     {
+        $table = 'sys_category';
+        $connection = $this->connectionPool->getConnectionForTable($table);
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+
         $categories = [];
-        $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby);
+       // $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby);
+        $result =  $queryBuilder->select($select)
+            ->from($table)
+            ->where(
+//
+//                $queryBuilder->expr()->eq(
+//                    'calendar_id',$calId
+//                ),
+//                $queryBuilder->expr()->eq(
+//                    'title',$queryBuilder->createNamedParameter($category,$categoryTable)
+//                )
+            )
+            ->groupBy($groupby)
+            ->execute();
+//            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($categorySelect, $categoryTable, $categoryWhere);
         if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+            while ($row = $result->fetch()) {
+           // while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($GLOBALS['TSFE']->sys_language_content) {
                     $row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
                         'sys_category',

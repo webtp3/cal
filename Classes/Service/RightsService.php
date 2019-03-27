@@ -8,6 +8,9 @@
 
 namespace TYPO3\CMS\Cal\Service;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Cal\Utility\Registry;
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -32,6 +35,9 @@ class RightsService extends BaseService
     {
         parent::__construct();
         $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->controller = &Registry::Registry('basic', 'controller');
+
     }
 
     /**
@@ -102,7 +108,8 @@ class RightsService extends BaseService
                     return true;
                 }
             }
-        } elseif (getenv('TYPO3_Test')) {
+        }
+        else if(getenv('TYPO3_Test')){
             return true;
         }
         return false;

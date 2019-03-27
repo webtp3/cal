@@ -38,7 +38,8 @@ use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
 /**
  * Class EventService
  */
@@ -873,15 +874,28 @@ class EventService extends BaseService
 
         // Creating DB records
         $table = 'tx_cal_event';
-        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
+        $connection = $this->connectionPool->getConnectionForTable($table);
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+//        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
+        $result =  $queryBuilder->insert($table,$eventData)
+            ->execute();
         if (false === $result) {
             throw new RuntimeException(
-                'Could not write event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                'Could not write event record to database: ' . debug($queryBuilder->getSQL()),
                 1431458130
             );
         }
 
-        $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+        $uid =  $connection->lastInsertId($table);
 
         if ($this->rightsObj->isAllowedTo('create', 'event', 'image')) {
             $this->checkOnNewOrDeletableFiles('tx_cal_event', 'image', $eventData, $uid);
@@ -1095,7 +1109,7 @@ class EventService extends BaseService
                     $attendeeValues['status'] = $attendee->getStatus();
                     $attendeeValues['cruser_id'] = $insertFields['cruser_id'];
                     $attendeeService->_saveAttendee($attendeeValues);
-                    $attendeeUids[] = $GLOBALS['TYPO3_DB']->sql_insert_id();
+                    $attendeeUids[] =  $connection->lastInsertId($table);
                 }
             }
             $insertFields['attendee'] = count($attendeeUids);
@@ -1202,11 +1216,22 @@ class EventService extends BaseService
 
         // Creating DB records
         $table = 'tx_cal_event';
-        $where = 'uid = ' . $uid;
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $eventData);
+        $where = ['uid' =>  $uid];
+        $connection = $this->connectionPool->getConnectionForTable($table);
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+        $result = $queryBuilder->update($table, $where, $eventData);
         if (false === $result) {
             throw new RuntimeException(
-                'Could not write event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                'Could not write event record to database: ' . debug($queryBuilder->getSQL()),
                 1431458130
             );
         }
@@ -1337,8 +1362,19 @@ class EventService extends BaseService
 
         if ($tempValues['exception_ids'] !== null && $tempValues['exception_ids'] !== '' && $this->rightsObj->isAllowedToEditEventException()) {
             $table = 'tx_cal_exception_event_mm';
-            $where = 'uid_local = ' . $uid;
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
+            $where = ['uid_local' => $uid];
+            $connection = $this->connectionPool->getConnectionForTable($table);
+
+            $queryBuilder = $connection->createQueryBuilder();
+            if (TYPO3_MODE == 'BE') {
+                $queryBuilder
+                    ->getRestrictions()
+                    ->removeAll()
+                    ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            } else {
+                $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+            }
+            $queryBuilder->delete($table, $where);
             $user = [];
             $group = [];
             self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['exception_ids'])), $user, $group);
@@ -1432,14 +1468,29 @@ class EventService extends BaseService
                     $attendeeValues['attendance'] = $attendee->getAttendance();
                     $attendeeValues['status'] = $attendee->getStatus();
                     $attendeeService->_saveAttendee($attendeeValues);
-                    $attendeeUids[] = $GLOBALS['TYPO3_DB']->sql_insert_id();
+                    $attendeeUids[] =  $connection->lastInsertId($table);
                 }
             }
             $uidsToBeDeleted = array_diff($oldAttendeeUids[$servKey], $attendeeUids);
             if (!empty($uidsToBeDeleted)) {
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-                    'tx_cal_attendee',
-                    'uid in (' . implode(',', $uidsToBeDeleted) . ')'
+               $table = 'tx_cal_attendee';
+               $connection = $this->connectionPool->getConnectionForTable($table);
+
+                $queryBuilder = $connection->createQueryBuilder();
+                if (TYPO3_MODE == 'BE') {
+                    $queryBuilder
+                        ->getRestrictions()
+                        ->removeAll()
+                        ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+                } else {
+                    $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+                }
+                $queryBuilder->delete('tx_cal_attendee')->where(
+                   //
+                // 'uid in (' . implode(',', $uidsToBeDeleted) . ')'
+                    $queryBuilder->expr()->in(
+                        'uid',implode(',', $uidsToBeDeleted)
+                    )
                 );
             }
             $eventData['attendee'] = count($attendeeUids);
@@ -1467,7 +1518,7 @@ class EventService extends BaseService
             $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
             if (false === $result) {
                 throw new RuntimeException(
-                    'Could not delete event record from database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                    'Could not delete event record from database: ' . debug($queryBuilder->getSQL()),
                     1431458133
                 );
             }
@@ -2077,7 +2128,7 @@ class EventService extends BaseService
                         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
                         if (false === $result) {
                             throw new RuntimeException(
-                                'Could not write event index record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                                'Could not write event index record to database: ' . debug($queryBuilder->getSQL()),
                                 1431458131
                             );
                         }
@@ -2154,7 +2205,7 @@ class EventService extends BaseService
                         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
                         if (false === $result) {
                             throw new RuntimeException(
-                                'Could not write event index record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                                'Could not write event index record to database: ' . debug($queryBuilder->getSQL()),
                                 1431458132
                             );
                         }
@@ -2196,7 +2247,7 @@ class EventService extends BaseService
                         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
                         if (false === $result) {
                             throw new RuntimeException(
-                                'Could not write event index record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                                'Could not write event index record to database: ' . debug($queryBuilder->getSQL()),
                                 1431458133
                             );
                         }
@@ -2307,11 +2358,11 @@ class EventService extends BaseService
         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
         if (false === $result) {
             throw new RuntimeException(
-                'Could not write exception event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                'Could not write exception event record to database: ' . debug($queryBuilder->getSQL()),
                 1431458134
             );
         }
-        $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+        $uid =  $connection->lastInsertId($table);
 
         self::insertIdsIntoTableWithMMRelation('tx_cal_exception_event_mm', [
             $uid
@@ -2698,7 +2749,7 @@ class EventService extends BaseService
                         $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
                         if (false === $result) {
                             throw new RuntimeException(
-                                'Could not write event index record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                                'Could not write event index record to database: ' . debug($queryBuilder->getSQL()),
                                 1431458135
                             );
                         }

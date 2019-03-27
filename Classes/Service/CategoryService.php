@@ -44,6 +44,7 @@ class CategoryService extends BaseService
     public function __construct()
     {
         parent::__construct();
+        $this->rightsObj =  $this->objectManager->get(RightsService::class);
         trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Affected class: ' . get_class($this), E_USER_DEPRECATED);
     }
 

@@ -11,6 +11,8 @@ namespace TYPO3\CMS\Cal\Domain\Repository;
 
 use TYPO3\CMS\Cal\Service\RightsService;
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -46,6 +48,7 @@ class CalendarRepository extends DoctrineRepository
      */
     public function getAccessibleCalendars($limitationList, $pidList, $includePublic, $includeData = false, $onlyPublic = false): array
     {
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $groupIds = '';
         $userId = '';
         $calendarIds = [];
@@ -58,7 +61,8 @@ class CalendarRepository extends DoctrineRepository
 
         // Lets see if the user is logged in
         /** @var RightsService $rightsObj */
-        $rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        //$rightsObj = &Registry::Registry('basic', 'rightscontroller');
+        $rightsObj = $this->objectManager->get(RightsService::class);
         if (!$onlyPublic && $rightsObj->isLoggedIn()) {
             $userId = $rightsObj->getUserId();
             $groupIds = implode(',', $rightsObj->getUserGroups());

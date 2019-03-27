@@ -179,6 +179,10 @@ abstract class BaseModel extends AbstractModel
      * @var ObjectStorage
      */
     protected $images;
+    /**
+     * @var int
+     */
+    public $calendarUid = 0;
 
     /**
      * @var MarkerBasedTemplateService
@@ -224,9 +228,7 @@ abstract class BaseModel extends AbstractModel
      */
     public function __construct($serviceKey)
     {
-        if ($this->objectManager === null) {
-            $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        }
+        if($this->objectManager === null)  $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->controller = &Registry::Registry('basic', 'controller');
         $this->conf = &Registry::Registry('basic', 'conf');
         $this->serviceKey = &$serviceKey;
@@ -244,6 +246,21 @@ abstract class BaseModel extends AbstractModel
         $this->images = new ObjectStorage();
     }
 
+    /**
+     * @param $uid
+     */
+    public function setCalendarUid($uid)
+    {
+        $this->calendarUid = $uid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCalendarUid(): int
+    {
+        return $this->calendarUid;
+    }
     /**
      * Returns the image marker
      * @param $template

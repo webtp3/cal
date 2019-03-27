@@ -27,14 +27,16 @@ use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
 use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-
+use PDO;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 /**
  * Class BaseService
  */

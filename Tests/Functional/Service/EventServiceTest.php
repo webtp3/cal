@@ -21,21 +21,21 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Service;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 
-use TYPO3\CMS\Cal\Service\EventsService;
+use TYPO3\CMS\Cal\Service\EventService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Class EventsServiceTest
+ * Class EventServiceTest
  */
-class EventsServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class EventServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
 {
 
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
     protected $objectManager;
 
-    /** @var  EventsService */
+    /** @var  EventService */
     protected $calService;
 
     protected $testExtensionsToLoad = ['typo3conf/ext/cal'];
@@ -46,7 +46,8 @@ class EventsServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
         $success = true;
         $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_calendar.xml');
-        $this->calService = $this->objectManager->get(EventsService::class);
+        $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_event.xml');
+        $this->calService = $this->objectManager->get(EventService::class);
 
     }
 
@@ -86,8 +87,14 @@ class EventsServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
                 $onlyMeetingsWithoutStatus = false,
                 $eventType = '0,1,2,3'
             )*/
-        $c =  $this->calService->getEventsFromTable();
-        $this->assertEquals(1, $c);
+        $c =  $this->calService->getEventsFromTable([],
+             false,
+             '',
+             '',
+             false,
+             false,
+             '0,1,2,3');
+        $this->assertInternalType('array',$c);
     }
 
     /**
@@ -106,7 +113,7 @@ class EventsServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
      * @return array array of array (array of $rows)
      */
         $c = $this->calService->findAll([1]);
-        $this->assertEquals($c, 1);
+        $this->assertInternalType('array',$c);
 
     }
 
@@ -118,9 +125,15 @@ class EventsServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
     public function camCreateEventTest()
     {
 
-        $c = $this->calService->createEvent(1, 0);
-        $this->assertEquals(1, $c);
-
+        $evt = $this->calService->createEvent(1, 0);
+        $evt->setPid(1);
+        $evt->setUid(111);
+        $type = "tx_cal_phpicalendar";
+        $evt->setType($type);
+        $title = "testtype event";
+        $evt->setTitle($title);
+        $this->calService->saveEvent('','tx_cal_phpicalendar',1);
+        $this->assertEquals($evt, $this->calService->findEvent(111, $type, [1]));
     }
 
 

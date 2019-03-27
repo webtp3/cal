@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model\Pear\Date;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -39,6 +33,8 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
+ * @author Baba Buehler <baba@babaz.com>
+ * @author Pierre-Alain Joye <pajoye@php.net>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -66,6 +62,7 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * This class includes time zone data (from zoneinfo) in the form of a
  * global array, $_DATE_TIMEZONE_DATA.
  *
+ * @author Baba Buehler <baba@babaz.com>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License

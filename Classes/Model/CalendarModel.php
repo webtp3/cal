@@ -117,9 +117,7 @@ class CalendarModel extends BaseModel
         parent::__construct($row, $serviceKey);
 //        $this->userGroupMMRepository = GeneralUtility::makeInstance(UserGroupMMRepository::class);
 //        $this->fnbUserGroupMMRepository = GeneralUtility::makeInstance(FnbUserGroupMMRepository::class);
-        if ($this->objectManager === null) {
-            $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        }
+        if($this->objectManager === null) $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
 //        $this->userGroupMMRepository = $this->objectManager->get(UserGroupMMRepository::class);
 //        $this->fnbUserGroupMMRepository = $this->objectManager->get(FnbUserGroupMMRepository::class);
 

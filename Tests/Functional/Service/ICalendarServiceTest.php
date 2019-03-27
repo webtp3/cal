@@ -264,45 +264,47 @@ class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestC
     }
     //#todo further functional Tests if work
 
-    /**
-     * Test insertCalEventsIntoDB an existing calendar events
-     *
-     * @test
-     *
-     */
-    public function canInsertCalEventsIntoDBTest() {
-        /**
-         * @param array $iCalendarComponentArray
-         *            component array
-         * @param int $calId
-         *            The calendar uid to add the events/todos to
-         * @param string $pid
-         *            The save page id
-         * @param string $cruserId
-         *            The create user id
-         * @param number $isTemp
-         *            are the records only temporary (1 == true, 0 == false)
-         * @param string $deleteNotUsedCategories
-         *            Should not assigned categories be deleted
-         * @return array The inserted or updated event uids
-         * @throws RuntimeException
-         */
-        $calId = 2;
-        $c = $this->calService->insertCalEventsIntoDB(
-            $iCalendarComponentArray = [
-                'type' => 'vEvent',
-            ],
-            $calId,
-            $pid = '1',
-            $cruserId = '1',
-            $isTemp = 1,
-            $deleteNotUsedCategories = true
-        );
-        if (is_array($c)) {
-            $c = array_sum($c);
-        }
-        $this->assertGreaterThan($calId, $c);
-    }
+//    /**
+//     * Test insertCalEventsIntoDB an existing calendar events
+//     *
+//     * @test
+//     *
+//     */
+//    public function canInsertCalEventsIntoDBTest() {
+//        /**
+//         * @param array $iCalendarComponentArray
+//         *            component array
+//         * @param int $calId
+//         *            The calendar uid to add the events/todos to
+//         * @param string $pid
+//         *            The save page id
+//         * @param string $cruserId
+//         *            The create user id
+//         * @param number $isTemp
+//         *            are the records only temporary (1 == true, 0 == false)
+//         * @param string $deleteNotUsedCategories
+//         *            Should not assigned categories be deleted
+//         * @return array The inserted or updated event uids
+//         * @throws RuntimeException
+//         */
+//        $calId = 2;
+//        $venvent = new \TYPO3\CMS\Cal\Model\ICalendar\vevent();
+//        $venvent->setAttribute('UID',2);
+//        $c = $this->calService->insertCalEventsIntoDB(
+//            $iCalendarComponentArray = [
+//                $venvent,
+//            ],
+//            $calId,
+//            $pid = '1',
+//            $cruserId = '1',
+//            $isTemp = 1,
+//            $deleteNotUsedCategories = true
+//        );
+//        if (is_array($c)) {
+//            $c = array_sum($c);
+//        }
+//        $this->assertGreaterThan($calId, $c);
+//    }
 
 //    /**
 //     * Test if calendar can be updated

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model\Pear;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -43,6 +37,9 @@ namespace TYPO3\CMS\Cal\Model\Pear;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
+ * @author Baba Buehler <baba@babaz.com>
+ * @author Pierre-Alain Joye <pajoye@php.net>
+ * @author Firman Wandayandi <firman@php.net>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -105,6 +102,9 @@ define('DATE_FORMAT_UNIXTIME', 5);
  * through the Date::TimeZone class. Supports several operations from
  * Date::Calc on Date objects.
  *
+ * @author Baba Buehler <baba@babaz.com>
+ * @author Pierre-Alain Joye <pajoye@php.net>
+ * @author Firman Wandayandi <firman@php.net>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -1280,7 +1280,7 @@ class Date
 
         $day = Calc::prevDay($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
-        $newDate = new self();
+        $newDate = new Date();
         $newDate->setDate($date);
         return $newDate;
     }
@@ -1303,7 +1303,7 @@ class Date
 
         $day = Calc::nextWeekday($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
-        $newDate = new self();
+        $newDate = new Date();
         $newDate->setDate($date);
         return $newDate;
     }
@@ -1326,7 +1326,7 @@ class Date
 
         $day = Calc::prevWeekday($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
-        $newDate = new self();
+        $newDate = new Date();
         $newDate->setDate($date);
         return $newDate;
     }

@@ -30,6 +30,7 @@ use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 
 /**
  * Class CalendarService
@@ -437,8 +438,9 @@ class CalendarService extends BaseService
             $calendarIds = implode(',', $idArray);
             $calendarSearchString = ' AND tx_cal_calendar.uid IN (' . $calendarIds . ')';
         }
-
-        $calendarSearchString .= $this->cObj->enableFields('tx_cal_calendar') . ' AND tx_cal_calendar.pid IN (' . $pidList . ') ';
+        //#todo
+        // $this->cObj->enableFields('tx_cal_calendar') . -> cobj should be provided by controller
+        $calendarSearchString .= ' AND tx_cal_calendar.pid IN (' . $pidList . ') ';
 
         $this->calendarSearchStringCache[$hash] = $calendarSearchString;
 
