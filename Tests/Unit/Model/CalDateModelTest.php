@@ -8,7 +8,7 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Model;
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  */
-use CAG\CagTests\Core\Unit\UnitTestCase;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 use TYPO3\CMS\Cal\Model\CalDate;
 
 /**

@@ -5,8 +5,23 @@
     "license": "GPL-2.0+",
     "require": {
         "php": ">=7.0 < 7.3",
-        "typo3/cms-core": "^8 || ^9",
-		"sjbr/static-info-tables": "~6.7"
+        "typo3/cms-core": "^9",
+		"sjbr/static-info-tables": "~6.7",
+		"typo3/cms-recordlist": "^8 || ^9.5",
+        "friendsoftypo3/typo3db-legacy": "^1.1"
+	},
+	"repositories":  {
+		"0":{
+			"type": "path",
+			"url": "../cal",
+			"options": {
+				"symlink": true
+			}
+		},
+		"1": {
+			"type": "composer",
+			"url": "https://composer.typo3.org/"
+		}
 
 	},
 	"require-dev": {
@@ -30,8 +45,11 @@
     },
     "replace": {
         "cal": "self.version",
-        "typo3-ter/cal": "self.version"
-    },
+        "typo3-ter/cal": "self.version",
+		"janhelke/cal": "self.version",
+		"web-tp3/cal": "self.version"
+
+	},
     "extra": {
         "typo3/cms": {
             "extension-key": "cal"

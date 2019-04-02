@@ -28,7 +28,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class RightsServiceTest
  */
-class RightsServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class RightsServiceTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
 {
 
 

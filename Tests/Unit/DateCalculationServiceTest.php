@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace TYPO3\CMS\Cal\Tests\Unit\Services;
 
 use TYPO3\CMS\Cal\Service\DateCalculationService;
-use CAG\CagTests\Core\Unit\UnitTestCase;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
  * Class DateCalculationServiceTest

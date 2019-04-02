@@ -13,7 +13,7 @@
  */
 call_user_func(function () {
     putenv('TYPO3_Test=true');
-    $testbase = new \CAG\CagTests\Core\Testbase();
+    $testbase = new \TYPO3\TestingFramework\Core\Testbase();
     $testbase->enableDisplayErrors();
     $testbase->defineBaseConstants();
     $testbase->defineOriginalRootPath();

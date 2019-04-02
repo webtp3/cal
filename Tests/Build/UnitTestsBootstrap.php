@@ -21,7 +21,7 @@
  *     typo3/sysext/core/Tests/Unit/DataHandling/DataHandlerTest.php
  */
 call_user_func(function () {
-    $testbase = new \CAG\CagTests\Core\Testbase();
+    $testbase = new \TYPO3\TestingFramework\Core\Testbase();
     $testbase->enableDisplayErrors();
     $testbase->defineBaseConstants();
     $testbase->defineSitePath();

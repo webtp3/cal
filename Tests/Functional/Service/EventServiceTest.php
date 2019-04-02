@@ -28,7 +28,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class EventServiceTest
  */
-class EventServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class EventServiceTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
 {
 
 

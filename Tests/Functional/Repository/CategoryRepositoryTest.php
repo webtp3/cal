@@ -13,7 +13,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Functional test for the DataHandler
  */
-class CategoryRepositoryTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class CategoryRepositoryTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
 {
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
