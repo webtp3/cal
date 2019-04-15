@@ -4,7 +4,7 @@
     "description" : "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
     "license": "GPL-2.0+",
     "require": {
-        "php": ">=7.0 < 7.3",
+        "php": ">=7.0 < 7.4",
         "typo3/cms-core": "^8 || ^9",
 		"sjbr/static-info-tables": "~6.7"
 

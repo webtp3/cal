@@ -22,6 +22,8 @@ $EM_CONF['cal'] = [
                 ],
             'suggests' => [
             'typo3db_legacy' => '1.1.0-1.1.99',
+            'tt_address' => '*',
+            'wec_map' => '*',
         ],
     ]
 ];
