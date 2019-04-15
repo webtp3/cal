@@ -85,7 +85,7 @@ class Labels
             $feUserRec = BackendUtility::getRecord('fe_users', $rec ['fe_user_id']);
             $label = $feUserRec ['name'] != '' ? $feUserRec ['name'] : $feUserRec ['username'];
         }
-        $label .= ' (' . $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.attendance.' . $rec ['attendance']) . ' -> ' . $rec ['status'] . ')';
+        $label .= ' (' . $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.attendance.' . $rec ['attendance']) . ' -> ' . $rec ['status'] . ')';
 
         // Write to the label
         $params ['title'] = $label;
@@ -116,7 +116,7 @@ class Labels
         }
 
         // Write to the label
-        $params ['title'] = $label . ' (' . $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_fe_user_event.offset') . ': ' . $rec ['offset'] . ')';
+        $params ['title'] = $label . ' (' . $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_fe_user_event.offset') . ': ' . $rec ['offset'] . ')';
     }
     public function getDeviationRecordLabel(&$params, &$pObj)
     {
@@ -127,7 +127,7 @@ class Labels
         // Get complete record
         $rec = BackendUtility::getRecord($params ['table'], $params ['row'] ['uid']);
 
-        $label = $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.deviation') . ': ';
+        $label = $GLOBALS ['LANG']->sl('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.deviation') . ': ';
 
         if ($rec ['orig_start_date']) {
             $dateObj = new \TYPO3\CMS\Cal\Model\CalDate($rec ['orig_start_date'] . '000000');

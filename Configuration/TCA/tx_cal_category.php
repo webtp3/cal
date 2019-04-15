@@ -10,7 +10,7 @@ defined('TYPO3_MODE') or die();
 
 $tx_cal_category = [
     'ctrl' => [
-        'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category',
+        'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category',
         'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -49,7 +49,7 @@ $tx_cal_category = [
         ],
         'title' => [
                 'exclude' => 0,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.title',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.title',
                 'config' => [
                         'type' => 'input',
                         'size' => '30',
@@ -59,7 +59,7 @@ $tx_cal_category = [
         ],
         'headerstyle' => [
                 'exclude' => 1,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.headerstyle',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.headerstyle',
                 'config' => [
                         'type' => 'user',
                         'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getHeaderStyles'
@@ -67,7 +67,7 @@ $tx_cal_category = [
         ],
         'bodystyle' => [
                 'exclude' => 1,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.bodystyle',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.bodystyle',
                 'config' => [
                         'type' => 'user',
                         'userFunc' => 'TYPO3\CMS\Cal\Backend\TCA\CustomTca->getBodyStyles'
@@ -75,7 +75,7 @@ $tx_cal_category = [
         ],
         'calendar_id' => [
                 'exclude' => 1,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.calendar',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.calendar',
                 'onChange' => 'reload',
                 'config' => [
                         'renderType' => 'selectSingle',
@@ -87,7 +87,7 @@ $tx_cal_category = [
                         ],
                         'items' => [
                                 [
-                                        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.none',
+                                        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.none',
                                         0
                                 ]
                         ],
@@ -99,7 +99,7 @@ $tx_cal_category = [
         ],
         'parent_category' => [
                 'exclude' => 1,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.parent_category',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.parent_category',
                 'config' => [
                         'type' => 'select',
                         'renderType' => 'selectTree',
@@ -130,14 +130,14 @@ $tx_cal_category = [
                 ]
         ],
         'shared_user_allowed' => [
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.shared_user_allowed',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.shared_user_allowed',
                 'config' => [
                         'type' => 'check'
                 ]
         ],
         'single_pid' => [
                 'exclude' => 1,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.single_pid',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.single_pid',
                 'config' => [
                         'type' => 'group',
                         'internal_type' => 'db',
@@ -149,7 +149,7 @@ $tx_cal_category = [
         ],
         'notification_emails' => [
                 'exclude' => 0,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.notification_emails',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.notification_emails',
                 'config' => [
                         'type' => 'input',
                         'size' => '30'
@@ -157,7 +157,7 @@ $tx_cal_category = [
         ],
         'icon' => [
                 'exclude' => 0,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.icon',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.icon',
                 'config' => [
                         'type' => 'input',
                         'size' => '30',

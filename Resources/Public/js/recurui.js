@@ -3,7 +3,7 @@ RecurUI.prototype = {
 	initialize: function(containerID, storageID, rowClass, rowHTML) {
 		this.containerID = containerID;
 		this.storageID = storageID;
-		this.rowClass = rowClass
+		this.rowClass = rowClass;
 		this.rowHTML = rowHTML;
 	},
 					
@@ -85,7 +85,7 @@ RecurUI.prototype = {
 			
 		});
 	}
-}
+};
 
 
 var ByDayUI = Class.create();

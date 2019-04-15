@@ -1,0 +1,225 @@
+<dataset>
+
+	<tt_content>
+		<uid>183</uid>
+		<pid>1</pid>
+        <tstamp>1553605779</tstamp>
+		<crdate>1553605658</crdate>
+		<cruser_id>1</cruser_id>
+		<editlock>0</editlock>
+		<hidden>0</hidden>
+		<sorting>768</sorting>
+		<CType>list</CType>
+		<header></header>
+		<header_position></header_position>
+		<rowDescription></rowDescription>
+		<bodytext>NULL</bodytext>
+		<bullets_type>0</bullets_type>
+		<uploads_description>0</uploads_description>
+		<uploads_type>0</uploads_type>
+		<assets>0</assets>
+		<image>0</image>
+		<imagewidth>0</imagewidth>
+		<imageorient>0</imageorient>
+		<imagecols>2</imagecols>
+		<imageborder>0</imageborder>
+		<media>0</media>
+		<layout>0</layout>
+		<frame_class>default</frame_class>
+		<deleted>0</deleted>
+		<cols>0</cols>
+		<spaceBefore>0</spaceBefore>
+		<spaceAfter>0</spaceAfter>
+		<space_before_class></space_before_class>
+		<space_after_class></space_after_class>
+		<records>NULL</records>
+		<pages></pages>
+		<starttime>0</starttime>
+		<endtime>0</endtime>
+		<colPos>3</colPos>
+		<subheader></subheader>
+		<fe_group></fe_group>
+		<header_link></header_link>
+		<image_zoom>0</image_zoom>
+		<header_layout>0</header_layout>
+		<list_type>cal_controller</list_type>
+		<sectionIndex>1</sectionIndex>
+		<linkToTop>0</linkToTop>
+		<file_collections>NULL</file_collections>
+		<filelink_size>0</filelink_size>
+		<filelink_sorting></filelink_sorting>
+		<target></target>
+		<date>0</date>
+		<recursive>0</recursive>
+		<imageheight>0</imageheight>
+		<sys_language_uid>0</sys_language_uid>
+		<pi_flexform>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;yes&quot; ?&gt;
+&lt;T3FlexForms&gt;
+    &lt;data&gt;
+        &lt;sheet index=&quot;sDEF&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;allowedViews&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;list&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;calendarName&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;My Calendar&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;subscription&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;subscribeWithCaptcha&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;weekStartDay&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;calendarDistance&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;50&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_Cat&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;calendarMode&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;calendarSelection&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;categoryMode&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;categorySelection&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_Year_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;yearViewPid&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_Month_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;monthViewPid&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;monthShowListView&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;monthMakeMiniCal&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_Week_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;weekViewPid&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_Day_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;dayViewPid&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;dayStart&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0700&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;dayEnd&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;2300&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;gridLength&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;15&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_List_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;listViewPid&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;starttime&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;endtime&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;maxEvents&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;maxRecurringEvents&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;usePageBrowser&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;recordsPerPage&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;pagesCount&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_Event_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;eventViewPid&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;isPreview&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_Ics_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;showIcsLinks&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_Other_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;showLogin&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;showSearch&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;showJumps&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;showCalendarSelection&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;showCategorySelection&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+                &lt;field index=&quot;showTomorrowEvents&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;0&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+        &lt;sheet index=&quot;s_TS_View&quot;&gt;
+            &lt;language index=&quot;lDEF&quot;&gt;
+                &lt;field index=&quot;myTS&quot;&gt;
+                    &lt;value index=&quot;vDEF&quot;&gt;&lt;/value&gt;
+                &lt;/field&gt;
+            &lt;/language&gt;
+        &lt;/sheet&gt;
+    &lt;/data&gt;
+&lt;/T3FlexForms&gt;</pi_flexform>
+		<accessibility_title></accessibility_title>
+		<accessibility_bypass>0</accessibility_bypass>
+		<accessibility_bypass_text></accessibility_bypass_text>
+		<l18n_parent>0</l18n_parent>
+		<l18n_diffsource>...</l18n_diffsource>
+		<l10n_source>0</l10n_source>
+		<selected_categories>NULL</selected_categories>
+		<category_field></category_field>
+	</tt_content>
+</dataset>

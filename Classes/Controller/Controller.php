@@ -32,7 +32,7 @@ class Controller extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 {
     public $prefixId = 'tx_cal_controller'; // Same as class name
     public $scriptRelPath = 'Classes/Controller/Controller.php'; // Path to this script relative to the extension dir.
-    public $locallangPath = 'Resources/Private/Language/locallang.xlf';
+    public $locallangPath = 'Resources/Private/Language/locallang.xml';
     public $extKey = 'cal'; // The extension key.
     public $pi_checkCHash = false;
     public $dayStart;

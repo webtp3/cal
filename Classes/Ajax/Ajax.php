@@ -47,7 +47,7 @@ if (is_array($controllerPiVarsPOST) && is_array($controllerPiVarsGET)) {
     $controllerPiVars = $controllerPiVarsGET;
 }
 
-$pid = intval($controllerPiVars ['pid']);
+$pid = (int)$controllerPiVars ['pid'];
 $view = $controllerPiVars ['view'];
 
 /** @var \TYPO3\CMS\Cal\Controller\Api $calAPI */

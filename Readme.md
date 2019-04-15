@@ -3,7 +3,7 @@
 [![Daily Downloads](https://poser.pugx.org/web-tp3/cal/d/daily)](https://packagist.org/packages/web-tp3/cal)
 [![Total Downloads](https://poser.pugx.org/web-tp3/cal/downloads)](https://packagist.org/packages/web-tp3/cal)
 [![License](https://poser.pugx.org/web-tp3/cal/license)](https://packagist.org/packages/web-tp3/cal)
-
+[![Build Status](https://travis-ci.org/webtp3/cal.svg?branch=master)](https://travis-ci.org/webtp3/cal)
 
 ## Installation
 
@@ -49,7 +49,3 @@ to accept only bugfixes if I can reproduce the issue.
 even more complicated in usability for an edge case feature. Please discuss a new feature before.
 
 [1]: https://getcomposer.org/
-
-[Manual](https://web.tp3.de/manual/cal.html)
-
-[Repository](https://bitbucket.org/web-tp3/cal)

@@ -143,8 +143,7 @@ function typo3Cal() {
 			}
 		);
 	};
-};
-
+}
 var cal = new typo3Cal();
 
 function calEvent(props) {
@@ -158,7 +157,7 @@ function calEvent(props) {
 				this[p] = props[prop][p];
 			}
 		}
-	}
+	};
 	
 	this.initStart = function() {
 		if(this.start_date){
@@ -201,7 +200,7 @@ function calEvent(props) {
 		this.initProps(props);
 		this.initStart();
 		this.initEnd();
-	}
+	};
 	
 	this.update(props);
 }

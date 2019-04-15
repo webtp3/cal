@@ -4,7 +4,127 @@
 	<tx_cal_event>
 		<uid>1</uid>
 		<pid>1</pid>
-		<title>findRecordsByUid</title>
+		<tstamp>1546741571</tstamp>
+		<crdate>1546741571</crdate>
+		<cruser_id>1</cruser_id>
+		<deleted>0</deleted>
+		<hidden>0</hidden>
+		<starttime>0</starttime>
+		<endtime>0</endtime>
+		<start_date>20170420</start_date>
+		<end_date>20170420</end_date>
+		<start_time>57600</start_time>
+		<end_time>61200</end_time>
+		<allday>0</allday>
+		<timezone>UTC</timezone>
+		<title>Kung Fu für Kinder ab 8 Jahren</title>
+		<calendar_id>6</calendar_id>
+		<organizer/>
+		<organizer_id>0</organizer_id>
+		<organizer_pid>0</organizer_pid>
+		<organizer_link/>
+		<location>Tai Chi Schule Ingelheim</location>
+		<location_id>0</location_id>
+		<location_pid>0</location_pid>
+		<location_link/>
+		<teaser>NULL</teaser>
+		<description>
+			Kung Fu Kinder (ab 8 Jahren) Eine typische Stunde: -Lockern -Gymnastik -Sanftes Dehnen -Stände (Ba Shi) -Spielen -Kicks -Basistechniken -Atemübung -Spielen
+		</description>
+		<freq>week</freq>
+		<until>20180502</until>
+		<cnt>0</cnt>
+		<byday>th</byday>
+		<bymonthday/>
+		<bymonth/>
+		<intrval>1</intrval>
+		<rdate>NULL</rdate>
+		<rdate_type>0</rdate_type>
+		<deviation/>
+		<monitor_cnt>0</monitor_cnt>
+		<exception_cnt>0</exception_cnt>
+		<fe_cruser_id>0</fe_cruser_id>
+		<fe_crgroup_id>0</fe_crgroup_id>
+		<shared_user_cnt>0</shared_user_cnt>
+		<type>0</type>
+		<page>0</page>
+		<ext_url/>
+		<isTemp>1</isTemp>
+		<icsUid>
+			q4khslt60m1h5f8t6mf4db1o6c_R20170420T140000@google.com
+		</icsUid>
+		<image/>
+		<attachment/>
+		<ref_event_id>0</ref_event_id>
+		<send_invitation>0</send_invitation>
+		<attendee/>
+		<status/>
+		<priority>0</priority>
+
+		<sys_language_uid>0</sys_language_uid>
+
+
+	</tx_cal_event>
+	<tx_cal_event>
+		<uid>2</uid>
+		<pid>1</pid>
+		<tstamp>1546741571</tstamp>
+		<crdate>1546741571</crdate>
+		<cruser_id>1</cruser_id>
+		<deleted>0</deleted>
+		<hidden>0</hidden>
+		<starttime>0</starttime>
+		<endtime>0</endtime>
+		<start_date>20170420</start_date>
+		<end_date>20170420</end_date>
+		<start_time>57600</start_time>
+		<end_time>61200</end_time>
+		<allday>0</allday>
+		<timezone>UTC</timezone>
+		<title>Kung Fu für Kinder ab 8 Jahren</title>
+		<calendar_id>6</calendar_id>
+		<organizer/>
+		<organizer_id>0</organizer_id>
+		<organizer_pid>0</organizer_pid>
+		<organizer_link/>
+		<location>Tai Chi Schule Ingelheim</location>
+		<location_id>0</location_id>
+		<location_pid>0</location_pid>
+		<location_link/>
+		<teaser>NULL</teaser>
+		<description>
+			Kung Fu Kinder (ab 7 Jahren) Eine typische Stunde: -Lockern -Gymnastik -Sanftes Dehnen -Stände (Ba Shi) -Spielen -Kicks -Basistechniken -Atemübung -Spielen
+		</description>
+		<freq>week</freq>
+		<until>20170419</until>
+		<cnt>0</cnt>
+		<byday>th</byday>
+		<bymonthday/>
+		<bymonth/>
+		<intrval>1</intrval>
+		<rdate>NULL</rdate>
+		<rdate_type>0</rdate_type>
+		<deviation/>
+		<monitor_cnt>0</monitor_cnt>
+		<exception_cnt>0</exception_cnt>
+		<fe_cruser_id>0</fe_cruser_id>
+		<fe_crgroup_id>0</fe_crgroup_id>
+		<shared_user_cnt>0</shared_user_cnt>
+		<type>0</type>
+		<page>0</page>
+		<ext_url/>
+		<isTemp>1</isTemp>
+		<icsUid>q4khslt60m1h5f8t6mf4db1o6c@google.com</icsUid>
+		<image/>
+		<attachment/>
+		<ref_event_id>0</ref_event_id>
+		<send_invitation>0</send_invitation>
+		<attendee/>
+		<status/>
+		<priority>0</priority>
+		<sys_language_uid>0</sys_language_uid>
+
+
 	</tx_cal_event>
 
 	<!--findRecordsByImportSource-->

@@ -1,5 +1,5 @@
-var MONTH_NAMES=new Array('January','February','March','April','May','June','July','August','September','October','November','December','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
-var DAY_NAMES=new Array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sun','Mon','Tue','Wed','Thu','Fri','Sat');
+var MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DAY_NAMES=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function LZ(x) {return(x<0||x>9?"":"0")+x}
 // ------------------------------------------------------------------
 // formatDate (date_object, format)
@@ -21,7 +21,7 @@ function formatDate(date,format) {
 	var s=date.getUTCSeconds();
 	var yyyy,yy,MMM,MM,dd,hh,h,mm,ss,ampm,HH,H,KK,K,kk,k;
 	// Convert real date parts into formatted versions
-	var value=new Object();
+	var value={};
 	if (y.length < 4) {y=""+(y-0+1900);}
 	value["y"]=""+y;
 	value["yyyy"]=y;

@@ -6,28 +6,22 @@
  * LICENSE file that was distributed with this source code.
  */
 
-$EM_CONF [$_EXTKEY] = [
+$EM_CONF['cal'] = [
         'title' => 'Calendar Base',
         'description' => 'A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard',
         'category' => 'plugin',
-        'shy' => 0,
-        'version' => '2.1.5-dev',
-        'loadOrder' => '',
+        'version' => '1.3.0',
         'state' => 'stable',
-        'uploadfolder' => 0,
         'createDirs' => 'uploads/tx_cal/pics,uploads/tx_cal/ics,uploads/tx_cal/media',
-        'clearCacheOnLoad' => 0,
-        'author' => 'Mario Matzulla, Jeff Segars, Franz Koch, Thomas Kowtsch',
-        'author_email' => 'mario@matzullas.de, jeff@webempoweredchurch.org, franz.koch@elements-net.de, typo3@thomas-kowtsch.de',
-        'author_company' => '',
+        'author' => 'Jan Helke, Mario Matzulla',
+        'author_email' => 'cal@typo3.helke.de, mario@matzullas.de',
         'constraints' => [
                 'depends' => [
-                        'typo3' => '6.1.0-8.9.99'
+            'typo3' => '8.7.13 - 9.5.99',
+            'static_info_tables' => '6.7.0 - 6.7.99'
                 ],
-                'suggests' => [
-                        'css_styled_content' => '6.1.0-8.9.99',
-                        'wec_map' => '',
-                        'tt_address' => ''
-                ]
-        ]
+            'suggests' => [
+            'typo3db_legacy' => '1.1.0-1.1.99',
+        ],
+    ]
 ];

@@ -10,7 +10,7 @@ if (! defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
-$ll = 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:';
+$ll = 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:';
 
 /**
  * Add extra fields to the sys_category record

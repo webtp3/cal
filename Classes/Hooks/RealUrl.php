@@ -53,7 +53,7 @@ class RealUrl
     public function addFilenameSet()
     {
         $calendarRSS = [];
-        $calendarRSS ['calendarRSS.xlf'] = [
+        $calendarRSS ['calendarRSS.xml'] = [
                 'keyValues' => [
                         'type' => 151
                 ]

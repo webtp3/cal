@@ -221,7 +221,7 @@ class DatabaseTreeDataProvider extends \TYPO3\CMS\Core\Tree\TableConfiguration\D
             $node->setLabel($row['title']);
             $node->setSortValue($id);
         } elseif ($basicNode->getId() === GLOBAL_PREFIX) {
-            $node->setLabel($GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_category.global'));
+            $node->setLabel($GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_category.global'));
             $node->setSortValue(0);
         } elseif ($basicNode->getId() == 0) {
             $node->setLabel($GLOBALS['LANG']->sL($GLOBALS['TCA'][$this->tableName]['ctrl']['title']));

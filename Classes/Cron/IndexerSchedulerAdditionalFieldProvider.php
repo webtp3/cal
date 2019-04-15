@@ -52,7 +52,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->eventFolder . '"/>';
         $fieldConfiguration = [
             'code' => $fieldHtml,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:tableHeader1',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:tableHeader1',
             'cshKey' => '',
             'cshLabel' => $fieldId
         ];
@@ -74,7 +74,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->typoscriptPage . '" />';
         $fieldConfiguration = [
                 'code' => $fieldHtml,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:tableHeader2',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:tableHeader2',
                 'cshKey' => '',
                 'cshLabel' => $fieldId
         ];
@@ -96,7 +96,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->starttime . '" />';
         $fieldConfiguration = [
                 'code' => $fieldHtml,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexStart',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:indexStart',
                 'cshKey' => '',
                 'cshLabel' => $fieldId
         ];
@@ -118,7 +118,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->endtime . '" />';
         $fieldConfiguration = [
                 'code' => $fieldHtml,
-                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexEnd',
+                'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:indexEnd',
                 'cshKey' => '',
                 'cshLabel' => $fieldId
         ];

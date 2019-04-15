@@ -31,7 +31,7 @@ switch ($useOrganizerStructure) {
 
 $tx_cal_event_deviation = [
         'ctrl' => [
-                'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.deviation',
+                'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.deviation',
                 'label' => 'title',
                 'tstamp' => 'tstamp',
                 'crdate' => 'crdate',
@@ -66,7 +66,7 @@ $tx_cal_event_deviation = [
                 ],
                 'title' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.title',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.title',
                         'config' => [
                                 'type' => 'input',
                                 'size' => '30',
@@ -99,7 +99,7 @@ $tx_cal_event_deviation = [
                 ],
                 'orig_start_date' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.orig_start_date',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.orig_start_date',
                         'config' => [
                                 'type' => 'input',
                                 'renderType' => 'inputDateTime',
@@ -109,7 +109,7 @@ $tx_cal_event_deviation = [
                 ],
                 'orig_start_time' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.orig_start_time',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.orig_start_time',
                         'config' => [
                                 'type' => 'input',
                                 'renderType' => 'inputDateTime',
@@ -119,7 +119,7 @@ $tx_cal_event_deviation = [
                 ],
                 'start_date' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.start_date',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.start_date',
                         'config' => [
                                 'type' => 'input',
                                 'renderType' => 'inputDateTime',
@@ -129,7 +129,7 @@ $tx_cal_event_deviation = [
                 ],
                 'allday' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.allday',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.allday',
                         'config' => [
                                 'type' => 'check',
                                 'default' => 0
@@ -137,7 +137,7 @@ $tx_cal_event_deviation = [
                 ],
                 'start_time' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.start_time',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.start_time',
                         'displayCond' => 'FIELD:allday:!=:1',
                         'config' => [
                                 'type' => 'input',
@@ -149,7 +149,7 @@ $tx_cal_event_deviation = [
                 ],
                 'end_date' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.end_date',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.end_date',
                         'config' => [
                                 'type' => 'input',
                                 'renderType' => 'inputDateTime',
@@ -160,7 +160,7 @@ $tx_cal_event_deviation = [
                 ],
                 'end_time' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.end_time',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.end_time',
                         'displayCond' => 'FIELD:allday:!=:1',
                         'config' => [
                                 'type' => 'input',
@@ -172,7 +172,7 @@ $tx_cal_event_deviation = [
                 ],
                 'organizer' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.organizer',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.organizer',
                         'config' => [
                                 'type' => 'input',
                                 'size' => '30',
@@ -181,7 +181,7 @@ $tx_cal_event_deviation = [
                 ],
                 'organizer_id' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.organizer_id',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.organizer_id',
                         'config' => [
                                 'type' => 'group',
                                 'internal_type' => 'db',
@@ -197,14 +197,14 @@ $tx_cal_event_deviation = [
                                             'setValue' => 'set',
                                             'pid' => $sPid,
                                             'table' => $useOrganizerStructure,
-                                            'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_organizer.createNew',
+                                            'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_organizer.createNew',
                                         ]
                                     ],
                                     'editPopup' => [
                                         'disabled' => '',
                                         'options' => [
                                             'windowOpenParameters' => 'height=600,width=525,status=0,menubar=0,scrollbars=1',
-                                            'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_organizer.edit',
+                                            'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_organizer.edit',
                                         ]
                                     ]
                                 ],
@@ -216,7 +216,7 @@ $tx_cal_event_deviation = [
                 ],
                 'organizer_pid' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.organizer_pid',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.organizer_pid',
                         'config' => [
                                 'type' => 'group',
                                 'internal_type' => 'db',
@@ -228,7 +228,7 @@ $tx_cal_event_deviation = [
                 ],
                 'organizer_link' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.organizer_link',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.organizer_link',
                         'config' => [
                                 'type' => 'input',
                                 'size' => '25',
@@ -243,7 +243,7 @@ $tx_cal_event_deviation = [
                 ],
                 'location' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.location',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.location',
                         'config' => [
                                 'type' => 'input',
                                 'size' => '30',
@@ -252,7 +252,7 @@ $tx_cal_event_deviation = [
                 ],
                 'location_id' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.location_id',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.location_id',
                         'config' => [
                                 'type' => 'group',
                                 'internal_type' => 'db',
@@ -268,14 +268,14 @@ $tx_cal_event_deviation = [
                                             'setValue' => 'set',
                                             'pid' => $sPid,
                                             'table' => $useLocationStructure,
-                                            'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.createNew',
+                                            'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.createNew',
                                         ]
                                     ],
                                     'editPopup' => [
                                         'disabled' => '',
                                         'options' => [
                                             'windowOpenParameters' => 'height=600,width=525,status=0,menubar=0,scrollbars=1',
-                                            'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_location.edit',
+                                            'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_location.edit',
                                         ]
                                     ]
                                 ],
@@ -287,7 +287,7 @@ $tx_cal_event_deviation = [
                 ],
                 'location_pid' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.location_pid',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.location_pid',
                         'config' => [
                                 'type' => 'group',
                                 'internal_type' => 'db',
@@ -299,7 +299,7 @@ $tx_cal_event_deviation = [
                 ],
                 'location_link' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.location_link',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.location_link',
                         'config' => [
                                 'type' => 'input',
                                 'size' => '25',
@@ -323,7 +323,7 @@ $tx_cal_event_deviation = [
                 ],
                 'teaser' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.teaser',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.teaser',
                         'config' => [
                                 'type' => 'text',
                                 'cols' => '40',
@@ -344,7 +344,7 @@ $tx_cal_event_deviation = [
                 ],
                 'description' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.description',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.description',
                         'config' => [
                                 'type' => 'text',
                                 'cols' => '40',
@@ -456,7 +456,7 @@ $tx_cal_event_deviation = [
         ],
         'types' => [
                 '0' => [
-                    'showitem' => '--div--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.general_sheet,--palette--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.orig_start;3, title, --palette--;;1,--palette--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.start;5,--palette--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.end;6,' . ($configuration['useTeaser'] ? 'teaser,' : '') . 'description, --div--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.location_sheet,' . ($configuration['hideLocationTextfield'] ? 'location_id,location_pid,location_link' : 'location,location_id,location_pid,location_link') . ',--div--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.organizer_sheet,' . ($configuration['hideOrganizerTextfield'] ? 'organizer_id,organizer_pid,organizer_link' : 'organizer,organizer_id,organizer_pid,organizer_link') . ',--div--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.files_sheet,image, --palette--;;4,imagecaption,attachment,attachmentcaption'
+                    'showitem' => '--div--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.general_sheet,--palette--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.orig_start;3, title, --palette--;;1,--palette--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.start;5,--palette--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.end;6,' . ($configuration['useTeaser'] ? 'teaser,' : '') . 'description, --div--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.location_sheet,' . ($configuration['hideLocationTextfield'] ? 'location_id,location_pid,location_link' : 'location,location_id,location_pid,location_link') . ',--div--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.organizer_sheet,' . ($configuration['hideOrganizerTextfield'] ? 'organizer_id,organizer_pid,organizer_link' : 'organizer,organizer_id,organizer_pid,organizer_link') . ',--div--;LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_event.files_sheet,image, --palette--;;4,imagecaption,attachment,attachmentcaption'
                 ]
         ],
         'palettes' => [

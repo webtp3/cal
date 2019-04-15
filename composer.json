@@ -5,7 +5,18 @@
     "license": "GPL-2.0+",
     "require": {
         "php": ">=7.0 < 7.3",
-        "typo3/cms-core": "^8 || ^9"
+        "typo3/cms-core": "^8 || ^9",
+		"sjbr/static-info-tables": "~6.7"
+
+	},
+	"require-dev": {
+		"friendsofphp/php-cs-fixer": "^2.0",
+		"nimut/testing-framework": "^1.0 || ^2.0 || ^3.0 || ^4.0",
+		"web-tp3/cag_tests":"^1.2",
+		"phpunit/phpunit": "*",
+		"helhum/typo3-console": "^5",
+		"typo3/testing-framework": "*"
+
     },
     "autoload": {
         "psr-4": {
@@ -24,7 +35,28 @@
     "extra": {
         "typo3/cms": {
             "extension-key": "cal"
-        }
     }
+    },
+	"config": {
+		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin"
+	},
+	"scripts": {
+		"typo3-cms-scripts": [
+			"typo3cms install:fixfolderstructure",
+			"typo3cms install:generatepackagestates"
+		],
+		"post-autoload-dump": [
+			"@typo3-cms-scripts"
+		],
+		"test:php:unit": [
+			"@php -v",
+			"@php bin/phpunit -c Tests/Build/UnitTests.xml"
+		],
+		"test:php:func": [
+			"@php -v",
+			"@php bin/phpunit -c Tests/Build/FunctionalTests.xml"
+		]
 
+}
 }

@@ -76,7 +76,7 @@ Ext.onReady(function(){
         if(btn=='yes'){
         	window.location.href = "?no_cache=1&tx_cal_controller[view]=remove_event&id="+pid+"&tx_cal_controller[lastview]="+document.getElementById('event_lastview').value+"&tx_cal_controller[uid]="+eventUid+"&tx_cal_controller[type]="+eventType;
         }
-    };
+    }
 });
 
 //*******************************************************************************
@@ -85,9 +85,9 @@ Ext.onReady(function(){
 	var categoryArray;
 	var eventCalendarUid;
 	var eventCategoryUids;
-	var categoryByCalendar = new Array();
-	var categoryByParent = new Array();
-	var categoryByUid = new Array();
+	var categoryByCalendar = [];
+	var categoryByParent = [];
+	var categoryByUid = [];
 	
 	function renderCalendarSelector(){
 		var calSelector = document.getElementById('calendar_selector');
@@ -110,15 +110,15 @@ Ext.onReady(function(){
 				for(var key in categoryArray[i]){
 					for(var j=0; j<categoryArray[i][key].length;j++){
 						if(!categoryByCalendar[categoryArray[i][key][j]['calendaruid']]){
-							categoryByCalendar[categoryArray[i][key][j]['calendaruid']] = new Array();
+							categoryByCalendar[categoryArray[i][key][j]['calendaruid']] = [];
 						}
 						categoryByCalendar[categoryArray[i][key][j]['calendaruid']].push(categoryArray[i][key][j]);
 						if(!categoryByParent[categoryArray[i][key][j]['parentuid']]){
-							categoryByParent[categoryArray[i][key][j]['parentuid']] = new Array();
+							categoryByParent[categoryArray[i][key][j]['parentuid']] = [];
 						}
 						categoryByParent[categoryArray[i][key][j]['parentuid']].push(categoryArray[i][key][j]);
 						if(!categoryByUid[categoryArray[i][key][j]['uid']]){
-							categoryByUid[categoryArray[i][key][j]['uid']] = new Array();
+							categoryByUid[categoryArray[i][key][j]['uid']] = [];
 						}
 						categoryByUid[categoryArray[i][key][j]['uid']]=categoryArray[i][key][j];
 					}
@@ -315,7 +315,7 @@ Ext.extend(Ext.ux.form.Action.LoadServerForm, Ext.form.Action, {
     success : function(response){
    	//here comes marios change:
     var theXml = response.responseXML;
-    var configObject = new Object();
+    var configObject = {};
     configObject.parentObject = Ext.get(this.options.ct);
    	this.form.generateFormFromXML(theXml, configObject);
    	this.form.generateForm(theXml, this.options.ct);
@@ -452,7 +452,7 @@ Ext.extend(Ext.ux.form.ServerForm, Ext.form.Form, {
 					}
 					configObject.config = null;
 					configObject.id = null;
-					configObject.activate = null
+					configObject.activate = null;
 					break;
 				case "Ext.TabPanelItem":
 					configObject.parentObject.addTab(configObject.id,configObject.config,configObject.content);

@@ -1,22 +1,23 @@
 <phpunit
-	backupGlobals="false"
-	backupStaticAttributes="false"
-	bootstrap="../../../../../typo3/sysext/core/Build/FunctionalTestsBootstrap.php"
-	colors="true"
-	convertErrorsToExceptions="true"
-	convertWarningsToExceptions="true"
-	forceCoversAnnotation="false"
-	processIsolation="true"
-	stopOnError="false"
-	stopOnFailure="false"
-	stopOnIncomplete="false"
-	stopOnSkipped="false"
-	strict="false"
-	verbose="false"
+		backupGlobals="false"
+		backupStaticAttributes="false"
+		bootstrap="FunctionalTestsBootstrap.php"
+		colors="true"
+		convertErrorsToExceptions="true"
+		convertWarningsToExceptions="true"
+		forceCoversAnnotation="false"
+		processIsolation="true"
+		stopOnError="false"
+		stopOnFailure="false"
+		stopOnIncomplete="false"
+		stopOnSkipped="false"
+		verbose="false"
 >
 	<testsuites>
-		<testsuite name="cal tests">
+
+		<testsuite name="cag_tests_func">
 			<directory>../Functional/</directory>
 		</testsuite>
+
 	</testsuites>
 </phpunit>

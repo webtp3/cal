@@ -153,8 +153,8 @@ Calendar.prototype.create = function (_par) {
 				}
 				Calendar._add_evs(part);
 				return part;
-			};
-			var hrs = cal.date.getHours();
+            }
+            var hrs = cal.date.getHours();
 			var mins = cal.date.getMinutes();
 			var t12 = !cal.time24;
 			var pm = (hrs > 12);
@@ -283,10 +283,10 @@ Calendar.prototype._init = function (firstDayOfWeek, date) {
 
 	var row = this.tbody.firstChild;
 	var MN = Calendar._SMN[month];
-	var ar_days = this.ar_days = new Array();
+	var ar_days = this.ar_days = [];
 	var weekend = Calendar._TT["WEEKEND"];
 	var dates = this.multiple ? (this.datesCells = {}) : null;
-	var cellIds = new Array();
+	var cellIds = [];
 	var monthDatesDone = false;
 	for (var i = 0; i < 6; ++i, row = row.nextSibling) {
 		var cell = row.firstChild;
@@ -427,10 +427,10 @@ Calendar.dayMouseDblClick = function(ev) {
 
 Calendar.prototype.setDate = function (date) {
 	if (!date.equalsTo(this.date)) {
-		events = new Array();
-		dragZones = new Array();
-		dropTargets = new Array();
-		eventArray = new Array();
+		events = [];
+		dragZones = [];
+		dropTargets = [];
+		eventArray = [];
 		this._init(this.firstDayOfWeek, date);
 		var calMonth = cal.date.getMonth()+1;
 		viewStart = cal.date.getFullYear()+''+(calMonth<10?'0'+calMonth:calMonth)+'01';

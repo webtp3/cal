@@ -46,7 +46,7 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
     public $cachedValueArray = [];
     public $initializingCacheValues = false;
     public $templatePath;
-
+    public $classMethodVars = [];
     /**
      * Constructor.
      *
@@ -106,9 +106,9 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
                 $autoFetchTextSplitValue = $cachedValues [2];
             } else {
                 $noAutoFetchMethods = $this->noAutoFetchMethods;
-                if (is_object(parent) && count(parent::getNoAutoFetchMethods())) {
-                    $noAutoFetchMethods = array_merge(parent::getNoAutoFetchMethods(), $this->getNoAutoFetchMethods());
-                }
+                //if (is_object (parent::class) && count (parent::getNoAutoFetchMethods ())) {
+                //   $noAutoFetchMethods = array_merge (parent::getNoAutoFetchMethods (), $this->getNoAutoFetchMethods ());
+                //  }
                 $cObj = &\TYPO3\CMS\Cal\Utility\Registry::Registry('basic', 'cobj');
                 $autoFetchTextFields = explode(',', strtolower($this->conf ['autoFetchTextFields']));
                 $autoFetchTextSplitValue = $cObj->stdWrap($this->conf ['autoFetchTextSplitValue'], $this->conf ['autoFetchTextSplitValue.']);
@@ -136,9 +136,9 @@ abstract class BaseModel extends \TYPO3\CMS\Cal\Model\AbstractModel
                     GeneralUtility::devLog('CACHE MISS (' . __CLASS__ . '::' . __FUNCTION__ . ')', 'cal', 2, []);
                 }
                 $this->controller->cache->set($storeKey, serialize([
-                        $this->classMethodVars,
-                        $autoFetchTextFields,
-                        $autoFetchTextSplitValue
+                    $this->classMethodVars,
+                    $autoFetchTextFields,
+                    $autoFetchTextSplitValue
                 ]), __FUNCTION__);
             }
 

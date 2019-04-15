@@ -10,7 +10,7 @@ defined('TYPO3_MODE') or die();
 
 $tx_cal_attendee = [
         'ctrl' => [
-                'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee',
+                'title' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee',
                 'label' => 'uid',
                 'tstamp' => 'tstamp',
                 'crdate' => 'crdate',
@@ -39,7 +39,7 @@ $tx_cal_attendee = [
                 ],
                 'fe_user_id' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.fe_user_id',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.fe_user_id',
                         'config' => [
                                 'type' => 'group',
                                 'internal_type' => 'db',
@@ -51,7 +51,7 @@ $tx_cal_attendee = [
                 ],
                 'fe_group_id' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.fe_group_id',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.fe_group_id',
                         'config' => [
                                 'type' => 'group',
                                 'internal_type' => 'db',
@@ -63,7 +63,7 @@ $tx_cal_attendee = [
                 ],
                 'email' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.email',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.email',
                         'config' => [
                                 'type' => 'input',
                                 'size' => '30',
@@ -71,27 +71,33 @@ $tx_cal_attendee = [
                                 'eval' => 'lower'
                         ]
                 ],
+                'event_id' => [
+                    'exclude' => 1,
+                    'config' => [
+                        'type' => 'passthrough'
+                    ]
+                ],
                 'attendance' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.attendance',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.attendance',
                         'config' => [
                                 'renderType' => 'selectSingle',
                                 'type' => 'select',
                                 'items' => [
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.attendance.NON',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.attendance.NON',
                                                 'NON'
                                         ],
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.attendance.OPT-PARTICIPANT',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.attendance.OPT-PARTICIPANT',
                                                 'OPT-PARTICIPANT'
                                         ],
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.attendance.REQ-PARTICIPANT',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.attendance.REQ-PARTICIPANT',
                                                 'REQ-PARTICIPANT'
                                         ],
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.attendance.CHAIR',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.attendance.CHAIR',
                                                 'CHAIR'
                                         ]
                                 ],
@@ -102,33 +108,33 @@ $tx_cal_attendee = [
                 ],
                 'status' => [
                         'exclude' => 1,
-                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.status',
+                        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.status',
                         'config' => [
                                 'renderType' => 'selectSingle',
                                 'type' => 'select',
                                 'items' => [
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.status.0',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.status.0',
                                                 '0'
                                         ],
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.status.NEEDS-ACTION',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.status.NEEDS-ACTION',
                                                 'NEEDS-ACTION'
                                         ],
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.status.ACCEPTED',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.status.ACCEPTED',
                                                 'ACCEPTED'
                                         ],
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.status.DECLINE',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.status.DECLINE',
                                                 'DECLINE'
                                         ],
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.status.TENTATIVE',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.status.TENTATIVE',
                                                 'TENTATIVE'
                                         ],
                                         [
-                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_attendee.status.DELEGATED',
+                                                'LLL:EXT:cal/Resources/Private/Language/locallang_db.xml:tx_cal_attendee.status.DELEGATED',
                                                 'DELEGATED'
                                         ]
                                 ],

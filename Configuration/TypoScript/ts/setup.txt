@@ -25,7 +25,7 @@ plugin.tx_cal_controller {
 
 	# @description	Allows registered frontend users to subscribe based on the email address in their account.
 	# @also			FlexForm
-	subscribeFeUser = 0
+	subscribeFeUser = 1
 
 	# @description	Enables CAPTCHA-based validation before a vistor can subscribe to an event.  Requires CAPTCHA Library extension.
 	# @also			FlexForm
@@ -37,7 +37,7 @@ plugin.tx_cal_controller {
 	
 	# @description	Set this to 1 if you do not want the plugin to have a wrapping div tag
 	noWrapInBaseClass = 0
-	
+	activateFluid = 1
 	dateConfig {
 		# @description	Position of the day in a date string (0/1/2). Example: 2007-07-30 -> 2
 		dayPosition = 2
@@ -462,8 +462,8 @@ plugin.tx_cal_controller {
 					imgMax = 4
 
 					stdWrap.required = 1
-					stdWrap.dataWrap = <div>%%%IMAGE_LABEL%%%:&nbsp; |</div>
-					
+					stdWrap.dataWrap = <div> |</div>
+
 					maxW = {$plugin.tx_cal_controller.singleMaxW}
 					
 				}
@@ -2213,6 +2213,7 @@ plugin.tx_cal_controller {
 					}
 					titleText < .altText
 					titleText.field = imagetitletext
+
 				}
 
 				# @description	Content object for the event description

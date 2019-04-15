@@ -77,7 +77,7 @@ CREATE TABLE tx_cal_event (
 
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 CREATE TABLE tx_cal_event_shared_user_mm (
@@ -104,9 +104,9 @@ CREATE TABLE tx_cal_calendar (
 	activate_fnb tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	fnb_user_cnt int(11) unsigned DEFAULT '0' NOT NULL,
 	type tinyint(4) DEFAULT '0' NOT NULL,
-	ext_url text NOT NULL,
-	ext_url_notes text NOT NULL,
-	ics_file tinytext NOT NULL,
+	ext_url text,
+	ext_url_notes text,
+	ics_file VARCHAR(255) DEFAULT '' NOT NULL,
 	refresh int(11) unsigned DEFAULT '0' NOT NULL,
 	md5 varchar(32) DEFAULT '' NOT NULL,
 	headerstyle varchar(30) DEFAULT '' NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE tx_cal_calendar (
 	
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 # fnb = free & busy
@@ -149,7 +149,7 @@ CREATE TABLE tx_cal_calendar_fnb_user_group_mm (
 # Extend table structure of table 'sys_category'
 #
 CREATE TABLE sys_category (
-	images int(11) unsigned DEFAULT '0',
+	icon varchar(128) DEFAULT '' NOT NULL,
 	single_pid int(11) unsigned DEFAULT '0' NOT NULL,
 	shortcut int(11) DEFAULT '0' NOT NULL,
 
@@ -157,7 +157,7 @@ CREATE TABLE sys_category (
 	bodystyle varchar(30) DEFAULT '' NOT NULL,
 	calendar_id int(11) unsigned DEFAULT '0' NOT NULL,
 	shared_user_allowed tinyint(4) unsigned DEFAULT '0' NOT NULL,
-	notification_emails text NOT NULL,
+	notification_emails text
 );
 
 CREATE TABLE tx_cal_category (
@@ -178,7 +178,7 @@ CREATE TABLE tx_cal_category (
 	calendar_id int(11) unsigned DEFAULT '0' NOT NULL,
 	single_pid int(11) DEFAULT '0' NOT NULL,
 	shared_user_allowed tinyint(4) unsigned DEFAULT '0' NOT NULL,
-	notification_emails text NOT NULL,
+	notification_emails text,
 	icon varchar(128) DEFAULT '' NOT NULL,
 	
 	t3ver_oid int(11) DEFAULT '0' NOT NULL,
@@ -199,7 +199,7 @@ CREATE TABLE tx_cal_category (
 	
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 CREATE TABLE tx_cal_event_category_mm (
@@ -259,7 +259,7 @@ CREATE TABLE tx_cal_unknown_users (
 
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 CREATE TABLE tx_cal_exception_event_mm (
@@ -305,7 +305,7 @@ CREATE TABLE tx_cal_exception_event_group (
 
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 CREATE TABLE tx_cal_exception_event (
@@ -346,7 +346,7 @@ CREATE TABLE tx_cal_exception_event (
 
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 CREATE TABLE tx_cal_organizer (
@@ -358,7 +358,7 @@ CREATE TABLE tx_cal_organizer (
 	deleted tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	hidden tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	name varchar(128) DEFAULT '' NOT NULL,
-	description text NOT NULL,
+	description text,
 	street varchar(128) DEFAULT '' NOT NULL,
 	zip varchar(16) DEFAULT '' NOT NULL,
 	city varchar(128) DEFAULT '' NOT NULL,
@@ -368,9 +368,9 @@ CREATE TABLE tx_cal_organizer (
 	fax varchar(24) DEFAULT '' NOT NULL,
 	email varchar(64) DEFAULT '' NOT NULL,
 	image varchar(64) DEFAULT '' NOT NULL,
-	imagecaption text NOT NULL,
-	imagealttext text NOT NULL,
-	imagetitletext text NOT NULL,
+	imagecaption text,
+	imagealttext text,
+	imagetitletext text,
 	link varchar(255) DEFAULT '' NOT NULL,
 	fe_user_id int(11) unsigned DEFAULT '0' NOT NULL,
 	shared_user_cnt int(11) unsigned DEFAULT '0' NOT NULL,
@@ -393,7 +393,7 @@ CREATE TABLE tx_cal_organizer (
 	
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 CREATE TABLE tx_cal_organizer_shared_user_mm (
@@ -414,7 +414,7 @@ CREATE TABLE tx_cal_location (
 	deleted tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	hidden tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	name varchar(128) DEFAULT '' NOT NULL,
-	description text NOT NULL,
+	description text,
 	street varchar(128) DEFAULT '' NOT NULL,
 	zip varchar(16) DEFAULT '' NOT NULL,
 	city varchar(128) DEFAULT '' NOT NULL,
@@ -424,9 +424,9 @@ CREATE TABLE tx_cal_location (
 	fax varchar(24) DEFAULT '' NOT NULL,
 	email varchar(64) DEFAULT '' NOT NULL,
 	image varchar(64) DEFAULT '' NOT NULL,
-	imagecaption text NOT NULL,
-	imagealttext text NOT NULL,
-	imagetitletext text NOT NULL,
+	imagecaption text,
+	imagealttext text,
+	imagetitletext text,
 	link varchar(255) DEFAULT '' NOT NULL,
 	shared_user_cnt int(11) unsigned DEFAULT '0' NOT NULL,
 	latitude double default '0',
@@ -450,7 +450,7 @@ CREATE TABLE tx_cal_location (
 	
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 CREATE TABLE tx_cal_location_shared_user_mm (
@@ -465,27 +465,27 @@ CREATE TABLE tx_cal_location_shared_user_mm (
 CREATE TABLE tt_address (
 	tx_cal_controller_isorganizer tinyint(4) DEFAULT '0' NOT NULL,
 	tx_cal_controller_islocation tinyint(4) DEFAULT '0' NOT NULL,
-	tx_cal_controller_latitude tinytext NOT NULL,
-	tx_cal_controller_longitude tinytext NOT NULL,
+	tx_cal_controller_latitude VARCHAR(255) DEFAULT '' NOT NULL,
+	tx_cal_controller_longitude VARCHAR(255) DEFAULT '' NOT NULL,
 	sys_language_uid int(11) DEFAULT '0' NOT NULL,
-	l18n_parent int(11) DEFAULT '0' NOT NULL,
+	l18n_parent int(11) DEFAULT '0' NOT NULL
 );
 
 CREATE TABLE be_users (
 	tx_cal_enable_accesscontroll tinyint(4) DEFAULT '0' NOT NULL,
-	tx_cal_calendar tinyblob NOT NULL,
-	tx_cal_category tinyblob NOT NULL,
+	tx_cal_calendar VARCHAR(255) DEFAULT '' NOT NULL,
+	tx_cal_category VARCHAR(255) DEFAULT '' NOT NULL
 );
 
 CREATE TABLE be_groups (
 	tx_cal_enable_accesscontroll tinyint(4) DEFAULT '0' NOT NULL,
-	tx_cal_calendar tinyblob NOT NULL,
-	tx_cal_category tinyblob NOT NULL,
+	tx_cal_calendar VARCHAR(255) DEFAULT '' NOT NULL,
+	tx_cal_category VARCHAR(255) DEFAULT '' NOT NULL
 );
 
 CREATE TABLE fe_users (
-	tx_cal_calendar tinytext NOT NULL,
-	tx_cal_calendar_subscription tinyblob NOT NULL,
+	tx_cal_calendar VARCHAR(255) DEFAULT '' NOT NULL,
+	tx_cal_calendar_subscription VARCHAR(255) DEFAULT '' NOT NULL
 );
 
 CREATE TABLE tx_cal_attendee (
@@ -516,7 +516,7 @@ CREATE TABLE tx_cal_attendee (
 	
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
+	KEY t3ver_oid (t3ver_oid, t3ver_wsid)
 );
 
 CREATE TABLE tx_cal_index (
@@ -528,7 +528,7 @@ CREATE TABLE tx_cal_index (
 	event_deviation_uid int(11) DEFAULT '-1' NOT NULL,
 	PRIMARY KEY (uid),
 	KEY start_datetime (start_datetime),
-	KEY event_uid_start_datetime (event_uid,start_datetime),
+	KEY event_uid_start_datetime (event_uid, start_datetime)
 );
 
 #
@@ -566,12 +566,12 @@ CREATE TABLE tx_cal_event_deviation (
 	description text,
 	isTemp tinyint(1) DEFAULT '0' NOT NULL,
 	icsUid text,
-	image tinyblob NOT NULL,
-	imagecaption text NOT NULL,
-	imagealttext text NOT NULL,
-	imagetitletext text NOT NULL,
-	attachment text NOT NULL,
-	attachmentcaption text NOT NULL,
+	image VARCHAR(255) DEFAULT '' NOT NULL,
+	imagecaption text,
+	imagealttext text,
+	imagetitletext text,
+	attachment text,
+	attachmentcaption text,
 	ref_event_id int(11) unsigned DEFAULT '0',
 
 	t3ver_oid int(11) DEFAULT '0' NOT NULL,
@@ -601,12 +601,13 @@ CREATE TABLE tx_cal_event_deviation (
 CREATE TABLE tx_cal_cache (
     id int(11) unsigned NOT NULL auto_increment,
     identifier varchar(128) DEFAULT '' NOT NULL,
-    content text NOT NULL,
+	content text,
 	crdate int(11) DEFAULT '0' NOT NULL,
 	lifetime int(11) DEFAULT '0' NOT NULL,    
   	PRIMARY KEY (id),
   	KEY cache_id (identifier)
-) ENGINE=InnoDB;
+)
+	ENGINE = InnoDB;
 
 #
 # Table structure for table 'tx_cal_cache_tags'
@@ -618,4 +619,5 @@ CREATE TABLE tx_cal_cache_tags (
   PRIMARY KEY (id),
   KEY cache_id (identifier),
   KEY cache_tag (tag)
-) ENGINE=InnoDB;
+)
+	ENGINE = InnoDB;
