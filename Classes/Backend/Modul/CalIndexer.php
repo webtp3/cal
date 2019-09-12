@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Backend\Modul;
 
 /**
@@ -26,7 +20,7 @@ use TYPO3\CMS\Backend\Module\BaseScriptClass;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\DateParser;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
@@ -100,7 +94,7 @@ class CalIndexer extends BaseScriptClass
     public function __construct()
     {
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->getLanguageService()->includeLLFile('EXT:cal/Resources/Private/Language/locallang_indexer.xlf');
+        $this->getLanguageService()->includeLLFile('EXT:cal/Resources/Private/Language/locallang_indexer.xml');
         $this->MCONF = [
             'name' => $this->moduleName,
         ];
@@ -365,9 +359,9 @@ class CalIndexer extends BaseScriptClass
 
     /**
      * @param $timeString
-     * @return CalDate
+     * @return CalendarDateTime
      */
-    private function getTimeParsed($timeString): CalDate
+    private function getTimeParsed($timeString): CalendarDateTime
     {
         $dp = GeneralUtility::makeInstance(DateParser::class);
         $dp->parse($timeString, 0, '');

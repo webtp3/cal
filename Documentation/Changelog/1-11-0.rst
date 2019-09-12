@@ -38,4 +38,4 @@
     * Core-Task #79221 	- Use $ instead of TYPO3.jQuery
     * Core-Task #78953	- Custom FormDataProvider breaks with date related changes
     * Core: Deprecation: #70052 - TCA Display condition EXT LOADED
-    
+

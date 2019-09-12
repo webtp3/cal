@@ -1,21 +1,29 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
+/**
+ * This file is part of the TYPO3 extension Calendar Base (cal).
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
  * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 namespace TYPO3\CMS\Cal\Utility;
 
 use TYPO3\CMS\Cal\Backend\Modul\CalIndexer;
 use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Controller\DateParser;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Service\EventService;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 
@@ -24,6 +32,13 @@ use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
  */
 class RecurrenceGenerator
 {
+    /** @var ConnectionPool $connectionPool */
+    public $connectionPool;
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
 
     /**
      * The table name of the index table
@@ -63,6 +78,9 @@ class RecurrenceGenerator
     public function __construct($pageIDForPlugin = null, $starttime = null, $endtime = null)
     {
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+
         $this->pageIDForPlugin = $pageIDForPlugin;
         if ($starttime == null) {
             $starttime = $this->getTimeParsed($this->extConf['recurrenceStart'])->format('Ymd');
@@ -244,8 +262,8 @@ class RecurrenceGenerator
         if (!is_object($eventService)) {
             return;
         }
-        $eventService->starttime = new CalDate($this->starttime);
-        $eventService->endtime = new CalDate($this->endtime);
+        $eventService->starttime = new CalendarDateTime($this->starttime);
+        $eventService->endtime = new CalendarDateTime($this->endtime);
         $databaseConnection = $this->getDatabaseConnection();
 
         $select = '*';
@@ -301,8 +319,8 @@ class RecurrenceGenerator
         if (!is_object($eventService)) {
             return;
         }
-        $eventService->starttime = new CalDate($this->starttime);
-        $eventService->endtime = new CalDate($this->endtime);
+        $eventService->starttime = new CalendarDateTime($this->starttime);
+        $eventService->endtime = new CalendarDateTime($this->endtime);
 
         $this->cleanIndexTableOfUid($uid, $table);
         $databaseConnection = $this->getDatabaseConnection();
@@ -329,8 +347,8 @@ class RecurrenceGenerator
         if (!is_object($eventService)) {
             return;
         }
-        $eventService->starttime = new CalDate($this->starttime);
-        $eventService->endtime = new CalDate($this->endtime);
+        $eventService->starttime = new CalendarDateTime($this->starttime);
+        $eventService->endtime = new CalendarDateTime($this->endtime);
 
         $this->cleanIndexTableOfCalendarUid($uid);
         $databaseConnection = $this->getDatabaseConnection();
@@ -358,8 +376,8 @@ class RecurrenceGenerator
         if (!is_object($eventService)) {
             return;
         }
-        $eventService->starttime = new CalDate($this->starttime);
-        $eventService->endtime = new CalDate($this->endtime);
+        $eventService->starttime = new CalendarDateTime($this->starttime);
+        $eventService->endtime = new CalendarDateTime($this->endtime);
 
         $this->cleanIndexTableOfExceptionGroupUid($uid);
         $databaseConnection = $this->getDatabaseConnection();
@@ -395,6 +413,9 @@ class RecurrenceGenerator
         if (is_object($eventService)) {
             return $eventService;
         }
+        else {
+            return GeneralUtility::makeInstance(EventService::class);
+        }
         try {
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             if (!$modelObj) {
@@ -422,9 +443,9 @@ class RecurrenceGenerator
      *
      * @param string $timeString
      *
-     * @return CalDate
+     * @return CalendarDateTime
      */
-    protected function getTimeParsed($timeString): CalDate
+    protected function getTimeParsed($timeString): CalendarDateTime
     {
         /** @var DateParser $dp */
         $dp = GeneralUtility::makeInstance(DateParser::class);
@@ -437,7 +458,7 @@ class RecurrenceGenerator
      *
      * @return DatabaseConnection
      */
-    protected function getDatabaseConnection(): DatabaseConnection
+    protected function getDatabaseConnection()
     {
         return $GLOBALS['TYPO3_DB'];
     }

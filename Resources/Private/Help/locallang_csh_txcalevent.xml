@@ -4,7 +4,7 @@
         <description>CSH for table tx_cal_event</description>
         <type>CSH</type>
         <csh_table>tx_cal_event</csh_table>
-        <fileId>EXT:cal/locallang_csh_txcalevent.xlf</fileId>
+        <fileId>EXT:cal/locallang_csh_txcalevent.xml</fileId>
         <labelContext type="array">
         </labelContext>
     </meta>

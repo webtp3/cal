@@ -27,11 +27,11 @@
 .tx-cal-controller .next-button {
 	margin-bottom: 2px;
 }
-
+.tx-cal-controller .left,
 .tx-cal-controller .previous-button {
 	float: left;
 }
-
+.tx-cal-controller .right,
 .tx-cal-controller .next-button {
 	float: right;
 }
@@ -880,28 +880,22 @@
 
 /*--- TODO: to be checked from here on to the end!! ---*/
 /*------------- list styles ------------*/
-
+div#content .list-view .vevent .dtstart-container, div#content .list-view .vtodo .dtstart-container {
+	margin-right: 0;
+	text-align: left;
+	width: 220px;
+	font-size: 12pt;
+}
 .tx-cal-controller .even {
 	background-color: #FAFAFA;
 }
-
-.tx-cal-controller .list-view .vevent,
-.tx-cal-controller .list-view .vtodo {
-	color: #000000;
-}
-
-.tx-cal-controller .list-view .vevent .dtstart-container,
-.tx-cal-controller .list-view .vtodo .dtstart-container {
+.cal-panel img {
 	float: left;
-	margin-right: 1em;
-	text-align: right;
-	width: 12em;
+	clear: left;
 }
-
-.tx-cal-controller .list-view .vevent .summary,
-.tx-cal-controller .list-view .vtodo .summary {
+.tx-cal-controller  a.url {
+	overflow: hidden;
 }
-
 .tx-cal-controller h1, .tx-cal-controller .found, .tx-cal-controller .pagebrowser {
 	text-align: center;
 }

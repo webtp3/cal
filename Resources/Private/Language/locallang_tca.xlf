@@ -349,6 +349,9 @@
 			<trans-unit id="cal.pi_flexform.isPreview" xml:space="preserve">
 				<source>Show preview</source>
 			</trans-unit>
+			<trans-unit id="cal.pi_flexform.hasMap" xml:space="preserve">
+				<source>Show Map</source>
+			</trans-unit>
 			<trans-unit id="cal.pi_flexform.createEventTemplate" xml:space="preserve">
 				<source>Create event template</source>
 			</trans-unit>

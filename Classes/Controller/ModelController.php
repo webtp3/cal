@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Controller;
 
 /**
@@ -21,14 +15,15 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use PDO;
-use TYPO3\CMS\Cal\Domain\Repository\AttendeeRepository;
-use TYPO3\CMS\Cal\Domain\Repository\LocationRepository;
+use phpDocumentor\Reflection\Types\Mixed_;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Location;
 use TYPO3\CMS\Cal\Model\Organizer;
 use TYPO3\CMS\Cal\Service\AttendeeService;
+use TYPO3\CMS\Cal\Service\CalculateDateTimeService;
 use TYPO3\CMS\Cal\Service\CalendarService;
 use TYPO3\CMS\Cal\Service\EventService;
 use TYPO3\CMS\Cal\Service\LocationService;
@@ -51,16 +46,6 @@ class ModelController extends BaseController
 
     private $todoSubtype;
 
-    /**
-     * @var AttendeeRepository
-     */
-    protected $attendeeRepository;
-
-    /**
-     * @var LocationRepository
-     */
-    protected $locationRepository;
-
     public function __construct()
     {
         parent::__construct();
@@ -68,7 +53,6 @@ class ModelController extends BaseController
         $this->todoSubtype = $confArr ['todoSubtype'];
 
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        // $this->locationRepository = GeneralUtility::makeInstance(LocationRepository::class);
     }
 
     /**
@@ -320,11 +304,12 @@ class ModelController extends BaseController
      * @param string $pidList
      * @return Location
      */
-    public function findLocation($uid, $type = 'tx_cal_location', $pidList = ''): Location
+    public function findLocation($uid, $type = 'tx_cal_location', $pidList = '')// avoid 0 collision : Location
     {
-        return $this->locationRepository->getObject(
-            $this->locationRepository->findByUid($uid)
-        );
+        /** @var LocationService $service */
+        $service = $this->getServiceObjByKey('cal_location_model', 'location', $type);
+        $location = $service->find($uid, $pidList);
+        return $location;
     }
 
     /**
@@ -375,7 +360,7 @@ class ModelController extends BaseController
      * @param string $pidList
      * @return Organizer
      */
-    public function findOrganizer(int $uid, $type = 'tx_cal_organizer', $pidList = ''): Organizer
+    public function findOrganizer(int $uid, $type = 'tx_cal_organizer', $pidList = '')// avoid 0 collision : Organizer
     {
         /** @var OrganizerService $service */
         $service = $this->getServiceObjByKey('cal_organizer_model', 'organizer', $type);
@@ -611,9 +596,9 @@ class ModelController extends BaseController
      */
     public function findEventsForDay(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3'): array
     {
-        $starttime = Calendar::calculateStartDayTime($dateObject);
-        $endtime = Calendar::calculateEndDayTime($dateObject);
-        return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
+        $starttime = CalculateDateTimeService::calculateStartOfDay(clone $dateObject);
+        $endtime = CalculateDateTimeService::calculateEndOfDay(clone $dateObject);
+        return $this->findAllWithin('cal_event_model', clone $starttime, clone $endtime, $type, 'event', $pidList, $eventType);
     }
 
     /**
@@ -625,9 +610,9 @@ class ModelController extends BaseController
      */
     public function findEventsForWeek(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3'): array
     {
-        $starttime = Calendar::calculateStartWeekTime($dateObject);
-        $endtime = Calendar::calculateEndWeekTime($dateObject);
-        return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
+        $starttime = CalculateDateTimeService::calculateStartOfWeek(clone $dateObject);
+        $endtime = CalculateDateTimeService::calculateEndOfWeek(clone $dateObject);
+        return $this->findAllWithin('cal_event_model', clone $starttime, clone $endtime, $type, 'event', $pidList, $eventType);
     }
 
     /**
@@ -639,9 +624,9 @@ class ModelController extends BaseController
      */
     public function findEventsForMonth(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3'): array
     {
-        $starttime = Calendar::calculateStartMonthTime($dateObject);
-        $endtime = Calendar::calculateEndMonthTime($dateObject);
-        return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
+        $starttime = CalculateDateTimeService::calculateStartOfMonth(clone $dateObject);
+        $endtime = CalculateDateTimeService::calculateEndOfMonth(clone $dateObject);
+        return $this->findAllWithin('cal_event_model', clone $starttime, clone $endtime, $type, 'event', $pidList, $eventType);
     }
 
     /**
@@ -653,9 +638,9 @@ class ModelController extends BaseController
      */
     public function findEventsForYear(&$dateObject, $type = '', $pidList = '', $eventType = '0,1,2,3'): array
     {
-        $starttime = Calendar::calculateStartYearTime($dateObject);
-        $endtime = Calendar::calculateEndYearTime($dateObject);
-        return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, 'event', $pidList, $eventType);
+        $starttime = CalculateDateTimeService::calculateStartOfYear(clone $dateObject);
+        $endtime = CalculateDateTimeService::calculateEndOfYear(clone $dateObject);
+        return $this->findAllWithin('cal_event_model', clone $starttime, clone $endtime, $type, 'event', $pidList, $eventType);
     }
 
     /**
@@ -675,7 +660,7 @@ class ModelController extends BaseController
         $eventType = '0,1,2,3',
         $additionalWhere = ''
     ): array {
-        return $this->findAllWithin('cal_event_model', $startDateObject, $endDateObject, $type, 'event', $pidList, $eventType, $additionalWhere);
+        return $this->findAllWithin('cal_event_model', clone $startDateObject, clone $endDateObject, $type, 'event', $pidList, $eventType, $additionalWhere);
     }
 
     /**
@@ -687,9 +672,9 @@ class ModelController extends BaseController
      */
     public function findTodosForDay(&$dateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
-        $starttime = Calendar::calculateStartDayTime($dateObject);
-        $endtime = Calendar::calculateEndDayTime($dateObject);
-        return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, $this->todoSubtype, $pidList, $eventType);
+        $starttime = CalculateDateTimeService::calculateStartOfDay(clone $dateObject);
+        $endtime = CalculateDateTimeService::calculateEndOfDay(clone $dateObject);
+        return $this->findAllWithin('cal_event_model', clone $starttime, clone $endtime, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
     /**
@@ -701,9 +686,9 @@ class ModelController extends BaseController
      */
     public function findTodosForWeek(&$dateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
-        $starttime = Calendar::calculateStartWeekTime($dateObject);
-        $endtime = Calendar::calculateEndWeekTime($dateObject);
-        return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, $this->todoSubtype, $pidList, $eventType);
+        $starttime = CalculateDateTimeService::calculateStartOfWeek(clone $dateObject);
+        $endtime = CalculateDateTimeService::calculateEndOfWeek(clone $dateObject);
+        return $this->findAllWithin('cal_event_model', clone $starttime, clone $endtime, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
     /**
@@ -715,9 +700,9 @@ class ModelController extends BaseController
      */
     public function findTodosForMonth(&$dateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
-        $starttime = Calendar::calculateStartMonthTime($dateObject);
-        $endtime = Calendar::calculateEndMonthTime($dateObject);
-        return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, $this->todoSubtype, $pidList, $eventType);
+        $starttime = CalculateDateTimeService::calculateStartOfMonth(clone $dateObject);
+        $endtime = CalculateDateTimeService::calculateEndOfMonth(clone $dateObject);
+        return $this->findAllWithin('cal_event_model', clone $starttime, clone $endtime, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
     /**
@@ -729,9 +714,9 @@ class ModelController extends BaseController
      */
     public function findTodosForYear(&$dateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
-        $starttime = Calendar::calculateStartYearTime($dateObject);
-        $endtime = Calendar::calculateEndYearTime($dateObject);
-        return $this->findAllWithin('cal_event_model', $starttime, $endtime, $type, $this->todoSubtype, $pidList, $eventType);
+        $starttime = CalculateDateTimeService::calculateStartOfYear(clone $dateObject);
+        $endtime = CalculateDateTimeService::calculateEndOfYear(clone $dateObject);
+        return $this->findAllWithin('cal_event_model', clone $starttime, clone $endtime, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
     /**
@@ -744,7 +729,7 @@ class ModelController extends BaseController
      */
     public function findTodosForList(&$startDateObject, &$endDateObject, $type = '', $pidList = '', $eventType = '4'): array
     {
-        return $this->findAllWithin('cal_event_model', $startDateObject, $endDateObject, $type, $this->todoSubtype, $pidList, $eventType);
+        return $this->findAllWithin('cal_event_model', clone $startDateObject, clone $endDateObject, $type, $this->todoSubtype, $pidList, $eventType);
     }
 
     /**
@@ -786,7 +771,7 @@ class ModelController extends BaseController
      */
     public function findEventsForRss(&$startDateObject, &$endDateObject, $type, $pidList): array
     {
-        return $this->findAllWithin('cal_event_model', $startDateObject, $endDateObject, $type, 'event', $pidList, '0,1,2,3');
+        return $this->findAllWithin('cal_event_model', clone $startDateObject, clone $endDateObject, $type, 'event', $pidList, '0,1,2,3');
     }
 
     /**
@@ -808,7 +793,7 @@ class ModelController extends BaseController
      */
     public function findTodosForRss(&$startDateObject, &$endDateObject, $type, $pidList): array
     {
-        return $this->findAllWithin('cal_event_model', $startDateObject, $endDateObject, $type, $this->todoSubtype, $pidList, '4');
+        return $this->findAllWithin('cal_event_model', clone $startDateObject, clone $endDateObject, $type, $this->todoSubtype, $pidList, '4');
     }
 
     /**
@@ -923,8 +908,8 @@ class ModelController extends BaseController
      */
     public function findAllWithin(
         $serviceName,
-        &$startDateObject,
-        &$endDateObject,
+        $startDateObject,
+        $endDateObject,
         $type = '',
         $subtype = '',
         $pidList = '',
@@ -935,12 +920,11 @@ class ModelController extends BaseController
         if ($type === '') {
             $serviceChain = '';
             $events = [];
-
             /* Iterate over all classes providing the cal_model service */
             while (is_object($service = GeneralUtility::makeInstanceService($serviceName, $subtype, $serviceChain))) {
                 $serviceChain .= ',' . $service->getServiceKey();
                 /* Gets all events from the current model as an array */
-                $eventsFromService = $service->findAllWithin($startDateObject, $endDateObject, $pidList, $eventType, $additionalWhere);
+                $eventsFromService = $service->findAllWithin(new CalendarDateTime($startDateObject->format('Y-m-d H:i:s')), new CalendarDateTime($endDateObject->format('Y-m-d H:i:s')), $pidList, $eventType, $additionalWhere);
 
                 if (!empty($eventsFromService)) {
                     if (empty($events)) {

@@ -1,14 +1,8 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
@@ -71,6 +65,7 @@ abstract class NewTimeView
 
         $subpart = $this->markerBasedTemplateService->getSubpart($template, $this->getMySubpart());
         $this->getMarker($subpart, $sims, $rems, $wrapped);
+
         return $this->finish(Functions::substituteMarkerArrayNotCached(
             $subpart,
             $sims,
@@ -424,11 +419,11 @@ abstract class NewTimeView
             }
             return sprintf($wrap, $remember, $class, '');
         }
-        $now = new CalDate();
+        $now = new CalendarDateTime();
         $now->setTZbyID('UTC');
         $now->addSeconds($createOffset);
 
-        $date = new CalDate();
+        $date = new CalendarDateTime();
         $date->setDay($this->day);
         $date->setMonth($this->month);
         $date->setYear($this->year);
@@ -505,8 +500,8 @@ abstract class NewTimeView
             $dayEnd .= '0';
         }
 
-        $d_start = new CalDate('01012000' . $dayStart);
-        $d_end = new CalDate('01012000' . $dayEnd);
+        $d_start = new CalendarDateTime('20000101' . $dayStart);
+        $d_end = new CalendarDateTime('20000101' . $dayEnd);
 
         $sims['###TIMETABLE_HEIGHT###'] = (($d_end->getHour() * 3600 + $d_end->getMinute() * 60) - ($d_start->getHour() * 3600 + $d_start->getMinute() * 60)) / $gridLength * 0.35;
     }
@@ -525,7 +520,7 @@ abstract class NewTimeView
 
         $conf = &Registry::Registry('basic', 'conf');
 
-        $gridTime = new CalDate();
+        $gridTime = new CalendarDateTime();
         $gridTime->setTZbyID('UTC');
         $gridTime->setMinute(0);
 
@@ -542,12 +537,12 @@ abstract class NewTimeView
         }
 
         if ($conf['view'] === 'day') {
-            $d_start = new CalDate($this->getYmd() . $dayStart);
-            $d_end = new CalDate($this->getYmd() . $dayEnd);
+            $d_start = new CalendarDateTime($this->getYmd() . $dayStart);
+            $d_end = new CalendarDateTime($this->getYmd() . $dayEnd);
         }
         if ($conf['view'] === 'week') {
-            $d_start = new CalDate($this->weekStart . $dayStart);
-            $d_end = new CalDate($this->weekStart . $dayEnd);
+            $d_start = new CalendarDateTime($this->weekStart . $dayStart);
+            $d_end = new CalendarDateTime($this->weekStart . $dayEnd);
         }
         $d_start->setTZbyID('UTC');
         $d_end->setTZbyID('UTC');
@@ -648,11 +643,11 @@ abstract class NewTimeView
         if (!$rightsObj->isViewEnabled('create_event')) {
             return;
         }
-        $than = new CalDate();
+        $than = new CalendarDateTime();
         $than->setTZbyID('UTC');
         $than->addSeconds();
 
-        $date = new CalDate();
+        $date = new CalendarDateTime();
         $date->setDay($this->day);
         $date->setMonth($this->month);
         $date->setYear($this->year);
@@ -669,7 +664,7 @@ abstract class NewTimeView
             if ($view === 'day' || $view === 'week') {
                 $timeParams = '&tx_cal_controller[gettime]=' . $date->format('HM');
             } elseif ($conf['rights.']['create.']['event.']['fields.']['starttime.']['default'] === 'now') {
-                $now = new CalDate();
+                $now = new CalendarDateTime();
                 $than->setTZbyID('UTC');
                 $timeParams = '&tx_cal_controller[gettime]=' . $now->format('HM');
             }

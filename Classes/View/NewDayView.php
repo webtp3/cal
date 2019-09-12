@@ -1,16 +1,11 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Exception;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -49,13 +44,13 @@ class NewDayView extends NewTimeView
         $this->setDay(intval($day));
         $this->setMonth(intval($month));
         $this->setYear(intval($year));
-        $date = new CalDate();
+        $date = new CalendarDateTime();
         $date->setDay($this->getDay());
         $date->setMonth($this->getMonth());
         $date->setYear($this->getYear());
         $this->setWeekdayNumber($date->format('w'));
         $this->setYmd($date->format('Ymd'));
-        $this->time = $date->getTime();
+        $this->time = $date->format('U');
         if ($parentMonth >= 0) {
             $this->setParentMonth(intval($parentMonth));
         } else {
@@ -68,7 +63,7 @@ class NewDayView extends NewTimeView
      */
     public function addEvent(&$event)
     {
-        $this->events[$event->getStart()->format('HM')][$event->getUid()] = &$event;
+        $this->events[$event->getStart()->format('Hi')][$event->getUid()] = &$event;
     }
 
     /**
@@ -118,13 +113,13 @@ class NewDayView extends NewTimeView
             $gridLength = 15;
         }
 
-        $d_start = new CalDate($this->getYmd() . $dayStart);
+        $d_start = new CalendarDateTime($this->getYmd() . $dayStart);
         $d_start->setTZbyID('UTC');
-        $d_end = new CalDate($this->getYmd() . $dayEnd);
+        $d_end = new CalendarDateTime($this->getYmd() . $dayEnd);
         $d_end->setTZbyID('UTC');
 
         // splitting the events into H:M, to find out if events run in parallel
-        $i = new CalDate();
+        $i = new CalendarDateTime();
         $eventArray = [];
         $viewArray = [];
         $positionArray = [];
@@ -132,18 +127,19 @@ class NewDayView extends NewTimeView
 
         // Sort by starttime, otherwise $pos_array keys may be assigned multiple times and events may therefore overwrite each other
         asort($timeKeys);
+        //throw new Exception('Web/typo3conf/ext/cal/Classes/View/NewDayView.php:130');
 
         foreach ($timeKeys as $timeKey) {
             $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
                 if (!$this->events[$timeKey][$eventKey]->isAllday() && ($this->events[$timeKey][$eventKey]->getStart()->format('Ymd') === $this->events[$timeKey][$eventKey]->getEnd()->format('Ymd'))) {
-                    $eventMappingKey = $this->events[$timeKey][$eventKey]->getType() . '_' . $this->events[$timeKey][$eventKey]->getUid() . '_' . $this->events[$timeKey][$eventKey]->getStart()->format('YmdHMS');
+                    $eventMappingKey = $this->events[$timeKey][$eventKey]->getType() . '_' . $this->events[$timeKey][$eventKey]->getUid() . '_' . $this->events[$timeKey][$eventKey]->getStart()->format('YmdHis');
                     $eventArray[$eventMappingKey] = &$this->events[$timeKey][$eventKey];
 
                     $i->copy($this->events[$timeKey][$eventKey]->getStart());
-                    $time = $i->getTime();
+                    $time = $i->format('U');
                     $time -= ($time % ($gridLength * 60));
-                    $i = new CalDate($time);
+                    $i = new CalendarDateTime(date('Y-m-d H:i:s', $time));
                     if ($i->before($d_start)) {
                         $i->copy($d_start);
                     }
@@ -151,7 +147,7 @@ class NewDayView extends NewTimeView
                     $entries = 0;
                     for (; $i->before($this->events[$timeKey][$eventKey]->getEnd()); $i->addSeconds($gridLength * 60)) {
                         $ymd = $i->format('Ymd');
-                        $hm = $i->format('HM');
+                        $hm = $i->format('Hi');
                         $viewArray[$ymd][$hm][] = $eventMappingKey;
                         $entries++;
 
@@ -185,17 +181,17 @@ class NewDayView extends NewTimeView
         $t_array = [];
 
         while ($i->before($d_end)) {
-            $i_formatted = $i->format('HM');
+            $i_formatted = $i->format('Hi');
 
             if (is_array($viewArray[$this->getYmd()][$i_formatted]) && count($viewArray[$this->getYmd()][$i_formatted]) > 0) {
                 foreach ($viewArray[$this->getYmd()][$i_formatted] as $eventKey) {
                     $event = &$eventArray[$eventKey];
                     $eventStart = $event->getStart();
-                    $eventMappingKey = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHMS');
+                    $eventMappingKey = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHis');
                     if (array_key_exists($eventMappingKey, $pos_array)) {
                         $eventEnd = $event->getEnd();
                         $eventEnd->subtractSeconds(($eventEnd->getMinute() % $gridLength) * 60);
-                        if ($i_formatted >= $eventEnd->format('HM')) {
+                        if ($i_formatted >= $eventEnd->format('Hi')) {
                             $t_array[$i_formatted][$pos_array[$eventMappingKey]] = [
                                 'ended' => $eventMappingKey
                             ];
@@ -253,12 +249,12 @@ class NewDayView extends NewTimeView
         $daydisplay = '';
         $conf = &Registry::Registry('basic', 'conf');
 
-        $cal_time_obj = new CalDate($this->getYmd() . '000000');
+        $cal_time_obj = new CalendarDateTime($this->getYmd() . '000000');
         $cal_time_obj->setTZbyID('UTC');
         foreach ($t_array as $cal_time => $val) {
             preg_match('/([0-9]{2})([0-9]{2})/', $cal_time, $dTimeStart);
-            $cal_time_obj->setHour($dTimeStart[1]);
-            $cal_time_obj->setMinute($dTimeStart[2]);
+            $cal_time_obj->setHour($dTimeStart[1] ?? 0);
+            $cal_time_obj->setMinute($dTimeStart[2] ?? 0);
 
             if ($val !== '' && count($val) > 0) {
                 for ($i = 0, $iMax = count($val); $i < $iMax; $i++) {

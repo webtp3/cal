@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 use SJBR\StaticInfoTables\Hook\Backend\Form\Wizard\SuggestReceiver;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -167,7 +161,6 @@ $tx_cal_location = [
             'config' => [
                 'type' => 'input',
                 'size' => 25,
-                'max' => 128,
                 'checkbox' => '',
                 'eval' => 'trim',
                 'default' => '',
@@ -271,6 +264,41 @@ $tx_cal_location = [
         ]
     ]
 ];
+
+/* If wec_map is present, define the address fields */
+if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('wec_map')) {
+    $tx_cal_location['ctrl']['EXT']['wec_map'] = [
+        'isMappable' => 1,
+        'addressFields' => [
+            'street' => 'street',
+            'city' => 'city',
+            'state' => 'country_zone',
+            'zip' => 'zip',
+            'country' => 'country'
+        ]
+    ];
+    $tx_cal_location['columns']['tx_wecmap_geocode'] = [
+        'exclude' => 1,
+        'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xlf:berecord_geocodelabel',
+        'config' => [
+            'type' => 'user',
+            'userFunc' => 'JBartels\\WecMap\\Utility\\Backend->checkGeocodeStatus'
+        ]
+    ];
+    $tx_cal_location['interface']['showRecordFieldList'] .= ', tx_wecmap_geocode';
+    $tx_cal_location['types']['0']['showitem'] .= ', tx_wecmap_geocode';
+
+    $tx_cal_location['columns']['tx_wecmap_map'] = [
+        'exclude' => 1,
+        'label' => 'LLL:EXT:wec_map/Resources/Private/Languages/locallang_db.xlf:berecord_maplabel',
+        'config' => [
+            'type' => 'user',
+            'userFunc' => 'JBartels\\WecMap\\Utility\\Backend->drawMap'
+        ]
+    ];
+    $tx_cal_location['interface']['showRecordFieldList'] .= ', tx_wecmap_map';
+    $tx_cal_location['types']['0']['showitem'] .= ', tx_wecmap_map';
+}
 
 $dummy = [
     'exclude' => 1,

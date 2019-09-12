@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
 /**
@@ -34,12 +28,12 @@ class EventRecModel extends Model
     public $parentEvent;
 
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     public $start;
 
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     public $end;
 
@@ -858,7 +852,7 @@ class EventRecModel extends Model
         if ($rightsObj->isAllowedToEditStartedEvent()) {
             $eventHasntStartedYet = true;
         } else {
-            $temp = new CalDate();
+            $temp = new CalendarDateTime();
             $temp->setTZbyID('UTC');
             $temp->addSeconds($editOffset);
             $eventStart = $this->getStart();
@@ -899,7 +893,7 @@ class EventRecModel extends Model
         if ($rightsObj->isAllowedToDeleteStartedEvents()) {
             $eventHasntStartedYet = true;
         } else {
-            $temp = new CalDate();
+            $temp = new CalendarDateTime();
             $temp->setTZbyID('UTC');
             $temp->addSeconds($deleteOffset);
             $eventStart = $this->getStart();
@@ -967,7 +961,7 @@ class EventRecModel extends Model
     public function getEventIdMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
         $start = $this->getStart();
-        $sims['###EVENT_ID###'] = $this->parentEvent->getType() . $this->parentEvent->getUid() . $start->format('YmdHM');
+        $sims['###EVENT_ID###'] = $this->parentEvent->getType() . $this->parentEvent->getUid() . $start->format('YmdHi');
     }
 
     /**
@@ -1210,9 +1204,9 @@ class EventRecModel extends Model
     }
 
     /**
-     * @return CalDate
+     * @return CalendarDateTime
      */
-    public function getUntil(): CalDate
+    public function getUntil(): CalendarDateTime
     {
         return $this->parentEvent->getUntil();
     }

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 use TYPO3\CMS\Cal\Backend\TCA\Labels;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -237,7 +231,6 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'size' => 25,
-                'max' => 128,
                 'checkbox' => '',
                 'default' =>'',
                 'eval' => 'trim',
@@ -304,7 +297,6 @@ $tx_cal_event_deviation = [
             'config' => [
                 'type' => 'input',
                 'size' => 25,
-                'max' => 128,
                 'checkbox' => '',
                 'default' => '',
                 'eval' => 'trim',

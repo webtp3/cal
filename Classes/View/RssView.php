@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -372,6 +366,6 @@ class RssView extends BaseView
         } else {
             $offset = '+' . $offset;
         }
-        return strftime('%Y-%m-%dT%H:%M:%S', $datetime) . $offset . ':00';
+        return strftime('%Y-%m-%dT%H:%i:%S', $datetime) . $offset . ':00';
     }
 }

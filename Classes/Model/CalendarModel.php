@@ -1,18 +1,11 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
 use TYPO3\CMS\Cal\Domain\Repository\FnbUserGroupMMRepository;
 use TYPO3\CMS\Cal\Domain\Repository\UserGroupMMRepository;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -114,12 +107,8 @@ class CalendarModel extends BaseModel
      */
     public function __construct($row, $serviceKey)
     {
-        parent::__construct($row, $serviceKey);
-//        $this->userGroupMMRepository = GeneralUtility::makeInstance(UserGroupMMRepository::class);
-//        $this->fnbUserGroupMMRepository = GeneralUtility::makeInstance(FnbUserGroupMMRepository::class);
-        if($this->objectManager === null) $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-//        $this->userGroupMMRepository = $this->objectManager->get(UserGroupMMRepository::class);
-//        $this->fnbUserGroupMMRepository = $this->objectManager->get(FnbUserGroupMMRepository::class);
+        $this->userGroupMMRepository = GeneralUtility::makeInstance(UserGroupMMRepository::class);
+        $this->fnbUserGroupMMRepository = GeneralUtility::makeInstance(FnbUserGroupMMRepository::class);
 
         $this->setType('tx_cal_calendar');
         $this->setObjectType('calendar');

@@ -110,6 +110,7 @@ define('DATE_FORMAT_UNIXTIME', 5);
  *          BSD License
  * @version Release: 1.4.7
  * @link http://pear.php.net/package/Date
+ * @deprecated
  */
 class Date
 {
@@ -199,7 +200,7 @@ class Date
      */
     public function Date($date = null)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $this->tz = TimeZone::getDefault();
         if ($date === null) {
@@ -229,7 +230,7 @@ class Date
      */
     public function setDate($date, $format = DATE_FORMAT_ISO)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if (preg_match(
             '/^(\d{4})-?(\d{2})-?(\d{2})([T\s]?(\d{2}):?(\d{2}):?(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:?\d{2})?)?$/i',
@@ -287,7 +288,7 @@ class Date
      */
     public function getDate($format = DATE_FORMAT_ISO)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         switch ($format) {
             case DATE_FORMAT_ISO:
@@ -336,7 +337,7 @@ class Date
      */
     public function copy($date)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $this->year = $date->year;
         $this->month = $date->month;
@@ -397,7 +398,7 @@ class Date
      */
     public function format($format): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $output = '';
 
@@ -561,7 +562,7 @@ class Date
      */
     public function getTime(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->getDate(DATE_FORMAT_UNIXTIME);
     }
@@ -584,7 +585,7 @@ class Date
      */
     public function setTZ($tz)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($tz instanceof Timezone) {
             $this->tz = $tz;
@@ -632,7 +633,7 @@ class Date
      */
     public function inDaylightTime(): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->tz->inDaylightTime($this);
     }
@@ -921,7 +922,7 @@ class Date
      */
     public function compare($d1, $d2): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $d1->convertTZ(new TimeZone('UTC'));
         $d2->convertTZ(new TimeZone('UTC'));
@@ -969,9 +970,9 @@ class Date
      */
     public function before($when): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        if (self::compare($this, $when) == -1) {
+        if (Date::compare($this, $when) == -1) {
             return true;
         }
         return false;
@@ -992,9 +993,9 @@ class Date
      */
     public function after($when): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        if (self::compare($this, $when) == 1) {
+        if (Date::compare($this, $when) == 1) {
             return true;
         }
         return false;
@@ -1015,9 +1016,9 @@ class Date
      */
     public function equals($when): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        if (self::compare($this, $when) == 0) {
+        if (Date::compare($this, $when) == 0) {
             return true;
         }
         return false;
@@ -1036,9 +1037,9 @@ class Date
      */
     public function isFuture(): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        $now = new self();
+        $now = new Date();
         if ($this->after($now)) {
             return true;
         }
@@ -1058,9 +1059,9 @@ class Date
      */
     public function isPast(): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        $now = new self();
+        $now = new Date();
         if ($this->before($now)) {
             return true;
         }
@@ -1080,7 +1081,7 @@ class Date
      */
     public function isLeapYear(): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return Calc::isLeapYear($this->year);
     }
@@ -1098,7 +1099,7 @@ class Date
      */
     public function getJulianDate(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return Calc::julianDate($this->day, $this->month, $this->year);
     }
@@ -1116,7 +1117,7 @@ class Date
      */
     public function getDayOfWeek(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return Calc::dayOfWeek($this->day, $this->month, $this->year);
     }
@@ -1134,7 +1135,7 @@ class Date
      */
     public function getWeekOfYear()
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return Calc::weekOfYear($this->day, $this->month, $this->year);
     }
@@ -1152,7 +1153,7 @@ class Date
      */
     public function getQuarterOfYear(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return Calc::quarterOfYear($this->day, $this->month, $this->year);
     }
@@ -1170,7 +1171,7 @@ class Date
      */
     public function getDaysInMonth(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return Calc::daysInMonth($this->month, $this->year);
     }
@@ -1188,7 +1189,7 @@ class Date
      */
     public function getWeeksInMonth(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return Calc::weeksInMonth($this->month, $this->year);
     }
@@ -1208,7 +1209,7 @@ class Date
      */
     public function getDayName($abbr = false, $length = 3)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($abbr) {
             return Calc::getWeekdayAbbrname($this->day, $this->month, $this->year, $length);
@@ -1231,7 +1232,7 @@ class Date
      */
     public function getMonthName($abbr = false)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($abbr) {
             return Calc::getMonthAbbrname($this->month);
@@ -1253,11 +1254,11 @@ class Date
      */
     public function getNextDay()
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $day = Calc::nextDay($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
-        $newDate = new self();
+        $newDate = new Date();
         $newDate->setDate($date);
         return $newDate;
     }
@@ -1276,7 +1277,7 @@ class Date
      */
     public function getPrevDay()
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $day = Calc::prevDay($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
@@ -1299,7 +1300,7 @@ class Date
      */
     public function getNextWeekday()
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $day = Calc::nextWeekday($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
@@ -1322,7 +1323,7 @@ class Date
      */
     public function getPrevWeekday()
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $day = Calc::prevWeekday($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
@@ -1344,7 +1345,7 @@ class Date
      */
     public function getYear(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return (int)$this->year;
     }
@@ -1362,7 +1363,7 @@ class Date
      */
     public function getMonth(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return (int)$this->month;
     }
@@ -1380,7 +1381,7 @@ class Date
      */
     public function getDay(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return (int)$this->day;
     }
@@ -1398,7 +1399,7 @@ class Date
      */
     public function getHour(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->hour;
     }
@@ -1416,7 +1417,7 @@ class Date
      */
     public function getMinute(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->minute;
     }
@@ -1434,7 +1435,7 @@ class Date
      */
     public function getSecond(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->second;
     }
@@ -1453,7 +1454,7 @@ class Date
      */
     public function setYear($y)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($y < 0 || $y > 9999) {
             $this->year = 0;
@@ -1476,7 +1477,7 @@ class Date
      */
     public function setMonth($m)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($m < 1 || $m > 12) {
             $this->month = 1;
@@ -1499,7 +1500,7 @@ class Date
      */
     public function setDay($d)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($d > 31 || $d < 1) {
             $this->day = 1;
@@ -1523,7 +1524,7 @@ class Date
      */
     public function setHour($h)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($h > 23 || $h < 0) {
             $this->hour = 0;
@@ -1546,7 +1547,7 @@ class Date
      */
     public function setMinute($m)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($m > 59 || $m < 0) {
             $this->minute = 0;
@@ -1569,7 +1570,7 @@ class Date
      */
     public function setSecond($s)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($s > 59 || $s < 0) {
             $this->second = 0;

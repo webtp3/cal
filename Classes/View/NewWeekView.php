@@ -1,14 +1,8 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -73,7 +67,7 @@ class NewWeekView extends NewTimeView
 
     private function generateDays()
     {
-        $weekStart = new CalDate(Functions::getDayByWeek(
+        $weekStart = new CalendarDateTime(Functions::getDayByWeek(
             $this->getYear(),
             $this->week,
             DATE_CALC_BEGIN_WEEKDAY
@@ -110,7 +104,7 @@ class NewWeekView extends NewTimeView
      */
     public function addEvent(&$event)
     {
-        $eventStart = new CalDate();
+        $eventStart = new CalendarDateTime();
         $eventStart->copy($event->getStart());
         $eventStartFormatted = $eventStart->format('Ymd');
         $eventStartYear = $eventStart->getYear();
@@ -794,7 +788,7 @@ class NewWeekView extends NewTimeView
     }
 
     /**
-     * @param CalDate $dateObject
+     * @param CalendarDateTime $dateObject
      * @return mixed|void
      */
     public function setSelected(&$dateObject)
@@ -810,7 +804,7 @@ class NewWeekView extends NewTimeView
     }
 
     /**
-     * @param CalDate $dateObject
+     * @param CalendarDateTime $dateObject
      * @return mixed|void
      */
     public function setCurrent(&$dateObject)

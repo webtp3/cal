@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -21,7 +15,7 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Controller\Calendar;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -40,13 +34,13 @@ class DayView extends BaseView
     public function newDrawDay(&$master_array, $getdate)
     {
         if (!isset($getdate) || $getdate === '') {
-            $getdate = new  CalDate();
+            $getdate = new CalendarDateTime();
         } else {
-            $getdate = new  CalDate($getdate);
+            $getdate = new CalendarDateTime($getdate);
         }
 
         $dayModel = new NewDayView($getdate->getDay(), $getdate->getMonth(), $getdate->getYear());
-        $today = new  CalDate();
+        $today = new CalendarDateTime();
         $dayModel->setCurrent($today);
         $dayModel->setSelected($getdate);
 
@@ -106,7 +100,7 @@ class DayView extends BaseView
         $gridLength = $this->conf['view.']['day.']['gridLength']; // '15'; // Grid distance in minutes for day view, multiples of 15 preferred
 
         if (!isset($getdate) || $getdate === '') {
-            $getdate_obj = new  CalDate();
+            $getdate_obj = new CalendarDateTime();
             $getdate = $getdate_obj->format('Ymd');
         }
 
@@ -115,7 +109,7 @@ class DayView extends BaseView
 
         list($this_year, $this_month, $this_day) = $day_array2;
 
-        $unix_time = new  CalDate($getdate . '000000');
+        $unix_time = new CalendarDateTime($getdate . '000000');
 
         $this->initLocalCObject();
 
@@ -131,30 +125,30 @@ class DayView extends BaseView
             $this->conf['view.']['day.']['legendPrevDayLink.']
         );
 
-        $next_month_obj = new  CalDate();
+        $next_month_obj = new CalendarDateTime();
         $next_month_obj->copy($unix_time);
         $next_month_obj->addSeconds(604800);
-        $prev_month_obj = new  CalDate();
+        $prev_month_obj = new CalendarDateTime();
         $prev_month_obj->copy($unix_time);
         $prev_month_obj->subtractSeconds(604801);
 
         $dateOfWeek = Calc::beginOfWeek($this_day, $this_month, $this_year);
-        $week_start_day = new  CalDate($dateOfWeek . '000000');
+        $week_start_day = new CalendarDateTime($dateOfWeek . '000000');
 
         $start_day = $unix_time;
         $start_week_time = $start_day;
 
-        $end_week_time = new  CalDate();
+        $end_week_time = new CalendarDateTime();
         $end_week_time->copy($start_week_time);
         $end_week_time->addSeconds(604799);
 
         // Nasty fix to work with TS strftime
-        $start_day_time = new  CalDate($getdate . '000000');
+        $start_day_time = new CalendarDateTime($getdate . '000000');
         $start_day_time->setTZbyID('UTC');
         $end_day_time = Calendar::calculateEndDayTime($start_day_time);
 
-        $GLOBALS['TSFE']->register['cal_day_starttime'] = $start_day_time->getTime();
-        $GLOBALS['TSFE']->register['cal_day_endtime'] = $end_day_time->getTime();
+        $GLOBALS['TSFE']->register['cal_day_starttime'] = $start_day_time->format('U');
+        $GLOBALS['TSFE']->register['cal_day_endtime'] = $end_day_time->format('U');
 
         $display_date = $this->cObj->cObjGetSingle(
             $this->conf['view.']['day.']['titleWrap'],
@@ -205,8 +199,8 @@ class DayView extends BaseView
         $rowspan_array = [];
         $eventArray = [];
 
-        $endOfDay = new  CalDate();
-        $startOfDay = new  CalDate();
+        $endOfDay = new CalendarDateTime();
+        $startOfDay = new CalendarDateTime();
 
         if (!empty($this->master_array)) {
             foreach ($this->master_array as $ovlKey => $ovlValue) {
@@ -217,9 +211,9 @@ class DayView extends BaseView
                 preg_match('/([0-9]{2})([0-9]{2})/', $dayEnd, $dTimeEnd);
                 preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $ovlKey, $dDate);
 
-                $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . $dTimeStart[2] . ':00');
+                $d_start = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . $dTimeStart[2] . ':00');
                 $d_start->setTZbyID('UTC');
-                $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . $dTimeEnd[2] . ':00');
+                $d_end = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . $dTimeEnd[2] . ':00');
                 $d_end->setTZbyID('UTC');
 
                 foreach ($ovlValue as $ovl_time_key => $ovl_time_Value) {
@@ -227,9 +221,9 @@ class DayView extends BaseView
                     foreach ($ovl_time_Value as $event) {
                         $eventStart = $event->getStart();
                         $eventArray[$event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHM')] = $event;
-                        $starttime = new  CalDate();
-                        $endtime = new  CalDate();
-                        $j = new  CalDate();
+                        $starttime = new CalendarDateTime();
+                        $endtime = new CalendarDateTime();
+                        $j = new CalendarDateTime();
                         if ($ovl_time_key === '-1') {
                             $starttime->copy($event->getStart());
                             $endtime->copy($event->getEnd());
@@ -246,7 +240,7 @@ class DayView extends BaseView
                             $endtime->subtractSeconds(($endtime->getMinute() % $gridLength) * 60);
 
                             $entries = 1;
-                            $old_day = new  CalDate($ovlKey . '000000');
+                            $old_day = new CalendarDateTime($ovlKey . '000000');
                             $old_day->setTZbyID('UTC');
                             $endOfDay->copy($d_end);
                             $startOfDay->copy($d_start);
@@ -400,18 +394,18 @@ class DayView extends BaseView
         $dTimeStart[2] -= $dTimeStart[2] % $gridLength;
         $dTimeEnd[2] -= $dTimeEnd[2] % $gridLength;
 
-        $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
+        $d_start = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
             '%02d',
             $dTimeStart[2]
             ) . ':00');
         $d_start->setTZbyID('UTC');
-        $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
+        $d_end = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
             '%02d',
             $dTimeEnd[2]
             ) . ':00');
         $d_end->setTZbyID('UTC');
 
-        $i = new  CalDate();
+        $i = new CalendarDateTime();
         $i->copy($d_start);
         $i->setTZbyID('UTC');
         while ($i->before($d_end)) {
@@ -456,7 +450,7 @@ class DayView extends BaseView
 
         $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
         $daydisplay = '';
-        $cal_time_obj = new  CalDate($getdate . '000000');
+        $cal_time_obj = new CalendarDateTime($getdate . '000000');
         $cal_time_obj->setTZbyID('UTC');
         foreach ($t_array as $cal_time => $val) {
             preg_match('/([0-9]{2})([0-9]{2})/', $cal_time, $dTimeStart);
@@ -496,9 +490,9 @@ class DayView extends BaseView
                         $keys = array_keys($iValue);
                         if ($keys[0] === 'begin') {
                             $event = &$eventArray[$val[$i][$keys[0]]];
-                            $dayEndTime = new  CalDate();
+                            $dayEndTime = new CalendarDateTime();
                             $dayEndTime->copy($event->getEnd());
-                            $dayStartTime = new  CalDate();
+                            $dayStartTime = new CalendarDateTime();
                             $dayStartTime->copy($event->getStart());
 
                             $colSpan = $rowspan_array[$getdate][$val[$i][$keys[0]]];

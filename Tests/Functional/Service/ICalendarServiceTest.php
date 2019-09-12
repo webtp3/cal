@@ -20,7 +20,6 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 use TYPO3\CMS\Cal\Service\ICalendarService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -28,9 +27,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class ICalendarServiceTest
  */
-class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
+class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
 {
-
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
     protected $objectManager;
@@ -47,14 +45,14 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
         $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_calendar.xml');
         $this->calService = $this->objectManager->get(ICalendarService::class);
-
     }
 
     /**
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod() {
+    public function dummyMethod()
+    {
         $this->assertTrue(true);
     }
 
@@ -65,7 +63,7 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
      */
     public function canFindByUidTest()
     {
-       /*
+        /*
      * @param int $uid
      *            to search for
      * @param string $pidList
@@ -73,8 +71,8 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
      * @return array array ($row)
     */
 
-       $c =  $this->calService->find(1);
-        $this->assertEquals(1, $c["uid"]);
+        $c =  $this->calService->find(1);
+        $this->assertEquals(1, $c['uid']);
     }
     /**
      * Test find external calendar uid or pid-list
@@ -91,8 +89,8 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
       * @return array array ($row)
      */
 
-        $c =  $this->calService->find('',[1]);
-        $this->assertEquals($c["uid"], 1);
+        $c =  $this->calService->find('', [1]);
+        $this->assertEquals($c['uid'], 1);
     }
 
     /**
@@ -100,19 +98,17 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
      *
      * @test
      */
-
     public function canFindAll()
     {
-    /**
-     * Looks for all external calendars on a certain pid-list
-     *
-     * @param string $pidList
-     *            to search in
-     * @return array array of array (array of $rows)
-     */
+        /**
+         * Looks for all external calendars on a certain pid-list
+         *
+         * @param string $pidList
+         *            to search in
+         * @return array array of array (array of $rows)
+         */
         $c = $this->calService->findAll([1]);
-        $this->assertEquals($c["uid"], 1);
-
+        $this->assertEquals($c['uid'], 1);
     }
 
     /**
@@ -155,12 +151,8 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
 //
 //        $newMD5 = md5(implode('', $mD5Array));
         //#todo real check md5 -> check return needed or can me array
-        $this->assertEquals(1,preg_match('/^[a-f0-9]{32}$/', $cmd5));
-
+        $this->assertEquals(1, preg_match('/^[a-f0-9]{32}$/', $cmd5));
     }
-
-
-
 
     /**
      * Test ScheduleUpdates an existing calendar events
@@ -170,7 +162,6 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
      */
     public function canScheduleUpdatesTest()
     {
-
         if (ExtensionManagementUtility::isLoaded('scheduler')) {
             /**
              * Schedules future updates using the scheduling engine.
@@ -183,13 +174,10 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
             $refreshInterval = 120;
             $uid = 1;
             $this->calService->scheduleUpdates($refreshInterval, $uid);
-        }
-        else{
+        } else {
             // ignore Test
             $this->assertTrue(true);
-
         }
-
     }
     /**
      * Test CreateSchedulerTask an existing calendar events
@@ -197,7 +185,6 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
      * @test
      *
      */
-
     public function canCreateSchedulerTaskTest()
     {
         /**
@@ -209,17 +196,16 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
         if (ExtensionManagementUtility::isLoaded('scheduler')) {
             $offset = 1;
 
-        $calendarUid = 1;
+            $calendarUid = 1;
 
-            $this->assertEquals(1,$this->calService->createSchedulerTask($scheduler, $offset, $calendarUid));
-        } else{
+            $this->assertEquals(1, $this->calService->createSchedulerTask($scheduler, $offset, $calendarUid));
+        } else {
             // ignore Test
             $this->assertTrue(true);
-
         }
     }
 
-      /**
+    /**
      * Test DeleteSchedulerTask an existing calendar events
      *
      * @test
@@ -229,14 +215,11 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
     {
         if (ExtensionManagementUtility::isLoaded('scheduler')) {
             $calendarUid = 1;
-            $this->assertEquals(1,$this->calService->deleteSchedulerTask($calendarUid));
-        }
-        else{
+            $this->assertEquals(1, $this->calService->deleteSchedulerTask($calendarUid));
+        } else {
             // ignore Test
             $this->assertTrue(true);
-
         }
-
     }
     /**
      * Test deleteScheduledUpdatesFromCalendar an existing calendar events
@@ -252,14 +235,11 @@ class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\Funct
          */
         if (ExtensionManagementUtility::isLoaded('scheduler')) {
             $calendarUid = 1;
-            ;
-            $this->assertEquals(1, $this->calService->deleteScheduledUpdatesFromCalendar($calendarUid));
 
-        }
-        else{
+            $this->assertEquals(1, $this->calService->deleteScheduledUpdatesFromCalendar($calendarUid));
+        } else {
             // ignore Test
             $this->assertTrue(true);
-
         }
     }
     //#todo further functional Tests if work

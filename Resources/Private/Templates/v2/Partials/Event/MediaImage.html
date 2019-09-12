@@ -1,0 +1,61 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	  xmlns:n="http://typo3.org/ns/GeorgRinger/News/ViewHelpers"
+		xmlns:bk2k="http://typo3.org/ns/BK2K/BootstrapPackage/ViewHelpers"
+	  data-namespace-typo3-fluid="true">
+
+<div class="mediaelement mediaelement-image" itemscope="image" itemtype="http://schema.org/ImageObject">
+	<f:if condition="{mediaElement.link}">
+		<f:then>
+			<f:link.page pageUid="{mediaElement.link}" target="{n:targetLink(link:mediaElement.link)}">
+				<f:image image="{mediaElement}" title="{mediaElement.title}" alt="{mediaElement.alternative}" maxWidth="{f:if(condition: settings.media.maxWidth, then: settings.media.maxWidth, else: settings.detail.media.image.maxWidth)}" maxHeight="{f:if(condition: settings.media.maxHeight, then: settings.media.maxHeight, else: settings.detail.media.image.maxHeight)}" />
+			</f:link.page>
+		</f:then>
+		<f:else>
+			<f:if condition="{settings.detail.media.image.lightbox.enabled}">
+				<f:then>
+					<a
+						href="{f:uri.image(image: mediaElement, maxHeight: settings.lightbox.image.maxHeight, maxWidth: settings.lightbox.image.maxWidth)}"
+						title="{mediaElement.properties.title}"
+						data-lightbox-caption="{mediaElement.properties.description}"
+						class="lightbox img-responsive"
+						data-lightbox-width="{bk2k:lastImageInfo(property: 'width')}"
+						data-lightbox-height="{bk2k:lastImageInfo(property: 'height')}"
+						rel="lightbox-group-{mediaElement.uid}">
+						<img src="{f:uri.image(src: 'EXT:bootstrap_package/Resources/Public/Images/blank.gif')}"
+								 data-src="{f:uri.image(image: mediaElement)}"
+								 data-large="{f:uri.image(image: mediaElement, cropVariant: 'default', maxWidth: 350)}"
+								 data-medium="{f:uri.image(image: mediaElement, cropVariant: 'medium', maxWidth: 940)}"
+								 data-small="{f:uri.image(image: mediaElement, cropVariant: 'small', maxWidth: 720)}"
+								 data-extrasmall="{f:uri.image(image: mediaElement, cropVariant: 'extrasmall', maxWidth: 320)}" title="{mediaElement.title}"
+								 alt="{mediaElement.alternative}" class="lazyload"
+								 data-preload="{f:if(condition: settings.preload.images, then: 'true', else: 'false')}"
+								 data-speed="{mediaElement.speed}" data-parallax="{mediaElement.parallax}" />
+						<noscript>
+							<img src="{f:uri.image(image: mediaElement)}" title="{mediaElement.title}" alt="{mediaElement.alternative}"/>
+						</noscript>
+					</a>
+				</f:then>
+				<f:else>
+					<img src="{f:uri.image(src: 'EXT:bootstrap_package/Resources/Public/Images/blank.gif')}"
+							 data-src="{f:uri.image(image: mediaElement,cropVariant: settings.detail.media.image.maxWidth)})}"
+							 data-large="{f:uri.image(image: mediaElement, cropVariant: 'default', maxWidth: 350)}"
+							 data-medium="{f:uri.image(image: mediaElement, cropVariant: 'medium', maxWidth: 940)}"
+							 data-small="{f:uri.image(image: mediaElement, cropVariant: 'small', maxWidth: 720)}"
+							 data-extrasmall="{f:uri.image(image: mediaElement, cropVariant: 'extrasmall', maxWidth: 320)}" title="{mediaElement.title}"
+							 alt="{mediaElement.alternative}" class="lazyload"
+							 data-preload="{f:if(condition: settings.preload.images, then: 'true', else: 'false')}"
+							 data-speed="{mediaElement.speed}" data-parallax="{mediaElement.parallax}" />
+					<noscript>
+						<img src="{f:uri.image(image: mediaElement)}" title="{mediaElement.title}" alt="{mediaElement.alternative}"/>
+					</noscript>
+				</f:else>
+			</f:if>
+		</f:else>
+	</f:if>
+</div>
+<f:if condition="{mediaElement.description}">
+	<p class="news-img-caption">
+		{mediaElement.description}
+	</p>
+</f:if>
+</html>

@@ -1,12 +1,6 @@
 <?php
 declare(strict_types = 1);
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Service;
 
 use DateTime;
@@ -87,6 +81,7 @@ if (!defined('DATE_CALC_FORMAT')) {
  * @version Release: 1.4.7
  * @link http://pear.php.net/package/Date
  * @since Class available since Release 1.2
+ * @deprecated
  */
 class DateCalculationService
 {

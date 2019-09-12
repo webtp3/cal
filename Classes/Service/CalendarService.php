@@ -458,8 +458,6 @@ class CalendarService extends BaseService
      */
     public function getIdsFromTable($list, $pidList, $includePublic, $includeData = false, $onlyPublic = false): array
     {
-        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3. Use $this->calendarRepository->getIdsFromTable instead.', E_USER_DEPRECATED);
-
         $userId = 0;
         $groupIds = '';
         $this->calendarIds = [];

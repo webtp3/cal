@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
 /**
@@ -26,7 +20,6 @@ use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -136,6 +129,11 @@ abstract class BaseModel extends AbstractModel
     protected $isPreview = false;
 
     /**
+     * @var bool
+     */
+    protected $hasMap = false;
+
+    /**
      * @var array
      */
     public $image = [];
@@ -179,10 +177,6 @@ abstract class BaseModel extends AbstractModel
      * @var ObjectStorage
      */
     protected $images;
-    /**
-     * @var int
-     */
-    public $calendarUid = 0;
 
     /**
      * @var MarkerBasedTemplateService
@@ -205,35 +199,17 @@ abstract class BaseModel extends AbstractModel
     public $sharedGroups = [];
 
     /**
-     * @var ObjectManager
-     * @inject
-     */
-    protected $objectManager = null;
-
-    /**
-     * Injects the object manager
-     *
-     * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
-     * @return void
-     */
-    public function injectObjectManager(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
-
-    /**
      * Constructor.
      *
      * @param string $serviceKey serviceKey for this model
      */
     public function __construct($serviceKey)
     {
-        if($this->objectManager === null)  $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->controller = &Registry::Registry('basic', 'controller');
         $this->conf = &Registry::Registry('basic', 'conf');
         $this->serviceKey = &$serviceKey;
 
-        //$this->markerBasedTemplateService = $this->objectManager->get(MarkerBasedTemplateService::class);
+        $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
 
         $this->initObjectStorage();
     }
@@ -246,21 +222,6 @@ abstract class BaseModel extends AbstractModel
         $this->images = new ObjectStorage();
     }
 
-    /**
-     * @param $uid
-     */
-    public function setCalendarUid($uid)
-    {
-        $this->calendarUid = $uid;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCalendarUid(): int
-    {
-        return $this->calendarUid;
-    }
     /**
      * Returns the image marker
      * @param $template
@@ -428,7 +389,7 @@ abstract class BaseModel extends AbstractModel
      */
     public function getImages()
     {
-        $fileRepository = $this->objectManager->get(FileRepository::class);
+        $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
         return $fileRepository->findByRelation('tx_cal_' . $this->getObjectType(), 'image', $this->getUid());
     }
 
@@ -472,7 +433,7 @@ abstract class BaseModel extends AbstractModel
      */
     public function getAttachments()
     {
-        $fileRepository = $this->objectManager->get(FileRepository::class);
+        $fileRepository = GeneralUtility::makeInstance(FileRepository::class);
         return $fileRepository->findByRelation('tx_cal_' . $this->getObjectType(), 'attachment', $this->getUid());
     }
 
@@ -908,7 +869,7 @@ abstract class BaseModel extends AbstractModel
     public function fillTemplate($subpartMarker): string
     {
         $page = Functions::getContent($this->templatePath);
-        $this->markerBasedTemplateService = $this->objectManager->get(MarkerBasedTemplateService::class);
+
         if ($page === '') {
             return Functions::createErrorMessage(
                 'No ' . $this->objectType . ' template file found at: >' . $this->templatePath . '<.',
@@ -1085,5 +1046,20 @@ abstract class BaseModel extends AbstractModel
     public function setSharedGroups($groupIds)
     {
         $this->sharedGroups = $groupIds;
+    }
+    /**
+     * @return boolean
+     */
+    public function getHasMap(): bool
+    {
+        return $this->hasMap;
+    }
+
+    /**
+     * @param boolean $hasMap
+     */
+    public function setHasMap($hasMap)
+    {
+        $this->hasMap = $hasMap;
     }
 }

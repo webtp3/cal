@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
 /**
@@ -20,7 +14,8 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use TYPO3\CMS\Cal\Domain\Repository\LocationRepository;
+
+use TYPO3\CMS\Cal\Controller\ModelController;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -33,12 +28,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 abstract class Model extends BaseModel
 {
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     protected $start;
 
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     protected $end;
 
@@ -142,7 +137,7 @@ abstract class Model extends BaseModel
     public $_class;
 
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     public $until;
 
@@ -413,11 +408,6 @@ abstract class Model extends BaseModel
     private $calendarObject;
 
     /**
-     * @var LocationRepository
-     */
-    protected $locationRepository;
-
-    /**
      * Constructor.
      *
      * @param string $serviceKey
@@ -426,7 +416,6 @@ abstract class Model extends BaseModel
     {
         $this->setObjectType('event');
         parent::__construct($serviceKey);
-//        $this->locationRepository = GeneralUtility::makeInstance(LocationRepository::class);
     }
 
     /**
@@ -480,7 +469,7 @@ abstract class Model extends BaseModel
         $d = nl2br($cObj->parseFunc($this->getDescription(), $this->conf['parseFunc.']));
         $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
-        return '<h3>' . $this->getTitle() . '</h3><span color="#000000"><ul>' . '<li>Start: ' . $eventStart->format('H:M') . '</li>' . '<li>End: ' . $eventEnd->format('%H:%M') . '</li>' . '<li> Organizer: ' . $this->getOrganizer() . '</li>' . '<li>Location: ' . $this->getLocation() . '</li>' . '<li>Description: ' . $d . '</li></ul></span>';
+        return '<h3>' . $this->getTitle() . '</h3><span color="#000000"><ul>' . '<li>Start: ' . $eventStart->format('H:i') . '</li>' . '<li>End: ' . $eventEnd->format('H:i') . '</li>' . '<li> Organizer: ' . $this->getOrganizer() . '</li>' . '<li>Location: ' . $this->getLocation() . '</li>' . '<li>Description: ' . $d . '</li></ul></span>';
     }
 
     /**
@@ -606,9 +595,9 @@ abstract class Model extends BaseModel
     /**
      * Returns the startdate object.
      *
-     * @return CalDate startdate timeObject
+     * @return CalendarDateTime startdate timeObject
      */
-    public function getStart(): CalDate
+    public function getStart(): CalendarDateTime
     {
         return $this->start;
     }
@@ -616,9 +605,9 @@ abstract class Model extends BaseModel
     /**
      * Returns the enddate object.
      *
-     * @return CalDate enddate timeObject
+     * @return CalendarDateTime enddate timeObject
      */
-    public function getEnd(): CalDate
+    public function getEnd(): CalendarDateTime
     {
         if (!$this->end) {
             $this->setEnd($this->getStart());
@@ -630,11 +619,11 @@ abstract class Model extends BaseModel
     /**
      * Sets the event start.
      *
-     * @param CalDate $start
+     * @param CalendarDateTime $start
      */
     public function setStart($start)
     {
-        $this->start = new CalDate();
+        $this->start = new CalendarDateTime();
         $this->start->copy($start);
         $this->row['start_date'] = $start->format('Ymd');
         $this->row['start_time'] = $start->getHour() * 3600 + $start->getMinute() * 60;
@@ -643,11 +632,11 @@ abstract class Model extends BaseModel
     /**
      * Sets the event end.
      *
-     * @param CalDate $end
+     * @param CalendarDateTime $end
      */
     public function setEnd($end)
     {
-        $this->end = new CalDate();
+        $this->end = new CalendarDateTime();
         $this->end->copy($end);
         $this->row['end_date'] = $end->format('Ymd');
         $this->row['end_time'] = $end->getHour() * 3600 + $end->getMinute() * 60;
@@ -660,6 +649,8 @@ abstract class Model extends BaseModel
      */
     public function getStartAsTimestamp(): int
     {
+        return $this->getStart()->format('U');
+
         $start = &$this->getStart();
         return $start->getDate(DATE_FORMAT_UNIXTIME);
     }
@@ -671,6 +662,7 @@ abstract class Model extends BaseModel
      */
     public function getEndAsTimestamp(): int
     {
+        return $this->getEnd()->format('U');
         $end = &$this->getEnd();
         return $end->getDate(DATE_FORMAT_UNIXTIME);
     }
@@ -787,7 +779,7 @@ abstract class Model extends BaseModel
      */
     public function getDuration(): int
     {
-        return $this->end->getTime() - $this->start->getTime();
+        return $this->end->format('U') - $this->start->format('U');
     }
 
     /**
@@ -1245,7 +1237,7 @@ abstract class Model extends BaseModel
     /**
      * Returns the until date object
      */
-    public function getUntil(): CalDate
+    public function getUntil(): CalendarDateTime
     {
         return $this->until;
     }
@@ -1253,7 +1245,7 @@ abstract class Model extends BaseModel
     /**
      * Sets the until object.
      *
-     * @param CalDate $until
+     * @param CalendarDateTime $until
      */
     public function setUntil($until)
     {
@@ -1466,7 +1458,7 @@ abstract class Model extends BaseModel
         if (!$this->organizerObject) {
             $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             $useOrganizerStructure = ($confArr['useOrganizerStructure'] ?: 'tx_cal_organizer');
-            $modelObj = &Registry::Registry('basic', 'modelcontroller');
+            $modelObj = GeneralUtility::makeInstance(ModelController::class);//&Registry::Registry('basic', 'modelcontroller');
             $this->organizerObject = $modelObj->findOrganizer(
                 $this->getOrganizerId(),
                 $useOrganizerStructure,
@@ -1539,8 +1531,13 @@ abstract class Model extends BaseModel
     public function getLocationObject()
     {
         if (!$this->locationObject) {
-            $this->locationRepository->findByUid(
-                $this->getLocationId()
+            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
+            $modelObj =  GeneralUtility::makeInstance(ModelController::class);//&Registry::Registry('basic', 'modelcontroller');
+            $this->locationObject = $modelObj->findLocation(
+                $this->getLocationId(),
+                $useLocationStructure,
+                $this->conf['pidList']
             );
         }
         return $this->locationObject;
@@ -1820,7 +1817,7 @@ abstract class Model extends BaseModel
         $values['intrval'] = $this->getInterval();
         $values['cnt'] = $this->getCount();
 
-        /** @var CalDate $until */
+        /** @var CalendarDateTime $until */
         $until = $this->getUntil();
         if (is_object($until)) {
             $values['until'] = $until->format('Ymd');

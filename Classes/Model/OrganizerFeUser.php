@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -36,12 +30,9 @@ class OrganizerFeUser extends Organizer
      *
      * @param array $row
      * @param string $pidList
-     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function __construct($row, $pidList)
     {
-        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
-
         parent::__construct($row, $pidList);
         $this->setType('tx_feuser');
         $this->setObjectType('organizer');
@@ -51,12 +42,9 @@ class OrganizerFeUser extends Organizer
 
     /**
      * @param $row
-     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function createOrganizer($row)
     {
-        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
-
         $this->setUid($row['uid']);
         $this->setName($row['name']);
         $this->setStreet($row['address']);

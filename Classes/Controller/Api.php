@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Controller;
 
 /**
@@ -29,7 +23,6 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\TimeTracker\TimeTracker;
 use TYPO3\CMS\Core\TypoScript\ExtendedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
@@ -57,16 +50,10 @@ class Api
     public $unsetTSFEOnDestruct = false;
     /** @var ConnectionPool $connectionPool */
     public $connectionPool;
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
 
     public function __construct()
     {
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        $this->modelObj = $this->objectManager->get(ModelController::class);
     }
 
     /**
@@ -78,7 +65,7 @@ class Api
      * @param $conf
      * @return Api
      */
-    public function tx_cal_api_with(&$cObj, &$conf): self
+    public function tx_cal_api_with(&$cObj, &$conf): Api
     {
         $this->cObj = &$cObj;
         $this->conf = &$conf;
@@ -108,7 +95,7 @@ class Api
         $this->rightsObj->setDefaultSaveToPage();
 
         $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
-        // $this->modelObj = new ModelController();
+        $this->modelObj = new ModelController();
 
         $this->viewObj = &Registry::Registry('basic', 'viewcontroller');
         $this->viewObj = GeneralUtility::makeInstance(ViewController::class);
@@ -123,7 +110,7 @@ class Api
      * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
      * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
      */
-    public function tx_cal_api_without($pid, $feUserObj = ''): self
+    public function tx_cal_api_without($pid, $feUserObj = ''): Api
     {
         $cObj = new ContentObjectRenderer();
 
@@ -409,7 +396,7 @@ class Api
      */
     public function findEventsWithin($startTimestamp, $endTimestamp, $type = '', $pidList = ''): array
     {
-        return $this->modelObj->findAllWithin('cal_event_model', $startTimestamp, $endTimestamp, $type, 'event', $pidList);
+        return $this->modelObj->findAllWithin('cal_event_model', clone $startTimestamp, clone $endTimestamp, $type, 'event', $pidList);
     }
 
     /**

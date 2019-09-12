@@ -22,13 +22,11 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Controller;
  */
 use TYPO3\CMS\Cal\Controller\ModelController;
 
-
 /**
  * ModelController for calendar base (cal)
  */
-class ModelControllerTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
+class ModelControllerTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
 {
-
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
     protected $objectManager;
@@ -46,15 +44,14 @@ class ModelControllerTest extends \TYPO3\TestingFramework\Core\Functional\Functi
         $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_event.xml');
         $this->modelController = $this->objectManager->get(ModelController::class);
         //$this->setUpFrontendRootPage(1, ['EXT:cal/Configuration/TypoScript/']);
-
-
     }
 
     /**
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod() {
+    public function dummyMethod()
+    {
         $this->assertTrue(true);
     }
 
@@ -73,8 +70,8 @@ class ModelControllerTest extends \TYPO3\TestingFramework\Core\Functional\Functi
       * @return array array ($row)
      */
 
-        $c =  $this->modelController->findEvent(2,'tx_cal_phpicalendar','1');
-        $this->assertEquals(1, $c["uid"]);
+        $c =  $this->modelController->findEvent(2, 'tx_cal_phpicalendar', '1');
+        $this->assertEquals(1, $c['uid']);
     }
 
     /**
@@ -84,9 +81,8 @@ class ModelControllerTest extends \TYPO3\TestingFramework\Core\Functional\Functi
      */
     public function canFindAllCalendarFromPid(): array
     {
-
-        $c =  $this->modelController->findAllCalendar('tx_cal_phpicalendar','1');
-        $this->assertEquals(1, $c["uid"]);
+        $c =  $this->modelController->findAllCalendar('tx_cal_phpicalendar', '1');
+        $this->assertEquals(1, $c['uid']);
     }
 
     /**
@@ -96,9 +92,8 @@ class ModelControllerTest extends \TYPO3\TestingFramework\Core\Functional\Functi
      */
     public function canFindAllCalendar(): array
     {
-
-        $c =  $this->modelController->findAllCalendar('tx_cal_phpicalendar','');
-        $this->assertEquals(1, $c["uid"]);
+        $c =  $this->modelController->findAllCalendar('tx_cal_phpicalendar', '');
+        $this->assertEquals(1, $c['uid']);
     }
     /**
      * Test create save and find the event
@@ -107,16 +102,14 @@ class ModelControllerTest extends \TYPO3\TestingFramework\Core\Functional\Functi
      */
     public function canCreateAndSaveAndFindEvent(): array
     {
-
-
         $evt =  $this->modelController->createEvent('tx_cal_phpicalendar');
         $evt->setPid(1);
         $evt->setUid(111);
-        $type = "tx_cal_phpicalendar";
+        $type = 'tx_cal_phpicalendar';
         $evt->setType($type);
-        $title = "testtype event";
+        $title = 'testtype event';
         $evt->setTitle($title);
-        $this->modelController->saveEvent('','tx_cal_phpicalendar',1);
+        $this->modelController->saveEvent('', 'tx_cal_phpicalendar', 1);
         $this->assertEquals($evt, $this->modelController->findEvent(111, $type, [1]));
     }
 }

@@ -23,6 +23,7 @@ namespace TYPO3\CMS\Cal\Service;
 use RuntimeException;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
 
 /**
  * Base model for the category.
@@ -310,7 +311,6 @@ class SysCategoryService extends BaseService
      */
     public function getCategoryArray($pidList, &$categoryArrayToBeFilled, $showPublicCategories = true)
     {
-
         if (!empty($this->categoryArrayCached[md5($this->conf['view.']['categoryMode'] . $this->conf['view.']['allowedCategories'])])) {
             $categoryArrayToBeFilled[] = $this->categoryArrayCached[md5($this->conf['view.']['categoryMode'] . $this->conf['view.']['allowedCategories'])];
             return;
@@ -729,7 +729,7 @@ class SysCategoryService extends BaseService
      */
     public function createTranslation($uid, $overlay)
     {
-        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+       //trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
 
         $table = 'sys_category';
         $select = $table . '.*';

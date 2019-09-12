@@ -4,7 +4,7 @@
         <description>CSH labels for the Calendar Base Frontend Plugin</description>
         <type>CSH</type>
         <csh_table></csh_table>
-        <fileId>EXT:cal/res/help/locallang_csh_flexform.xlf</fileId>
+        <fileId>EXT:cal/res/help/locallang_csh_flexform.xml</fileId>
         <labelContext type="array"></labelContext>
     </meta>
     <data type="array">

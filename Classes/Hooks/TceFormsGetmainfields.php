@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Hooks;
 
 /**
@@ -21,7 +15,7 @@ namespace TYPO3\CMS\Cal\Hooks;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 
 /**
  * This hook extends the tcemain class.
@@ -52,9 +46,9 @@ class TceFormsGetmainfields
                 }
             } elseif (false === strpos($row['uid'], 'NEW')) {
                 if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] === '1') {
-                    $format = '%m-%d-%Y';
+                    $format = 'm-d-Y';
                 } else {
-                    $format = '%d-%m-%Y';
+                    $format = 'd-m-Y';
                 }
 
                 $row['start_date'] = $this->formatDate($row['start_date'], $format);
@@ -65,9 +59,9 @@ class TceFormsGetmainfields
 
         if (($table === 'tx_cal_exception_event') && false === strpos($row['uid'], 'NEW')) {
             if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['USdateFormat'] === '1') {
-                $format = '%m-%d-%Y';
+                $format = 'm-d-Y';
             } else {
-                $format = '%d-%m-%Y';
+                $format = 'd-m-Y';
             }
 
             $row['start_date'] = $this->formatDate($row['start_date'], $format);
@@ -107,9 +101,9 @@ class TceFormsGetmainfields
     public function formatDate($ymdDate, $format)
     {
         if ($ymdDate) {
-            $dateObj = new CalDate(intval($ymdDate) . '000000');
+            $dateObj = new CalendarDateTime((int)$ymdDate . '000000');
             $dateObj->setTZbyID('UTC');
-            return $dateObj->getTime();
+            return $dateObj->format('U');
         }
         $dateString = '';
 

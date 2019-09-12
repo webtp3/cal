@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -27,7 +21,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Base model for the calendar location.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class LocationAddress extends Location
 {
@@ -37,12 +30,9 @@ class LocationAddress extends Location
      *
      * @param $row
      * @param string $pidList
-     * @deprecated since ext:cal v2, will be removed in ext:cal v3
      */
     public function __construct($row, $pidList)
     {
-        trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
-
         parent::__construct($row, $pidList);
         $this->setObjectType('location');
         $this->setType('tx_tt_address');
@@ -67,6 +57,8 @@ class LocationAddress extends Location
         $this->setEmail($row['email']);
         $this->setImage(GeneralUtility::trimExplode(',', $row['image'], 1));
         $this->setLink($row['www']);
+        $this->setLongitude($row['longitude']);
+        $this->setLatitude($row['latitude']);
         $this->row = $row;
     }
 }

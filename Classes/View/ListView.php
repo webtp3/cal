@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -20,7 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
@@ -37,12 +31,12 @@ class ListView extends BaseView
     public $suggestMessage = '';
 
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     public $starttime;
 
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     public $endtime;
     public $objectsInList = [];
@@ -132,11 +126,11 @@ class ListView extends BaseView
 
         /* Subtract strtotimeOffset because we're going from GMT back to local time */
         if ($this->reverse) {
-            $GLOBALS['TSFE']->register['cal_list_starttime'] = $this->endtime->getTime();
-            $GLOBALS['TSFE']->register['cal_list_endtime'] = $this->starttime->getTime();
+            $GLOBALS['TSFE']->register['cal_list_starttime'] = $this->endtime->format('U');
+            $GLOBALS['TSFE']->register['cal_list_endtime'] = $this->starttime->format('U');
         } else {
-            $GLOBALS['TSFE']->register['cal_list_starttime'] = $this->starttime->getTime();
-            $GLOBALS['TSFE']->register['cal_list_endtime'] = $this->endtime->getTime();
+            $GLOBALS['TSFE']->register['cal_list_starttime'] = $this->starttime->format('U');
+            $GLOBALS['TSFE']->register['cal_list_endtime'] = $this->endtime->format('U');
         }
 
         // clear the register
@@ -153,18 +147,18 @@ class ListView extends BaseView
             $this->count = 0;
             $this->eventCounter = [];
             $this->listStartOffsetCounter = 0;
-            $this->listStartOffset = intval($this->conf['view.']['list.']['listStartOffset']);
+            $this->listStartOffset = (int)$this->conf['view.']['list.']['listStartOffset'];
 
             if ($this->conf['view.']['list.']['pageBrowser.']['usePageBrowser']) {
-                $this->offset = intval($this->controller->piVars[$this->pointerName]);
-                $this->recordsPerPage = intval($this->conf['view.']['list.']['pageBrowser.']['recordsPerPage']);
+                $this->offset = (int)$this->controller->piVars[$this->pointerName];
+                $this->recordsPerPage = (int)$this->conf['view.']['list.']['pageBrowser.']['recordsPerPage'];
             }
 
             $this->walkThroughMasterArray($master_array, $this->reverse, $firstEventDate);
 
-            /** @var CalDate $firstEventDate */
+            /** @var CalendarDateTime $firstEventDate */
             if ($firstEventDate) {
-                $GLOBALS['TSFE']->register['cal_list_firstevent'] = $firstEventDate->getTime();
+                $GLOBALS['TSFE']->register['cal_list_firstevent'] = $firstEventDate->format('U');
             }
 
             if ($this->count) {
@@ -186,11 +180,11 @@ class ListView extends BaseView
                 $alternationCount = 0;
                 $pageItemCount = $this->recordsPerPage * $this->offset;
 
-                // don't assign these dates in one line like "$date1 = $date2 = $date3 = new CalDate()", as this will make all dates references to each other!!!
-                $lastEventDay = new  CalDate('000000001000000');
-                $lastEventWeek = new  CalDate('000000001000000');
-                $lastEventMonth = new  CalDate('000000001000000');
-                $lastEventYear = new  CalDate('000000001000000');
+                // don't assign these dates in one line like "$date1 = $date2 = $date3 = new CalendarDateTime()", as this will make all dates references to each other!!!
+                $lastEventDay = new CalendarDateTime();
+                $lastEventWeek = new CalendarDateTime();
+                $lastEventMonth = new CalendarDateTime();
+                $lastEventYear = new CalendarDateTime();
 
                 $categoryGroupArray = [];
                 $categoryArray = [];
@@ -209,8 +203,7 @@ class ListView extends BaseView
                 $alternatingLayoutConfig = $this->conf['view.']['list.']['alternatingLayoutMarkers.'];
                 if (is_array($alternatingLayoutConfig) && count($alternatingLayoutConfig)) {
                     $alternatingLayouts = [];
-                    $layout_keys = array_keys($alternatingLayoutConfig);
-                    foreach ($layout_keys as $key) {
+                    foreach (array_keys($alternatingLayoutConfig) as $key) {
                         if (substr($key, strlen($key) - 1) !== '.') {
                             $suffix = $this->cObj->stdWrap(
                                 $alternatingLayoutConfig[$key],
@@ -258,7 +251,7 @@ class ListView extends BaseView
 
                     unset($calTimeObject);
 
-                    $calTimeObject = new  CalDate($cal_time . '000000');
+                    $calTimeObject = new CalendarDateTime($cal_time . '000000');
                     $calTimeObject->setTZbyID('UTC');
 
                     $cal_day = $calTimeObject->getDay();
@@ -627,13 +620,13 @@ class ListView extends BaseView
         $eventStart = $event->getStart();
         $eventEnd = $event->getEnd();
 
-        if ($eventEnd->before($this->starttime) || $eventStart->after($this->endtime)) {
+        if ($eventEnd->before(new CalendarDateTime($this->starttime->format('Y-m-d H:i:s'))) || $eventStart->after(new CalendarDateTime($this->endtime->format('Y-m-d H:i:s')))) {
             return false;
         }
 
         /* If we haven't saved an event date already, save this one */
         if (!$firstEventDate) {
-            $firstEventDate = new  CalDate();
+            $firstEventDate = new CalendarDateTime();
             if ($this->reverse) {
                 $firstEventDate->copy($eventEnd);
             } else {
@@ -683,13 +676,13 @@ class ListView extends BaseView
 
             if ($this->count < $this->recordsPerPage * $this->offset || $this->count > $this->recordsPerPage * $this->offset + $this->recordsPerPage - 1) {
                 $this->count++;
-                if ($this->count === intval($this->conf['view.']['list.']['maxEvents'])) {
+                if ($this->count === (int)$this->conf['view.']['list.']['maxEvents']) {
                     $finished = true;
                 }
                 return $finished;
             }
         }
-        $GLOBALS['TSFE']->register['cal_list_lastevent'] = $event->getStart()->getTime();
+        $GLOBALS['TSFE']->register['cal_list_lastevent'] = $event->getStart()->format('U');
 
         // reference the event in the rendering array
         $hookObjectsArr = Functions::getHookObjectsArray('tx_cal_listview', 'sorting', 'view');
@@ -705,7 +698,7 @@ class ListView extends BaseView
 
         if ($this->conf['view.']['list.']['showLongEventsInEachWrapper']) {
             if ($this->conf['view.']['list.']['enableDayWrapper'] && $eventStart->format('Ymd') !== $eventEnd->format('Ymd')) {
-                $tempEventStart = new  CalDate();
+                $tempEventStart = new CalendarDateTime();
                 $tempEventStart->copy($eventStart);
                 while ($tempEventStart->format('Ymd') !== $eventEnd->format('Ymd')) {
                     $tempEventStart->addSeconds(60 * 60 * 24);
@@ -713,7 +706,7 @@ class ListView extends BaseView
                 }
             }
             if ($this->conf['view.']['list.']['enableWeekWrapper'] && $eventStart->format('YU') !== $eventEnd->format('YU')) {
-                $tempEventStart = new  CalDate();
+                $tempEventStart = new CalendarDateTime();
                 $tempEventStart->copy($eventStart);
                 while ($tempEventStart->format('YU') !== $eventEnd->format('YU')) {
                     $tempEventStart->addSeconds(60 * 60 * 24 * 7);
@@ -721,7 +714,7 @@ class ListView extends BaseView
                 }
             }
             if ($this->conf['view.']['list.']['enableMonthWrapper'] && $eventStart->format('Ym') !== $eventEnd->format('Ym')) {
-                $tempEventStart = new  CalDate();
+                $tempEventStart = new CalendarDateTime();
                 $tempEventStart->copy($eventStart);
                 while ($tempEventStart->format('%Y%m') !== $eventEnd->format('Ym')) {
                     $tempEventStart->setMonth($tempEventStart->getMonth() + 1);
@@ -729,7 +722,7 @@ class ListView extends BaseView
                 }
             }
             if ($this->conf['view.']['list.']['enableYearWrapper'] && $eventStart->format('Y') !== $eventEnd->format('Y')) {
-                $tempEventStart = new  CalDate();
+                $tempEventStart = new CalendarDateTime();
                 $tempEventStart->copy($eventStart);
                 while ($tempEventStart->format('Y') !== $eventEnd->format('Y')) {
                     $tempEventStart->setYear($tempEventStart->getYear() + 1);
@@ -739,7 +732,7 @@ class ListView extends BaseView
         }
 
         $this->count++;
-        if ($this->count === intval($this->conf['view.']['list.']['maxEvents'])) {
+        if ($this->count === (int)$this->conf['view.']['list.']['maxEvents']) {
             $finished = true;
         }
         return $finished;
@@ -956,7 +949,7 @@ class ListView extends BaseView
                 $browserConfig = &$this->conf['view.']['list.']['pageBrowser.']['piPageBrowser.'];
                 $this->controller->internal['res_count'] = $this->count;
                 $this->controller->internal['results_at_a_time'] = $this->recordsPerPage;
-                if ($maxPages = intval($this->conf['view.']['list.']['pageBrowser.']['pagesCount'])) {
+                if ($maxPages = (int)$this->conf['view.']['list.']['pageBrowser.']['pagesCount']) {
                     $this->controller->internal['maxPages'] = $maxPages;
                 }
                 $this->controller->internal['pagefloat'] = $browserConfig['pagefloat'];
@@ -1018,12 +1011,12 @@ class ListView extends BaseView
             } else {
                 // use default page browser of cal
                 $browserConfig = $this->conf['view.']['list.']['pageBrowser.']['default.'];
-                $this->offset = intval($this->controller->piVars[$this->pointerName]);
+                $this->offset = (int)$this->controller->piVars[$this->pointerName];
 
-                $pagesTotal = intval($this->recordsPerPage) === 0 ? 1 : ceil($this->count / $this->recordsPerPage);
+                $pagesTotal = (int)$this->recordsPerPage === 0 ? 1 : ceil($this->count / $this->recordsPerPage);
                 $nextPage = $this->offset + 1;
                 $previousPage = $this->offset - 1;
-                $pagesCount = intval($this->conf['view.']['list.']['pageBrowser.']['pagesCount']) - 1;
+                $pagesCount = (int)$this->conf['view.']['list.']['pageBrowser.']['pagesCount'] - 1;
                 if ($pagesCount < 0) {
                     $pagesCount = 0;
                 }
@@ -1114,8 +1107,8 @@ class ListView extends BaseView
     public function hasPeriodChanged($old, $new, $reverse = false, $debug = false): bool
     {
         if ($reverse) {
-            return intval($new) < intval($old);
+            return (int)$new < (int)$old;
         }
-        return intval($new) > intval($old);
+        return (int)$new > (int)$old;
     }
 }

@@ -33,19 +33,19 @@ calRSS {
                 atom1_tmplFile = {$plugin.tx_cal_controller.rss.atom1_tmplFile}
 
                 # possibile values: rss091 / rss2 / rdf / atom03
-                xmlFormat = {$plugin.tx_cal_controller.rss.xlfFormat}
+                xmlFormat = {$plugin.tx_cal_controller.rss.xmlFormat}
 
-                xmlTitle = {$plugin.tx_cal_controller.rss.xlfTitle}
-                xmlDesc = {$plugin.tx_cal_controller.rss.xlfDesc}
-                xmlLang = {$plugin.tx_cal_controller.rss.xlfLang}
-                xmlIcon = {$plugin.tx_cal_controller.rss.xlfIcon}
-                xmlLimit = {$plugin.tx_cal_controller.rss.xlfLimit}
-                xmlCaching = {$plugin.tx_cal_controller.rss.xlfCaching}
+                xmlTitle = {$plugin.tx_cal_controller.rss.xmlTitle}
+                xmlDesc = {$plugin.tx_cal_controller.rss.xmlDesc}
+                xmlLang = {$plugin.tx_cal_controller.rss.xmlLang}
+                xmlIcon = {$plugin.tx_cal_controller.rss.xmlIcon}
+                xmlLimit = {$plugin.tx_cal_controller.rss.xmlLimit}
+                xmlCaching = {$plugin.tx_cal_controller.rss.xmlCaching}
                 xmlLastBuildDate = 1
                 range = {$plugin.tx_cal_controller.rss.range}
 
-                timeFormat = %I:%M %p
-                dateFormat = %Y-%m-%d
+                timeFormat = H:i p
+                dateFormat = Y-m-d
 
                 event < plugin.tx_cal_controller.view.event.event
                 event {

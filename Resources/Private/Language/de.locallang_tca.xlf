@@ -469,6 +469,10 @@
 				<source>Show preview</source>
 				<target>Zeige Vorschau</target>
 			</trans-unit>
+			<trans-unit id="cal.pi_flexform.hasMap" xml:space="preserve" approved="yes">
+				<source>Show Map</source>
+				<target>Zeige Karte</target>
+			</trans-unit>
 			<trans-unit id="cal.pi_flexform.createEventTemplate" xml:space="preserve" approved="yes">
 				<source>Create event template</source>
 				<target>Ereignis erstellen Template</target>

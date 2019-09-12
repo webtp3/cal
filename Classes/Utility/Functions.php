@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Utility;
 
 /**
@@ -21,7 +15,8 @@ namespace TYPO3\CMS\Cal\Utility;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Controller\UriHandler;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
+use TYPO3\CMS\Cal\Service\CalculateDateTimeService;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
@@ -663,17 +658,17 @@ class Functions
      */
     public static function getDayByWeek($year, $week, $weekday): string
     {
-        $date = new CalDate($year . '0101');
-        $date->setTZbyID('UTC');
+        $date = new CalendarDateTime($year . '0101');
+        $date = CalculateDateTimeService::setTZbyID($date, 'UTC');
 
         $offset = (int)$weekday - (int)$date->format('w');
 
         // correct weekday
-        $date->addSeconds($offset * 86400);
-        $oldYearWeek = ($date->getWeekOfYear() > 1) ? '0' : '1';
+        CalculateDateTimeService::addSeconds($date, $offset * 86400);
+        $oldYearWeek = ((int)$date->format('W') > 1) ? '0' : '1';
 
         // correct week
-        $date->addSeconds((($week - $oldYearWeek) * 7) * 86400);
+        CalculateDateTimeService::addSeconds($date, (($week - $oldYearWeek) * 7) * 86400);
 
         return $date->format('Ymd');
     }

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -20,7 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
@@ -186,7 +180,7 @@ END:VCALENDAR
                             $deviationResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
                             if ($deviationResult) {
                                 while ($deviationRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($deviationResult)) {
-                                    $start = new  CalDate(substr(
+                                    $start = new CalendarDateTime(substr(
                                         $deviationRow['start_datetime'],
                                         0,
                                         8
@@ -194,7 +188,7 @@ END:VCALENDAR
                                     $start->setHour(substr($deviationRow['start_datetime'], 8, 2));
                                     $start->setMinute(substr($deviationRow['start_datetime'], 10, 2));
                                     $start->setTZbyID('UTC');
-                                    $end = new  CalDate(substr(
+                                    $end = new CalendarDateTime(substr(
                                         $deviationRow['end_datetime'],
                                         0,
                                         8

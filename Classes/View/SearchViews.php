@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -21,7 +15,7 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Controller\Controller;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -356,8 +350,9 @@ class SearchViews extends ListView
                 return $this->drawLocation(array_pop(array_pop($master_array)), $this->conf['getdate']);
             }
         }
-        $starttime = new  CalDate();
-        $endtime = new  CalDate();
+
+        $starttime = new CalendarDateTime();
+        $endtime = new CalendarDateTime();
         return $this->drawList($master_array, '', $starttime, $endtime);
     }
 

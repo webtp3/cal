@@ -8,7 +8,7 @@
 
 <h1>CALENDAR EVENT TEMPLATE</h1>
 
-<p>This template contains the subparts for the event rendering in each view, like: event,day,week,month,year,ics,rss,preview,tomorrow,location,organizer,fnb,day_fnb,week_fnb,month_fnb,year_fnb. 
+<p>This template contains the subparts for the event rendering in each view, like: event,day,week,month,year,ics,rss,preview,tomorrow,location,organizer,fnb,day_fnb,week_fnb,month_fnb,year_fnb.
 The subparts are additionally divided into the normal and an _ALLDAY subpart, to distinguish between both of them.</p>
 <p>In general you can use any marker inside these subparts. Our logic will:
 <ol>
@@ -43,17 +43,15 @@ value = HelloWorld<br/>
 <div itemscope itemtype="http://schema.org/Event">
     <div class="image" itemprop="image" >###IMAGE###</div>
     <meta itemprop="startDate" content="###MICROFORMAT_START###">
+	<meta itemprop="endDate" content="###MICROFORMAT_END###">
     <h2 itemprop="name">###TITLE###</h2>
 ###EDIT_LINK###
 
-###STARTDATE###
-###ENDDATE###
-###STARTTIME###
-###ENDTIME###
-###STATUS### ###PRIORITY### ###COMPLETED###
+###STARTDATE###&nbsp;###STARTTIME###&nbsp;###ENDDATE###&nbsp;###ENDTIME###
+	###STATUS### ###PRIORITY### ###COMPLETED###
     <span class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">###ORGANIZER###</span>
-    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">###LOCATION###</span>
-    <div class="description"  itemprop="description" >###DESCRIPTION###</div>
+        <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place"><div itemprop="address">###LOCATION###</div></span>
+    <div class="description"  itemprop="name" >###DESCRIPTION###</div>
 ###ATTACHMENT###
     <div itemprop="attendee" itemscope itemtype="http://schema.org/Person">###ATTENDEE###</div>
 <!-- ###ICS_LINK### start --><img src="###IMG_PATH###/ics.gif" border="0"/><!-- ###ICS_LINK### end -->
@@ -131,14 +129,14 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
 				<div style="top: ###TOP###px; left: ***LEFT***%; width: ***WIDTH***%;" class="vevent ###HEADERSTYLE###">
 				  <!-- ###EVENT_LINK### start -->
 	                  <dl style="height: ###LENGTH###px;">
-	                    <span class="popup">
-	                    	<span title="###MICROFORMAT_START###" class="dtstart"></span>
+	                    <span class="popup hidden">
+	                    	<span title="###MICROFORMAT_START###" class="dtstart">###MICROFORMAT_START###</span>
 	                    </span>
 	                    <dd>
 	                      <span class="summary">###TITLE###</span>
   <span class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">###ORGANIZER###</span>
-    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">###LOCATION###</span>
-    	                    </dd>
+        <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place"><div itemprop="address">###LOCATION###</div></span>
+	                    </dd>
 	                  </dl>
 	                <!-- ###EVENT_LINK### end -->
                 </div>
@@ -148,14 +146,14 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
                 <div style="top: ###TOP###px; left: ***LEFT***%; width: ***WIDTH***%;" class="vevent ###HEADERSTYLE###">
                 <!-- ###EVENT_LINK### start -->
                   <dl style="height: ###LENGTH###px;">
-	                  <span class="popup">
-    	                <span title="###MICROFORMAT_START###" class="dtstart"></span>
+	                  <span class="popup hidden">
+    	                <span title="###MICROFORMAT_START###" class="dtstart">###MICROFORMAT_START###</span>
     	              </span>
                     <dd>
                       <span class="summary">###TITLE###</span>
   <span class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">###ORGANIZER###</span>
-    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">###LOCATION###</span>
-                        </dd>
+        <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place"><div itemprop="address">###LOCATION###</div></span>
+                    </dd>
                   </dl>
                   <!-- ###EVENT_LINK### end -->
                 </div>
@@ -177,8 +175,8 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
 		<div class="vevent" id="cal_event_###UID###">
 			<!-- ###EVENT_LINK### start -->
 			<span class="###HEADERSTYLE###_text">
-					<span class="popup">
-						<span title="###MICROFORMAT_START###" class="dtstart"></span>
+					<span class="popup hidden">
+						<span title="###MICROFORMAT_START###" class="dtstart">###MICROFORMAT_START###</span>
 					</span>
 					<span class="summary">###TITLE###</span>
 				###FREQ###
@@ -192,8 +190,8 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
 		<div class="allday vevent ###HEADERSTYLE###_allday" id="cal_event_###UID###">
 			<!-- ###EVENT_LINK### start -->
 				<span class="###HEADERSTYLE###_text">
-					<span class="popup">
-						<span title="###MICROFORMAT_START###" class="dtstart"></span>
+					<span class="popup hidden">
+						<span title="###MICROFORMAT_START###" class="dtstart">###MICROFORMAT_START###</span>
 					</span>
 					<span class="summary">###TITLE###</span>
 				###FREQ###
@@ -223,6 +221,7 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
 <div itemscope itemtype="http://schema.org/Event">
     <div itemprop="image" >###IMAGE###</div>
     <meta itemprop="startDate" content="###MICROFORMAT_START###">
+	<meta itemprop="endDate" content="###MICROFORMAT_END###">
     <h2 itemprop="name">###TITLE###</h2>
 ###EDIT_LINK###
 
@@ -232,7 +231,7 @@ Stop monitoring this event? <input type="hidden" id="userid" value="1"/> <input 
 ###ENDTIME###
    <div class="description"  itemprop="description" >###DESCRIPTION###</div>###MORE_LINK###
   <span class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">###ORGANIZER###</span>
-    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">###LOCATION###</span>
+    <span class="location" itemprop="location" itemscope itemtype="http://schema.org/Place"><div itemprop="address">###LOCATION###</div></span>
 
 <!--###TEMPLATE_PHPICALENDAR_EVENT_PREVIEW### end -->
 

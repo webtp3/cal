@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -21,7 +15,7 @@ namespace TYPO3\CMS\Cal\View;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use RuntimeException;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
@@ -270,7 +264,7 @@ class SubscriptionManagerView extends BaseView
                 );
             }
 
-            $date = new  CalDate();
+            $date = new CalendarDateTime();
             $date->setTZbyID('UTC');
             $reminderService = &Functions::getReminderService();
             $reminderService->scheduleReminder($eventUID);

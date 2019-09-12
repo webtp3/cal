@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Controller;
 
 /**
@@ -20,11 +14,12 @@ namespace TYPO3\CMS\Cal\Controller;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 
 /**
  * date parser
+ * @deprecated
  */
 class DateParser
 {
@@ -74,7 +69,7 @@ class DateParser
     public $special = '';
 
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     public $timeObj;
 
@@ -86,20 +81,18 @@ class DateParser
     /**
      * @param $value
      * @param array $conf
-     * @param string $timeObj
+     * @param CalendarDateTime $timeObj
      */
-    public function parse($value, $conf = [], $timeObj = '')
+    public function parse($value, $conf = [], $timeObj = null)
     {
-        if ($timeObj === '') {
-            $timeObj = new CalDate();
-            $timeObj->setTZbyID('UTC');
+        if ($timeObj === null) {
+            $timeObj = new \CalendarDateTime();
+            $timeObj->setTimezone(new \DateTimeZone(date('T')));
         }
         $this->timeObj = $timeObj;
         $this->conf = &$conf;
         if (!empty($value) && is_array($value)) {
-            foreach ($value as $iValue) {
-                $chr = $iValue;
-
+            foreach ($value as $chr) {
                 switch ($chr) {
                     case ' ':
                     case '_':
@@ -277,27 +270,27 @@ class DateParser
                 break;
             case 'now':
                 $this->stack[] = [
-                    'abs' => $this->timeObj->getTime()
+                    'abs' => $this->timeObj->format('U')
                 ];
                 break;
             case 'today':
                 $this->stack[] = [
-                    'today' => $this->timeObj->getTime()
+                    'today' => $this->timeObj->format('U')
                 ];
                 break;
             case 'current':
                 $this->stack[] = [
-                    'today' => $this->timeObj->getTime()
+                    'today' => $this->timeObj->format('U')
                 ];
                 break;
             case 'tomorrow':
                 $this->stack[] = [
-                    'tomorrow' => $this->timeObj->getTime()
+                    'tomorrow' => $this->timeObj->format('U')
                 ];
                 break;
             case 'yesterday':
                 $this->stack[] = [
-                    'yesterday' => $this->timeObj->getTime()
+                    'yesterday' => $this->timeObj->format('U')
                 ];
                 break;
 
@@ -546,11 +539,11 @@ class DateParser
     }
 
     /**
-     * @return CalDate
+     * @return CalendarDateTime
      */
-    public function getDateObjectFromStack(): CalDate
+    public function getDateObjectFromStack(): CalendarDateTime
     {
-        $date = new CalDate();
+        $date = new CalendarDateTime();
         $date->setTZbyID('UTC');
         $date->copy($this->timeObj);
         $lastKey = '';
@@ -702,7 +695,7 @@ class DateParser
     }
 
     /**
-     * @param CalDate$date
+     * @param CalendarDateTime$date
      * @param $range
      * @param $rangeValue
      */
@@ -727,7 +720,7 @@ class DateParser
                             $date->getMonth(),
                             $date->getYear()
                         );
-                        $date = new CalDate($formatedDate);
+                        $date = new CalendarDateTime($formatedDate);
                         $date->setTZbyID('UTC');
                     }
                 } elseif ($key === 'weekday' && $range < 0) {
@@ -738,7 +731,7 @@ class DateParser
                             $date->getMonth(),
                             $date->getYear()
                         );
-                        $date = new CalDate($formatedDate);
+                        $date = new CalendarDateTime($formatedDate);
                         $date->setTZbyID('UTC');
                     }
                 } elseif ($value === 'week' && $range > 0) {
@@ -751,7 +744,7 @@ class DateParser
             if ($rangeValue === 'month') {
                 for ($i = 0; $i < $range; $i++) {
                     $days = Calc::daysInMonth($date->getMonth(), $date->getYear());
-                    $endOfNextMonth = new CalDate(Calc::endOfNextMonth(
+                    $endOfNextMonth = new CalendarDateTime(Calc::endOfNextMonth(
                         $date->getDay(),
                         $date->getMonth(),
                         $date->getYear()
@@ -775,7 +768,7 @@ class DateParser
         } elseif ($range < 0) {
             if ($rangeValue === 'month') {
                 for ($i = 0; $i > $range; $i--) {
-                    $endOfPrevMonth = new CalDate(Calc::endOfPrevMonth(
+                    $endOfPrevMonth = new CalendarDateTime(Calc::endOfPrevMonth(
                         $date->getDay(),
                         $date->getMonth(),
                         $date->getYear()

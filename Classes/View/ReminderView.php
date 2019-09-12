@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -25,7 +19,7 @@ use OutOfBoundsException;
 use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Cron\ReminderScheduler;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\Execution;
@@ -121,25 +115,25 @@ class ReminderView extends NotificationView
 
             // maybe there is a recurring instance
             // get the uids of recurring events from index
-            $now = new  CalDate();
+            $now = new CalendarDateTime();
             $now->setTZbyID('UTC');
             $now->addSeconds($offset * 60);
-            $startDateTimeObject = new  CalDate($eventRecord['start_date'] . '000000');
+            $startDateTimeObject = new CalendarDateTime($eventRecord['start_date'] . '000000');
             $startDateTimeObject->setTZbyID('UTC');
             $startDateTimeObject->addSeconds($eventRecord['start_time']);
-            $start_datetime = $startDateTimeObject->format('YmdHMS');
+            $start_datetime = $startDateTimeObject->format('YmdHis');
             $select2 = '*';
             $table2 = 'tx_cal_index';
-            $where2 = 'start_datetime >= ' . $now->format('YmdHMS') . ' AND event_uid = ' . $calEventUID;
+            $where2 = 'start_datetime >= ' . $now->format('YmdHis') . ' AND event_uid = ' . $calEventUID;
             $orderby2 = 'start_datetime asc';
             $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select2, $table2, $where2, $orderby2);
             if ($result) {
                 $tmp = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2);
                 if (is_array($tmp)) {
                     $start_datetime = $tmp['start_datetime'];
-                    $nextOccuranceTime = new  CalDate($tmp['start_datetime']);
+                    $nextOccuranceTime = new CalendarDateTime($tmp['start_datetime']);
                     $nextOccuranceTime->setTZbyID('UTC');
-                    $nextOccuranceEndTime = new  CalDate($tmp['end_datetime']);
+                    $nextOccuranceEndTime = new CalendarDateTime($tmp['end_datetime']);
                     $nextOccuranceEndTime->setTZbyID('UTC');
                     $eventRecord['start_date'] = $nextOccuranceTime->format('Ymd');
                     $eventRecord['start_time'] = $nextOccuranceTime->getHour() * 3600 + $nextOccuranceTime->getMinute() * 60 + $nextOccuranceTime->getSecond();
@@ -151,10 +145,10 @@ class ReminderView extends NotificationView
 
             if (ExtensionManagementUtility::isLoaded('scheduler')) {
                 $scheduler = new Scheduler();
-                $date = new  CalDate($start_datetime);
+                $date = new CalendarDateTime($start_datetime);
                 $date->setTZbyID('UTC');
-                $timestamp = $date->getTime();
-                $offsetTime = new  CalDate();
+                $timestamp = $date->format('U');
+                $offsetTime = new CalendarDateTime();
                 $offsetTime->copy($date);
                 $offsetTime->setTZbyID('UTC');
                 $offsetTime->addSeconds(-1 * $offset * 60);
@@ -192,7 +186,7 @@ class ReminderView extends NotificationView
 
     /**
      * @param $scheduler
-     * @param CalDate $date
+     * @param CalendarDateTime $date
      * @param $calEventUID
      * @param $timestamp
      * @param $offset

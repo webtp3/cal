@@ -20,17 +20,13 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 use TYPO3\CMS\Cal\Service\RightsService;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class RightsServiceTest
  */
-class RightsServiceTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
+class RightsServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
 {
-
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
     protected $objectManager;
@@ -48,14 +44,14 @@ class RightsServiceTest extends \TYPO3\TestingFramework\Core\Functional\Function
         $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_calendar.xml');
         $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_event.xml');
         $this->calService = $this->objectManager->get(RightsService::class);
-
     }
 
     /**
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod() {
+    public function dummyMethod()
+    {
         $this->assertTrue(true);
     }
 
@@ -66,8 +62,7 @@ class RightsServiceTest extends \TYPO3\TestingFramework\Core\Functional\Function
      */
     public function canCheckIsLoggedIn()
     {
-
-       $c =  $this->calService->isLoggedIn();
+        $c =  $this->calService->isLoggedIn();
         $this->assertEquals(false, $c);
     }
     /**
@@ -84,7 +79,4 @@ class RightsServiceTest extends \TYPO3\TestingFramework\Core\Functional\Function
         $c =  $this->calService->isCalAdmin();
         $this->assertEquals(getenv('TYPO3_Test'), $c);
     }
-
-
-
 }

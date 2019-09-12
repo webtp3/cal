@@ -1,29 +1,54 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-			xmlns:cal="http://typo3.org/ns/TYPO3/CMS/Cal/ViewHelpers"
+			xmlns:n="http://typo3.org/ns/GeorgRinger/News/ViewHelpers"
+			xmlns:n="http://typo3.org/ns/TYPO3/Cal/ViewHelpers"
 			data-namespace-typo3-fluid="true">
-
 <div class="list-view">
-	<h1>
-		<f:format.date format="F d Y">{listView.starttime.time}</f:format.date>
+	<h2>
+		<f:format.date format="d.m.Y">{listView.starttime}</f:format.date>
 		-
-		<f:format.date format="F d Y">{listView.endtime.time}</f:format.date>
-	</h1>
+		<f:format.date format="d.m.Y">{listView.endtime}</f:format.date>
+	</h2>
 	<f:if condition="{listView.master_array}">
 		<f:then>
-			<dl>
-				<f:for each="{listView.master_array}" as="entriesOfADay" key="day">
-					<f:for each="{entriesOfADay}" as="entriesOfAnHour">
-						<f:for each="{entriesOfAnHour}" as="event">
-							<f:render partial="List/event"
-								arguments="{event:event, settings:settings}" />
-						</f:for>
-					</f:for>
-				</f:for>
-			</dl>
+			<!--			#todo settings paginate-->
+			<f:if condition="{settings.list.paginate}">
+				<f:then>
+				<n:widget.paginate objects="{listView.master_array}" as="paginatedEvents" configuration="{settings.list.paginate}" initial="{offset:settings.offset,limit:settings.limit}">
+					<div class="cal-panel">
+						<ul class=" nav nav-section">
+							<f:for each="{paginatedEvents}" as="entriesOfADay" key="day">
+								<f:for each="{entriesOfADay}" as="entriesOfAnHour">
+									<f:for each="{entriesOfAnHour}" as="event">
+										<f:render partial="List/event"
+															arguments="{event:event, settings:settings}"/>
+									</f:for>
+								</f:for>
+							</f:for>
+						</ul>
+					</div>
+				</n:widget.paginate>
+				</f:then>
+				<f:else>
+					<div class="cal-panel">
+						<ul class=" nav nav-section">
+							<f:for each="{listView.master_array}" as="entriesOfADay" key="day">
+								<f:for each="{entriesOfADay}" as="entriesOfAnHour">
+									<f:for each="{entriesOfAnHour}" as="event">
+										<f:render partial="List/event"
+															arguments="{event:event, settings:settings}"/>
+									</f:for>
+								</f:for>
+							</f:for>
+						</ul>
+					</div>
+				</f:else>
+			</f:if>
 		</f:then>
 		<f:else>
-			<f:translate
-				key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_no_results" />
+			<div class="cal-panel">
+				<f:translate
+				key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_no_results"/>
+			</div>
 		</f:else>
 	</f:if>
 </div>

@@ -1,11 +1,16 @@
 <?php
-
-/*
- * This file is part of the web-tp3/cal.
+/**
+ * This file is part of the TYPO3 extension Calendar Base (cal).
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
  * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-
 namespace TYPO3\CMS\Cal\Cron;
 
 use TYPO3\CMS\Scheduler\AdditionalFieldProviderInterface;
@@ -67,7 +72,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->eventFolder . '"/>';
         $fieldConfiguration = [
             'code' => $fieldHtml,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:tableHeader1',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:tableHeader1',
             'cshKey' => '',
             'cshLabel' => $fieldId
         ];
@@ -92,7 +97,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->typoscriptPage . '" />';
         $fieldConfiguration = [
             'code' => $fieldHtml,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:tableHeader2',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:tableHeader2',
             'cshKey' => '',
             'cshLabel' => $fieldId
         ];
@@ -114,7 +119,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->starttime . '" />';
         $fieldConfiguration = [
             'code' => $fieldHtml,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexStart',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:indexStart',
             'cshKey' => '',
             'cshLabel' => $fieldId
         ];
@@ -136,7 +141,7 @@ class IndexerSchedulerAdditionalFieldProvider implements AdditionalFieldProvider
         $fieldHtml = '<input type="text" name="' . $fieldName . '" ' . 'id="' . $fieldId . '" value="' . $task->endtime . '" />';
         $fieldConfiguration = [
             'code' => $fieldHtml,
-            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xlf:indexEnd',
+            'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_indexer.xml:indexEnd',
             'cshKey' => '',
             'cshLabel' => $fieldId
         ];

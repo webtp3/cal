@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -29,7 +23,7 @@ use TYPO3\CMS\Cal\Utility\Functions;
 class EventRecDeviationModel extends EventModel
 {
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     private $origStartDate;
 
@@ -67,7 +61,7 @@ class EventRecDeviationModel extends EventModel
         $this->setEnd($end);
 
         $this->setAllDay($row['allday']);
-        $this->origStartDate = new  CalDate($row['orig_start_date']);
+        $this->origStartDate = new CalendarDateTime($row['orig_start_date']);
         $this->origStartDate->addSeconds($row['orig_start_time']);
 
         $this->setCategories($event->getCategories());
@@ -88,11 +82,11 @@ class EventRecDeviationModel extends EventModel
         if ($this->isAllday()) {
             $sims['###RRULE###'] = 'RECURRENCE-ID;VALUE=DATE:' . $eventStart->format('Ymd');
         } elseif ($this->conf['view.']['ics.']['timezoneId'] !== '') {
-            $sims['###RRULE###'] = 'RECURRENCE-ID;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('YmdTHMS');
+            $sims['###RRULE###'] = 'RECURRENCE-ID;TZID=' . $this->conf['view.']['ics.']['timezoneId'] . ':' . $eventStart->format('YmdTHis');
         } else {
-            $offset = Functions::strtotimeOffset($eventStart->getTime());
+            $offset = Functions::strtotimeOffset($eventStart->format('U'));
             $eventStart->subtractSeconds($offset);
-            $sims['###RRULE###'] = 'RECURRENCE-ID:' . $eventStart->format('YmdTHMSZ');
+            $sims['###RRULE###'] = 'RECURRENCE-ID:' . $eventStart->format('YmdTHisZ');
             $eventStart->addSeconds($offset);
         }
     }

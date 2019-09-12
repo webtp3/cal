@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -20,7 +14,7 @@ namespace TYPO3\CMS\Cal\View;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Functions;
@@ -39,18 +33,17 @@ class WeekView extends BaseView
     public function newDrawWeek(&$master_array, $getdate)
     {
         if (!isset($getdate) || $getdate === '') {
-            $getdate = new  CalDate();
+            $getdate = new CalendarDateTime();
         } else {
-            $getdate = new  CalDate($getdate);
+            $getdate = new CalendarDateTime($getdate);
         }
-
         $week = $getdate->getWeekOfYear();
         $year = $getdate->getYear();
         if ($getdate->getMonth() === 12 && $week === 1) {
             $year++;
         }
         $weekModel = new NewWeekView($week, $year);
-        $today = new  CalDate();
+        $today = new CalendarDateTime();
         $weekModel->setCurrent($today);
         $weekModel->setSelected($getdate);
 
@@ -75,6 +68,7 @@ class WeekView extends BaseView
         $subpart = Functions::getContent($this->conf['view.']['week.']['newWeekTemplate']);
         $page = Functions::getContent($this->conf['view.']['week.']['weekTemplate']);
         $page = str_replace('###WEEK###', $weekModel->render($subpart), $page);
+
         $rems = [];
 
         return $this->finish($page, $rems);
@@ -110,43 +104,43 @@ class WeekView extends BaseView
         $gridLength = $this->conf['view.']['day.']['gridLength']; // '15'; // Grid distance in minutes for day view, multiples of 15 preferred
 
         if (!isset($getdate) || $getdate === '') {
-            $getdate_obj = new  CalDate();
+            $getdate_obj = new CalendarDateTime();
             $getdate = $getdate_obj->format('Ymd');
         }
 
         $day_array2 = [];
         preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $getdate, $day_array2);
         list($this_year, $this_month, $this_day) = $day_array2;
-        $unix_time = new  CalDate($getdate . '000000');
-        $today = new  CalDate();
+        $unix_time = new CalendarDateTime($getdate . '000000');
+        $today = new CalendarDateTime();
         $todayFormatted = $today->format('Ymd');
 
-        $now = new  CalDate($getdate . '000000');
+        $now = new CalendarDateTime($getdate . '000000');
         $now->addSeconds(60 * 60 * 24 * 31);
 
-        $now = new  CalDate($getdate . '000000');
-        $startOfPrevMonth = new  CalDate(Calc::endOfPrevMonth($this_day, $this_month, $this_year));
+        $now = new CalendarDateTime($getdate . '000000');
+        $startOfPrevMonth = new CalendarDateTime(Calc::endOfPrevMonth($this_day, $this_month, $this_year));
         $startOfPrevMonth->setDay(1);
         $now->subtractSeconds(60 * 60 * 24 * 31);
 
-        $next_week_obj = new  CalDate();
+        $next_week_obj = new CalendarDateTime();
         $next_week_obj->copy($unix_time);
         $next_week_obj->addSeconds(60 * 60 * 24 * 7);
         $next_week_obj->subtractSeconds(60 * 60 * 24 * 7 * 2);
 
         $dateOfWeek = Calc::beginOfWeek($unix_time->getDay(), $unix_time->getMonth(), $unix_time->getYear());
 
-        $week_start_day = new  CalDate($dateOfWeek . '000000');
+        $week_start_day = new CalendarDateTime($dateOfWeek . '000000');
 
         // Nasty fix to work with TS strftime
-        $start_week_time = new  CalDate($dateOfWeek . '000000');
+        $start_week_time = new CalendarDateTime($dateOfWeek . '000000');
         $start_week_time->setTZbyID('UTC');
-        $end_week_time = new  CalDate();
+        $end_week_time = new CalendarDateTime();
         $end_week_time->copy($start_week_time);
         $end_week_time->addSeconds(604799);
 
-        $GLOBALS['TSFE']->register['cal_week_endtime'] = $end_week_time->getTime();
-        $GLOBALS['TSFE']->register['cal_week_starttime'] = $start_week_time->getTime();
+        $GLOBALS['TSFE']->register['cal_week_endtime'] = $end_week_time->format('U');
+        $GLOBALS['TSFE']->register['cal_week_starttime'] = $start_week_time->format('U');
         $display_date = $this->cObj->cObjGetSingle(
             $this->conf['view.']['week.']['titleWrap'],
             $this->conf['view.']['week.']['titleWrap.']
@@ -173,13 +167,13 @@ class WeekView extends BaseView
         $view_array = [];
         $rowspan_array = [];
 
-        $endOfDay = new  CalDate();
-        $startOfDay = new  CalDate();
+        $endOfDay = new CalendarDateTime();
+        $startOfDay = new CalendarDateTime();
 
         // creating the dateObjects only once:
-        $starttime = new  CalDate();
-        $endtime = new  CalDate();
-        $j = new  CalDate();
+        $starttime = new CalendarDateTime();
+        $endtime = new CalendarDateTime();
+        $j = new CalendarDateTime();
 
         if (count($this->master_array) > 0) {
             $masterKeys = array_keys($this->master_array);
@@ -191,12 +185,12 @@ class WeekView extends BaseView
                 preg_match('/([0-9]{2})([0-9]{2})/', $this->conf['view.']['day.']['dayEnd'], $dTimeEnd);
                 preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $ovlKey, $dDate);
 
-                $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
+                $d_start = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
                     '%02d',
                     $dTimeStart[2]
                     ) . ':00');
                 $d_start->setTZbyID('UTC');
-                $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
+                $d_end = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
                     '%02d',
                     $dTimeEnd[2]
                     ) . ':00');
@@ -229,7 +223,7 @@ class WeekView extends BaseView
                             $endtime->addSeconds(($endtime->getMinute() % $gridLength) * 60);
 
                             $entries = 1;
-                            $old_day = new  CalDate($ovlKey . '000000');
+                            $old_day = new CalendarDateTime($ovlKey . '000000');
 
                             $endOfDay->copy($d_end);
                             $startOfDay->copy($d_start);
@@ -313,8 +307,8 @@ class WeekView extends BaseView
             }
             $dayStart = substr($dayStart, 0, 2) . '00';
         }
-        $startdate = new  CalDate($start_week_time->format('Ymd') . '000000');
-        $enddate = new  CalDate();
+        $startdate = new CalendarDateTime($start_week_time->format('Ymd') . '000000');
+        $enddate = new CalendarDateTime();
         $enddate->copy($end_week_time);
         for ($i = $startdate; $enddate->after($i); $i->addSeconds(86400)) {
             if (!empty($view_array[$i->format('Ymd')])) {
@@ -333,16 +327,16 @@ class WeekView extends BaseView
         preg_match('/([0-9]{2})([0-9]{2})/', $dayStart, $dTimeStart);
         preg_match('/([0-9]{2})([0-9]{2})/', $dayEnd, $dTimeEnd);
 
-        $nd = new  CalDate();
+        $nd = new CalendarDateTime();
 
         foreach (array_keys($view_array) as $week_key) {
             preg_match('/([0-9]{4})([0-9]{2})([0-9]{2})/', $week_key, $dDate);
-            $d_start = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
+            $d_start = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
                 '%02d',
                 $dTimeStart[2]
                 ) . ':00');
             $d_start->setTZbyID('UTC');
-            $d_end = new  CalDate($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
+            $d_end = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
                 '%02d',
                 $dTimeEnd[2]
                 ) . ':00');
@@ -393,7 +387,7 @@ class WeekView extends BaseView
             }
         }
 
-        $thisdate = new  CalDate();
+        $thisdate = new CalendarDateTime();
         $thisdate->copy($week_start_day);
 
         for ($i = 0; $i < 7; $i++) {
@@ -432,7 +426,7 @@ class WeekView extends BaseView
         // Replaces the daysofweek
         $loop_dof = $this->markerBasedTemplateService->getSubpart($weekTemplate, '###DAYSOFWEEK###');
 
-        $start_day = new  CalDate();
+        $start_day = new CalendarDateTime();
         $start_day->copy($week_start_day);
 
         $isAllowedToCreateEvent = $this->rightsObj->isAllowedToCreateEvent();
@@ -523,7 +517,7 @@ class WeekView extends BaseView
 
         $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
 
-        $cal_time_obj = new  CalDate();
+        $cal_time_obj = new CalendarDateTime();
         $cal_time_obj->copy($week_start_day);
         $cal_time_obj->setHour(intval($dTimeStart[1]));
         $cal_time_obj->setMinute(intval($dTimeStart[2]));

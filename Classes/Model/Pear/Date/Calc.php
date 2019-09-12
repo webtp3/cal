@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model\Pear\Date;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -42,6 +36,9 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
+ * @author Monte Ohrt <monte@ispi.net>
+ * @author Pierre-Alain Joye <pajoye@php.net>
+ * @author Daniel Convissor <danielc@php.net>
  * @copyright 1999-2006 Monte Ohrt, Pierre-Alain Joye, Daniel Convissor
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -81,12 +78,15 @@ if (!defined('DATE_CALC_FORMAT')) {
  * It does not rely on 32-bit system time stamps, so it works dates
  * before 1970 and after 2038.
  *
+ * @author Monte Ohrt <monte@ispi.net>
+ * @author Daniel Convissor <danielc@php.net>
  * @copyright 1999-2006 Monte Ohrt, Pierre-Alain Joye, Daniel Convissor
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
  * @version Release: 1.4.7
  * @link http://pear.php.net/package/Date
  * @since Class available since Release 1.2
+ * @deprecated
  */
 class Calc
 {
@@ -140,7 +140,7 @@ class Calc
      */
     public static function dateFormat($day, $month, $year, $format): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (!self::isValidDate($day, $month, $year)) {
             $year = self::dateNow('%Y');
@@ -232,7 +232,7 @@ class Calc
      */
     public static function defaultCentury($year): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (strlen($year) == 1) {
             $year = '0' . $year;
@@ -265,7 +265,7 @@ class Calc
      */
     public static function dateToDays($day, $month, $year): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $century = (int)substr($year, 0, 2);
         $year = (int)substr($year, 2, 2);
@@ -302,7 +302,7 @@ class Calc
      */
     public static function daysToDate($days, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $days -= 1721119;
         $century = floor((4 * $days - 1) / 146097);
@@ -361,7 +361,7 @@ class Calc
      */
     public static function isoWeekDate($pn_day = 0, $pn_month = 0, $pn_year = null): array
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if ($pn_year === null) {
             $pn_year = self::dateNow('%Y');
@@ -457,7 +457,7 @@ class Calc
      */
     public static function gregorianToISO($day, $month, $year): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $mnth = [
             0,
@@ -544,11 +544,13 @@ class Calc
      * @deprecated since ext:cal version 2.x. Will be removed in version 3.0.0
      * @return float the julian date the season starts on
      *
+     * @author James Mark Hamilton <mhamilton@qwest.net>
+     * @author Robert Butler <rob@maxwellcreek.org>
      * @static
      */
     public static function dateSeason($season, $year = 0): float
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if ($year == '') {
             $year = self::dateNow('%Y');
@@ -608,7 +610,7 @@ class Calc
      */
     public static function dateNow($format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         return strftime($format, time());
     }
@@ -626,7 +628,7 @@ class Calc
      */
     public static function getYear(): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         return self::dateNow('%Y');
     }
@@ -644,7 +646,7 @@ class Calc
      */
     public static function getMonth(): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         return self::dateNow('%m');
     }
@@ -662,7 +664,7 @@ class Calc
      */
     public static function getDay(): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         return self::dateNow('%d');
     }
@@ -687,7 +689,7 @@ class Calc
      */
     public static function julianDate($day = 0, $month = 0, $year = 0): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -739,7 +741,7 @@ class Calc
      */
     public static function getWeekdayFullname($day = 0, $month = 0, $year = 0): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -779,7 +781,7 @@ class Calc
      */
     public static function getWeekdayAbbrname($day = 0, $month = 0, $year = 0, $length = 3): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -809,7 +811,7 @@ class Calc
      */
     public static function getMonthFullname($month): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $month = (int)$month;
         if (empty($month)) {
@@ -839,7 +841,7 @@ class Calc
      */
     public static function getMonthAbbrname($month, $length = 3): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $month = (int)$month;
         if (empty($month)) {
@@ -867,7 +869,7 @@ class Calc
      */
     public static function getMonthFromFullName($month): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $month = strtolower($month);
         $months = self::getMonthNames();
@@ -898,7 +900,7 @@ class Calc
      */
     public static function getMonthNames(): array
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $months = [];
         for ($i = 1; $i < 13; $i++) {
@@ -926,7 +928,7 @@ class Calc
      */
     public static function getWeekDays(): array
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $weekdays = [];
         for ($i = 0; $i < 7; $i++) {
@@ -955,7 +957,7 @@ class Calc
      */
     public static function dayOfWeek($day = 0, $month = 0, $year = 0): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -999,7 +1001,7 @@ class Calc
      */
     public static function weekOfYear($day = 0, $month = 0, $year = 0): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1036,7 +1038,7 @@ class Calc
      */
     public static function quarterOfYear($day = 0, $month = 0, $year = 0): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($month)) {
             $month = self::dateNow('%m');
@@ -1063,7 +1065,7 @@ class Calc
      */
     public static function daysInMonth($month = 0, $year = 0): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1109,7 +1111,7 @@ class Calc
      */
     public static function weeksInMonth($month = 0, $year = 0): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1154,7 +1156,7 @@ class Calc
      */
     public static function getCalendarWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): array
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1199,7 +1201,7 @@ class Calc
      */
     public static function getCalendarMonth($month = 0, $year = 0, $format = DATE_CALC_FORMAT): array
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1250,7 +1252,7 @@ class Calc
      */
     public static function getCalendarYear($year = 0, $format = DATE_CALC_FORMAT): array
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1287,7 +1289,7 @@ class Calc
      */
     public static function prevDay($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1324,7 +1326,7 @@ class Calc
      */
     public static function nextDay($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1361,7 +1363,7 @@ class Calc
      */
     public static function prevWeekday($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1406,7 +1408,7 @@ class Calc
      */
     public static function nextWeekday($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1461,7 +1463,7 @@ class Calc
         $format = DATE_CALC_FORMAT,
         $onOrBefore = false
     ): string {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1519,7 +1521,7 @@ class Calc
         $format = DATE_CALC_FORMAT,
         $onOrAfter = false
     ): string {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1572,7 +1574,7 @@ class Calc
      */
     public static function prevDayOfWeekOnOrBefore($dow, $day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         return self::prevDayOfWeek($dow, $day, $month, $year, $format, true);
     }
@@ -1602,7 +1604,7 @@ class Calc
      */
     public static function nextDayOfWeekOnOrAfter($dow, $day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         return self::nextDayOfWeek($dow, $day, $month, $year, $format, true);
     }
@@ -1632,7 +1634,7 @@ class Calc
      */
     public static function beginOfWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1673,7 +1675,7 @@ class Calc
      */
     public static function endOfWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1714,7 +1716,7 @@ class Calc
      */
     public static function beginOfPrevWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1760,7 +1762,7 @@ class Calc
      */
     public static function beginOfNextWeek($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1804,7 +1806,7 @@ class Calc
      */
     public static function beginOfMonth($month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1840,7 +1842,7 @@ class Calc
      */
     public static function beginOfPrevMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1884,7 +1886,7 @@ class Calc
      */
     public static function endOfPrevMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1927,7 +1929,7 @@ class Calc
      */
     public static function beginOfNextMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -1971,7 +1973,7 @@ class Calc
      */
     public static function endOfNextMonth($day = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -2018,7 +2020,7 @@ class Calc
      */
     public static function beginOfMonthBySpan($months = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -2084,7 +2086,7 @@ class Calc
      */
     public static function endOfMonthBySpan($months = 0, $month = 0, $year = 0, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -2139,7 +2141,7 @@ class Calc
      */
     public static function firstOfMonthWeekday($month = 0, $year = 0): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -2178,7 +2180,7 @@ class Calc
      */
     public static function NWeekdayOfMonth($week, $dow, $month, $year, $format = DATE_CALC_FORMAT): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (is_numeric($week)) {
             $DOW1day = ($week - 1) * 7 + 1;
@@ -2223,7 +2225,7 @@ class Calc
      */
     public static function isValidDate($day, $month, $year): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if ($year < 0 || $year > 9999) {
             return false;
@@ -2252,7 +2254,7 @@ class Calc
      */
     public static function isLeapYear($year = 0): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (empty($year)) {
             $year = self::dateNow('%Y');
@@ -2293,7 +2295,7 @@ class Calc
      */
     public static function isFutureDate($day, $month, $year): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $this_year = self::dateNow('%Y');
         $this_month = self::dateNow('%m');
@@ -2337,7 +2339,7 @@ class Calc
      */
     public static function isPastDate($day, $month, $year): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $this_year = self::dateNow('%Y');
         $this_month = self::dateNow('%m');
@@ -2390,7 +2392,7 @@ class Calc
      */
     public static function dateDiff($day1, $month1, $year1, $day2, $month2, $year2): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         if (!self::isValidDate($day1, $month1, $year1)) {
             return -1;
@@ -2432,7 +2434,7 @@ class Calc
      */
     public static function compareDates($day1, $month1, $year1, $day2, $month2, $year2): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal. If in need, check for a similar function in \TYPO3\CMS\Cal\Service\DateCalculationService', E_USER_DEPRECATED);
 
         $ndays1 = self::dateToDays($day1, $month1, $year1);
         $ndays2 = self::dateToDays($day2, $month2, $year2);

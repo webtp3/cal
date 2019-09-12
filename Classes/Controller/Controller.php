@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Controller;
 
 /**
@@ -21,12 +15,12 @@ namespace TYPO3\CMS\Cal\Controller;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use PDO;
-use TYPO3\CMS\Cal\Domain\Repository\LocationRepository;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
+use TYPO3\CMS\Cal\Service\CalculateDateTimeService;
 use TYPO3\CMS\Cal\Utility\Cache;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -34,7 +28,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
 
@@ -101,7 +94,7 @@ class Controller extends AbstractPlugin
     public $error = false;
 
     /**
-     * @var CalDate
+     * @var CalendarDateTime
      */
     public $getDateTimeObject;
 
@@ -130,17 +123,10 @@ class Controller extends AbstractPlugin
      */
     protected $markerBasedTemplateService;
 
-    /**
-     * @var LocationRepository
-     */
-    protected $locationRepository;
-
     public function __construct()
     {
         parent::__construct();
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->markerBasedTemplateService = $objectManager->get(MarkerBasedTemplateService::class);
-        $this->locationRepository = $objectManager->get(LocationRepository::class);
+        $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
     }
 
     /**
@@ -164,7 +150,7 @@ class Controller extends AbstractPlugin
 
         $this->cacheHandling();
 
-        // Set the week start day, and then include CalDate so that the week start day is already defined.
+        // Set the week start day, and then include CalendarDateTime so that the week start day is already defined.
         $this->setWeekStartDay();
 
         $this->cleanPiVarParam($this->piVars);
@@ -456,10 +442,10 @@ class Controller extends AbstractPlugin
             $this->conf ['view'] = $this->conf ['view.'] ['allowedViews'] [0];
         }
 
-        $this->getDateTimeObject = new CalDate($this->conf ['getdate'] . '000000');
+        $this->getDateTimeObject = new CalendarDateTime($this->conf ['getdate'] . '000000');
 
         if ($this->getDateTimeObject->getMonth() > 12) {
-            $this->getDateTimeObject->setMinute(12);
+            $this->getDateTimeObject->getMonth(12);
         } elseif ($this->getDateTimeObject->getMonth() < 1) {
             $this->getDateTimeObject->setMonth(1);
         }
@@ -469,13 +455,13 @@ class Controller extends AbstractPlugin
             $this->getDateTimeObject->getYear()
         )) {
             if ($this->getDateTimeObject->getDay() > 28) {
-                $this->getDateTimeObject->setDay($this->getDateTimeObject->getDay()--);
+                $this->getDateTimeObject->setDay($this->getDateTimeObject->getDay() - 1);
             } elseif ($this->getDateTimeObject->getDay() < 1) {
                 $this->getDateTimeObject->setDay(1);
             }
         }
 
-        $this->getDateTimeObject->setTZbyID('UTC');
+        $this->getDateTimeObject->setTimezone(new \DateTimeZone(date('T')));
         $this->conf ['day'] = $this->getDateTimeObject->getDay();
         $this->conf ['month'] = $this->getDateTimeObject->getMonth();
         $this->conf ['year'] = $this->getDateTimeObject->getYear();
@@ -1173,7 +1159,6 @@ class Controller extends AbstractPlugin
         $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
         $getdate = $this->conf ['getdate'];
-
         $hookObjectsArr = $this->getHookObjectsArray('drawEventClass');
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
@@ -1248,8 +1233,8 @@ class Controller extends AbstractPlugin
         if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
-        $timeObj = new CalDate($this->conf ['getdate'] . '000000');
-        $timeObj->setTZbyID('UTC');
+        $timeObj = CalendarDateTime::createFromFormat( 'Ymd', $this->conf ['getdate']  )->setTimezone(new \DateTimeZone(date('T')));
+       // $timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForDay($timeObj, $type, $pidList);
         // Hook: preDayRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1284,16 +1269,19 @@ class Controller extends AbstractPlugin
         if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
-        $timeObj = new CalDate($this->conf ['getdate'] . '000000');
-        $timeObj->setTZbyID('UTC');
+        $timeObj = CalendarDateTime::createFromFormat( 'Ymd', $this->conf ['getdate']  )->setTimezone(new \DateTimeZone(date('T')));
+        //$timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForWeek($timeObj, $type, $pidList);
+
         // Hook: preWeekRendering
         foreach ($hookObjectsArr as $hookObj) {
             if (method_exists($hookObj, 'preWeekRendering')) {
                 $hookObj->preWeekRendering($master_array, $this);
             }
         }
+        /** @var ViewController $viewObj */
         $viewObj = &Registry::Registry('basic', 'viewcontroller');
+
         $drawnWeek = $viewObj->drawWeek($master_array, $getdate);
         // Hook: postWeekRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1325,8 +1313,8 @@ class Controller extends AbstractPlugin
                 $type = '';
             }
 
-            $timeObj = new CalDate($this->conf ['getdate'] . '000000');
-            $timeObj->setTZbyID('UTC');
+            $timeObj =CalendarDateTime::createFromFormat( 'Ymd', $this->conf ['getdate']  )->setTimezone(new \DateTimeZone(date('T')));
+            //$timeObj->setTZbyID('UTC');
             $master_array = $modelObj->findEventsForMonth($timeObj, $type, $pidList);
         }
         // Hook: preMonthRendering
@@ -1361,8 +1349,8 @@ class Controller extends AbstractPlugin
         if (!in_array($type, $availableTypes, true)) {
             $type = '';
         }
-        $timeObj = new CalDate($this->conf ['getdate'] . '000000');
-        $timeObj->setTZbyID('UTC');
+        $timeObj =CalendarDateTime::createFromFormat( 'Ymd', $this->conf ['getdate']  )->setTimezone(new \DateTimeZone(date('T')));
+        //$timeObj->setTZbyID('UTC');
         $master_array = $modelObj->findEventsForYear($timeObj, $type, $pidList);
         // Hook: preYearRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -1474,7 +1462,7 @@ class Controller extends AbstractPlugin
         }
 
         $starttime = Calendar::calculateStartDayTime($this->getDateTimeObject);
-        $endtime = new CalDate();
+        $endtime = new CalendarDateTime();
         $endtime->copy($starttime);
         $endtime->addSeconds($this->conf ['view.'] ['rss.'] ['range'] * 86400);
         $master_array = $modelObj->findEventsForRss($starttime, $endtime, $type, $pidList); // $this->conf['pid_list']);
@@ -1512,13 +1500,11 @@ class Controller extends AbstractPlugin
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_location_model', 'location');
 
-        $location = $this->locationRepository->getObject(
-            $this->locationRepository->findByUid(
-                $uid
-            )
-        );
+        if (!in_array($type, $availableTypes, true)) {
+            $type = '';
+        }
 
-        //  $location = $modelObj->findLocation($uid, $type, $pidList);
+        $location = $modelObj->findLocation($uid, $type, $pidList);
         if (!is_object($location)) {
             if (is_string($location)) {
                 return $location;
@@ -1603,15 +1589,14 @@ class Controller extends AbstractPlugin
      * Calculates the time for list view start and end times.
      *
      * @param  string        The string representing the relative time.
-     * @param  CalDate       The starting point that timeString is relative to.
-     * @return CalDate for list view start or end time.
+     * @param  CalendarDateTime       The starting point that timeString is relative to.
+     * @return CalendarDateTime for list view start or end time.
      */
-    public function getListViewTime($timeString, $timeObj = null): CalDate
+    public function getListViewTime($timeString, $timeObj = null): CalendarDateTime
     {
-        /** @var DateParser $dp */
-        $dp = new DateParser();
-        $dp->parse($timeString, $this->conf ['dateParserConf.'], $timeObj);
-        return $dp->getDateObjectFromStack();
+        $dateParser = new DateParser();
+        $dateParser->parse($timeString, $this->conf ['dateParserConf.'], $timeObj);
+        return $dateParser->getDateObjectFromStack();
     }
 
     /**
@@ -1623,6 +1608,7 @@ class Controller extends AbstractPlugin
         $pidList = $this->conf ['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('drawListClass');
+        /** @var ModelController $modelObj */
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
         $availableTypes = $modelObj->getServiceTypes('cal_event_model', 'event');
         if (!in_array($type, $availableTypes, true)) {
@@ -1638,8 +1624,8 @@ class Controller extends AbstractPlugin
             $this->conf ['view.'] ['list.'] ['endtime.']
         );
 
-        $starttime = $this->getListViewTime($starttimePreset);
-        $endtime = $this->getListViewTime($endtimePreset);
+        $starttime = CalculateDateTimeService::parseTcaString($starttimePreset);
+        $endtime = CalculateDateTimeService::parseTcaString($endtimePreset);
 
         if (!$this->conf ['view.'] ['list.'] ['useGetdate']) {
             // do nothing - removed "continue" at this point, due to #543
@@ -1667,7 +1653,7 @@ class Controller extends AbstractPlugin
                     // if we have a custom starttime but use getdate, calculate the endtime based on the getdate and not on the changed startdate
                     $endtime = Calendar::calculateStartDayTime($this->getDateTimeObject);
                 } else {
-                    $endtime = new CalDate();
+                    $endtime = new CalendarDateTime();
                     $endtime->copy($starttime);
                 }
                 $endtime->addSeconds(86340);
@@ -1766,7 +1752,7 @@ class Controller extends AbstractPlugin
             $start_day = $this->getListViewTime($this->conf ['view.'] ['search.'] ['defaultValues.'] ['start_day']);
             $start_day = Calendar::calculateStartDayTime($start_day);
         } else {
-            $start_day = new CalDate(Functions::getYmdFromDateString(
+            $start_day = new CalendarDateTime(Functions::getYmdFromDateString(
                 $this->conf,
                 $start_day
                 ) . '000000');
@@ -1779,7 +1765,7 @@ class Controller extends AbstractPlugin
             $end_day = $this->getListViewTime($this->conf ['view.'] ['search.'] ['defaultValues.'] ['end_day']);
             $end_day = Calendar::calculateEndDayTime($end_day);
         } else {
-            $end_day = new CalDate(Functions::getYmdFromDateString(
+            $end_day = new CalendarDateTime(Functions::getYmdFromDateString(
                 $this->conf,
                 $end_day
                 ) . '000000');
@@ -1789,7 +1775,7 @@ class Controller extends AbstractPlugin
             $end_day->setTZbyID('UTC');
         }
         if ($this->piVars ['single_date']) {
-            $start_day = new CalDate(Functions::getYmdFromDateString(
+            $start_day = new CalendarDateTime(Functions::getYmdFromDateString(
                 $this->conf,
                 $this->piVars ['single_date']
             ));
@@ -1797,13 +1783,13 @@ class Controller extends AbstractPlugin
             $start_day->setMinute(0);
             $start_day->setSecond(0);
             $start_day->setTZbyID('UTC');
-            $end_day = new CalDate();
+            $end_day = new CalendarDateTime();
             $end_day->copy($start_day);
             $end_day->addSeconds(86399);
         }
 
-        $minStarttime = new CalDate($this->conf ['view.'] ['search.'] ['startRange'] . '000000');
-        $maxEndtime = new CalDate($this->conf ['view.'] ['search.'] ['endRange'] . '000000');
+        $minStarttime = new CalendarDateTime($this->conf ['view.'] ['search.'] ['startRange'] . '000000');
+        $maxEndtime = new CalendarDateTime($this->conf ['view.'] ['search.'] ['endRange'] . '000000');
 
         if ($start_day->before($minStarttime)) {
             $start_day->copy($minStarttime);
@@ -2061,15 +2047,12 @@ class Controller extends AbstractPlugin
     public function editLocation(): string
     {
         $uid = $this->conf ['uid'];
+        $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('editLocationClass');
-
-        $location = $this->locationRepository->getObject(
-            $this->locationRepository->findByUid(
-                $uid
-            )
-        );
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
+        $location = $modelObj->findLocation($uid, $type, $pidList);
 
         // Hook: preEditLocationRendering
         foreach ($hookObjectsArr as $hookObj) {
@@ -2096,15 +2079,14 @@ class Controller extends AbstractPlugin
     public function deleteLocation(): string
     {
         $uid = $this->conf ['uid'];
+        $type = $this->conf ['type'];
         $pidList = $this->conf ['pidList'];
 
         $hookObjectsArr = $this->getHookObjectsArray('deleteLocationClass');
 
-        $location = $this->locationRepository->getObject(
-            $this->locationRepository->findByUid(
-                $uid
-            )
-        );
+        $modelObj = &Registry::Registry('basic', 'modelcontroller');
+        $location = $modelObj->findLocation($uid, $type, $pidList);
+
         // Hook: preDeleteLocationRendering
         foreach ($hookObjectsArr as $hookObj) {
             if (method_exists($hookObj, 'preDeleteLocationRendering')) {
@@ -2504,12 +2486,13 @@ class Controller extends AbstractPlugin
         if (intval($this->piVars ['start_day']) === 0) {
             $starttime = $this->getListViewTime($this->conf ['view.'] ['search.'] ['defaultValues.'] ['start_day']);
         } else {
-            $starttime = new CalDate(intval($this->piVars ['start_day']) . '000000');
+            $starttime = CalendarDateTime::createFromFormat( 'Ymd', intval($this->piVars ['start_day']) )->setTimezone(new \DateTimeZone(date('T')));
         }
         if (intval($this->piVars ['end_day']) === 0) {
             $endtime = $this->getListViewTime($this->conf ['view.'] ['search.'] ['defaultValues.'] ['end_day']);
         } else {
-            $endtime = new CalDate(intval($this->piVars ['end_day']) . '000000');
+            $endtime = CalendarDateTime::createFromFormat( 'Ymd', intval($this->piVars ['end_day']) )->setTimezone(new \DateTimeZone(date('T')));
+            //new CalendarDateTime(intval($this->piVars ['end_day']) . '000000');
         }
         $searchword = strip_tags($this->piVars ['query']);
         if ($searchword === '') {
@@ -2521,8 +2504,8 @@ class Controller extends AbstractPlugin
         $endtime->addSeconds(86399);
 
         /* Get the boundaries for allowed search dates */
-        $minStarttime = new CalDate(intval($this->conf ['view.'] ['search.'] ['startRange']) . '000000');
-        $maxEndtime = new CalDate(intval($this->conf ['view.'] ['search.'] ['endRange']) . '000000');
+        $minStarttime = new CalendarDateTime(intval($this->conf ['view.'] ['search.'] ['startRange']) . '000000');
+        $maxEndtime = new CalendarDateTime(intval($this->conf ['view.'] ['search.'] ['endRange']) . '000000');
 
         /* Check starttime against boundaries */
         if ($starttime->before($minStarttime)) {
@@ -2957,14 +2940,14 @@ class Controller extends AbstractPlugin
         if (!$this->piVars ['start']) {
             $this->piVars ['start'] = $this->confArr ['recurrenceStart'];
         }
-        $startObj = new CalDate($this->piVars ['start'] . '000000');
+        $startObj = new CalendarDateTime($this->piVars ['start'] . '000000');
         $startObj->setTZbyID('UTC');
 
         if (!$this->piVars ['end']) {
             $this->piVars ['end'] = $this->confArr ['recurrenceEnd'];
         }
 
-        $endObj = new CalDate($this->piVars ['end'] . '000000');
+        $endObj = new CalendarDateTime($this->piVars ['end'] . '000000');
         $endObj->setTZbyID('UTC');
         $eventTypes = '0,1,2,3';
 
@@ -3036,7 +3019,6 @@ class Controller extends AbstractPlugin
         $pidList = $this->conf ['pidList'];
 
         $eventType = intval($this->piVars ['event_type']);
-
         $hookObjectsArr = $this->getHookObjectsArray('drawLoadEventClass');
         /** @var ModelController $modelObj */
         $modelObj = &Registry::Registry('basic', 'modelcontroller');
@@ -3464,7 +3446,12 @@ class Controller extends AbstractPlugin
                 $this->pi_getFFvalue($piFlexForm, 'isPreview', 's_Event_View')
             );
         }
-
+        if ((int)$this->conf ['dontListenToFlexForm.'] ['event.'] ['hasMap'] !== 1) {
+            self::updateIfNotEmpty(
+                $this->conf ['view.'] ['event.'] ['hasMap'],
+                $this->pi_getFFvalue($piFlexForm, 'hasMap', 's_Event_View')
+            );
+        }
         if ((int)$this->conf ['dontListenToFlexForm.'] ['list.'] ['listViewPid'] !== 1) {
             self::updateIfNotEmpty(
                 $this->conf ['view.'] ['list.'] ['listViewPid'],
@@ -3904,7 +3891,7 @@ class Controller extends AbstractPlugin
 
                 unset($this->piVars ['year'], $this->piVars ['week'], $this->piVars ['weekday']);
             } else {
-                $date = new CalDate();
+                $date = new CalendarDateTime();
                 $date->setTZbyID('UTC');
                 if (!$this->piVars['year']) {
                     $this->piVars['year'] = $date->format('Y');
@@ -4010,7 +3997,7 @@ class Controller extends AbstractPlugin
 
         /* TEST */
         if ($piVars [$this->prefixId] ['getdate']) {
-            $date = new CalDate($piVars [$this->prefixId] ['getdate']);
+            $date = new CalendarDateTime($piVars [$this->prefixId] ['getdate']);
 
             $sessionVars = [];
             switch ($piVars [$this->prefixId] ['view']) {
@@ -4071,7 +4058,7 @@ class Controller extends AbstractPlugin
         // add time/date related parameters to all link objects, so that they can use them e.g. to display the monthname etc.
         $parameterArray ['getdate'] = $this->conf ['getdate'];
         if (is_object($date) && $overrulePIvars ['getdate']) {
-            $parameterArray ['link_timestamp'] = $date->getTime();
+            $parameterArray ['link_timestamp'] = $date->format('U');
             $parameterArray ['link_getdate'] = $overrulePIvars ['getdate'];
         }
     }

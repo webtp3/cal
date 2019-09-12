@@ -22,13 +22,11 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Controller;
  */
 use TYPO3\CMS\Cal\Controller\Api;
 
-
 /**
  * API for calendar base (cal)
  */
-class ApiControllerTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
+class ApiControllerTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
 {
-
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */
     protected $objectManager;
@@ -49,15 +47,14 @@ class ApiControllerTest extends \TYPO3\TestingFramework\Core\Functional\Function
         $this->importDataSet(__DIR__ . '/../Fixtures/tx_cal_event.xml');
         $this->apiController = $this->objectManager->get(Api::class);
         //$this->setUpFrontendRootPage(1, ['EXT:cal/Configuration/TypoScript/']);
-
-
     }
 
     /**
      * Test if tests work fine
      * @test
      */
-    public function dummyMethod() {
+    public function dummyMethod()
+    {
         $this->assertTrue(true);
     }
 
@@ -69,6 +66,9 @@ class ApiControllerTest extends \TYPO3\TestingFramework\Core\Functional\Function
     public function canFindByUidTest(): array
     {
         /*
+         * * require_once ('class.tx_cal_api.php');
+     * $calAPI = new Api($this->cObj, &$conf);
+     * $event = $calAPI->findEvent('2','tx_cal_phpicalendar');
       * @param int $uid
       *            to search for
       * @param string $pidList
@@ -76,10 +76,9 @@ class ApiControllerTest extends \TYPO3\TestingFramework\Core\Functional\Function
       * @return array array ($row)
      */
 
-        $c =  $this->apiController->findEvent(1,'tx_cal_phpicalendar','1');
-        $this->assertEquals($c["uid"], 1);
+        $c =  $this->apiController->findEvent(1, 'tx_cal_phpicalendar', '1');
+        $this->assertEquals($c['uid'], 1);
     }
-
 
     /**
      * Test find tx_cal_api_without event by pid
@@ -89,8 +88,7 @@ class ApiControllerTest extends \TYPO3\TestingFramework\Core\Functional\Function
     public function canFindWithoutApi()
     {
         $c =  $this->apiController->tx_cal_api_without(1);
-        $this->assertEquals($c["uid"], 1);
-
+        $this->assertEquals($c['uid'], 1);
     }
 
     /**
@@ -100,16 +98,15 @@ class ApiControllerTest extends \TYPO3\TestingFramework\Core\Functional\Function
      */
     public function canCreateFindEvent()
     {
-        $evt = new \TYPO3\CMS\Cal\Model\EventModel('',0,'tx_cal_phpicalendar');
+        $evt = new \TYPO3\CMS\Cal\Model\EventModel('', 0, 'tx_cal_phpicalendar');
         $evt->setPid(1);
         $evt->setUid(111);
-        $type = "tx_cal_phpicalendar";
+        $type = 'tx_cal_phpicalendar';
         $evt->setType($type);
-        $title = "testtype event";
+        $title = 'testtype event';
         $evt->setTitle($title);
-        $this->apiController->saveEvent('','tx_cal_phpicalendar',1);
+        $this->apiController->saveEvent('', 'tx_cal_phpicalendar', 1);
         $this->assertEquals($evt, $this->apiController->findEvent(111, $type, [1]));
-
     }
 
 //    /**

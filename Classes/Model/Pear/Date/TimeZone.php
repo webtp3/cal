@@ -68,6 +68,7 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  *          BSD License
  * @version Release: 1.4.7
  * @link http://pear.php.net/package/Date
+ * @deprecated
  */
 class TimeZone
 {
@@ -146,10 +147,10 @@ class TimeZone
      */
     public function __construct($id)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $_DATE_TIMEZONE_DATA = &$GLOBALS['_DATE_TIMEZONE_DATA'];
-        if (self::isValidID($id)) {
+        if (TimeZone::isValidID($id)) {
             $this->id = $id;
             $this->longname = $_DATE_TIMEZONE_DATA[$id]['longname'];
             $this->shortname = $_DATE_TIMEZONE_DATA[$id]['shortname'];
@@ -186,9 +187,9 @@ class TimeZone
      */
     public static function getDefault()
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        return new self($GLOBALS['_DATE_TIMEZONE_DEFAULT']);
+        return new TimeZone($GLOBALS['_DATE_TIMEZONE_DEFAULT']);
     }
 
     // }}}
@@ -204,9 +205,9 @@ class TimeZone
      */
     public static function setDefault($id)
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        if (self::isValidID($id)) {
+        if (TimeZone::isValidID($id)) {
             $GLOBALS['_DATE_TIMEZONE_DEFAULT'] = $id;
         }
     }
@@ -226,7 +227,7 @@ class TimeZone
      */
     public static function isValidID($id): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if (isset($GLOBALS['_DATE_TIMEZONE_DATA'][$id])) {
             return true;
@@ -250,7 +251,7 @@ class TimeZone
      */
     public function isEqual($tz): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if (strcasecmp($this->id, $tz->id) == 0) {
             return true;
@@ -279,7 +280,7 @@ class TimeZone
      */
     public function isEquivalent($tz): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($this->offset == $tz->offset && $this->hasdst == $tz->hasdst) {
             return true;
@@ -300,7 +301,7 @@ class TimeZone
      */
     public function hasDaylightTime(): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->hasdst;
     }
@@ -326,7 +327,7 @@ class TimeZone
      */
     public function inDaylightTime($date): bool
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $env_tz = '';
         if (isset($_ENV['TZ']) && getenv('TZ')) {
@@ -356,7 +357,7 @@ class TimeZone
      */
     public function getDSTSavings(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($this->hasdst) {
             return 3600000;
@@ -382,7 +383,7 @@ class TimeZone
      */
     public function getOffset($date): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($this->inDaylightTime($date)) {
             return $this->offset + $this->getDSTSavings();
@@ -403,7 +404,7 @@ class TimeZone
      */
     public function getAvailableIDs()
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return array_keys($GLOBALS['_DATE_TIMEZONE_DATA']);
     }
@@ -421,7 +422,7 @@ class TimeZone
      */
     public function getID(): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->id;
     }
@@ -440,7 +441,7 @@ class TimeZone
      */
     public function getLongName(): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->longname;
     }
@@ -458,7 +459,7 @@ class TimeZone
      */
     public function getShortName(): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->shortname;
     }
@@ -476,7 +477,7 @@ class TimeZone
      */
     public function getDSTLongName(): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->dstlongname;
     }
@@ -494,7 +495,7 @@ class TimeZone
      */
     public function getDSTShortName(): string
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->dstshortname;
     }
@@ -512,7 +513,7 @@ class TimeZone
      */
     public function getRawOffset(): int
     {
-        trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->offset;
     }

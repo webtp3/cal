@@ -1,32 +1,24 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
-$_EXTKEY = $GLOBALS['_EXTKEY'] = 'cal';
-$extensionName = \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToUpperCamelCase($_EXTKEY);
+
+$extensionName = GeneralUtility::underscoredToUpperCamelCase('cal');
 $pluginSignature = strtolower($extensionName) . '_controller';
 
 /***************
  * Plugin
  */
-//\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin([
-//        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tt_content.list_type',
-//        $_EXTKEY . '_controller'
-//], 'list_type');
-
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-    'Cal',
-    'Controller',
-    'tp3 typo3 Calendar - ext:cal'
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(
+    [
+        'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tt_content.list_type',
+        'cal_controller'
+    ],
+    'list_type',
+    'cal'
 );
 
 $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist'][$pluginSignature] = 'layout,select_key';

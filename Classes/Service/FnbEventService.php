@@ -1,14 +1,7 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Service;
 
-use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 
@@ -42,7 +35,7 @@ class FnbEventService extends EventService
      * @param string $additionalWhere
      * @return array
      */
-    public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '0,1,2,3', $additionalWhere = ''): array
+    public function findAllWithin($start_date, $end_date, $pidList, $eventType = '0,1,2,3', $additionalWhere = ''): array
     {
 
         // How to get the events
@@ -58,17 +51,17 @@ class FnbEventService extends EventService
         $this->setStartAndEndPoint($start_date, $end_date);
         $dontShowOldEvents = (int)$this->conf['view.'][$this->conf['view'] . '.']['dontShowOldEvents'];
         if ($dontShowOldEvents > 0) {
-            $now = new CalDate();
+            $now = new CalendarDateTime();
             if ($dontShowOldEvents === 2) {
                 $now->setHour(0);
                 $now->setMinute(0);
                 $now->setSecond(0);
             }
 
-            if ($start_date->getTime() <= $now->getTime()) {
+            if ($start_date->format('U') <= $now->format('U')) {
                 $start_date->copy($now);
             }
-            if ($end_date->getTime() <= $now->getTime()) {
+            if ($end_date->format('U') <= $now->format('U')) {
                 $end_date->copy($now);
                 $end_date->addSeconds(86400);
             }
@@ -95,7 +88,7 @@ class FnbEventService extends EventService
             // get the uids of recurring events from index
             $select = 'event_uid';
             $table = 'tx_cal_index';
-            $where = 'start_datetime >= ' . $this->starttime->format('YmdHMS') . ' AND start_datetime <= ' . $this->endtime->format('YmdHMS');
+            $where = 'start_datetime >= ' . $this->starttime->format('YmdHis') . ' AND start_datetime <= ' . $this->endtime->format('YmdHis');
             $group = 'event_uid';
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $group);
             $tmpUids = [];

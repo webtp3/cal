@@ -1,73 +1,161 @@
-<h2>{event.title}</h2>
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+			xmlns:n="http://typo3.org/ns/GeorgRinger/News/ViewHelpers"
+			xmlns:bk2k="http://typo3.org/ns/BK2K/BootstrapPackage/ViewHelpers"
+			xmlns:rx="http://typo3.org/ns/Reelworx/RxShariff/ViewHelper"
+			xmlns:ttaddr="http://typo3.org/ns/FriendsOfTYPO3/TtAddress/ViewHelper"
+			data-namespace-typo3-fluid="true">
+
+<meta itemprop="startDate" content="<f:format.date format='Y-m-d\TH:i:s.u\Z'>{event.start}</f:format.date>">
+<meta itemprop="endDate" content="<f:format.date format='Y-m-d\TH:i:s.u\Z'>{event.end}</f:format.date>">
+<h2 itemprop="name">{event.title}</h2>
+<h3>
+	<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_start"/>
+</h3>
+<g itemprop="offers" itemscope="" itemtype="http://schema.org/Offer" >
+	<meta itemprop="availability" itemscope="" itemtype="http://schema.org/LimitedAvailability"/>
+	<f:link.page additionalAttributes="{itemprop:'url'}" class="url" pageUid="{settings.view.event.eventViewPid}"
+							 additionalParams="{tx_cal_controller: '{view: \'event\',type: event.type, uid: event.uid, year: event.start.year, month: event.start.month, day: event.start.day  }'}">
+	</f:link.page>
+</g>
+
+<f:format.date format='d.m.Y'>{event.start}</f:format.date>
+<f:if condition="{event.allday} != 1">
+	<f:format.date format='H:i'>{event.start}</f:format.date>
+	<f:if condition="{event.end}">
+		<f:if condition="{event.allday} != 1">
+			-
+			<f:format.date format='H:i'>{event.end}</f:format.date>
+		</f:if>
+	</f:if>
+</f:if>
+
 <f:for each="{event.categories}" as="category" iteration="itemIteration">
 	<i>{category.title}</i>
 </f:for>
-<div class="image-intext-left image-intext">
-	<div class="image-wrap">
-		<f:for each="{event.images}" as="image" iteration="itemIteration">
-			<figure class="image"><f:image src="{image.uid}" alt="{image.originalResource.title}" width="{settings.view.event.event.image.maxW}" treatIdAsReference="1" /></figure>
+<div class="calbody image-intext-left image-intext">
+	<div class="image-wrap col-md-6 right">
+		<f:for each="{event.images}" as="mediaElement" iteration="itemIteration">
+			<f:if condition="{mediaElement.link}">
+				<f:then>
+					<f:link.page pageUid="{mediaElement.link}" target="{n:targetLink(link:mediaElement.link)}">
+						<f:image  additionalAttributes="itemprop:'image'"  image="{mediaElement}" title="{mediaElement.title}" alt="{mediaElement.alternative}" maxWidth="{f:if(condition: settings.media.maxWidth, then: settings.media.maxWidth, else: settings.detail.media.image.maxWidth)}" maxHeight="{f:if(condition: settings.media.maxHeight, then: settings.media.maxHeight, else: settings.detail.media.image.maxHeight)}" />
+					</f:link.page>
+				</f:then>
+				<f:else>
+					<f:if condition="{settings.view.event.event.image.lightbox.enabled}">
+						<f:then>
+							<a
+								href="{f:uri.image(image: mediaElement, maxHeight: settings.lightbox.image.maxHeight, maxWidth: settings.lightbox.image.maxWidth)}"
+								title="{mediaElement.properties.title}"
+								data-lightbox-caption="{mediaElement.properties.description}"
+								class="lightbox img-responsive"
+								data-lightbox-width="{bk2k:lastImageInfo(property: 'width')}"
+								data-lightbox-height="{bk2k:lastImageInfo(property: 'height')}"
+								rel="lightbox-group-{mediaElement.uid}">
+								<img itemprop="image"
+										 src="{f:uri.image(src: 'EXT:bootstrap_package/Resources/Public/Images/blank.gif')}"
+										 data-src="{f:uri.image(image: mediaElement)}"
+										 data-large="{f:uri.image(image: mediaElement, cropVariant: 'default', maxWidth: 350)}"
+										 data-medium="{f:uri.image(image: mediaElement, cropVariant: 'medium', maxWidth: 940)}"
+										 data-small="{f:uri.image(image: mediaElement, cropVariant: 'small', maxWidth: 720)}"
+										 data-extrasmall="{f:uri.image(image: mediaElement, cropVariant: 'extrasmall', maxWidth: 320)}" title="{mediaElement.title}"
+										 alt="{mediaElement.alternative}" class="lazyload"
+										 data-preload="{f:if(condition: settings.preload.images, then: 'true', else: 'false')}"
+										 data-speed="{mediaElement.speed}" data-parallax="{mediaElement.parallax}" />
+								<noscript>
+									<img src="{f:uri.image(image: mediaElement)}" title="{mediaElement.title}" alt="{mediaElement.alternative}"/>
+								</noscript>
+							</a>
+						</f:then>
+						<f:else>
+							<img itemprop="image"
+									 src="{f:uri.image(src: 'EXT:bootstrap_package/Resources/Public/Images/blank.gif')}"
+									 data-src="{f:uri.image(image: mediaElement,cropVariant: settings.detail.media.image.maxWidth)})}"
+									 data-large="{f:uri.image(image: mediaElement, cropVariant: 'default', maxWidth: 350)}"
+									 data-medium="{f:uri.image(image: mediaElement, cropVariant: 'medium', maxWidth: 940)}"
+									 data-small="{f:uri.image(image: mediaElement, cropVariant: 'small', maxWidth: 720)}"
+									 data-extrasmall="{f:uri.image(image: mediaElement, cropVariant: 'extrasmall', maxWidth: 320)}" title="{mediaElement.title}"
+									 alt="{mediaElement.alternative}" class="lazyload"
+									 data-preload="{f:if(condition: settings.preload.images, then: 'true', else: 'false')}"
+									 data-speed="{mediaElement.speed}" data-parallax="{mediaElement.parallax}" />
+							<noscript>
+								<img src="{f:uri.image(image: mediaElement)}" title="{mediaElement.title}" alt="{mediaElement.alternative}"/>
+							</noscript>
+						</f:else>
+					</f:if>
+				</f:else>
+			</f:if>
 		</f:for>
 	</div>
-	<div class="text"><f:format.html >{event.description}</f:format.html></div>
+	<div class="text" itemprop="description">
+		<div class="lead"><f:format.html>{event.teaser}</f:format.html></div>
+		<f:format.html>{event.description}</f:format.html>
+	</div>
 </div>
-
-<h3><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_start" /></h3>
-<f:if condition="{event.allday} != 1">
-	<f:then>
-		<f:if condition="{event.startdate} != {event.enddate}">
-			<f:then>
-				<f:format.date format='{settings.view.event.event.dateFormat} {settings.view.event.event.timeFormat}'>@{event.start.time}</f:format.date></div> - <div><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_enddate" />: <f:format.date format='{settings.view.event.event.dateFormat} {settings.view.event.event.timeFormat}'>@{event.end.time}</f:format.date>
-			</f:then>
-			<f:else>
-				<f:format.date format='{settings.view.event.event.dateFormat} {settings.view.event.event.timeFormat}'>@{event.start.time}</f:format.date>
-			</f:else>
-		</f:if>
-	</f:then>
-	<f:else>
-		<f:if condition="{event.startdate} != {event.enddate}">
-			<f:then>
-				<f:format.date format='{settings.view.event.event.dateFormat}'>@{event.start.time}</f:format.date> - <f:format.date format='{settings.view.event.event.dateFormat}'>@{event.end.time}</f:format.date>
-			</f:then>
-			<f:else>
-				<f:format.date format='{settings.view.event.event.dateFormat}'>@{event.start.time}</f:format.date>
-			</f:else>
-		</f:if>	
-	</f:else>
-</f:if>
 
 <f:if condition="{event.organizerObject}">
 	<f:then>
-		<h3><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_organizer" /></h3>
-		{event.organizerObject.name}
+		<div class="organizer" itemprop="organizer" itemscope itemtype="http://schema.org/Organization">
+		<h3 class="organizerObject">
+			<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_organizer"/>
+		</h3>
+		<n:extensionLoaded extensionKey="tt_address">
+				<f:render partial="Event/Maps" section="leaflet" arguments="{address:event.organizerObject, settings:settings}" />
+		</n:extensionLoaded>
+		</div>
 	</f:then>
 	<f:else>
 		<f:if condition="{event.organizer} != ''">
-			<h3><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_organizer" /></h3>
+			<h3 class="organizerObject">
+				<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_organizer"/>
+			</h3>
 			{event.organizer}
 		</f:if>
 	</f:else>
 </f:if>
+<n:extensionLoaded extensionKey="rx_shariff">
+	<f:render partial="Event/Shariff" />
+</n:extensionLoaded>
+
 <f:if condition="{event.locationObject}">
 	<f:then>
-		<h3><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_location" /></h3>
-		{event.locationObject.name}
+		<div class="location" itemprop="location" itemscope itemtype="http://schema.org/Place">
+		<h3 class="locationObject">
+			<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_location"/>
+		</h3>
+		<n:extensionLoaded extensionKey="tt_address">
+				<f:render partial="Event/Maps" section="leaflet" arguments="{address:event.locationObject, settings:settings}" />
+		</n:extensionLoaded>
+			</div>
 	</f:then>
 	<f:else>
 		<f:if condition="{event.location} != ''">
-			<h3><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_location" /></h3>
+			<h3 class="locationObject">
+				<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_location"/>
+			</h3>
 			{event.location}
 		</f:if>
 	</f:else>
 </f:if>
 
 <f:if condition="{event.attachments}">
-	<h3><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_attachment" /></h3>
+	<h3>
+		<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_attachment"/>
+	</h3>
 	<ul>
-	<f:for each="{event.attachments}" as="attachment" iteration="itemIteration">
-		<li><f:link.page pageUid="{attachment.originalFile.publicUrl}"> {attachment.originalFile.name} </f:link.page></li> 
-	</f:for>
+		<f:for each="{event.attachments}" as="attachment" iteration="itemIteration">
+			<li>
+				<f:link.page pageUid="{attachment.originalFile.publicUrl}"> {attachment.originalFile.name}</f:link.page>
+			</li>
+		</f:for>
 	</ul>
 </f:if>
 <f:if condition="{settings.view.ics.showIcsLinks} == 1">
-	<br /><f:link.page pageType="{settings.view.ics.typeNum}" additionalParams="{tx_cal_controller: '{view: \'event\',type: event.type, uid: event.uid, year: event.start.year, month: event.start.month, day: event.start.day  }'}" title="{f:translate(key:'LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_icslink')}"><f:image src="{settings.view.imagePath}/ics.gif" /></f:link.page><br />
+	<br/>
+	<f:link.page pageType="{settings.view.ics.typeNum}"
+							 additionalParams="{tx_cal_controller: '{view: \'event\',type: event.type, uid: event.uid, year: event.start.year, month: event.start.month, day: event.start.day  }'}"
+							 title="{f:translate(key:'LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_icslink')}">
+		<f:image src="{settings.view.imagePath}/ics.gif"/>
+	</f:link.page>
+	<br/>
 </f:if>

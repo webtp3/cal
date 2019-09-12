@@ -1,11 +1,4 @@
 <?php
-
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 defined('TYPO3_MODE') or die();
 
 // Define the TCA for a checkbox and calendar-/category selector to enable access control.

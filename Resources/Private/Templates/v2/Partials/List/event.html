@@ -1,14 +1,38 @@
-<dt class="vevent">
-	<div class="dtstart-container">
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+			xmlns:n="http://typo3.org/ns/GeorgRinger/News/ViewHelpers"
+			data-namespace-typo3-fluid="true">
+<li class="item row vevent">
+	<f:link.page class="url" pageUid="{settings.view.event.eventViewPid}"
+		 additionalParams="{tx_cal_controller: '{view: \'event\',type: event.type, uid: event.uid, year: event.start.year, month: event.start.month, day: event.start.day  }'}">
+
+	<div class="col-md-3 dtstart-container">
 		<abbr
-			title="<f:format.date format='Ymd\THi00'>@{event.start.time}</f:format.date>"
-			class="dtstart"><f:format.date format='F d '>@{event.start.time}</f:format.date>
-			<f:if condition="{event.allday} != 1">
-				<f:format.date format='g:i a'>@{event.start.time}</f:format.date>
-			</f:if></abbr>
+			title="<f:format.date format='Ymd\THi00'>{event.start}</f:format.date>"
+			class="dtstart">
+		</abbr>
+		<abbr
+			title="<f:format.date format='Ymd\THi00'>{event.end}</f:format.date>"
+			class="dtend">
+		</abbr>
+			<f:format.date format='d.m.Y'>{event.start}</f:format.date>
+				<f:if condition="{event.allday} != 1">
+					<f:format.date format='H:i'>{event.start}</f:format.date>
+					<f:if condition="{event.end}">
+						<f:if condition="{event.allday} != 1">
+							-
+							<f:format.date format='H:i'>{event.end}</f:format.date>
+						</f:if>
+					</f:if>
+				</f:if>
 	</div>
-	<div class="summary">
-		<f:link.page
-			additionalParams="{tx_cal_controller: '{view: \'event\',type: event.type, uid: event.uid, year: event.start.year, month: event.start.month, day: event.start.day  }'}">{event.title} {event.locationObject.city}</f:link.page>
+	<div class="summary col-md-9">
+			{event.title} {event.locationObject.city}
+		<div class="lead"><f:format.html>{event.teaser}</f:format.html></div>
 	</div>
-</dt>
+		<f:for each="{event.images}" as="image" iteration="i">
+			<f:if condition="{i.cycle} == 1">
+				<f:image  image="{image}" title="{image.title}" alt="{image.alternative}" maxWidth="200" maxHeight="200" />
+			</f:if>
+		</f:for>
+	</f:link.page>
+</li>

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Backend\TCA;
 
 /**
@@ -21,7 +15,7 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 
 /**
  * Class Labels
@@ -36,27 +30,17 @@ class Labels
      */
     public function getEventRecordLabel(&$params, &$pObj)
     {
-        if ($params['table'] != 'tx_cal_event' && $params['table'] != 'tx_cal_exception_event') {
+        if ($params['table'] !== 'tx_cal_event' && $params['table'] !== 'tx_cal_exception_event') {
             return '';
         }
 
         // Get complete record
         $rec = BackendUtility::getRecordWSOL($params['table'], $params['row']['uid']);
-        $dateObj = new CalDate($rec['start_date'] . '000000');
+        $dateObj = new CalendarDateTime($rec['start_date'] ?: date('Ymd') . '000000');
         $dateObj->setTZbyID('UTC');
 
-        $format = str_replace([
-            'd',
-            'm',
-            'y',
-            'Y'
-        ], [
-            '%d',
-            '%m',
-            '%y',
-            '%Y'
-        ], $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy']);
-        if ($rec['allday'] || $params['table'] == 'tx_cal_exception_event') {
+        $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'];
+        if ($rec['allday'] || $params['table'] === 'tx_cal_exception_event') {
             /* If we have an all day event, only show the date */
             $datetime = $dateObj->format($format);
             $params['start_date'] = $datetime;
@@ -87,7 +71,7 @@ class Labels
      */
     public function getAttendeeRecordLabel(&$params, &$pObj)
     {
-        if (!$params['table'] == 'tx_cal_attendee') {
+        if (!$params['table'] === 'tx_cal_attendee') {
             return '';
         }
 
@@ -113,7 +97,7 @@ class Labels
      */
     public function getMonitoringRecordLabel(&$params, &$pObj)
     {
-        if (!$params['table'] == 'tx_cal_fe_user_event_monitor_mm') {
+        if (!$params['table'] === 'tx_cal_fe_user_event_monitor_mm') {
             return '';
         }
 
@@ -148,7 +132,7 @@ class Labels
      */
     public function getDeviationRecordLabel(&$params, &$pObj)
     {
-        if (!$params['table'] == 'tx_cal_event_deviation') {
+        if (!$params['table'] === 'tx_cal_event_deviation') {
             return '';
         }
 
@@ -158,7 +142,7 @@ class Labels
         $label = $GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.deviation') . ': ';
 
         if ($rec['orig_start_date']) {
-            $dateObj = new CalDate($rec['orig_start_date'] . '000000');
+            $dateObj = new CalendarDateTime($rec['orig_start_date'] . '000000');
             $dateObj->setTZbyID('UTC');
 
             $format = str_replace([

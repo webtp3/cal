@@ -1,25 +1,32 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-			xmlns:cal="http://typo3.org/ns/TYPO3/CMS/Cal/ViewHelpers"
+			xmlns:n="http://typo3.org/ns/GeorgRinger/News/ViewHelpers"
+			xmlns:rx="http://typo3.org/ns/Reelworx/RxShariff/ViewHelper"
+			xmlns:ttaddr="http://typo3.org/ns/FriendsOfTYPO3/TtAddress/ViewHelper"
 			data-namespace-typo3-fluid="true">
-<div id="calendar-event">
+
+<div id="calendar-event" itemscope itemtype="http://schema.org/Event" >
 	<f:if condition="{event}">
-		<f:render partial="Event/event" arguments="{event:event, settings:settings, eventView:eventView}" />
+		<f:render partial="Event/event" arguments="{event:event, settings:settings, eventView:eventView}"/>
 	</f:if>
 </div>
 <f:if condition="{eventView.master_array}">
-	<p class="related"><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_category_relatedevents" /></p>
+	<p class="related">
+		<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_category_relatedevents"/>
+	</p>
 	<dl>
 		<f:for each="{eventView.master_array}" as="entriesOfADay" key="day">
 			<f:if
-				condition="{day} >= {f:format.date(format:'Ymd' date:'@{eventView.starttime.time}')}">
+				condition="{day} >= {f:format.date(format:'Ymd' date:'{eventView.starttime.time}')}">
 				<f:for each="{entriesOfADay}" as="entriesOfAnHour">
 					<f:for each="{entriesOfAnHour}" as="event">
 						<f:render partial="List/event"
-							arguments="{event:event, settings:settings, eventView:eventView}" />
+											arguments="{event:event, settings:settings, eventView:eventView}"/>
 					</f:for>
 				</f:for>
 			</f:if>
 		</f:for>
 	</dl>
 </f:if>
-<div id="calendar-event-backlink"><a href="javascript:history.back();"><f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_back" /></a></div>
+<div id="calendar-event-backlink"><a class="btn btn-default" href="javascript:history.back();">
+	<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_back"/>
+</a></div>

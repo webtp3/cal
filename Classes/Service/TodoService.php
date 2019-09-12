@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Service;
 
 /**
@@ -21,7 +15,6 @@ namespace TYPO3\CMS\Cal\Service;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use RuntimeException;
-use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Model;
@@ -46,9 +39,9 @@ class TodoService extends EventService
      * @param string $additionalWhere
      * @return array array of events represented by the model.
      */
-    public function findAllWithin(&$start_date, &$end_date, $pidList, $eventType = '4', $additionalWhere = ''): array
+    public function findAllWithin($start_date, $end_date, $pidList, $eventType = '4', $additionalWhere = ''): array
     {
-        return parent::findAllWithin($start_date, $end_date, $pidList, '4', $additionalWhere);
+        return parent::findAllWithin(clone $start_date, clone $end_date, $pidList, '4', $additionalWhere);
     }
 
     /**
@@ -116,8 +109,8 @@ class TodoService extends EventService
     public function findCurrentTodos($disableCalendarSearchString = false, $disableCategorySearchString = false): array
     {
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-        $this->starttime = new CalDate($confArr['recurrenceStart']);
-        $this->endtime = new CalDate($confArr['recurrenceEnd']);
+        $this->starttime = new CalendarDateTime($confArr['recurrenceStart']);
+        $this->endtime = new CalendarDateTime($confArr['recurrenceEnd']);
         $categories = &$this->modelObj->findAllCategories('cal_category_model', '', $this->conf['pidList']);
         $categories = [];
 
@@ -948,12 +941,12 @@ class TodoService extends EventService
         $master_array[$startDate->format('Ymd')][$event->isAllDay() ? '-1' : $startDate->format('HM')][$event->getUid()] = &$event;
         $select = '*';
         $table = 'tx_cal_index';
-        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('YmdHMS') . ' AND start_datetime <= ' . $this->endtime->format('YmdHMS');
+        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('YmdHis') . ' AND start_datetime <= ' . $this->endtime->format('YmdHis');
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
-                $nextOccuranceTime = new CalDate($row['start_datetime']);
-                $nextOccuranceEndTime = new CalDate($row['end_datetime']);
+                $nextOccuranceTime = new CalendarDateTime($row['start_datetime']);
+                $nextOccuranceEndTime = new CalendarDateTime($row['end_datetime']);
                 $new_event = new TodoRecModel($event, $nextOccuranceTime, $nextOccuranceEndTime);
                 if ($new_event->isAllDay()) {
                     $master_array[$nextOccuranceTime->format('Ymd')]['-1'][$event->getUid()] = $new_event;

@@ -1,13 +1,8 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
+use phpDocumentor\Reflection\Types\Mixed_;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -21,6 +16,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * See the enclosed file COPYING for license information (LGPL). If you
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
  *
+ * @author Mike Cochrane <mike@graftonhall.co.nz>
  * @since Horde 3.0
  */
 define('TX_MODEL_CALICALENDAR_SCALE_GREGORIAN', 0);
@@ -117,11 +113,9 @@ class ICalendar
     public function newComponent($type, &$container)
     {
         $type = strtolower($type);
-
-        $class =    '\\TYPO3\\CMS\\Cal\\Model\\ICalendar\\' . $type;
-
+        $class = 'TYPO3\CMS\Cal\Model\ICalendar\\'.$type;
         if (class_exists($class)) {
-            $component = new $class();
+            $component =  GeneralUtility::makeInstance( $class);
             if ($container !== false) {
                 $component->_container = &$container;
             }
@@ -636,7 +630,6 @@ class ICalendar
                 if ($type != 'VTIMEZONE') {
                     continue;
                 }
-
                 $component = &self::newComponent($type, $this);
                 if ($component === false) {
                     // return PEAR::raiseError("Unable to create object for type $type");
@@ -1328,7 +1321,7 @@ class ICalendar
             $temp['minute'] = date('i', $value);
             $temp['second'] = date('s', $value);
         } else {
-            $dateOb = new CalDate($value);
+            $dateOb = new CalendarDateTime($value);
             return self::_exportDateTime($dateOb->timestamp());
         }
 
@@ -1338,7 +1331,7 @@ class ICalendar
     /**
      * Parse a Time field.
      */
-    public function _parseTime($text): array
+    public function _parseTime($text)
     {
         $timeParts = [];
         if (preg_match('/([0-9]{2})([0-9]{2})([0-9]{2})(Z)?/', $text, $timeParts)) {
@@ -1369,7 +1362,6 @@ class ICalendar
 
     /**
      * Parse a Date field.
-     * @param  string $text
      */
     public function _parseDate($text)
     {

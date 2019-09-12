@@ -8,7 +8,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetGeneral</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -256,7 +256,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetCategory</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -363,7 +363,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetYearView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -389,7 +389,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetMonthView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -433,7 +433,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetWeekView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -459,7 +459,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetDayView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -571,7 +571,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetListView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -771,7 +771,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetEventView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -799,6 +799,15 @@
 							</config>
 						</TCEforms>
 					</isPreview>
+					<hasMap>
+						<TCEforms>
+							<exclude>1</exclude>
+							<label>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.hasMap</label>
+							<config>
+								<type>check</type>
+							</config>
+						</TCEforms>
+					</hasMap>
 				</el>
 			</ROOT>
 		</s_Event_View>
@@ -806,7 +815,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetIcsView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -825,7 +834,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetOtherView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>
@@ -890,7 +899,7 @@
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:cal/Resources/Private/Language/locallang_tca.xlf:cal.pi_flexform.sheetTSView</sheetTitle>
-					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xlf</cshFile>
+					<cshFile>LLL:EXT:cal/Resources/Private/Language/locallang_csh_flexform.xml</cshFile>
 				</TCEforms>
 				<type>array</type>
 				<el>

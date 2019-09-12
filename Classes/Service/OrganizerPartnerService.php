@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Service;
 
 /**
@@ -25,7 +19,6 @@ namespace TYPO3\CMS\Cal\Service;
  * Base model for the calendar organizer.
  * Provides basic model functionality that other
  * models can use or override by extending the class.
- * @deprecated since ext:cal v2, will be removed in ext:cal v3
  */
 class OrganizerPartnerService extends BaseService
 {

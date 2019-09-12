@@ -8,8 +8,6 @@
 
 namespace TYPO3\CMS\Cal\View\Module;
 
-use TYPO3\CMS\Cal\View\BaseView;
-
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -22,7 +20,11 @@ use TYPO3\CMS\Cal\View\BaseView;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-class Example extends BaseView
+
+/**
+ *
+ */
+class Example extends \TYPO3\CMS\Cal\View\BaseView
 {
     public function start(&$moduleCaller)
     {

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -23,13 +17,14 @@ namespace TYPO3\CMS\Cal\View;
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\Controller;
 use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Model\TodoModel;
 use TYPO3\CMS\Cal\Service\BaseService;
+use TYPO3\CMS\Cal\Service\CalculateDateTimeService;
 use TYPO3\CMS\Cal\Service\CalendarService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -38,6 +33,7 @@ use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Cal\Service\RightsService;
 
 /**
  * Class BaseView
@@ -76,6 +72,7 @@ class BaseView extends BaseService
     public function __construct()
     {
         parent::__construct();
+        $this->rightsObj  = GeneralUtility::makeInstance(RightsService::class);
         $this->markerBasedTemplateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
         $this->subscriptionRepository = GeneralUtility::makeInstance(SubscriptionRepository::class);
         $this->pointerName = $this->controller->getPointerName();
@@ -144,7 +141,7 @@ class BaseView extends BaseService
         $rems['###TODO###'] = '';
         $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         if ($confArr['todoSubtype'] === 'todo' && $this->rightsObj->isViewEnabled('todo')) {
-            $dateObject = new CalDate($this->conf['getdate']);
+            $dateObject = new CalendarDateTime($this->conf['getdate']);
             $pidList = $this->conf['pidList'];
             $todos = [];
             switch ($this->conf['view']) {
@@ -459,7 +456,7 @@ class BaseView extends BaseService
     public function getListMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###LIST###'] = '';
-        $starttime = new CalDate($this->conf['getdate'] . '000000');
+        $starttime = new CalendarDateTime($this->conf['getdate'] . '000000');
         $starttime->setTZbyID('UTC');
         $tx_cal_listview = GeneralUtility::makeInstanceService('cal_view', 'list', 'list');
         // set alternate rendering view, so that the rendering of the attached listView can be customized
@@ -526,14 +523,14 @@ class BaseView extends BaseService
         if ($this->rightsObj->isAllowedToCreateEvent()) {
             $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
 
-            $now = new CalDate();
+            $now = new CalendarDateTime();
             $now->setTZbyID('UTC');
 
             if ($this->conf['getdate'] !== $now->format('Ymd')) {
-                $cal_time_obj = new CalDate($this->conf['getdate'] . '000000');
+                $cal_time_obj = new CalendarDateTime($this->conf['getdate'] . '000000');
                 $cal_time_obj->setTZbyID('UTC');
             } else {
-                $cal_time_obj = new CalDate();
+                $cal_time_obj = new CalendarDateTime();
                 $cal_time_obj->setTZbyID('UTC');
                 $cal_time_obj->addSeconds($createOffset + 10);
             }
@@ -554,7 +551,7 @@ class BaseView extends BaseService
     /**
      * @param $view
      * @param $wrap
-     * @param CalDate $cal_time_obj
+     * @param CalendarDateTime $cal_time_obj
      * @param $createOffset
      * @param $isAllowedToCreateEvent
      * @param $remember
@@ -579,7 +576,7 @@ class BaseView extends BaseService
             }
             return sprintf($wrap, $remember, $class, '');
         }
-        $now = new CalDate();
+        $now = new CalendarDateTime();
         $now->setTZbyID('UTC');
         $now->addSeconds($createOffset);
         if ($this->rightsObj->isAllowedToCreateEventForTodayAndFuture()) {
@@ -613,7 +610,7 @@ class BaseView extends BaseService
                         $remember,
                         $class,
                         $tmp,
-                        $cal_time_obj->format('Y m d H M s')
+                        $cal_time_obj->format('Y m d H i s')
                     );
                 }
             } else {
@@ -627,7 +624,7 @@ class BaseView extends BaseService
                     $this->conf['view.'][$view . '.']['event.']['addLink.']
                 );
                 if ($wrap) {
-                    $tmp = sprintf($wrap, $remember, $class, $tmp, $cal_time_obj->format('Y m d H M s'));
+                    $tmp = sprintf($wrap, $remember, $class, $tmp, $cal_time_obj->format('Y m d H i s'));
                 }
             }
         } elseif ($this->conf['view.']['enableAjax']) {
@@ -971,11 +968,9 @@ class BaseView extends BaseService
         $this->getMarker($page, $sims, $rems, $wrapped);
         $sims['###VIEW###'] = $this->conf['view'];
         $page = Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
-
         $sims = [];
         $rems = [];
         $this->getImgPathMarker($page, $sims, $rems, $this->conf['view']);
-
         return Functions::substituteMarkerArrayNotCached($page, $sims, $rems, $wrapped);
     }
 
@@ -985,63 +980,31 @@ class BaseView extends BaseService
      */
     public function replaceViewMarker($page): string
     {
-        $next_day = new CalDate();
+        $next_day = new CalendarDateTime();
         $next_day->copy($this->controller->getDateTimeObject);
         $next_day->addSeconds(86400);
 
-        $prev_day = new CalDate();
+        $prev_day = new CalendarDateTime();
         $prev_day->copy($this->controller->getDateTimeObject);
         $prev_day->subtractSeconds(86400);
 
-        $next_week = new CalDate(Calc::beginOfNextWeek(
-            $this->conf['day'],
-            $this->conf['month'],
-            $this->conf['year']
-        ));
-        $prev_week = new CalDate(Calc::beginOfPrevWeek(
-            $this->conf['day'],
-            $this->conf['month'],
-            $this->conf['year']
-        ));
+        $next_week = CalculateDateTimeService::calculateStartOfNextWeek(clone $this->controller->getDateTimeObject);
+        $prev_week = CalculateDateTimeService::calculateStartOfLastWeek(clone $this->controller->getDateTimeObject);
 
-        $next_year = ($this->conf['year'] + 1) . sprintf('%02d', $this->conf['month']) . sprintf(
-            '%02d',
-            $this->conf['day']
-            );
-        $prev_year = ($this->conf['year'] - 1) . sprintf('%02d', $this->conf['month']) . sprintf(
-            '%02d',
-            $this->conf['day']
-            );
+        $next_year = clone $this->controller->getDateTimeObject;
+        $next_year = $next_year->modify('next year')->format('Ymd');
 
-        $endOfNextMonth = new CalDate(Calc::endOfNextMonth(
-            $this->conf['day'],
-            $this->conf['month'],
-            $this->conf['year']
-        ));
-        $endOfNextMonth->setDay($this->conf['day']);
+        $prev_year = clone $this->controller->getDateTimeObject;
+        $prev_year = $prev_year->modify('last year')->format('Ymd');
 
-        $startOfPrevMonth = new CalDate(Calc::endOfPrevMonth(
-            $this->conf['day'],
-            $this->conf['month'],
-            $this->conf['year']
-        ));
-        $startOfPrevMonth->setDay($this->conf['day']);
+        $next_month = CalculateDateTimeService::calculateEndOfNextMonth(clone $this->controller->getDateTimeObject)->format('Ymd');
+        $prev_month = CalculateDateTimeService::calculateStartOfLastMonth(clone $this->controller->getDateTimeObject)->format('Ymd');
 
-        $next_month = $endOfNextMonth->format('Ymd');
-        $prev_month = $startOfPrevMonth->format('Ymd');
+        $startOfThisWeek = CalculateDateTimeService::calculateStartOfWeek(clone $this->controller->getDateTimeObject);
+        $endOfThisWeek = CalculateDateTimeService::calculateEndOfWeek(clone $this->controller->getDateTimeObject);
 
-        $startOfThisWeek = new CalDate(Calc::beginOfWeek(
-            $this->conf['day'],
-            $this->conf['month'],
-            $this->conf['year']
-        ));
-        $endOfThisWeek = new CalDate(Calc::endOfWeek(
-            $this->conf['day'],
-            $this->conf['month'],
-            $this->conf['year']
-        ));
-        $GLOBALS['TSFE']->register['cal_week_starttime'] = $startOfThisWeek->getTime();
-        $GLOBALS['TSFE']->register['cal_week_endtime'] = $endOfThisWeek->getTime();
+        $GLOBALS['TSFE']->register['cal_week_starttime'] = $startOfThisWeek->format('U');
+        $GLOBALS['TSFE']->register['cal_week_endtime'] = $endOfThisWeek->format('U');
 
         $this->initLocalCObject();
 
@@ -1162,7 +1125,7 @@ class BaseView extends BaseService
             $this->conf['view.']['year.']['prevYearLink.']
         );
 
-        $this->local_cObj->setCurrentVal($this->controller->getDateTimeObject->getTime());
+        $this->local_cObj->setCurrentVal($this->controller->getDateTimeObject->format('U'));
 
         $sims['###DISPLAY_DATE###'] = $this->local_cObj->cObjGetSingle(
             $this->conf['view.'][$this->conf['view'] . '.']['displayDate'],
@@ -1183,7 +1146,6 @@ class BaseView extends BaseService
         }
 
         $page = Functions::substituteMarkerArrayNotCached($page, $sims, $rems, []);
-
         $languageArray = [
             'getdate' => $this->conf['getdate'],
             'next_month' => $next_month,
@@ -1287,7 +1249,7 @@ class BaseView extends BaseService
             ));
             $this->local_cObj->data['view'] = $viewTarget;
             if ($viewTarget === 'week' && DATE_CALC_BEGIN_WEEKDAY === 0) {
-                $date = new CalDate($this->conf['getdate']);
+                $date = new CalendarDateTime($this->conf['getdate']);
                 if ($date->format('w') === 0) {
                     $date->addSeconds(86400);
                 }
@@ -1862,7 +1824,7 @@ class BaseView extends BaseService
         if ($this->conf['view.']['other.']['listWeek_onlyShowCurrentYear']) {
             $weekSize = 52;
 
-            $start_week_time = new CalDate($this->controller->getDateTimeObject->getYear() . '0101000000');
+            $start_week_time = new CalendarDateTime($this->controller->getDateTimeObject->getYear() . '0101000000');
             $start_week_time->setTZbyID('UTC');
         } else {
             $weekSize = intval($this->conf['view.']['other.']['listWeek_totalWeekCount']);
@@ -1871,7 +1833,7 @@ class BaseView extends BaseService
             $weekOffset = intval($this->conf['view.']['other.']['listWeek_previousWeekCount']);
             $weekOffset = ($weekOffset < $weekSize) ? $weekOffset : intval($weekSize / 2);
 
-            $start_week_time = new CalDate();
+            $start_week_time = new CalendarDateTime();
             $start_week_time->copy($this->controller->getDateTimeObject);
             $start_week_time->subtractSeconds(604800 * $weekOffset);
         }
@@ -1930,7 +1892,7 @@ class BaseView extends BaseService
      */
     public function tomorrows_events($template)
     {
-        $starttime = new CalDate($this->conf['getdate'] . '000000');
+        $starttime = new CalendarDateTime($this->conf['getdate'] . '000000');
         $starttime->setTZbyID('UTC');
 
         $starttime->addSeconds(86400);
@@ -2019,7 +1981,7 @@ class BaseView extends BaseService
     public function _draw_month_new($offset, $type): string
     {
         if (preg_match('![+|-][0-9]{1,2}!is', $offset)) { // new one
-            $monthDate = new CalDate();
+            $monthDate = new CalendarDateTime();
             $monthDate->copy($this->controller->getDateTimeObject);
             $monthDate->setDay(15);
             if (intval($offset) < 0) {
@@ -2028,7 +1990,7 @@ class BaseView extends BaseService
                 $monthDate->addSeconds(intval($offset) * 2592000);
             }
         } else {
-            $monthDate = new CalDate();
+            $monthDate = new CalendarDateTime();
             $monthDate->copy($this->controller->getDateTimeObject);
             $monthDate->setDay(15);
             if (intval($offset) > 12) {
@@ -2042,11 +2004,10 @@ class BaseView extends BaseService
         $page = Functions::getContent($this->conf['view.']['month.']['new' . ucwords($type) . 'MonthTemplate']);
 
         $monthModel = NewMonthView::getMonthView($monthDate->getMonth(), $monthDate->getYear());
-
-        $today = new CalDate();
+        $today = new CalendarDateTime();
         $monthModel->setCurrent($today);
 
-        $selected = new CalDate($this->conf['getdate']);
+        $selected = new CalendarDateTime($this->conf['getdate']);
         $monthModel->setSelected($selected);
 
         $monthModel->setWeekDayFormat($this->conf['view.'][$this->conf['view'] . '.']['weekdayFormat' . ucwords($type) . 'Month']);
@@ -2067,7 +2028,6 @@ class BaseView extends BaseService
                 }
             }
         }
-
         return $monthModel->render($page);
     }
 
@@ -2091,7 +2051,7 @@ class BaseView extends BaseService
             $corner = $this->markerBasedTemplateService->getSubpart($monthTemplate, '###CORNER###');
 
             if (preg_match('![+|-][0-9]{1,2}!is', $offset)) { // new one
-                $fake_getdate_time = new CalDate();
+                $fake_getdate_time = new CalendarDateTime();
                 $fake_getdate_time->copy($this->controller->getDateTimeObject);
                 $fake_getdate_time->setDay(15);
                 if (intval($offset) < 0) {
@@ -2100,14 +2060,14 @@ class BaseView extends BaseService
                     $fake_getdate_time->addSeconds(intval($offset) * 2592000);
                 }
             } else {
-                $fake_getdate_time = new CalDate();
+                $fake_getdate_time = new CalendarDateTime();
                 $fake_getdate_time->copy($this->controller->getDateTimeObject);
                 $fake_getdate_time->setDay(15);
                 $fake_getdate_time->setMonth($offset);
             }
 
             $minical_month = $fake_getdate_time->getMonth();
-            $today = new CalDate();
+            $today = new CalendarDateTime();
 
             $month_title = $fake_getdate_time->format($this->conf['view.'][$viewTarget . '.']['dateFormatMonth']);
             $this->initLocalCObject();
@@ -2142,16 +2102,16 @@ class BaseView extends BaseService
                             foreach ($eventKeys as $eventKey) {
                                 /** @var EventModel $event */
                                 $event = &$arrayOfEvents[$eventKey];
-                                $eventReferenceKey = $dateKey . '_' . $event->getType() . '_' . $event->getUid() . '_' . $event->getStart()->format('YmdHMS');
+                                $eventReferenceKey = $dateKey . '_' . $event->getType() . '_' . $event->getUid() . '_' . $event->getStart()->format('YmdHis');
                                 $this->eventArray[$eventReferenceKey] = &$event;
-                                $starttime = new CalDate();
+                                $starttime = new CalendarDateTime();
                                 $starttime->copy($event->getStart());
-                                $endtime = new CalDate();
+                                $endtime = new CalendarDateTime();
                                 $endtime->copy($event->getEnd());
                                 if ($timeKey === '-1') {
                                     $endtime->addSeconds(1); // needed to let allday events show up
                                 }
-                                $j = new CalDate();
+                                $j = new CalendarDateTime();
                                 $j->copy($starttime);
                                 $j->setHour(0);
                                 $j->setMinute(0);
@@ -2172,7 +2132,7 @@ class BaseView extends BaseService
             $typeSize = intval($this->conf['view.']['month.']['weekdayLength' . ucwords($type) . 'Month']);
 
             $dateOfWeek = Calc::beginOfWeek(15, $fake_getdate_time->getMonth(), $fake_getdate_time->getYear());
-            $start_day = new CalDate($dateOfWeek . '000000');
+            $start_day = new CalendarDateTime($dateOfWeek . '000000');
 
             $weekday_loop = '';
 
@@ -2216,7 +2176,7 @@ class BaseView extends BaseService
 
             $dateOfWeek = Calc::beginOfWeek(1, $fake_getdate_time->getMonth(), $fake_getdate_time->getYear());
 
-            $start_day = new CalDate($dateOfWeek . '000000');
+            $start_day = new CalendarDateTime($dateOfWeek . '000000');
             $start_day->setTZbyID('UTC');
 
             $i = 0;
@@ -2225,7 +2185,7 @@ class BaseView extends BaseService
 
             $createOffset = intval($this->conf['rights.']['create.']['event.']['timeOffset']) * 60;
 
-            $getdate = new CalDate($this->conf['getdate']);
+            $getdate = new CalendarDateTime($this->conf['getdate']);
             $getdate->setTZbyID('UTC');
             $startWeekTime = Calendar::calculateStartWeekTime($getdate);
             $endWeekTime = Calendar::calculateEndWeekTime($getdate);
@@ -2233,7 +2193,7 @@ class BaseView extends BaseService
             $formattedWeekStartTime = $startWeekTime->format('Ymd');
             $formattedWeekEndTime = $endWeekTime->format('Ymd');
             do {
-                $daylink = new CalDate();
+                $daylink = new CalendarDateTime();
                 $daylink->copy($start_day);
 
                 $formatedGetdate = $daylink->format('Ymd');
