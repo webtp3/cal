@@ -10,7 +10,7 @@ $EM_CONF['cal'] = [
     'title' => 'Calendar Base',
     'description' => 'A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard',
     'category' => 'plugin',
-    'version' => '2.5.2',
+    'version' => '2.5.3',
     'state' => 'stable',
     'createDirs' => 'uploads/tx_cal/pics,uploads/tx_cal/ics,uploads/tx_cal/media',
     'author' => 'Jan Helke, Mario Matzulla',
@@ -22,6 +22,10 @@ $EM_CONF['cal'] = [
         ],
         'suggests' => [
             'typo3db_legacy' => '1.1.0-1.1.99',
+            'tt_address' => '',
+            'news' => '',
+            'rx_shariff' => '',
+            'bootstrap_package' => ''
         ],
     ]
 ];
