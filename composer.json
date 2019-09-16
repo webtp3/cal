@@ -36,7 +36,10 @@
 	},
 	"suggest": {
 		"friendsoftypo3/typo3db-legacy": "^1.1",
-		"friendsoftypo3/tt-address": "~4"
+		"friendsoftypo3/tt-address": "~4",
+		"georgringer/news": "^7",
+		"reelworx/rx-shariff": "~12",
+		"bk2k/bootstrap-package": "^8"
 
 	},
 	"autoload": {
