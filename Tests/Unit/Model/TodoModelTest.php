@@ -15,17 +15,17 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Model;
  * LICENSE.txt file that was distributed with this source code.
  */
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Cal\Model\Model;
+use TYPO3\CMS\Cal\Model\TodoModel;
 
 /**
  * Tests for domains model News
  *
  */
-class ModelTest extends UnitTestCase
+class TodoModelTest extends UnitTestCase
 {
 
     /**
-     * @var News
+     * @var TodoModel
      */
     protected $calModelInstance;
 
@@ -36,7 +36,7 @@ class ModelTest extends UnitTestCase
     protected function setUp()
     {
         // * @param string $serviceKey Service key, must be prefixed "tx_", "Tx_" or "user_"
-        $this->calModelInstance = new Model('tx_cal_event');
+        $this->calModelInstance = new TodoModel('tx_cal_todo');
     }
 
     /**
@@ -118,9 +118,9 @@ class ModelTest extends UnitTestCase
      */
     public function canSetLocationLinkUrl()
     {
-        $title = 'News title';
-        $this->calModelInstance->setLocationLinkUrl($title);
-        $this->assertEquals($title, $this->calModelInstance->getLocationLinkUrl());
+        $url = 'https://www.test.url';
+        $this->calModelInstance->setLocationLinkUrl($url);
+        $this->assertEquals($url, $this->calModelInstance->getLocationLinkUrl());
     }
     /**
      * Test setLocationPage
@@ -129,9 +129,9 @@ class ModelTest extends UnitTestCase
      */
     public function setLocationPage()
     {
-        $title = 'News title';
-        $this->calModelInstance->setLocationPage($title);
-        $this->assertEquals($title, $this->calModelInstance->getLocationPage());
+        $page = 1;
+        $this->calModelInstance->setLocationPage($page);
+        $this->assertEquals($page, $this->calModelInstance->getLocationPage());
     }
 //
 //    public function setStart($start)
