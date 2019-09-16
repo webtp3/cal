@@ -49,8 +49,9 @@
 		}
 	},
 	"replace": {
-		"cal": "self.version",
-		"typo3-ter/cal": "self.version"
+		"typo3-ter/cal": "self.version",
+		"janhelke/cal": "self.version",
+		"web-tp3/cal": "self.version"
 	},
 	"config": {
 		"vendor-dir": ".Build/vendor",
