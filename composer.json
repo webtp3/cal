@@ -30,7 +30,7 @@
 	"require-dev": {
 		"editorconfig-checker/editorconfig-checker": "^8.0",
 		"friendsofphp/php-cs-fixer": "^2.13",
-		"typo3/testing-framework": "^1 || ^4 || ^5",
+		"web-tp3/cag_tests": "^1.2",
 		"roave/security-advisories": "@dev"
 	},
 	"suggest": {
