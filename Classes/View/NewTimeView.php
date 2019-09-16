@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 use TYPO3\CMS\Cal\Model\CalendarDateTime;
@@ -105,7 +111,7 @@ abstract class NewTimeView
                 ' ',
                 '',
                 ucwords(str_replace('_', ' ', strtolower($marker)))
-                ) . 'Marker';
+            ) . 'Marker';
 
             if (method_exists($this, $funcFromMarker)) {
                 $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
@@ -133,7 +139,7 @@ abstract class NewTimeView
                         ' ',
                         '',
                         ucwords(str_replace('_', ' ', strtolower($marker)))
-                        ) . 'Marker';
+                    ) . 'Marker';
                     if (method_exists($this, $funcFromMarker)) {
                         $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
                     } elseif (preg_match('/MODULE__([A-Z0-9_-|])*/', $marker)) {
@@ -147,7 +153,7 @@ abstract class NewTimeView
                             ' ',
                             '',
                             ucwords(str_replace('_', ' ', strtolower($marker)))
-                            );
+                        );
                         if (method_exists($this, $functionName)) {
                             $tmp = $this->$functionName();
                             if (!is_object($tmp) && !is_array($tmp)) {

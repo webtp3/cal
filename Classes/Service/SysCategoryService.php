@@ -22,8 +22,8 @@ namespace TYPO3\CMS\Cal\Service;
  */
 use RuntimeException;
 use TYPO3\CMS\Cal\Model\CategoryModel;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Base model for the category.
@@ -98,10 +98,10 @@ class SysCategoryService extends BaseService
         $this->retrievePostData($insertFields);
         $uid = $this->checkUidForLanguageOverlay($uid, 'sys_category');
         // Creating DB records
-        $result = $queryBuilder->update($table,$insertFields,['uid' => $uid])
+        $result = $connection->update($table, $insertFields, ['uid' => $uid])
             ->execute();
-       // $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
-        if(!$result){
+        // $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
+        if (!$result) {
             return $result;
         }
         $this->unsetPiVars();
@@ -133,11 +133,11 @@ class SysCategoryService extends BaseService
             ];
             $table = 'sys_category';
             $where = 'uid = ' . $uid;
-           // $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
-            $result = $queryBuilder->update($table,$updateFields,['uid' => $uid])
+            // $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
+            $result = $queryBuilder->update($table)->values($updateFields)->where(['uid' => $uid])
                 ->execute();
             // $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $insertFields);
-            if(!$result){
+            if (!$result) {
                 return $result;
             }
             $this->unsetPiVars();
@@ -220,8 +220,10 @@ class SysCategoryService extends BaseService
             $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
         }
 
-       // $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
-        $result = $queryBuilder->insert($table, $insertFields)
+        // $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
+        $result =$queryBuilder
+            ->insert($table)
+            ->values($insertFields)
             ->execute();
         if (false === $result) {
             throw new RuntimeException(
@@ -448,7 +450,7 @@ class SysCategoryService extends BaseService
             $where = 'tx_cal_calendar.uid IN (' . implode(
                 ',',
                 $calendarsWithoutCategory
-                ) . ')' . $calendarSearchString . $this->cObj->enableFields('tx_cal_calendar');
+            ) . ')' . $calendarSearchString . $this->cObj->enableFields('tx_cal_calendar');
             $where .= $this->getAdditionalWhereForLocalizationAndVersioning('tx_cal_calendar');
 
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby, $orderby);
@@ -629,7 +631,7 @@ class SysCategoryService extends BaseService
         }
 
         $categories = [];
-       // $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby);
+        // $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupby);
         $result =  $queryBuilder->select($select)
             ->from($table)
             ->where(
@@ -646,7 +648,7 @@ class SysCategoryService extends BaseService
 //            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($categorySelect, $categoryTable, $categoryWhere);
         if ($result) {
             while ($row = $result->fetch()) {
-           // while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+                // while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($GLOBALS['TSFE']->sys_language_content) {
                     $row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
                         'sys_category',
@@ -729,7 +731,7 @@ class SysCategoryService extends BaseService
      */
     public function createTranslation($uid, $overlay)
     {
-       //trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+        //trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
 
         $table = 'sys_category';
         $select = $table . '.*';
@@ -772,7 +774,7 @@ class SysCategoryService extends BaseService
             $where .= ' ' . $this->cObj->cObjGetSingle(
                 $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere'],
                 $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere.']
-                );
+            );
         }
     }
 

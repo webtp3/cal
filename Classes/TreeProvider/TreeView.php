@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\TreeProvider;
 
 /**
@@ -419,7 +425,7 @@ class TreeView
                 if (!($GLOBALS['BE_USER']->isAdmin() || GeneralUtility::inList(
                     $GLOBALS['BE_USER']->groupData['pagetypes_select'],
                     $p[1]
-                    ))) {
+                ))) {
                     unset($selItems[$tk]);
                 }
             }
@@ -492,7 +498,7 @@ class TreeView
                     $this->NA_Items = '<table class="warningbox" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td><img src="gfx/icon_fatalerror.gif" class="absmiddle" alt="" height="16" width="18">SAVING DISABLED!! <br />' . ($row['l18n_parent'] && $row['sys_language_uid'] ? 'The translation original of this' : 'This') . ' record has the following categories assigned that are not defined in your BE usergroup: ' . implode(
                         $NACats,
                         chr(10)
-                        ) . '</td></tr></tbody></table>';
+                    ) . '</td></tr></tbody></table>';
                 }
                 $item = implode($categories, chr(10));
 
@@ -541,7 +547,7 @@ class TreeView
                             $catWhere = ' AND tx_cal_category.calendar_id in (' . implode(
                                 ',',
                                 $allowedCalendarIds
-                                ) . ')';
+                            ) . ')';
                             $calWhere = ' AND tx_cal_calendar.uid in (' . implode(',', $allowedCalendarIds) . ')';
                         }
                     } else {
@@ -669,7 +675,7 @@ class TreeView
                                 $catWhere = ' AND tx_cal_category.calendar_id in (' . implode(
                                     ',',
                                     $selectedCalendars
-                                    ) . ')';
+                                ) . ')';
                                 $calWhere = ' AND tx_cal_calendar.uid in (' . implode(',', $selectedCalendars) . ')';
                             } else { // $calendarMode==2
                                 $selectedCalendars = array_diff($selectedCalendars, [
@@ -679,18 +685,18 @@ class TreeView
                                     $catWhere = ' AND tx_cal_category.calendar_id not in (' . implode(
                                         ',',
                                         $selectedCalendars
-                                        ) . ')';
+                                    ) . ')';
                                     $calWhere = ' AND tx_cal_calendar.uid not in (' . implode(
                                         ',',
                                         $selectedCalendars
-                                        ) . ')';
+                                    ) . ')';
                                 }
                             }
                         } elseif (count($selectedCalendars) > 0) {
                             $catWhere = ' AND tx_cal_category.calendar_id in (' . implode(
                                 ',',
                                 $selectedCalendars
-                                ) . ')';
+                            ) . ')';
                             $calWhere = ' AND tx_cal_calendar.uid in (' . implode(',', $selectedCalendars) . ')';
                         }
                     }
@@ -698,7 +704,7 @@ class TreeView
                     $catWhere .= ' AND tx_cal_category.sys_language_uid IN (-1,0)';
                     if ($config['treeViewClass'] and is_object($treeViewObj = &GeneralUtility::getUserObj(
                         $config['treeViewClass']
-                        ))) {
+                    ))) {
                     } else {
                         $treeViewObj = new TceFuncSelectTreeView();
                     }
@@ -745,7 +751,7 @@ class TreeView
                             if (($allowAllCalendars && $allowAllCategories) || (($catrow['calendar_id'] == 0 || in_array(
                                 $catrow['calendar_id'],
                                 $be_userCalendars
-                                        )) && in_array($catrow['uid'], $be_userCategories))) {
+                            )) && in_array($catrow['uid'], $be_userCategories))) {
                                 $categoryById[$catrow['uid']] = $catrow;
                                 $categoryByCalendarId[$catrow['calendar_id']][] = $catrow;
                                 $categoryByParentId[$catrow['parent_category']][] = $catrow;
@@ -769,7 +775,7 @@ class TreeView
                         if (in_array(
                             $allCategoryById[$id]['parent_category'],
                             $ids
-                            ) || $categoryById[$allCategoryById[$id]['parent_category']]) {
+                        ) || $categoryById[$allCategoryById[$id]['parent_category']]) {
                             $categoryByParentId[$allCategoryById[$id]['parent_category']][] = $allCategoryById[$id];
                         }
                     }
@@ -916,7 +922,7 @@ class TreeView
                     $sOnChange = 'setFormValueFromBrowseWin(\'' . $PA['itemFormElName'] . '\',this.options[this.selectedIndex].value,this.options[this.selectedIndex].text); ' . implode(
                         '',
                         $PA['fieldChangeFunc']
-                        );
+                    );
 
                     // Put together the select form with selected elements:
                     $selector_itemListStyle = isset($config['itemListStyle']) ? ' style="' . htmlspecialchars($config['itemListStyle']) . '"' : ' style="' . $this->pObj->defaultMultipleSelectorStyle . '"';
@@ -1107,7 +1113,7 @@ class TreeView
                     $this->NA_Items = '<table class="warningbox" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td><img src="gfx/icon_fatalerror.gif" class="absmiddle" alt="" height="16" width="18">SAVING DISABLED!! <br />This record has the following categories assigned that are not defined in your BE usergroup: ' . implode(
                         $notAllowedCats,
                         chr(10)
-                        ) . '</td></tr></tbody></table>';
+                    ) . '</td></tr></tbody></table>';
                 }
             }
         }
@@ -1145,7 +1151,7 @@ class TreeView
             if ($table === 'tt_news_cat' && $row['pid'] == $storagePid && intval($row['uid']) && !in_array(
                 $row['uid'],
                 $treeIds
-                )) { // if the selected category is not empty and not in the array of tree-uids it seems to be part of a chain of recursive categories
+            )) { // if the selected category is not empty and not in the array of tree-uids it seems to be part of a chain of recursive categories
                 $recursionMsg = 'RECURSIVE CATEGORIES DETECTED!! <br />This record is part of a chain of recursive categories. The affected categories will not be displayed in the category tree.	You should remove the parent category of this record to prevent this.';
             }
             if ($table === 'tt_news' && $row['category']) { // find recursive categories in the tt_news db-record
@@ -1258,7 +1264,7 @@ class TreeView
                     $NA_Items = '<table class="warningbox" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td><img src="gfx/icon_fatalerror.gif" class="absmiddle" alt="" height="16" width="18">SAVING DISABLED!! <br />' . ($row['l18n_parent'] && $row['sys_language_uid'] ? 'The translation original of this' : 'This') . ' record has the following categories assigned that are not defined in your BE usergroup: ' . implode(
                         $NACats,
                         chr(10)
-                        ) . '</td></tr></tbody></table>';
+                    ) . '</td></tr></tbody></table>';
                 }
             }
         }

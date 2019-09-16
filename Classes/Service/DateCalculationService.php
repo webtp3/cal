@@ -1,6 +1,12 @@
 <?php
 declare(strict_types = 1);
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
 
 use DateTime;
@@ -35,9 +41,6 @@ use DateTime;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
- * @author Monte Ohrt <monte@ispi.net>
- * @author Pierre-Alain Joye <pajoye@php.net>
- * @author Daniel Convissor <danielc@php.net>
  * @copyright 1999-2006 Monte Ohrt, Pierre-Alain Joye, Daniel Convissor
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -73,8 +76,6 @@ if (!defined('DATE_CALC_FORMAT')) {
  * It does not rely on 32-bit system time stamps, so it works dates
  * before 1970 and after 2038.
  *
- * @author Monte Ohrt <monte@ispi.net>
- * @author Daniel Convissor <danielc@php.net>
  * @copyright 1999-2006 Monte Ohrt, Pierre-Alain Joye, Daniel Convissor
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License

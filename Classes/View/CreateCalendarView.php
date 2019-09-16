@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -193,7 +199,7 @@ class CreateCalendarView extends FeEditingBaseView
             'create',
             $this->objectString,
             'activateFreeAndBusy'
-            )) {
+        )) {
             $activate = '';
             if ($this->conf['rights.']['create.'][$this->objectString . '.']['fields.']['activateFreeAndBusy.']['default'] || $this->object->isActivateFreeAndBusy()) {
                 $activate = ' checked="checked" ';

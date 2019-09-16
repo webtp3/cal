@@ -1,80 +1,70 @@
 {
-    "name": "web-tp3/cal",
-    "type": "typo3-cms-extension",
-    "description" : "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
-    "license": "GPL-2.0+",
-    "require": {
-        "php": ">=7.0 < 7.3",
-        "typo3/cms-core": "^9",
-		"sjbr/static-info-tables": "~6.7",
-		"typo3/cms-recordlist": "^8 || ^9.5",
-        "friendsoftypo3/typo3db-legacy": "^1.1"
-	},
-	"repositories":  {
-		"0":{
-			"type": "path",
-			"url": "../cal",
-			"options": {
-				"symlink": true
-			}
+	"name": "web-tp3/cal",
+	"description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
+	"type": "typo3-cms-extension",
+	"version": "2.5.2",
+	"license": [
+		"GPL-2.0-or-later"
+	],
+	"authors": [
+		{
+			"name": "Jan Helke",
+			"email": "cal@typo3.helke.de",
+			"homepage": "https://helke.de"
 		},
-		"1": {
-			"type": "composer",
-			"url": "https://composer.typo3.org/"
+		{
+			"name": "Mario Matzulla",
+			"email": "mario@matzullas.de",
+			"homepage": "https://www.matzullas.de/"
+		},
+		{
+			"name": "Thomas Ruta",
+			"email": "email@thomasruta.de",
+			"homepage": "https://www.thomasruta.de/"
 		}
-
+	],
+	"require": {
+		"typo3/cms-core": "^8.7.13 || ^9.5.0",
+		"sjbr/static-info-tables": "^6.7"
 	},
 	"require-dev": {
-		"friendsofphp/php-cs-fixer": "^2.0",
-		"nimut/testing-framework": "^1.0 || ^2.0 || ^3.0 || ^4.0",
-		"web-tp3/cag_tests":"^1.2",
-		"phpunit/phpunit": "*",
-		"helhum/typo3-console": "^5",
-		"typo3/testing-framework": "*"
+		"editorconfig-checker/editorconfig-checker": "^8.0",
+		"friendsofphp/php-cs-fixer": "^2.13",
+		"typo3/testing-framework": "^1 || ^4 || ^5",
+		"roave/security-advisories": "@dev"
+	},
+	"suggest": {
+		"friendsoftypo3/typo3db-legacy": "^1.1",
+		"friendsoftypo3/tt-address": "~4"
 
 	},
-    "autoload": {
-        "psr-4": {
-            "TYPO3\\CMS\\Cal\\": "Classes"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "TYPO3\\CMS\\Cal\\Tests\\": "Tests"
-        }
-    },
-    "replace": {
-        "cal": "self.version",
-        "typo3-ter/cal": "self.version",
-		"janhelke/cal": "self.version",
-		"web-tp3/cal": "self.version"
-
+	"autoload": {
+		"psr-4": {
+			"TYPO3\\CMS\\Cal\\": "Classes"
+		}
 	},
-    "extra": {
-        "typo3/cms": {
-            "extension-key": "cal"
-        }
-    },
+	"autoload-dev": {
+		"psr-4": {
+			"TYPO3\\CMS\\Cal\\Tests\\": "Tests"
+		}
+	},
+	"replace": {
+		"cal": "self.version",
+		"typo3-ter/cal": "self.version"
+	},
 	"config": {
 		"vendor-dir": ".Build/vendor",
 		"bin-dir": ".Build/bin"
 	},
 	"scripts": {
-		"typo3-cms-scripts": [
-			"typo3cms install:fixfolderstructure",
-			"typo3cms install:generatepackagestates"
-		],
 		"post-autoload-dump": [
-			"@typo3-cms-scripts"
-		],
-		"test:php:unit": [
-			"@php -v",
-			"@php bin/phpunit -c Tests/Build/UnitTests.xml"
-		],
-		"test:php:func": [
-			"@php -v",
-			"@php bin/phpunit -c Tests/Build/FunctionalTests.xml"
+			"mkdir -p .Build/Web/typo3conf/ext/",
+			"[ -L .Build/Web/typo3conf/ext/cal ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/cal"
 		]
-
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "cal"
+		}
 	}
 }

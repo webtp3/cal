@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -270,7 +276,7 @@ class RssView extends BaseView
             if (strcmp(
                 $extKey,
                 ''
-                ) && ExtensionManagementUtility::isLoaded($extKey) && strcmp(
+            ) && ExtensionManagementUtility::isLoaded($extKey) && strcmp(
                     $local,
                     ''
                 )) {
@@ -294,7 +300,7 @@ class RssView extends BaseView
             $markerArray['###NEWS_LASTBUILD###'] = '<lastBuildDate>' . date(
                 'D, d M Y H:i:s O',
                 $lastBuildTimestamp
-                ) . '</lastBuildDate>';
+            ) . '</lastBuildDate>';
         } else {
             $markerArray['###NEWS_LASTBUILD###'] = '';
         }

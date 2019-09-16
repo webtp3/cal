@@ -11,8 +11,8 @@ namespace TYPO3\CMS\Cal\Domain\Repository;
 
 use TYPO3\CMS\Cal\Service\RightsService;
 use TYPO3\CMS\Cal\Utility\Registry;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).

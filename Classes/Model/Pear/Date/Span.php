@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model\Pear\Date;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -33,8 +39,6 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
- * @author Leandro Lucarella <llucax@php.net>
- * @author Pierre-Alain Joye <pajoye@php.net>
  * @copyright 1997-2006 Leandro Lucarella, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -94,8 +98,6 @@ $GLOBALS['_DATE_SPAN_INPUT_FORMAT'] = DATE_SPAN_INPUT_FORMAT_NNSV;
 /**
  * Generic time span handling class for PEAR
  *
- * @author Leandro Lucarella <llucax@php.net>
- * @author Pierre-Alain Joye <pajoye@php.net>
  * @copyright 1997-2006 Leandro Lucarella, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -147,7 +149,7 @@ class Span
      */
     public function __construct($time = 0, $format = null)
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $this->set($time, $format);
     }
@@ -178,7 +180,7 @@ class Span
      */
     public function set($time = 0, $format = null): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if (is_a($time, 'date_span')) {
             return $this->copy($time);
@@ -220,16 +222,16 @@ class Span
      */
     public function setFromArray($time): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if (!is_array($time)) {
             return false;
         }
-        $tmp1 = new Span();
+        $tmp1 = new self();
         if (!$tmp1->setFromSeconds(@array_pop($time))) {
             return false;
         }
-        $tmp2 = new Span();
+        $tmp2 = new self();
         if (!$tmp2->setFromMinutes(@array_pop($time))) {
             return false;
         }
@@ -301,7 +303,7 @@ class Span
      */
     public function setFromString($time, $format = null): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($format === null) {
             $format = $GLOBALS['_DATE_SPAN_INPUT_FORMAT'];
@@ -477,7 +479,7 @@ class Span
      */
     public function setFromSeconds($seconds): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($seconds < 0) {
             return false;
@@ -507,7 +509,7 @@ class Span
      */
     public function setFromMinutes($minutes): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->setFromSeconds(round($minutes * 60));
     }
@@ -526,7 +528,7 @@ class Span
      */
     public function setFromHours($hours): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->setFromSeconds(round($hours * 3600));
     }
@@ -545,7 +547,7 @@ class Span
      */
     public function setFromDays($days): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->setFromSeconds(round($days * 86400));
     }
@@ -569,7 +571,7 @@ class Span
      */
     public function setFromDateDiff($date1, $date2): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if (!is_a($date1, 'date') or !is_a($date2, 'date')) {
             return false;
@@ -611,7 +613,7 @@ class Span
      */
     public function copy($time): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if (is_a($time, 'date_span')) {
             $this->second = $time->second;
@@ -674,7 +676,7 @@ class Span
      */
     public function format($format = null): string
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($format === null) {
             $format = $GLOBALS['_DATE_SPAN_FORMAT'];
@@ -787,7 +789,7 @@ class Span
      */
     public function toSeconds(): int
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->day * 86400 + $this->hour * 3600 + $this->minute * 60 + $this->second;
     }
@@ -803,7 +805,7 @@ class Span
      */
     public function toMinutes(): float
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->day * 1440 + $this->hour * 60 + $this->minute + $this->second / 60;
     }
@@ -819,7 +821,7 @@ class Span
      */
     public function toHours(): float
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->day * 24 + $this->hour + $this->minute / 60 + $this->second / 3600;
     }
@@ -835,7 +837,7 @@ class Span
      */
     public function toDays(): float
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->day + $this->hour / 24 + $this->minute / 1440 + $this->second / 86400;
     }
@@ -852,7 +854,7 @@ class Span
      */
     public function add($time): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->setFromSeconds($this->toSeconds() + $time->toSeconds());
     }
@@ -873,7 +875,7 @@ class Span
      */
     public function subtract($time)
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         $sub = $this->toSeconds() - $time->toSeconds();
         if ($sub < 0) {
@@ -897,7 +899,7 @@ class Span
      */
     public function equal($time): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->toSeconds() == $time->toSeconds();
     }
@@ -916,7 +918,7 @@ class Span
      */
     public function greaterEqual($time): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->toSeconds() >= $time->toSeconds();
     }
@@ -935,7 +937,7 @@ class Span
      */
     public function lowerEqual($time): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->toSeconds() <= $time->toSeconds();
     }
@@ -954,7 +956,7 @@ class Span
      */
     public function greater($time): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->toSeconds() > $time->toSeconds();
     }
@@ -973,7 +975,7 @@ class Span
      */
     public function lower($time): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return $this->toSeconds() < $time->toSeconds();
     }
@@ -999,7 +1001,7 @@ class Span
      */
     public function compare($time1, $time2): int
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         if ($time1->equal($time2)) {
             return 0;
@@ -1021,7 +1023,7 @@ class Span
      */
     public function isEmpty(): bool
     {
-       //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
+        //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
         return !$this->day && !$this->hour && !$this->minute && !$this->second;
     }

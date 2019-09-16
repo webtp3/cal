@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Tests\Unit\Model;
 
 /**
@@ -8,7 +14,6 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Model;
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  */
-use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Cal\Model\Model;
 
@@ -45,7 +50,6 @@ class ModelTest extends UnitTestCase
         $this->calModelInstance->setTitle($title);
         $this->assertEquals($title, $this->calModelInstance->getTitle());
     }
-
 
     /**
      * Test setTstamp
@@ -188,5 +192,4 @@ class ModelTest extends UnitTestCase
 //    public function setPriority($priority)
 //    public function setCompleted($completed)
 //    public function setDeviationDates($deviationDates)
-
 }

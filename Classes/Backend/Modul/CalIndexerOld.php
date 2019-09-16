@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Backend\Modul;
 
 /**
@@ -89,7 +95,7 @@ class CalIndexerOld extends BaseScriptClass
                 'pages',
                 $this->pageinfo,
                 $this->pageinfo['_thePath']
-                ) . '<br>' . $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:labels.path') . ': ' . GeneralUtility::fixed_lgd_cs(
+            ) . '<br>' . $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:labels.path') . ': ' . GeneralUtility::fixed_lgd_cs(
                     $this->pageinfo['_thePath'],
                     -50
                 );
@@ -119,8 +125,8 @@ class CalIndexerOld extends BaseScriptClass
                         'id',
                         implode(',', array_keys($this->MOD_MENU)),
                         $this->MCONF['name']
-                        )
-                    );
+                    )
+                );
             }
 
             $this->content .= $this->doc->spacer(10);

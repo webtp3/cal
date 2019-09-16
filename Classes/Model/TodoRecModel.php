@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model;
 
 /**
@@ -95,7 +101,7 @@ class TodoRecModel extends EventRecModel
                 '###',
                 '',
                 $subpartMarker
-                ) . '< subpart-marker in ' . $this->parentEvent->conf['view.']['todo.']['todoModelTemplate'];
+            ) . '< subpart-marker in ' . $this->parentEvent->conf['view.']['todo.']['todoModelTemplate'];
         }
         $rems = [];
         $sims = [];

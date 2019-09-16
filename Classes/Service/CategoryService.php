@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
 
 use RuntimeException;
@@ -734,7 +740,7 @@ class CategoryService extends BaseService
             $where .= ' ' . $this->cObj->cObjGetSingle(
                 $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere'],
                 $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalCategoryWhere.']
-                );
+            );
         }
     }
 

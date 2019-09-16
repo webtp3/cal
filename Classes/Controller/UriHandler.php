@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Controller;
 
 /**
@@ -156,7 +162,7 @@ class UriHandler
                     $codepieces[$i],
                     strpos($codepieces[$i], $imageData['ref']) - 1,
                     1
-                    ) === '"') ? '"' : '';
+                ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
                 if (false === strpos(
@@ -191,7 +197,7 @@ class UriHandler
                     $codepieces[$i],
                     strpos($codepieces[$i], $imageData['ref']) - 1,
                     1
-                    ) === '"') ? '"' : '';
+                ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
                 if ($imageData['ref'] && false === strpos(
@@ -264,7 +270,7 @@ class UriHandler
                     $codepieces[$i],
                     strpos($codepieces[$i], $hrefData['ref']) - 1,
                     1
-                    ) === '"') ? '"' : '';
+                ) === '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $hrefData['subst_str'] = $hrefData['quotes'] . $hrefData['ref'] . $hrefData['quotes'];
                 if (false === strpos($this->href_fullpath_list, '|' . $hrefData['subst_str'] . '|') && strpos(trim($hrefData['ref']), '#') !== 0) {
@@ -407,7 +413,7 @@ class UriHandler
                         $part,
                         $thePos + strlen($reg[0]),
                         strlen($part)
-                        );
+                    );
                 }
             }
             $newContent .= $part . ((($key + 1) !== count($items)) ? '.src' : '');

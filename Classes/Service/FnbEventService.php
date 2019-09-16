@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
 
 use TYPO3\CMS\Cal\Model\EventModel;
@@ -151,7 +157,7 @@ class FnbEventService extends EventService
             $where = '(tablenames = "fe_users" AND uid_foreign = ' . $userId . ') OR (tablenames = "fe_groups" AND uid_foreign in (' . implode(
                 ',',
                 $groups
-                ) . '))';
+            ) . '))';
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_cal_calendar_fnb_user_group_mm', $where);
             if ($result) {
                 while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {

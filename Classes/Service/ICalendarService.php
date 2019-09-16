@@ -20,7 +20,6 @@ namespace TYPO3\CMS\Cal\Service;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
-use TYPO3\CMS\Cal\Utility\BackendUtilityReplacementUtility;
 use Doctrine\Common\Proxy\Exception\OutOfBoundsException;
 use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -29,6 +28,7 @@ use TYPO3\CMS\Cal\Cron\CalendarScheduler;
 use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\ICalendar;
 use TYPO3\CMS\Cal\Model\Pear\Date;
+use TYPO3\CMS\Cal\Utility\BackendUtilityReplacementUtility;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -80,9 +80,7 @@ class ICalendarService extends BaseService
             $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
         }
 
-
         if ($pidList == '') {
-
             $result =  $queryBuilder->select('*')
                 ->from('tx_cal_calendar')
                 ->where(
@@ -91,23 +89,23 @@ class ICalendarService extends BaseService
                         [1, 2]
                     ),
                     $queryBuilder->expr()->eq(
-                        'uid',$uid
+                        'uid',
+                        $uid
                     )
                 )
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
-
         } elseif ($uid < 1) {
-
             $result =  $queryBuilder->select('*')
                 ->from('tx_cal_calendar')
                 ->where(
-
                     $queryBuilder->expr()->in(
-                        'type',[1,2]
+                        'type',
+                        [1, 2]
                     ),
                     $queryBuilder->expr()->in(
-                        'pid',$pidList
+                        'pid',
+                        $pidList
                     )
                 )
                 ->execute()
@@ -119,33 +117,32 @@ class ICalendarService extends BaseService
 //                '  AND uid=' . $uid . ' ' . $enableFields
 //            );
         } else {
-
             $result =  $queryBuilder->select('*')
                 ->from('tx_cal_calendar')
                 ->where(
                     $queryBuilder->expr()->eq(
                         'deleted',
                         $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
-
                     ),
                     $queryBuilder->expr()->eq(
                         'hidden',
                         $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
-
                     ),
                     $queryBuilder->expr()->in(
-                        'type',[1,2]
+                        'type',
+                        [1, 2]
                     ),
                     $queryBuilder->expr()->in(
-                        'pid',$pidList
+                        'pid',
+                        $pidList
                     ),
                     $queryBuilder->expr()->eq(
-                        'uid',$uid
+                        'uid',
+                        $uid
                     )
                 )
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
-
         }
         if ($result) {
             return $result;
@@ -182,7 +179,8 @@ class ICalendarService extends BaseService
                 ->from('tx_cal_calendar')
                 ->where(
                     $queryBuilder->expr()->in(
-                        'type',[1,2]
+                        'type',
+                        [1, 2]
                     )
                 )
                 ->orderBy($orderBy)
@@ -200,13 +198,13 @@ class ICalendarService extends BaseService
             $result =  $queryBuilder->select('*')
                 ->from('tx_cal_calendar')
                 ->where(
-
                     $queryBuilder->expr()->in(
-                        'type',[1,2]
-                    )
-                    ,
+                        'type',
+                        [1, 2]
+                    ),
                     $queryBuilder->expr()->in(
-                        'pid',$pidList
+                        'pid',
+                        $pidList
                     )
                 )
                 ->orderBy($orderBy)
@@ -262,7 +260,7 @@ class ICalendarService extends BaseService
                 'tstamp' => time(),
                 'md5' => $newMD5
             ];
-            $result = $connection->update('tx_cal_calendar',  $insertFields, ['uid' => $uid]);
+            $result = $connection->update('tx_cal_calendar', $insertFields, ['uid' => $uid]);
             if (false === $result) {
                 throw new RuntimeException(
                     'Could not write new md5 hash to database: ' . debug($queryBuilder->getSQL()),
@@ -299,13 +297,12 @@ class ICalendarService extends BaseService
             /* If the calendar has a URL, get a checksum on the contents */
             if ($url != '') {
                 $contents = GeneralUtility::getUrl($url);
-
                 $hookObjectsArr = Functions::getHookObjectsArray(
                     'tx_cal_icalendar_service',
                     'importIcsContent',
                     'service'
                 );
-
+                // todo hook for location
                 // Hook: configuration
                 foreach ($hookObjectsArr as $hookObj) {
                     if (method_exists($hookObj, 'importIcsContent')) {
@@ -445,7 +442,6 @@ class ICalendarService extends BaseService
             ->set('schedulerId', $task->getTaskUid())
             ->execute();
 
-
 //                $connection->exec_UPDATEquery('tx_cal_calendar', 'uid=' . $calendarUid, [
 //            'schedulerId' => $task->getTaskUid()
 //        ]);
@@ -509,23 +505,26 @@ class ICalendarService extends BaseService
                     ->from('tx_cal_event')
                     ->where(
                         $queryBuilder->expr()->notIn(
-                            'uid',implode(',', $eventUidsNotIn)
+                            'uid',
+                            implode(',', $eventUidsNotIn)
                         ),
                         $queryBuilder->expr()->eq(
-                            'calendar_id',$uid
+                            'calendar_id',
+                            $uid
                         )
                     )
                     ->execute();
-            }
-            else {
+            } else {
                 $result =  $queryBuilder->select('*')
                     ->from('tx_cal_event')
                     ->where(
                         $queryBuilder->expr()->eq(
-                            'calendar_id',$uid
+                            'calendar_id',
+                            $uid
                         ),
                         $queryBuilder->expr()->eq(
-                            'isTemp',1
+                            'isTemp',
+                            1
                         )
                     )
                     ->execute();
@@ -540,20 +539,21 @@ class ICalendarService extends BaseService
             }
             // $connection->sql_free_result($result);
             if (count($uids)>0) {
-
                 $this->deleteExceptions($uids);
                 $this->deleteDeviations($uids);
                 $queryBuilder->delete('tx_cal_event')
                     ->where(
                         $queryBuilder->expr()->eq(
-                            'calendar_id', $uid
+                            'calendar_id',
+                            $uid
                         ),
                         $queryBuilder->expr()->in(
                             'uid',
                             implode(',', $uids)
                         ),
                         $queryBuilder->expr()->eq(
-                            'isTemp', 1
+                            'isTemp',
+                            1
                         )
                     )
                     ->execute();
@@ -637,18 +637,18 @@ class ICalendarService extends BaseService
                 $where = 'tx_cal_exception_event.uid in (' . implode(',', $exceptionEventUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                        ',',
-                        $exceptionEventUids
-                    ) . ') and tablenames="tx_cal_exception_event"';
+                    ',',
+                    $exceptionEventUids
+                ) . ') and tablenames="tx_cal_exception_event"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
             if (!empty($exceptionGroupUids)) {
                 $where = 'tx_cal_exception_group.uid in (' . implode(',', $exceptionGroupUids) . ')';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_group', $where);
                 $where = 'tx_cal_exception_event_mm.uid_foreign in (' . implode(
-                        ',',
-                        $exceptionGroupUids
-                    ) . ') and tablenames="tx_cal_exception_group"';
+                    ',',
+                    $exceptionGroupUids
+                ) . ') and tablenames="tx_cal_exception_group"';
                 $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_cal_exception_event_mm', $where);
             }
         }
@@ -681,7 +681,6 @@ class ICalendarService extends BaseService
             ->where(
                 $queryBuilder->expr()->eq('calendar_id', $queryBuilder->createNamedParameter($uid))
             )->execute();
-
     }
 
     /**
@@ -706,7 +705,8 @@ class ICalendarService extends BaseService
             ->from('tx_cal_event')
             ->where(
                 $queryBuilder->expr()->eq(
-                    'calendar_id',$uid
+                    'calendar_id',
+                    $uid
                 )
             )
             ->execute();
@@ -775,16 +775,22 @@ class ICalendarService extends BaseService
         if ($component->getAttribute($attribute)) {
             $value = $component->getAttribute($attribute);
             //$this->date =GeneralUtility::makeInstance(CalendarDateTime::class);
-            if (is_array($value)) {
-
-                $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('Ymdhmsu',$value['year'] . $value['month'] . $value['mday'] . '000000')->setTimezone(new \DateTimeZone(date('T')));
-            } else {
-                $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U',$value)->setTimezone(new \DateTimeZone(date('T')));
-            }
             $params = $component->getAttributeParameters($attribute);
             $timezone = $params['TZID'];
-            if ($timezone) {
+            if (!$timezone) {
+                // $dateTime->setTimezone(new \DateTimeZone($timezone));
+                $timezone = date('T');
+            }
+            if (is_array($value)) {
+                $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('Ymd', $value['year'] . $value['month'] . $value['mday']);
+            // $dateTime ->setTimezone(new \DateTimeZone($timezone));
+            } else {
+                $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U', $value);
+            }
+            if (!is_bool($dateTime)) {
                 $dateTime->setTimezone(new \DateTimeZone($timezone));
+            } else {
+                return null;
             }
             return $dateTime;
         }
@@ -833,19 +839,20 @@ class ICalendarService extends BaseService
             $categorySelect = '*';
             $categoryTable = 'sys_category';
             $categoryWhere = 'calendar_id = ' . intval($calId) . ' AND title =' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
-                    $category,
-                    $categoryTable
-                );
+                $category,
+                $categoryTable
+            );
             $foundCategory = false;
             $result =  $queryBuilder->select('uid')
                 ->from('sys_category')
                 ->where(
-
                     $queryBuilder->expr()->eq(
-                        'calendar_id',$calId
+                        'calendar_id',
+                        $calId
                     ),
                     $queryBuilder->expr()->eq(
-                        'title',$queryBuilder->createNamedParameter($category,$categoryTable)
+                        'title',
+                        $queryBuilder->createNamedParameter($category, $categoryTable)
                     )
                 )
                 ->execute();
@@ -866,7 +873,7 @@ class ICalendarService extends BaseService
 //                    'title' => $category,
 //                    'calendar_id' => $calId
 //                ]);
-                $result = $queryBuilder->insert($categoryTable,  [
+                $result = $queryBuilder->insert($categoryTable)->values([
                     'tstamp' => $insertFields['crdate'],
                     'crdate' => $insertFields['crdate'],
                     'pid' => $pid,
@@ -877,7 +884,7 @@ class ICalendarService extends BaseService
 
                 if (false === $result) {
                     throw new RuntimeException(
-                        'Could not write ' . $categoryTable . ' record to database: ' .$queryBuilder->getSQL(),
+                        'Could not write ' . $categoryTable . ' record to database: ' . $queryBuilder->getSQL(),
                         1431458143
                     );
                 }
@@ -923,7 +930,7 @@ class ICalendarService extends BaseService
      */
     private function setRecurrenceId($component, $eventUid, &$insertFields)
     {
-        $recurrenceIdStart = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U',$component->getAttribute('RECURRENCE-ID'));
+        $recurrenceIdStart = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U', $component->getAttribute('RECURRENCE-ID'));
         $params = $component->getAttributeParameters('RECURRENCE-ID');
         $timezone = $params['TZID'];
         if ($timezone) {
@@ -936,7 +943,6 @@ class ICalendarService extends BaseService
         );
 
         if ($indexEntry) {
-
             $table = 'tx_cal_event_deviation';
             $insertFields['parentid'] = $eventUid;
             $insertFields['orig_start_time'] = $recurrenceIdStart->getHour() * 3600 + $recurrenceIdStart->format('i') * 60;
@@ -964,15 +970,18 @@ class ICalendarService extends BaseService
 //                    'uid=' . $indexEntry['event_deviation_uid'],
 //                    $insertFields
 //                );
-                $result = $queryBuilder->update($table,$insertFields,['uid' =>$indexEntry['event_deviation_uid']]);
+                $result = $queryBuilder->update($table)->where(
+                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($indexEntry['event_deviation_uid']))
+                )
+                ->values($insertFields)
+                ->execute();
                 $eventDeviationUid = $indexEntry['event_deviation_uid'];
-
             } else {
 //                $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertFields);
-                $result = $queryBuilder->insert($table, $insertFields)
-                    ->execute();
+                $result = $queryBuilder->insert($table)
+                                    ->values($insertFields)
+                                    ->execute();
                 if (false === $result) {
-
                     throw new RuntimeException(
                         'Could not write ' . $table . ' record to database: ' . $queryBuilder->getSQL(),
                         1431458145
@@ -980,7 +989,7 @@ class ICalendarService extends BaseService
                 }
                 $eventDeviationUid = $connection->lastInsertId($table);
             }
-            $result = $queryBuilder->update($table,['event_deviation_uid' => $eventDeviationUid],['uid' => $indexEntry['uid']]);
+            $result = $queryBuilder->update($table, ['event_deviation_uid' => $eventDeviationUid], ['uid'=>$indexEntry['uid']])->execute();
 //            $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_cal_index', 'uid=' . $indexEntry['uid'], [
 //                'event_deviation_uid' => $eventDeviationUid
 //            ]);
@@ -1157,7 +1166,6 @@ class ICalendarService extends BaseService
                         $queryBuilder->expr()->notIn('uid', $queryBuilder->createNamedParameter(implode(',', $insertedOrUpdatedCategoryUids)))
                     )->execute();
             }
-
         }
     }
 
@@ -1182,14 +1190,20 @@ class ICalendarService extends BaseService
         }
 
         if ($eventRow['uid']) {
-            $queryBuilder->update($table, $insertFields, ['uid' => $eventRow['uid']])->execute();
+//            $queryBuilder->update($table)->where(
+//               $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($eventRow['uid']))
+//            )->values($insertFields)->execute();
+            $result = $connection->update($table, $insertFields, ['uid' => (int)$eventRow['uid']]);
+
             return $eventRow['uid'];
         }
-        $result = $queryBuilder->insert($table, $insertFields)
+        $result = $queryBuilder->insert($table)
+            ->values($insertFields)
             ->execute();
+        debug($queryBuilder->getSQL());
         if (false === $result) {
             throw new RuntimeException(
-                'Could not write ' . $table . ' record to database: ' .debug($queryBuilder->getSQL()),
+                'Could not write ' . $table . ' record to database: ' . debug($queryBuilder->getSQL()),
                 1431458144
             );
         }
@@ -1243,7 +1257,8 @@ class ICalendarService extends BaseService
             ->from('sys_file_reference')
             ->where(
                 $queryBuilder->expr()->eq(
-                    'uid_foreign',$uid
+                    'uid_foreign',
+                    $uid
                 )
             )
             ->execute();
@@ -1255,7 +1270,8 @@ class ICalendarService extends BaseService
                         ->from('sys_file_reference')
                         ->where(
                             $queryBuilder->expr()->eq(
-                                'uid_local',$row['uid_local']
+                                'uid_local',
+                                $row['uid_local']
                             )
                         )
                         ->execute() == 1) {
@@ -1308,9 +1324,9 @@ class ICalendarService extends BaseService
         }
 
         if ((string)$content === '' || (!empty($denyExt) && in_array(
-                    $ext,
-                    $denyExt
-                )) || (!empty($allowedExt) && !in_array($ext, $allowedExt))) {
+            $ext,
+            $denyExt
+        )) || (!empty($allowedExt) && !in_array($ext, $allowedExt))) {
             return;
         }
 
@@ -1407,7 +1423,7 @@ class ICalendarService extends BaseService
 
                 if ($component->getAttribute('DURATION')) {
                     $enddate = $insertFields['start_time'] + $component->getAttribute('DURATION');
-                    $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U',$insertFields['start_date'])->setTimezone(new \DateTimeZone(date('T')));
+                    $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U', $insertFields['start_date'])->setTimezone(new \DateTimeZone(date('T')));
                     $dateTime->addSeconds($enddate);
                     $params = $component->getAttributeParameters('DURATION');
                     $timezone = $params['TZID'];
@@ -1420,7 +1436,7 @@ class ICalendarService extends BaseService
 
                 // Fix for allday events
                 if ($insertFields['start_time'] == 0 && $insertFields['end_time'] == 0 && $insertFields['start_date'] != 0) {
-                    $date = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U',$insertFields['end_date'] . '000000');
+                    $date = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U', $insertFields['end_date']);
                     $date->setTZbyID('UTC');
                     $date->subtractSeconds(86400);
                     $insertFields['end_date'] = $date->format('Ymd');
@@ -1576,8 +1592,7 @@ class ICalendarService extends BaseService
             $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
         }
 
-
-        $exceptionDate = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('Ymd\THis',$exceptionDescription);
+        $exceptionDate = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('Ymd\THis', $exceptionDescription);
 
         $insertFields = [];
         $insertFields['tstamp'] = time();
@@ -1589,7 +1604,7 @@ class ICalendarService extends BaseService
 
 //        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_cal_exception_event', $insertFields);
 
-        $result =  $queryBuilder->insert('tx_cal_exception_event',$insertFields)
+        $result =  $queryBuilder->insert('tx_cal_exception_event')->values($insertFields)
             ->execute();
         if (false === $result) {
             throw new RuntimeException(

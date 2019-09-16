@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -188,12 +194,12 @@ class WeekView extends BaseView
                 $d_start = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
                     '%02d',
                     $dTimeStart[2]
-                    ) . ':00');
+                ) . ':00');
                 $d_start->setTZbyID('UTC');
                 $d_end = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
                     '%02d',
                     $dTimeEnd[2]
-                    ) . ':00');
+                ) . ':00');
                 $d_end->setTZbyID('UTC');
 
                 // minus 1 second to allow endtime 24:00
@@ -334,12 +340,12 @@ class WeekView extends BaseView
             $d_start = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
                 '%02d',
                 $dTimeStart[2]
-                ) . ':00');
+            ) . ':00');
             $d_start->setTZbyID('UTC');
             $d_end = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
                 '%02d',
                 $dTimeEnd[2]
-                ) . ':00');
+            ) . ':00');
             $d_end->setTZbyID('UTC');
 
             $d_start->subtractSeconds(($d_start->getMinute() % $gridLength) * 60);
@@ -357,7 +363,7 @@ class WeekView extends BaseView
                         if (is_array($pos_array[$week_key]) && array_key_exists(
                             $eventType . $eventUid . '_' . $startFormatted,
                             $pos_array[$week_key]
-                            )) {
+                        )) {
                             $nd->copy($event->getEnd());
                             $nd->addSeconds(($gridLength - ($nd->getMinute() % $gridLength)) * 60);
                             if ($nd->before($i)) {

@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 use TYPO3\CMS\Cal\Model\CalendarDateTime;
@@ -125,7 +131,7 @@ class NewWeekView extends NewTimeView
             if (!($eventStartYear === $this->getYear() && $eventStart->getWeekOfYear() === $this->week) && $eventStart->getYear() . sprintf(
                 '%02d',
                 $eventStart->getWeekOfYear()
-                ) < $this->getYear() . sprintf(
+            ) < $this->getYear() . sprintf(
                     '%02d',
                     $this->week
                 ) && $eventYearEnd . sprintf(

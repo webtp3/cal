@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Updates;
 
 use RuntimeException;
@@ -76,7 +82,7 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
             $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
                 $configuration['basePath'],
                 $fileadminDirectory
-                );
+            );
             if ($isLocalDriver && $isOnFileadmin) {
                 $this->storage = $storage;
                 break;
@@ -246,7 +252,7 @@ abstract class AbstractUpdateWizard extends AbstractUpdate
         $where = sprintf(
             'WHERE %s <> \'\'',
             $mapping['mapFieldNames'][$this->getColumnName()]
-            ) . ' AND ' . $mapping['mapFieldNames'][$this->getColumnName()] . ' <> \'0\' AND cast( ' . $mapping['mapFieldNames'][$this->getColumnName()] . ' AS decimal ) = 0';
+        ) . ' AND ' . $mapping['mapFieldNames'][$this->getColumnName()] . ' <> \'0\' AND cast( ' . $mapping['mapFieldNames'][$this->getColumnName()] . ' AS decimal ) = 0';
 
         return $where;
     }

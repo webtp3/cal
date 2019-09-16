@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -106,7 +112,7 @@ class NotificationView extends BaseView
                                 'tx_cal_controller[monitor]' => 'stop',
                                 'tx_cal_controller[sid]' => md5($event_old->getUid() . $subscriber['email'] . $subscriber['crdate'])
                             ]
-                        );
+                    );
                     $this->sendNotificationOfChanges(
                         $event_old,
                         $event_new,
@@ -133,7 +139,7 @@ class NotificationView extends BaseView
                                 'tx_cal_controller[monitor]' => 'stop',
                                 'tx_cal_controller[sid]' => md5($event_old->getUid() . $subscriber['email'] . $subscriber['crdate'])
                             ]
-                        );
+                    );
                     $this->sendNotificationOfChanges(
                         $event_old,
                         $event_new,
@@ -214,7 +220,7 @@ class NotificationView extends BaseView
                                     'tx_cal_controller[monitor]' => 'stop',
                                     'tx_cal_controller[sid]' => md5($event_old->getUid() . $row2['email'] . $row2['crdate'])
                                 ]
-                            );
+                        );
                         $this->sendNotificationOfChanges(
                             $event_old,
                             $event_new,
@@ -408,7 +414,7 @@ class NotificationView extends BaseView
                                 'tx_cal_controller[monitor]' => 'stop',
                                 'tx_cal_controller[sid]' => md5($event->getUid() . $subscriber['email'] . $subscriber['crdate'])
                             ]
-                        );
+                    );
                     $this->sendNotification($event, $subscriber['email'], $template, $titleText, $unsubscribeLink);
                 }
             }
@@ -432,7 +438,7 @@ class NotificationView extends BaseView
                                 'tx_cal_controller[monitor]' => 'stop',
                                 'tx_cal_controller[sid]' => md5($event->getUid() . $subscriber['email'] . $subscriber['crdate'])
                             ]
-                        );
+                    );
                     $this->sendNotification($event, $subscriber['email'], $template, $titleText, $unsubscribeLink);
                 }
             }
@@ -515,7 +521,7 @@ class NotificationView extends BaseView
                                     'tx_cal_controller[monitor]' => 'stop',
                                     'tx_cal_controller[sid]' => md5($event->getUid() . $row2['email'] . $row2['crdate'])
                                 ]
-                            );
+                        );
                         $this->sendNotification($event, $row2['email'], $template, $titleText, $unsubscribeLink);
                     }
                 }

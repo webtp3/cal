@@ -1,8 +1,13 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model;
 
-use phpDocumentor\Reflection\Types\Mixed_;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -16,7 +21,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * See the enclosed file COPYING for license information (LGPL). If you
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
  *
- * @author Mike Cochrane <mike@graftonhall.co.nz>
  * @since Horde 3.0
  */
 define('TX_MODEL_CALICALENDAR_SCALE_GREGORIAN', 0);
@@ -113,9 +117,9 @@ class ICalendar
     public function newComponent($type, &$container)
     {
         $type = strtolower($type);
-        $class = 'TYPO3\CMS\Cal\Model\ICalendar\\'.$type;
+        $class = 'TYPO3\CMS\Cal\Model\ICalendar\\' . $type;
         if (class_exists($class)) {
-            $component =  GeneralUtility::makeInstance( $class);
+            $component =  GeneralUtility::makeInstance($class);
             if ($container !== false) {
                 $component->_container = &$container;
             }
@@ -1123,7 +1127,7 @@ class ICalendar
                     '=0A',
                     '=0D=0A',
                     $this->_quotedPrintableEncode($value)
-                    ) . $this->_newline;
+                ) . $this->_newline;
             } else {
                 $attr_string = $name . $params_str . ':' . $value;
                 $result .= $this->_foldLine($attr_string) . $this->_newline;

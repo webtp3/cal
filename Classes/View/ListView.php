@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -313,7 +319,7 @@ class ListView extends BaseView
                             $lastEventYear->getYear(),
                             $cal_year,
                             $this->reverse
-                                ) || $firstTime)) {
+                        ) || $firstTime)) {
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['yearSectionMenuFormat']));
@@ -347,7 +353,7 @@ class ListView extends BaseView
                             $lastEventMonth->format('Ym'),
                             $calTimeObject->format('Ym'),
                             $this->reverse
-                                ) || $firstTime || $this->hasPeriodChanged(
+                        ) || $firstTime || $this->hasPeriodChanged(
                                     $lastEventMonth->getYear(),
                                     $cal_year,
                                     $this->reverse
@@ -385,7 +391,7 @@ class ListView extends BaseView
                             $lastEventWeek->getWeekOfYear(),
                             $cal_week,
                             $this->reverse
-                                ) || $firstTime || $this->hasPeriodChanged(
+                        ) || $firstTime || $this->hasPeriodChanged(
                                     $lastEventWeek->getYear(),
                                     $cal_year,
                                     $this->reverse
@@ -423,7 +429,7 @@ class ListView extends BaseView
                             $lastEventDay->getYear(),
                             $cal_year,
                             $this->reverse
-                                ))) {
+                        ))) {
                             $this->initLocalCObject();
                             if ($this->conf['view.']['list.']['enableSectionMenu']) {
                                 $this->local_cObj->setCurrentVal($calTimeObject->format($this->conf['view.']['list.']['daySectionMenuFormat']));
@@ -971,7 +977,7 @@ class ListView extends BaseView
                 if ($wrapArr['showResultsNumbersWrap'] && strpos(
                     $this->controller->LOCAL_LANG[$this->controller->LLkey]['pi_list_browseresults_displays'],
                     '%s'
-                    )) {
+                )) {
                     // if the advanced pagebrowser is enabled and the "pi_list_browseresults_displays" label contains %s it will be replaced with the content of the label "pi_list_browseresults_displays_advanced"
                     $this->controller->LOCAL_LANG[$this->controller->LLkey]['pi_list_browseresults_displays'] = $this->controller->LOCAL_LANG[$this->controller->LLkey]['pi_list_browseresults_displays_advanced'];
                 }

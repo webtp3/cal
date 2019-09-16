@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -79,13 +85,13 @@ class FeEditingBaseView extends BaseView
                     $marker,
                     0,
                     -6
-                    )));
+                )));
                 if ($sims['###' . $marker . '###'] === '') {
                     $sims['###' . $marker . '###'] = $this->controller->pi_getLL('l_' . strtolower(substr(
                         $marker,
                         0,
                         -6
-                        )));
+                    )));
                 }
                 continue;
             }
@@ -93,7 +99,7 @@ class FeEditingBaseView extends BaseView
                 ' ',
                 '',
                 ucwords(str_replace('_', ' ', strtolower($marker)))
-                ) . 'Marker';
+            ) . 'Marker';
             if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
                 $module = GeneralUtility::makeInstanceService(substr($marker, 8), 'module');
                 if (is_object($module)) {
@@ -659,7 +665,7 @@ class FeEditingBaseView extends BaseView
         if ($this->isEditMode && $this->rightsObj->isViewEnabled('translation') && $this->rightsObj->isAllowedTo(
             'create',
             'translation'
-            )) {
+        )) {
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
                 'sys_language_uid',
                 'pages_language_overlay',
@@ -707,7 +713,7 @@ class FeEditingBaseView extends BaseView
                         $sims['###TRANSLATION_OPTIONS###'] .= ' ' . $this->controller->pi_linkTP($this->cObj->cObjGetSingle(
                             $this->conf['view.']['translation.']['languageMenu.'][$langId],
                             $this->conf['view.']['translation.']['languageMenu.'][$langId . '.']
-                            ), [
+                        ), [
                                 $this->controller->prefixId => $overrulePIvars,
                                 [
                                     'L' => $langId
@@ -735,7 +741,7 @@ class FeEditingBaseView extends BaseView
                 $sims['###CURRENT_TRANSLATION###'] = 'Current translation: ' . $this->cObj->cObjGetSingle(
                     $this->conf['view.']['translation.']['languageMenu.'][$this->object->row['sys_language_uid']],
                     $this->conf['view.']['translation.']['languageMenu.'][$this->object->row['sys_language_uid'] . '.']
-                    ) . '<br/>';
+                ) . '<br/>';
             } else {
                 $sims['###CURRENT_TRANSLATION###'] = 'Current translation: default<br/>';
             }
@@ -1142,7 +1148,7 @@ class FeEditingBaseView extends BaseView
                 if (!empty($allowedUsers) && GeneralUtility::inList(
                     $this->conf['rights.']['allowedUsers'],
                     $row['uid']
-                    )) {
+                )) {
                     if (GeneralUtility::inList($selectedUsersList, $row['uid'])) {
                         $cal_shared_user .= '<input type="checkbox" value="u_' . $row['uid'] . '_' . $row['username'] . '" checked="checked" name="tx_cal_controller[shared][]" />' . $name . '<br />';
                     } else {
@@ -1177,7 +1183,7 @@ class FeEditingBaseView extends BaseView
                 if (!empty($allowedGroups) && GeneralUtility::inList(
                     $this->conf['rights.']['allowedGroups'],
                     $row['uid']
-                    )) {
+                )) {
                     if (GeneralUtility::inList($selectedGroupsList, $row['uid'])) {
                         $cal_shared_user .= '<input type="checkbox" value="g_' . $row['uid'] . '_' . $row['title'] . '" checked="checked" name="tx_cal_controller[shared][]" />' . $name . '<br />';
                     } else {

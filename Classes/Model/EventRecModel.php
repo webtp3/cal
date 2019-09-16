@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model;
 
 /**
@@ -273,7 +279,7 @@ class EventRecModel extends Model
         if (substr(
             $viewType,
             -6
-            ) !== 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('Ymd') !== $this->getEnd()->format('Ymd'))) {
+        ) !== 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('Ymd') !== $this->getEnd()->format('Ymd'))) {
             $subpartSuffix .= 'ALLDAY';
         }
         $hookObjectsArr = Functions::getHookObjectsArray(
@@ -327,7 +333,7 @@ class EventRecModel extends Model
                 '###',
                 '',
                 $subpartMarker
-                ) . '< subpart-marker in ' . $templatePath;
+            ) . '< subpart-marker in ' . $templatePath;
         }
         $rems = [];
         $sims = [];
@@ -916,7 +922,7 @@ class EventRecModel extends Model
         return 'Phpicalendar ' . (is_object($this) ? 'object' : 'something') . ': ' . implode(
             ',',
             $this->parentEvent->row
-            );
+        );
     }
 
     /**

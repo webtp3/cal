@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 use TYPO3\CMS\Cal\Backend\TCA\ItemsProcFunc;
 use TYPO3\CMS\Cal\Backend\TCA\Labels;
 use TYPO3\CMS\Core\Resource\File;
@@ -99,7 +105,6 @@ $tx_cal_event = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128,
                 'eval' => 'required'
             ]
         ],
@@ -224,7 +229,6 @@ $tx_cal_event = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
             ]
         ],
         'organizer_id' => [
@@ -295,7 +299,6 @@ $tx_cal_event = [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'max' => 128
             ]
         ],
         'location_id' => [
@@ -352,10 +355,9 @@ $tx_cal_event = [
             'config' => [
                 'type' => 'input',
                 'size' => 25,
-                'max' => 128,
                 'checkbox' => '',
                 'eval' => 'trim',
-                'default' => 0,
+                'default' => '',
                 'renderType' => 'inputLink',
                 'wizards' => [
                     '_PADDING' => 2,

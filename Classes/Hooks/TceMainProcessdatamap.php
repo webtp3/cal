@@ -1,4 +1,11 @@
 <?php
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Hooks;
 
 /**
@@ -118,7 +125,7 @@ class TceMainProcessdatamap
                         $fileInfo = GeneralUtility::split_fileref($oldPath);
                         $GLOBALS ['TSFE']->tmpl->allowedPaths [] = $fileInfo ['path'];
 
-                        $notificationService->controller->getDateTimeObject = CalendarDateTime::createFromFormat( 'Ymd', $event ['start_date'] )->setTimezone(new \DateTimeZone(date('T')));
+                        $notificationService->controller->getDateTimeObject = CalendarDateTime::createFromFormat('Ymd', $event ['start_date'])->setTimezone(new \DateTimeZone(date('T')));
                         $notificationService->notifyOfChanges($event, $fieldArray);
                         if ($fieldArray ['send_invitation']) {
                             $notificationService->invite($event);
@@ -203,7 +210,7 @@ class TceMainProcessdatamap
      */
     public static function processDatamap_afterDatabaseOperations($status, $table, $id, &$fieldArray, &$tcemain)
     {
-        #todo fix vertical list edit backend
+        //todo fix vertical list edit backend
         /* If we have a new calendar event */
         if (($table === 'tx_cal_event' || $table === 'tx_cal_exception_event') && count($fieldArray) > 1) {
             $event = BackendUtility::getRecord($table, $status === 'new' ? $tcemain->substNEWwithIDs [$id] : $id);
@@ -240,7 +247,7 @@ class TceMainProcessdatamap
                         $fileInfo = GeneralUtility::split_fileref($oldPath);
                         $GLOBALS ['TSFE']->tmpl->allowedPaths [] = $fileInfo ['path'];
 
-                        $notificationService->controller->getDateTimeObject = CalendarDateTime::createFromFormat( 'Ymd', $event ['start_date'] )->setTimezone(new \DateTimeZone(date('T')));
+                        $notificationService->controller->getDateTimeObject = CalendarDateTime::createFromFormat('Ymd', $event ['start_date'])->setTimezone(new \DateTimeZone(date('T')));
 
                         if ($status === 'new') {
                             $notificationService->notify($event);
@@ -605,7 +612,7 @@ class TceMainProcessdatamap
     public static function convertBackendDateToPear($dateString): CalendarDateTime
     {
         $ymdString = self::convertBackendDateToYMD($dateString);
-        return CalendarDateTime::createFromFormat( 'Ymd', $ymdString )->setTimezone(new \DateTimeZone(date('T')));
+        return CalendarDateTime::createFromFormat('Ymd', $ymdString)->setTimezone(new \DateTimeZone(date('T')));
         //new CalendarDateTime($ymdString . '000000');
     }
 
@@ -619,11 +626,11 @@ class TceMainProcessdatamap
      */
     public static function convertBackendDateToYMD($dateString): string
     {
-       // if(is_int($dateString))$dateString = '@'.$dateString;
+        // if(is_int($dateString))$dateString = '@'.$dateString;
         //$date = new CalendarDateTime($dateString);
         //get UTC offset
         $offset = \DateTime::createFromFormat('U', $dateString)->setTimezone(new \DateTimeZone(date('T')))->getOffset();
-        $date = CalendarDateTime::createFromFormat( 'U', $dateString)->setTimezone(new \DateTimeZone(date('T')))->add(new \DateInterval('PT' . $offset . 'S'));
+        $date = CalendarDateTime::createFromFormat('U', $dateString)->setTimezone(new \DateTimeZone(date('T')))->add(new \DateInterval('PT' . $offset . 'S'));
 
         return $date->format('Ymd');
     }

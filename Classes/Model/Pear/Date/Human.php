@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model\Pear\Date;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -41,7 +47,6 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
- * @author Allan Kent <allan@lodestone.co.za>
  * @copyright 1997-2006 Allan Kent
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -64,7 +69,6 @@ namespace TYPO3\CMS\Cal\Model\Pear\Date;
  * New Years day (00) is a monthless day
  * Note: Leap Years are not yet accounted for in the Human Calendar system
  *
- * @author Allan Kent <allan@lodestone.co.za>
  * @copyright 1997-2005 Allan Kent
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License

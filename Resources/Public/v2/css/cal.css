@@ -889,6 +889,12 @@ div#content .list-view .vevent .dtstart-container, div#content .list-view .vtodo
 .tx-cal-controller .even {
 	background-color: #FAFAFA;
 }
+.summary span.location {
+	float: right;
+}
+.cal-panel li.item {
+	background: rgba(0,0,0,0.6);
+}
 .cal-panel img {
 	float: left;
 	clear: left;

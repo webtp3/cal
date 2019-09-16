@@ -1,4 +1,11 @@
 <?php
+
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 ob_start();
 system('locale');
 $str = ob_get_contents();

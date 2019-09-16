@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Controller;
 
 /**
@@ -65,7 +71,7 @@ class Api
      * @param $conf
      * @return Api
      */
-    public function tx_cal_api_with(&$cObj, &$conf): Api
+    public function tx_cal_api_with(&$cObj, &$conf): self
     {
         $this->cObj = &$cObj;
         $this->conf = &$conf;
@@ -110,7 +116,7 @@ class Api
      * @throws \TYPO3\CMS\Core\Error\Http\PageNotFoundException
      * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
      */
-    public function tx_cal_api_without($pid, $feUserObj = ''): Api
+    public function tx_cal_api_without($pid, $feUserObj = ''): self
     {
         $cObj = new ContentObjectRenderer();
 

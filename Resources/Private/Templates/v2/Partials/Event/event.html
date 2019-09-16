@@ -113,9 +113,7 @@
 		</f:if>
 	</f:else>
 </f:if>
-<n:extensionLoaded extensionKey="rx_shariff">
-	<f:render partial="Event/Shariff" />
-</n:extensionLoaded>
+
 
 <f:if condition="{event.locationObject}">
 	<f:then>
@@ -150,6 +148,9 @@
 		</f:for>
 	</ul>
 </f:if>
+<n:extensionLoaded extensionKey="rx_shariff">
+	<f:render partial="Event/Shariff" />
+</n:extensionLoaded>
 <f:if condition="{settings.view.ics.showIcsLinks} == 1">
 	<br/>
 	<f:link.page pageType="{settings.view.ics.typeNum}"

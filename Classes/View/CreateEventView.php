@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -408,7 +414,7 @@ class CreateEventView extends FeEditingBaseView
             $sims['###STARTTIME###'] = $this->applyStdWrap(
                 $start_hours,
                 'starttime_stdWrap'
-                ) . $this->applyStdWrap($start_minutes, 'startminutes_stdWrap');
+            ) . $this->applyStdWrap($start_minutes, 'startminutes_stdWrap');
         }
     }
 
@@ -435,7 +441,7 @@ class CreateEventView extends FeEditingBaseView
             $sims['###ENDTIME###'] = $this->applyStdWrap(
                 $end_hours,
                 'endtime_stdWrap'
-                ) . $this->applyStdWrap($end_minutes, 'endminutes_stdWrap');
+            ) . $this->applyStdWrap($end_minutes, 'endminutes_stdWrap');
         }
     }
 
@@ -600,7 +606,7 @@ class CreateEventView extends FeEditingBaseView
                             !$location->isSharedUser(
                                 $feUserUid,
                                 $feGroupsArray
-                                                    )
+                            )
                             && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['onlyOwn']
                         ) {
                             continue;
@@ -627,7 +633,7 @@ class CreateEventView extends FeEditingBaseView
                         !$location->isSharedUser(
                             $feUserUid,
                             $feGroupsArray
-                                            )
+                        )
                         && $this->conf['rights.'][$this->isEditMode ? 'edit.' : 'create.']['event.']['fields.']['cal_location.']['onlyOwn']
                     ) {
                         continue;
@@ -1208,7 +1214,7 @@ class CreateEventView extends FeEditingBaseView
                 if (!empty($allowedUsers) && GeneralUtility::inList(
                     $this->conf['rights.']['allowedUsers'],
                     $row['uid']
-                    )) {
+                )) {
                     if (GeneralUtility::inList($selectedUsersList, $row['uid'])) {
                         $attendee .= '<input type="checkbox" value="u_' . $row['uid'] . '" checked="checked" name="tx_cal_controller[attendee][]" />' . $name;
                     } else {
@@ -1219,12 +1225,12 @@ class CreateEventView extends FeEditingBaseView
                         $attendee .= '<input type="checkbox" value="u_' . $row['uid'] . '" checked="checked" name="tx_cal_controller[attendee][]" />' . $name . $this->getAttendeeOptions(
                             'u_' . $row['uid'],
                             $attendeeAttendance[$row['uid']]
-                            );
+                        );
                     } else {
                         $attendee .= '<input type="checkbox" value="u_' . $row['uid'] . '"  name="tx_cal_controller[attendee][]"/>' . $name . $this->getAttendeeOptions(
                             'u_' . $row['uid'],
                             $attendeeAttendance[$row['uid']]
-                            );
+                        );
                     }
                 }
                 if ($row['tx_cal_calendar'] && $this->conf['view.'][$this->conf['view'] . '.']['freeAndBusyViewPid'] && $this->rightsObj->isLoggedIn()) {
@@ -1233,7 +1239,7 @@ class CreateEventView extends FeEditingBaseView
                     $where = 'uid_local = ' . $row['tx_cal_calendar'] . ' AND ((tablenames = "fe_users" AND uid_foreign = ' . $userId . ') OR (tablenames = "fe_groups" AND uid_foreign in (' . implode(
                         ',',
                         $groups
-                        ) . ')))';
+                    ) . ')))';
                     $result1 = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_cal_calendar_fnb_user_group_mm', $where);
                     $calendarOwner = [];
 

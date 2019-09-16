@@ -30,7 +30,6 @@ use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 
 /**
  * Class CalendarService
@@ -287,7 +286,7 @@ class CalendarService extends BaseService
             'create',
             'calendar',
             'headerstyle'
-            )) {
+        )) {
             $insertFields['headerstyle'] = strip_tags($this->controller->piVars['headerstyle']);
         }
 
@@ -295,7 +294,7 @@ class CalendarService extends BaseService
             'create',
             'calendar',
             'bodystyle'
-            )) {
+        )) {
             $insertFields['bodystyle'] = strip_tags($this->controller->piVars['bodystyle']);
         }
     }

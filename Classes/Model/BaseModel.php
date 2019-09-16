@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model;
 
 /**
@@ -639,7 +645,7 @@ abstract class BaseModel extends AbstractModel
                 ' ',
                 '',
                 ucwords(str_replace('_', ' ', strtolower($marker)))
-                ) . 'Marker';
+            ) . 'Marker';
             if (method_exists($this, $funcFromMarker)) {
                 $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
             }
@@ -671,7 +677,7 @@ abstract class BaseModel extends AbstractModel
                         ' ',
                         '',
                         ucwords(str_replace('_', ' ', strtolower($marker)))
-                        ) . 'Marker';
+                    ) . 'Marker';
                     if (method_exists($this, $funcFromMarker)) {
                         $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
                     } elseif (preg_match('/MODULE__([A-Z0-9_-|])*/', $marker)) {
@@ -685,7 +691,7 @@ abstract class BaseModel extends AbstractModel
                             ' ',
                             '',
                             ucwords(str_replace('_', ' ', strtolower($marker)))
-                            );
+                        );
                         if (method_exists($this, $functionName)) {
                             $tmp = $this->$functionName();
                             if (!is_object($tmp) && !is_array($tmp)) {
@@ -1048,7 +1054,7 @@ abstract class BaseModel extends AbstractModel
         $this->sharedGroups = $groupIds;
     }
     /**
-     * @return boolean
+     * @return bool
      */
     public function getHasMap(): bool
     {
@@ -1056,7 +1062,7 @@ abstract class BaseModel extends AbstractModel
     }
 
     /**
-     * @param boolean $hasMap
+     * @param bool $hasMap
      */
     public function setHasMap($hasMap)
     {

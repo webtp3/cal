@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
 
 /**
@@ -1340,7 +1346,7 @@ class RightsService extends BaseService
         return $this->isLoggedIn() && $this->isViewEnabled('admin') && ($this->isCalAdmin() || $this->isAllowedToCreateCalendar() || $this->isAllowedToEditCalendar() || $this->isAllowedToDeleteCalendar() || $this->isAllowedToCreateCategory() || $this->isAllowedToEditCategory() || $this->isAllowedToDeleteCategory() || $this->isAllowedTo(
             'create',
             'location'
-                ) || $this->isAllowedTo('edit', 'location') || $this->isAllowedTo(
+        ) || $this->isAllowedTo('edit', 'location') || $this->isAllowedTo(
                     'delete',
                     'location'
                 ) || $this->isAllowedToCreateOrganizer() || $this->isAllowedToEditOrganizer() || $this->isAllowedToDeleteOrganizer());
@@ -1417,7 +1423,7 @@ class RightsService extends BaseService
         } elseif ($view === 'translation' && $this->rightsObj->isAllowedTo(
             'create',
             'translation'
-            ) && $this->isViewEnabled($view)) {
+        ) && $this->isViewEnabled($view)) {
         } elseif ($view === 'meeting' && $this->isViewEnabled($view)) {
         } elseif ($view === 'admin' && $this->rightsObj->isAllowedToConfigure()) {
         } elseif (($view === 'load_events' || $view === 'load_todos' || $view === 'load_calendars' || $view === 'load_categories' || $view === 'load_rights' || $view === 'load_locations' || $view === 'load_organizers' || $view === 'search_user_and_group') && $this->conf['view.']['enableAjax']) {
@@ -1460,7 +1466,7 @@ class RightsService extends BaseService
                 'organizer',
                 $this->conf['view.']['allowedViews'],
                 true
-                            )))) {
+            )))) {
                 return;
             }
         } elseif (!($view === 'admin' && $this->rightsObj->isAllowedToConfigure()) && !in_array(

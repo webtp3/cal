@@ -71,7 +71,7 @@ class WecMap
 
                 $eventsHTMLArray = array_slice($eventsHTMLArray, 0, 8);
                 $eventsHTML = $this->stripNL(implode('', $eventsHTMLArray));
-                $markerObj->addTab('+'.$tabLabel, '', $eventsHTML);
+                $markerObj->addTab('+' . $tabLabel, '', $eventsHTML);
             }
         }
     }

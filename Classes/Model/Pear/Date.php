@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Model\Pear;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
@@ -37,9 +43,6 @@ namespace TYPO3\CMS\Cal\Model\Pear;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category Date and Time
- * @author Baba Buehler <baba@babaz.com>
- * @author Pierre-Alain Joye <pajoye@php.net>
- * @author Firman Wandayandi <firman@php.net>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -102,9 +105,6 @@ define('DATE_FORMAT_UNIXTIME', 5);
  * through the Date::TimeZone class. Supports several operations from
  * Date::Calc on Date objects.
  *
- * @author Baba Buehler <baba@babaz.com>
- * @author Pierre-Alain Joye <pajoye@php.net>
- * @author Firman Wandayandi <firman@php.net>
  * @copyright 1997-2006 Baba Buehler, Pierre-Alain Joye
  * @license http://www.opensource.org/licenses/bsd-license.php
  *          BSD License
@@ -236,7 +236,7 @@ class Date
             '/^(\d{4})-?(\d{2})-?(\d{2})([T\s]?(\d{2}):?(\d{2}):?(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:?\d{2})?)?$/i',
             $date,
             $regs
-            ) && $format != DATE_FORMAT_UNIXTIME) {
+        ) && $format != DATE_FORMAT_UNIXTIME) {
             // DATE_FORMAT_ISO, ISO_BASIC, ISO_EXTENDED, and TIMESTAMP
             // These formats are extremely close to each other. This regex
             // is very loose and accepts almost any butchered format you could
@@ -972,7 +972,7 @@ class Date
     {
         //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        if (Date::compare($this, $when) == -1) {
+        if (self::compare($this, $when) == -1) {
             return true;
         }
         return false;
@@ -995,7 +995,7 @@ class Date
     {
         //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        if (Date::compare($this, $when) == 1) {
+        if (self::compare($this, $when) == 1) {
             return true;
         }
         return false;
@@ -1018,7 +1018,7 @@ class Date
     {
         //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        if (Date::compare($this, $when) == 0) {
+        if (self::compare($this, $when) == 0) {
             return true;
         }
         return false;
@@ -1039,7 +1039,7 @@ class Date
     {
         //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        $now = new Date();
+        $now = new self();
         if ($this->after($now)) {
             return true;
         }
@@ -1061,7 +1061,7 @@ class Date
     {
         //trigger_error('This function will be removed together with all remains of PEAR in version 3.0.0 of ext:cal.', E_USER_DEPRECATED);
 
-        $now = new Date();
+        $now = new self();
         if ($this->before($now)) {
             return true;
         }
@@ -1258,7 +1258,7 @@ class Date
 
         $day = Calc::nextDay($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
-        $newDate = new Date();
+        $newDate = new self();
         $newDate->setDate($date);
         return $newDate;
     }
@@ -1281,7 +1281,7 @@ class Date
 
         $day = Calc::prevDay($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
-        $newDate = new Date();
+        $newDate = new self();
         $newDate->setDate($date);
         return $newDate;
     }
@@ -1304,7 +1304,7 @@ class Date
 
         $day = Calc::nextWeekday($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
-        $newDate = new Date();
+        $newDate = new self();
         $newDate->setDate($date);
         return $newDate;
     }
@@ -1327,7 +1327,7 @@ class Date
 
         $day = Calc::prevWeekday($this->day, $this->month, $this->year, '%Y-%m-%d');
         $date = sprintf('%s %02d:%02d:%02d', $day, $this->hour, $this->minute, $this->second);
-        $newDate = new Date();
+        $newDate = new self();
         $newDate->setDate($date);
         return $newDate;
     }

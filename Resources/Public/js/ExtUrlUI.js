@@ -1,80 +1,82 @@
+/**
+ * Module: TYPO3/CMS/Something/ImportData
+ *
+ * JavaScript to handle data import
+ * @exports TYPO3/CMS/Cal/ImportData
+ */
 define(['jquery'], function ($) {
+  'use strict';
 
-  var ExtUrlUI = Class.create();
+  /**
+   * @exports TYPO3/CMS/Something/ImportData
+   */
+  function ExtUrlUI(containerID, storageID, rowClass, rowHTML) {
+    this.containerID = containerID;
+    this.storageID = storageID;
+    this.rowClass = rowClass;
+    this.rowHTML = rowHTML;
+  }
+
   ExtUrlUI.prototype = {
-    initialize: function(containerID, storageID, rowClass, rowHTML) {
-      this.containerID = containerID;
-      this.storageID = storageID;
-      this.rowClass = rowClass;
-      this.rowHTML = rowHTML;
-    },
 
-    addUrl: function(defaultNote, defaultUrl){
-      new Insertion.Bottom(this.containerID, this.rowHTML);
+    addUrl: function (defaultNote, defaultUrl) {
+      var container = $("#" + escapeRegExp(this.containerID));
 
-      if(defaultUrl) {
-        $(this.containerID).getElementsBySelector('input[type="text"]').last().value = defaultUrl;
+      container.append(this.rowHTML);
+
+      if (defaultUrl) {
+        $("#" + escapeRegExp(this.containerID) + ' input[type="text"]').last().val(defaultUrl);
       }
-      if(defaultNote) {
-        $(this.containerID).getElementsBySelector('input[type="text"]').last().previous().value = defaultNote;
+      if (defaultNote) {
+        $("#" + escapeRegExp(this.containerID) + ' input[type="text"]').last().prev().val(defaultNote);
       }
 
       this.save();
     },
 
-    removeUrl: function(icon) {
-      $(icon).up().remove();
+    removeUrl: function (icon) {
+      $(icon).parent().remove();
       this.save();
     },
 
-    save: function() {
-      storage = $(this.storageID);
-      storage.clear();
+    save: function () {
+      var storage = $("#" + escapeRegExp(this.storageID));
+      //  storage.val('');
 
-      storageNotes = $(this.storageID.substr(0,this.storageID.length-1)+"_notes]");
-      storageNotes.clear();
+      var storageNotes = $("#" + escapeRegExp(this.storageID.substr(0, this.storageID.length - 1) + "_notes]"));
+      //  storageNotes.val('');
 
-      //@todo  Figure out how to differentiate selector based forms from element based forms
-      $(this.containerID).getElementsBySelector('div.' + this.rowClass).each( function(div) {
-        div.getElementsBySelector('input[type="text"]').each( function(input) {
-          if(input.className=="exturl") {
-            if(storage.value) {
-              storage.value += '\n';
-            }
-            storage.value += input.value;
+      var container = $("#" + escapeRegExp(this.containerID));
+      container.find('div.' + this.rowClass).each(function (index, div) {
+        $(div).find('input[type="text"]').each(function (index, input) {
+          if ($(input).hasClass("exturl") && $(input).val()) {
+            storage.val(storage.val()+$(input).val()+"\n");
           }
-          if(input.className=="exturlnote") {
-            if(storageNotes.value) {
-              storageNotes.value += '\n';
-            }
-            storageNotes.value += input.value;
+          if ($(input).hasClass("exturlnotes") && $(input).val()) {
+            storageNotes.val(storageNotes.val()+$(input).val()+"\n");
+
           }
         });
       });
     },
 
-    load: function() {
-      initialUrlValue = $(this.storageID).value;
-      urlArray = initialUrlValue.split('\n');
-      initialNoteValue = $(this.storageID.substr(0,this.storageID.length-1)+"_notes]").value;
-      noteArray = initialNoteValue.split('\n');
+    load: function () {
+      var initialUrlValue = $("#" + escapeRegExp(this.storageID)).val();
+      var urlArray = initialUrlValue.split('\n');
+      var initialNoteValue = $("#" + escapeRegExp(this.storageID.substr(0, this.storageID.length - 1) + "_notes]")).val();
+      var noteArray = initialNoteValue.split('\n');
       var obj = this;
 
-      for(var i=0; i<urlArray.length; i++){
-        obj.addUrl(noteArray[i],urlArray[i]);
+      for (var i = 0; i < urlArray.length; i++) {
+        obj.addUrl(noteArray[i], urlArray[i]);
       }
     },
 
-    storageToHash: function(url) {
-      urlValue = url;
-      return $H({ url: urlValue });
-    }
   };
 
+  function escapeRegExp(str) {
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  }
 
-  var ExtUrlInstanceUI = Class.create();
-  Object.extend(ExtUrlInstanceUI.prototype, ExtUrlUI.prototype);
-  Object.extend(ExtUrlInstanceUI.prototype, {
-
-  });
+  return ExtUrlUI;
 });

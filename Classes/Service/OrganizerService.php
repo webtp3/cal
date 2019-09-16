@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
 
 /**
@@ -314,7 +320,7 @@ class OrganizerService extends BaseService
             'create',
             'organizer',
             'fax'
-            )) {
+        )) {
             $insertFields['fax'] = strip_tags($this->controller->piVars['fax']);
         }
 
@@ -326,7 +332,7 @@ class OrganizerService extends BaseService
             'create',
             'organizer',
             'link'
-            )) {
+        )) {
             $insertFields['link'] = strip_tags($this->controller->piVars['link']);
         }
 
@@ -334,7 +340,7 @@ class OrganizerService extends BaseService
             'create',
             'organizer',
             'countryZone'
-            )) {
+        )) {
             $insertFields['country_zone'] = strip_tags($this->controller->piVars['countryzone']);
         }
 
@@ -342,7 +348,7 @@ class OrganizerService extends BaseService
             'create',
             'organizer',
             'country'
-            )) {
+        )) {
             $insertFields['country'] = strip_tags($this->controller->piVars['country']);
         }
     }
@@ -508,7 +514,7 @@ class OrganizerService extends BaseService
      */
     public function createTranslation($uid, $overlay)
     {
-       //trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+        //trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
 
         $table = 'tx_cal_organizer';
         $select = $table . '.*';

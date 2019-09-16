@@ -1,10 +1,17 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
 
 use RuntimeException;
 use TYPO3\CMS\Cal\Model\LocationAddress;
 use TYPO3\CMS\Cal\Utility\Functions;
+
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
  *
@@ -303,7 +310,7 @@ class LocationAddressService extends BaseService
      */
     public function createTranslation($uid, $overlay)
     {
-       //trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
+        //trigger_error('Deprecated since ext:cal v2, will be removed in ext:cal v3.', E_USER_DEPRECATED);
 
         $table = 'tt_address';
         $select = $table . '.*';

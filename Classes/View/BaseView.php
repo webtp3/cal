@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -26,6 +32,7 @@ use TYPO3\CMS\Cal\Model\TodoModel;
 use TYPO3\CMS\Cal\Service\BaseService;
 use TYPO3\CMS\Cal\Service\CalculateDateTimeService;
 use TYPO3\CMS\Cal\Service\CalendarService;
+use TYPO3\CMS\Cal\Service\RightsService;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
@@ -33,7 +40,6 @@ use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use TYPO3\CMS\Cal\Service\RightsService;
 
 /**
  * Class BaseView
@@ -867,7 +873,7 @@ class BaseView extends BaseService
                 ' ',
                 '',
                 ucwords(str_replace('_', ' ', strtolower($marker)))
-                ) . 'Marker';
+            ) . 'Marker';
             if (method_exists($this, $funcFromMarker)) {
                 $this->$funcFromMarker($template, $sims, $rems, $wrapped, $view);
             }
@@ -887,7 +893,7 @@ class BaseView extends BaseService
                     ' ',
                     '',
                     ucwords(str_replace('_', ' ', strtolower($marker)))
-                    ) . 'Marker';
+                ) . 'Marker';
                 if (preg_match('/MODULE__([A-Z0-9_-])*/', $marker)) {
                     $module = GeneralUtility:: makeInstanceService(substr($marker, 8), 'module');
                     if (is_object($module)) {

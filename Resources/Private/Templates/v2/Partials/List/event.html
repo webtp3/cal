@@ -26,7 +26,7 @@
 				</f:if>
 	</div>
 	<div class="summary col-md-9">
-			{event.title} {event.locationObject.city}
+		{event.title} <span class="location fab fa-map-marker"> {event.locationObject.city}</span>
 		<div class="lead"><f:format.html>{event.teaser}</f:format.html></div>
 	</div>
 		<f:for each="{event.images}" as="image" iteration="i">

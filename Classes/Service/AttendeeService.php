@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
 
 use TYPO3\CMS\Cal\Model\AttendeeModel;
@@ -141,7 +147,7 @@ class AttendeeService extends BaseService
             'edit',
             'attendee',
             'hidden'
-                ) || $this->rightsObj->isAllowedTo('create', 'attendee', 'hidden'))) {
+        ) || $this->rightsObj->isAllowedTo('create', 'attendee', 'hidden'))) {
             $hidden = 1;
         }
         $insertFields['hidden'] = $hidden;
@@ -150,7 +156,7 @@ class AttendeeService extends BaseService
             'create',
             'attendee',
             'fe_user_id'
-            )) {
+        )) {
             $insertFields['fe_user_id'] = strip_tags($this->controller->piVars['fe_user_id']);
         }
 
@@ -158,7 +164,7 @@ class AttendeeService extends BaseService
             'create',
             'attendee',
             'email'
-            )) {
+        )) {
             $insertFields['email'] = intval($this->controller->piVars['email']);
         }
 
@@ -166,7 +172,7 @@ class AttendeeService extends BaseService
             'create',
             'attendee',
             'attendance'
-            )) {
+        )) {
             $insertFields['attendance'] = intval($this->controller->piVars['attendance']);
         }
 
@@ -174,7 +180,7 @@ class AttendeeService extends BaseService
             'create',
             'attendee',
             'status'
-            )) {
+        )) {
             $insertFields['status'] = strip_tags($this->controller->piVars['status']);
         }
     }

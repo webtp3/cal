@@ -27,6 +27,7 @@ use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
 use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
@@ -35,8 +36,7 @@ use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use PDO;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+
 /**
  * Class BaseService
  */
@@ -188,7 +188,7 @@ abstract class BaseService extends AbstractService
                     'tablenames' => $tablename,
                     'sorting' => $key + 1
                 ], $additionalParams);
-                $result = $queryBuilder->insert($mm_table, $insertFields);
+                $result = $queryBuilder->insert($mm_table)->values($insertFields);
                 if (false === $result) {
                     throw new RuntimeException(
                         'Could not write ' . $mm_table . ' record to database: ' . $connection->errorCode(),
@@ -286,7 +286,7 @@ abstract class BaseService extends AbstractService
                 'create',
                 $object,
                 $field
-                    )) || (!$isSave && $this->rightsObj->isAllowedTo('edit', $object, $field))) {
+            )) || (!$isSave && $this->rightsObj->isAllowedTo('edit', $object, $field))) {
                 if ($this->conf['view.'][$this->conf['view'] . '.']['additional_fields.'][$field . '_stdWrap.']) {
                     $insertFields[$field] = $this->cObj->stdWrap(
                         $this->controller->piVars[$field],
@@ -365,7 +365,7 @@ abstract class BaseService extends AbstractService
             $where = 'uid_foreign = ' . $uid . ' AND  tablenames=\'' . $objectType . '\' AND fieldname=\'' . $type . '\' AND uid in (' . implode(
                 ',',
                 array_values($removeFiles)
-                ) . ')';
+            ) . ')';
             $result = $GLOBALS['TYPO3_DB']->exec_DELETEquery('sys_file_reference', $where);
             if (false === $result) {
                 throw new RuntimeException(
@@ -395,7 +395,7 @@ abstract class BaseService extends AbstractService
             $isOnFileadmin = !empty($configuration['basePath']) && GeneralUtility::isFirstPartOfStr(
                 $configuration['basePath'],
                 $fileadminDirectory
-                );
+            );
             if ($isLocalDriver && $isOnFileadmin) {
                 $storage = $tmpStorage;
                 break;

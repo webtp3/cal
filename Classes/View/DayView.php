@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\View;
 
 /**
@@ -397,12 +403,12 @@ class DayView extends BaseView
         $d_start = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeStart[1] . ':' . sprintf(
             '%02d',
             $dTimeStart[2]
-            ) . ':00');
+        ) . ':00');
         $d_start->setTZbyID('UTC');
         $d_end = new CalendarDateTime($dDate[1] . $dDate[2] . $dDate[3] . ' ' . $dTimeEnd[1] . ':' . sprintf(
             '%02d',
             $dTimeEnd[2]
-            ) . ':00');
+        ) . ':00');
         $d_end->setTZbyID('UTC');
 
         $i = new CalendarDateTime();

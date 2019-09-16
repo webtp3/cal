@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the web-tp3/cal.
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace TYPO3\CMS\Cal\Service;
 
 /**
@@ -18,6 +24,7 @@ use RuntimeException;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Controller\Calendar;
 use TYPO3\CMS\Cal\Controller\DateParser;
+use TYPO3\CMS\Cal\Domain\Repository\EventRepository;
 use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
 use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
 use TYPO3\CMS\Cal\Model\AttendeeModel;
@@ -30,8 +37,8 @@ use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Cal\Utility\Registry;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use  TYPO3\CMS\Cal\Domain\Repository\EventRepository;
+use  TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Class EventService
  */
@@ -262,7 +269,7 @@ class EventService extends BaseService
             $where .= ' ' . $this->cObj->cObjGetSingle(
                 $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere'],
                 $this->conf['view.'][$this->conf['view'] . '.']['event.']['additionalWhere.']
-                );
+            );
         }
 
         if ($addCategoryWhere) {
@@ -801,7 +808,7 @@ class EventService extends BaseService
         if ($GLOBALS['TSFE']->sys_language_content > 0 && $this->conf['showRecordsWithoutDefaultTranslation'] == 1 && $this->rightsObj->isAllowedTo(
             'create',
             'translation'
-            )) {
+        )) {
             $insertFields['sys_language_uid'] = $GLOBALS['TSFE']->sys_language_content;
         }
 
@@ -1078,7 +1085,7 @@ class EventService extends BaseService
             'create',
             'event',
             'attendee'
-            ) && $object->getEventType() === Model::EVENT_TYPE_MEETING) {
+        ) && $object->getEventType() === Model::EVENT_TYPE_MEETING) {
             $attendeeUids = [];
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $attendeeService = $modelObj->getServiceObjByKey('cal_attendee_model', 'attendee', 'tx_cal_attendee');
@@ -1386,7 +1393,7 @@ class EventService extends BaseService
             'edit',
             'event',
             'attendee'
-            ) && $object->getEventType() === Model::EVENT_TYPE_MEETING) {
+        ) && $object->getEventType() === Model::EVENT_TYPE_MEETING) {
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             $attendeeServices = $modelObj->findEventAttendees($uid);
 
@@ -1898,7 +1905,7 @@ class EventService extends BaseService
                 $bymonth = $event->getByMonth();
                 $byday = $event->getByDay();
                 $hour = $eventStart->format('H');
-                $minute = $eventStart->format('M');
+                $minute = $eventStart->format('i');
                 // 2007, 2008...
                 foreach ($byyear as $year) {
                     if ($counter < $count && $until->after($nextOccuranceTime) && $added < $maxRecurringEvents) {
@@ -1909,7 +1916,7 @@ class EventService extends BaseService
                                 2,
                                 '0',
                                 STR_PAD_LEFT
-                                    ) . str_pad(
+                            ) . str_pad(
                                         $month,
                                         2,
                                         '0',
@@ -2801,7 +2808,7 @@ class EventService extends BaseService
                 $monthStartTime = new CalendarDateTime($year . '-' . sprintf(
                     '%02d',
                     $month
-                    ) . '-01 00:00:00');
+                ) . '-01 00:00:00');
                 $monthStartTime->setTZbyID('UTC');
                 $monthEndTime = Calendar::calculateEndMonthTime($monthStartTime);
                 if ($byDaySplit[2] > 0) {
@@ -3028,7 +3035,7 @@ class EventService extends BaseService
                 $where = 'tx_cal_calendar.uid NOT IN (' . implode(
                     ',',
                     $updatedCalendar
-                    ) . ') AND fe_users.uid = ' . $attendee->getFeUserId() . ' AND fe_users.tx_cal_calendar=tx_cal_calendar.uid AND fe_users.disable=0 AND fe_users.deleted=0 AND tx_cal_calendar.hidden=0 AND tx_cal_calendar.deleted=0';
+                ) . ') AND fe_users.uid = ' . $attendee->getFeUserId() . ' AND fe_users.tx_cal_calendar=tx_cal_calendar.uid AND fe_users.disable=0 AND fe_users.deleted=0 AND tx_cal_calendar.hidden=0 AND tx_cal_calendar.deleted=0';
                 $groupBy = 'tx_cal_calendar.uid';
                 $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $groupBy);
                 if ($result) {

@@ -29,7 +29,7 @@
             <ul id="ttaddress__records" style="display: none">
                     <div id="ttaddress__record-{address.uid}" data-id="{address.uid}" data-lat="{address.latitude}"
                          data-lng="{address.longitude}" data-icon="icon">
-                        <h6>{address.fullName}</h6>
+                        <h6>{address.name}</h6>
                         <div>
                             <f:render partial="Event/Address" section="address" arguments="{_all}"/>
                             <f:render partial="Event/Address" section="contact" arguments="{_all}"/>
