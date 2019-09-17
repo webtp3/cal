@@ -41,10 +41,10 @@ define(['jquery'], function ($) {
 
         save: function () {
             var storage = $("#" + escapeRegExp(this.storageID));
-          //  storage.val('');
+            storage.val('');
 
             var storageNotes = $("#" + escapeRegExp(this.storageID.substr(0, this.storageID.length - 1) + "_notes]"));
-          //  storageNotes.val('');
+            storageNotes.val('');
 
             var container = $("#" + escapeRegExp(this.containerID));
             container.find('div.' + this.rowClass).each(function (index, div) {

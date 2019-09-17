@@ -1161,9 +1161,19 @@ class Controller extends AbstractPlugin
      */
     public function event(): string
     {
-        //for yoast_cal preview
-        $uid = GeneralUtility::_GP('type') == 1480321830 ? GeneralUtility::_GP('id') : $this->conf ['uid'];
+        //for yoast_cal
+
+        if(GeneralUtility::_GP('type') == 1480321830){
+            $cal_preview = GeneralUtility::_GP('tx_cal_controller');
+            $uid =  (int)$cal_preview['uid'];
+            $type =   'tx_cal_preview';
+            $pid = GeneralUtility::_GP('id');
+        }
+        else{
+            $uid =  $this->conf ['uid'];
         $type =  GeneralUtility::_GP('type') == 1480321830 ? 'tx_cal_preview' : $this->conf ['type'];
+
+        }
         $pidList = $this->conf ['pidList'];
         $getdate = $this->conf ['getdate'];
         $hookObjectsArr = $this->getHookObjectsArray('drawEventClass');

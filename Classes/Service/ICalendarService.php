@@ -39,7 +39,7 @@ use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\Execution;
 use TYPO3\CMS\Scheduler\Scheduler;
-
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 //
 //define(
 //    'ICALENDAR_PATH',
@@ -782,10 +782,10 @@ class ICalendarService extends BaseService
                 $timezone = date('T');
             }
             if (is_array($value)) {
-                $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('Ymd', $value['year'] . $value['month'] . $value['mday']);
+                $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('Ymd', $value['year'] . $value['month'] . $value['mday']);
             // $dateTime ->setTimezone(new \DateTimeZone($timezone));
             } else {
-                $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U', $value);
+                $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $value);
             }
             if (!is_bool($dateTime)) {
                 $dateTime->setTimezone(new \DateTimeZone($timezone));
@@ -930,7 +930,7 @@ class ICalendarService extends BaseService
      */
     private function setRecurrenceId($component, $eventUid, &$insertFields)
     {
-        $recurrenceIdStart = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U', $component->getAttribute('RECURRENCE-ID'));
+        $recurrenceIdStart = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $component->getAttribute('RECURRENCE-ID'));
         $params = $component->getAttributeParameters('RECURRENCE-ID');
         $timezone = $params['TZID'];
         if ($timezone) {
@@ -1423,7 +1423,7 @@ class ICalendarService extends BaseService
 
                 if ($component->getAttribute('DURATION')) {
                     $enddate = $insertFields['start_time'] + $component->getAttribute('DURATION');
-                    $dateTime = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U', $insertFields['start_date'])->setTimezone(new \DateTimeZone(date('T')));
+                    $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $insertFields['start_date'])->setTimezone(new \DateTimeZone(date('T')));
                     $dateTime->addSeconds($enddate);
                     $params = $component->getAttributeParameters('DURATION');
                     $timezone = $params['TZID'];
@@ -1436,7 +1436,7 @@ class ICalendarService extends BaseService
 
                 // Fix for allday events
                 if ($insertFields['start_time'] == 0 && $insertFields['end_time'] == 0 && $insertFields['start_date'] != 0) {
-                    $date = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('U', $insertFields['end_date']);
+                    $date = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $insertFields['end_date']);
                     $date->setTZbyID('UTC');
                     $date->subtractSeconds(86400);
                     $insertFields['end_date'] = $date->format('Ymd');
@@ -1592,7 +1592,7 @@ class ICalendarService extends BaseService
             $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
         }
 
-        $exceptionDate = GeneralUtility::makeInstance(\TYPO3\CMS\Cal\Model\CalendarDateTime::class)->createFromFormat('Ymd\THis', $exceptionDescription);
+        $exceptionDate = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('Ymd\THis', $exceptionDescription);
 
         $insertFields = [];
         $insertFields['tstamp'] = time();

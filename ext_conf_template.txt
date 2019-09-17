@@ -21,7 +21,7 @@ treeOrderBy = uid
 showTimes = 1
 
 # cat=basic/enable/250; type=boolean; label= Use Teaser Field:  Show the teaser field in addition to title and description.
-useTeaser = 1
+useTeaser = 0
 
 # cat=basic/enable/295; type=boolean; label= Hide Event Deviation records: Event deviation records should be changed only through IRRE editing; the records themselfs can be hidden.
 hideDeviationRecords = 1

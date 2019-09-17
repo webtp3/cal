@@ -76,11 +76,14 @@ class RecurrenceGenerator
 
         $this->pageIDForPlugin = $pageIDForPlugin;
         if ($starttime == null) {
-            $starttime = $this->getTimeParsed($this->extConf['recurrenceStart'])->format('Ymd');
+            $starttime = GeneralUtility::makeInstance(CalendarDateTime::class)
+                ->createFromFormat('Ymd', $this->extConf['recurrenceStart'])->format("Ymd");
         }
         $this->starttime = $starttime;
         if ($endtime == null) {
-            $endtime = $this->getTimeParsed($this->extConf['recurrenceEnd'])->format('Ymd');
+            $endtime = GeneralUtility::makeInstance(CalendarDateTime::class)
+                ->createFromFormat('Ymd', $this->extConf['recurrenceEnd'])->format("Ymd");;
+            //$this->getTimeParsed($this->extConf['recurrenceEnd'])->format('Ymd');
         }
         $this->endtime = $endtime;
     }
@@ -405,9 +408,8 @@ class RecurrenceGenerator
         static $eventService = null;
         if (is_object($eventService)) {
             return $eventService;
-        } else {
-            return GeneralUtility::makeInstance(EventService::class);
         }
+
         try {
             $modelObj = &Registry::Registry('basic', 'modelcontroller');
             if (!$modelObj) {
@@ -440,7 +442,7 @@ class RecurrenceGenerator
     protected function getTimeParsed($timeString): CalendarDateTime
     {
         /** @var DateParser $dp */
-        $dp = GeneralUtility::makeInstance(DateParser::class);
+        $dp = GeneralUtility::makeInstance(CalendarDateTime::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }

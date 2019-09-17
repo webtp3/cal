@@ -2,7 +2,6 @@
 	"name": "web-tp3/cal",
 	"description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
 	"type": "typo3-cms-extension",
-	"version": "2.5.3",
 	"license": [
 		"GPL-2.0-or-later"
 	],
@@ -32,6 +31,10 @@
 		"friendsofphp/php-cs-fixer": "^2.13",
 		"web-tp3/cag_tests": "^1.2",
 		"phpunit/phpunit": "*",
+		"web-tp3/chromedriver": "^2",
+		"helhum/dotenv-connector": "^2.0",
+		"typo3/testing-framework": "*",
+		"nimut/testing-framework": "*",
 		"roave/security-advisories": "@dev",
 		"helhum/typo3-console": "^5"
 
@@ -64,6 +67,7 @@
 		"bin-dir": ".Build/bin"
 	},
 	"scripts": {
+		"analyze:php": "phpstan analyse --ansi --no-progress --configuration=phpstan.neon --level=5 web/typo3conf/ext/",
 		"typo3-cms-scripts": [
 			"typo3cms install:fixfolderstructure",
 			"typo3cms install:generatepackagestates"
@@ -82,7 +86,20 @@
 	},
 	"extra": {
 		"typo3/cms": {
-			"extension-key": "cal"
+			"extension-key": "cal",
+			"app-dir": "web",
+			"web-dir": "web",
+			"cms-package-dir": ".Build/vendor/typo3/cms",
+			"Package": {
+				"partOfMinimalUsableSystem": true
+			}
+		},
+		"typo3/class-alias-loader": {
+			"always-add-alias-loader": true,
+			"autoload-case-sensitivity": false,
+			"class-alias-maps": [
+				"Migrations/Code/ClassAliasMap.php"
+			]
 		}
 	}
 }
