@@ -2,6 +2,7 @@
 	"name": "web-tp3/cal",
 	"description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
 	"type": "typo3-cms-extension",
+	"version": "2.5.5",
 	"license": [
 		"GPL-2.0-or-later"
 	],
@@ -77,29 +78,24 @@
 		],
 		"test:php:unit": [
 			"@php -v",
-			"@php bin/phpunit -c Tests/Build/UnitTests.xml"
+			"@php .Build/bin/phpunit -c Tests/Build/UnitTests.xml"
 		],
 		"test:php:func": [
 			"@php -v",
-			"@php bin/phpunit -c Tests/Build/FunctionalTests.xml"
+			"@php .Build/bin/phpunit -c Tests/Build/FunctionalTests.xml"
 		]
 	},
 	"extra": {
 		"typo3/cms": {
-			"extension-key": "cal",
+			"extension-key": "cal"
 			"app-dir": "web",
 			"web-dir": "web",
+			"bin-dir": "bin",
 			"cms-package-dir": ".Build/vendor/typo3/cms",
 			"Package": {
 				"partOfMinimalUsableSystem": true
 			}
-		},
-		"typo3/class-alias-loader": {
-			"always-add-alias-loader": true,
-			"autoload-case-sensitivity": false,
-			"class-alias-maps": [
-				"Migrations/Code/ClassAliasMap.php"
-			]
 		}
+
 	}
 }
