@@ -47,7 +47,7 @@ $tx_cal_event_deviation = [
             'disabled' => 'hidden'
         ],
         'versioningWS' => true,
-        'hideTable' => $configuration['hideDeviationRecords'],
+     //   'hideTable' => $configuration['hideDeviationRecords'],
         'searchFields' => 'title,organizer,organizer_link,location,location_link,teaser,description,image,imagecaption,imagealttext,imagetitletext,attachment,attachmentcaption',
         'label_userFunc' => Labels::class . '->getDeviationRecordLabel'
     ],

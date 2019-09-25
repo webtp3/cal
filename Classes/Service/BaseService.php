@@ -27,7 +27,6 @@ use TYPO3\CMS\Cal\Model\CalDate;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Cal\Utility\Registry;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
 use TYPO3\CMS\Core\Resource\Index\FileIndexRepository;
@@ -36,7 +35,8 @@ use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\Utility\File\BasicFileUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-
+use PDO;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 /**
  * Class BaseService
  */
@@ -188,7 +188,7 @@ abstract class BaseService extends AbstractService
                     'tablenames' => $tablename,
                     'sorting' => $key + 1
                 ], $additionalParams);
-                $result = $queryBuilder->insert($mm_table)->values($insertFields);
+                $result = $queryBuilder->insert($mm_table)->values($insertFields)->execute();
                 if (false === $result) {
                     throw new RuntimeException(
                         'Could not write ' . $mm_table . ' record to database: ' . $connection->errorCode(),
@@ -579,13 +579,15 @@ abstract class BaseService extends AbstractService
         // filter Workspaces preview.
         // Since "enablefields" is ignored in workspace previews it's required to filter out news manually which are not visible in the live version AND the selected workspace.
         if ($GLOBALS['TSFE']->sys_page->versioningPreview) {
-            // execute the complete query
-            $wsSelectconf = $selectConf;
-            $wsSelectconf['selectFields'] = 'uid,pid,tstamp,crdate,deleted,hidden,sys_language_uid,' . $localizationPrefix . '_parent,' . $localizationPrefix . '_diffsource,t3ver_oid,t3ver_id,t3ver_label,t3ver_wsid,t3ver_state,t3ver_stage,t3ver_count,t3ver_tstamp,t3_origuid';
-            $wsRes = $this->cObj->exec_getQuery($table, $wsSelectconf);
-            $tmpWSRes = $GLOBALS['TYPO3_DB']->exec_SELECT_queryArray($wsRes);
+        // execute the complete query
+        $wsSelectconf = $selectConf;
+        $wsSelectconf['selectFields'] = 'uid,pid,tstamp,crdate,deleted,hidden,sys_language_uid,' . $localizationPrefix . '_parent,' . $localizationPrefix . '_diffsource,t3ver_oid,t3ver_id,t3ver_label,t3ver_wsid,t3ver_state,t3ver_stage,t3ver_count,t3ver_tstamp,t3_origuid';
+        //   $wsRes = $this->cObj->exec_getQuery($table, $wsSelectconf);
+            $wsRes = $GLOBALS['TYPO3_DB']->exec_SELECTquery($wsSelectconf['selectFields'], $table, $wsSelectconf['where']);
+
+          //  $tmpWSRes = $GLOBALS['TYPO3_DB']->exec_SELECT_queryArray($wsRes);
             $removeUids = [];
-            while ($wsRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($tmpWSRes)) {
+            while ($wsRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($wsRes)) {
                 $orgUid = $wsRow['uid'];
                 $GLOBALS['TSFE']->sys_page->versionOL($table, $wsRow);
                 if (!$wsRow['uid']) { // if versionOL returns nothing the record is not visible in the selected Workspace

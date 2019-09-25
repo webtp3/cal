@@ -92,7 +92,7 @@ class DateParser
     public function parse($value, $conf = [], $timeObj = null)
     {
         if ($timeObj === null) {
-            $timeObj = new \CalendarDateTime();
+            $timeObj = new CalendarDateTime();
             $timeObj->setTimezone(new \DateTimeZone(date('T')));
         }
         $this->timeObj = $timeObj;

@@ -27,10 +27,10 @@ useTeaser = 0
 hideDeviationRecords = 1
 
 # cat=basic/enable/310; type=text; label= Recurring Event Start Date:  This is the earliest date recurring events will occur. The date format is YYYYMMDD.
-recurrenceStart = 20140101
+recurrenceStart = 20160101
 
 # cat=basic/enable/320; type=text; label= Recurring Event End Date:  This is the latest date recurring events will occur. The date format is YYYYMMDD.
-recurrenceEnd = 20201231
+recurrenceEnd = 20221231
 
 # cat=basic/enable/150; type=boolean; label=LLL:EXT:cal/Resources/Private/Language/locallang_plugin.xlf:extmng.useInternalCaching
 useInternalCaching = 1

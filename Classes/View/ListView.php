@@ -722,7 +722,7 @@ class ListView extends BaseView
             if ($this->conf['view.']['list.']['enableMonthWrapper'] && $eventStart->format('Ym') !== $eventEnd->format('Ym')) {
                 $tempEventStart = new CalendarDateTime();
                 $tempEventStart->copy($eventStart);
-                while ($tempEventStart->format('%Y%m') !== $eventEnd->format('Ym')) {
+                while ($tempEventStart->format('Ym') !== $eventEnd->format('Ym')) {
                     $tempEventStart->setMonth($tempEventStart->getMonth() + 1);
                     $this->objectsInList[$tempEventStart->format('Ym01')][] = &$event;
                 }

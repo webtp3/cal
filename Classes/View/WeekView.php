@@ -235,8 +235,8 @@ class WeekView extends BaseView
                             $startOfDay->copy($d_start);
 
                             // get x-array possition
-                            foreach ($view_array[$starttime->format('%Y%m%d')][$starttime->format('%H%M')] as $k => $kValue) {
-                                if (empty($view_array[$starttime->format('Ymd')][$starttime->format('HM')][$k])) {
+                            foreach ($view_array[$starttime->format('Ymd')][$starttime->format('Hi')] as $k => $kValue) {
+                                if (empty($view_array[$starttime->format('Ymd')][$starttime->format('Hi')][$k])) {
                                     break;
                                 }
                             }
@@ -251,7 +251,7 @@ class WeekView extends BaseView
 
                             while ($j->before($endtime) && $j->before($end_week_time)) {
                                 $counter++;
-                                $view_array[$j->format('Ymd')][$j->format('HM')][] = $ovlKey . '_' . $eventMappingKey;
+                                $view_array[$j->format('Ymd')][$j->format('Hi')][] = $ovlKey . '_' . $eventMappingKey;
                                 if ($j->after($endOfDay)) {
                                     $rowspan_array[$old_day->format('Ymd')][$eventMappingKey] = $entries - 1;
                                     $endOfDay->addSeconds(86400);
@@ -261,8 +261,8 @@ class WeekView extends BaseView
                                     $j->setHour($startOfDay->getHour());
                                     $j->setMinute($startOfDay->getMinute());
                                     $j->subtractSeconds($gridLength * 60);
-                                    foreach ($view_array[$startOfDay->format('%Y%m%d')][$startOfDay->format('%H%M')] as $k => $kValue) {
-                                        if (empty($view_array[$startOfDay->format('Ymd')][$startOfDay->format('HM')][$k])) {
+                                    foreach ($view_array[$startOfDay->format('Ymd')][$startOfDay->format('Hi')] as $k => $kValue) {
+                                        if (empty($view_array[$startOfDay->format('Ymd')][$startOfDay->format('Hi')][$k])) {
                                             break;
                                         }
                                     }
@@ -352,7 +352,7 @@ class WeekView extends BaseView
             $d_end->addSeconds(($gridLength - ($d_end->getMinute() % $gridLength)) * 60);
 
             for ($i->copy($d_start); !$i->after($d_end); $i->addSeconds($gridLength * 60)) {
-                $timeKey = $i->format('HM');
+                $timeKey = $i->format('Hi');
                 if (is_array($view_array[$week_key][$timeKey]) && count($view_array[$week_key][$timeKey]) > 0) {
                     foreach (array_keys($view_array[$week_key][$timeKey]) as $eventKey) {
                         $event = &$eventArray[$view_array[$week_key][$timeKey][$eventKey]];
@@ -531,7 +531,7 @@ class WeekView extends BaseView
         $start = 0;
 
         for ($i = $start; $i < $loops; $i++) {
-            $time = $cal_time_obj->format('HM');
+            $time = $cal_time_obj->format('Hi');
             for ($j = 0; $j < 7; $j++) {
                 $day = $cal_time_obj->format('Ymd');
                 if ($j === 0) {

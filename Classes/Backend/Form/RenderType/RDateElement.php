@@ -45,7 +45,7 @@ class RDateElement extends AbstractFormElement
         $out[] =       '<div class="form-wizards-element">';
         $out[] =           '<div class="form-control-wrap">';
 
-        $jsDate = $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['USdateFormat'] ? '%m-%d-%Y' : '%d-%m-%Y';
+        $jsDate = $GLOBALS ['TYPO3_CONF_VARS'] ['SYS'] ['USdateFormat'] ? 'm-d-Y' : 'd-m-Y';
 
         /** @var NodeFactory $nodefactory */
         $nodefactory = GeneralUtility::makeInstance(NodeFactory::class);

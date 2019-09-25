@@ -82,7 +82,7 @@ class RecurrenceGenerator
         $this->starttime = $starttime;
         if ($endtime == null) {
             $endtime = GeneralUtility::makeInstance(CalendarDateTime::class)
-                ->createFromFormat('Ymd', $this->extConf['recurrenceEnd'])->format("Ymd");;
+                ->createFromFormat('Ymd', $this->extConf['recurrenceEnd'])->format("Ymd");
             //$this->getTimeParsed($this->extConf['recurrenceEnd'])->format('Ymd');
         }
         $this->endtime = $endtime;

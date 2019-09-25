@@ -569,7 +569,7 @@ abstract class NewTimeView
                     true,
                     '',
                     '',
-                    $d_start->format('HM')
+                    $d_start->format('Hi')
                 );
             } else {
                 $createLink = '';
@@ -668,11 +668,11 @@ abstract class NewTimeView
             $local_cObj = $this->getLocalCObject();
             $timeParams = '';
             if ($view === 'day' || $view === 'week') {
-                $timeParams = '&tx_cal_controller[gettime]=' . $date->format('HM');
+                $timeParams = '&tx_cal_controller[gettime]=' . $date->format('Hi');
             } elseif ($conf['rights.']['create.']['event.']['fields.']['starttime.']['default'] === 'now') {
                 $now = new CalendarDateTime();
                 $than->setTZbyID('UTC');
-                $timeParams = '&tx_cal_controller[gettime]=' . $now->format('HM');
+                $timeParams = '&tx_cal_controller[gettime]=' . $now->format('Hi');
             }
 
             $local_cObj->setCurrentVal($conf['view.'][$view . '.']['event.']['addIcon']);

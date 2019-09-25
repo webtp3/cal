@@ -2197,12 +2197,13 @@ plugin.tx_cal_controller {
             }
             # Paginate configuration.
             paginate {
+                enabled = 1
                 itemsPerPage = 10
                 insertAbove = 0
                 insertBelow = 1
                 prevNextHeaderTags = 1
                 maximumNumberOfLinks = 10
-                templatePath = typo3conf/ext/cal/Resources/Private/Templates/ViewHelpers/Widget/Paginate/IndexAjax.html
+                templatePath = typo3conf/ext/cal/Resources/Private/Templates/ViewHelpers/Widget/Paginate/Index.html
             }
             # @description Restarts the alternation of the layouts after each day, when enableDayWrapper is used.
             # @also    enableDayWrapper

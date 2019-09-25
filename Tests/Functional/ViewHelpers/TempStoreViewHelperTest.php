@@ -15,9 +15,9 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Functional\ViewHelpers;
  * LICENSE.txt file that was distributed with this source code.
  */
 use DateTime;
-use TYPO3\CMS\Cal\Domain\Model\News;
 use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
 use Nimut\TestingFramework\TestCase\FunctionalTestCase;
+use TYPO3\CMS\Cal\Domain\Model\News;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 

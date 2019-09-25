@@ -23,12 +23,12 @@ use TYPO3\CMS\Cal\Model\CalendarDateTime;
 /**
  * Class EventRepository
  */
-class EventRepository extends DoctrineRepository
+class EventDeviationRepository extends DoctrineRepository
 {
     /**
      * @var string
      */
-    protected $table = 'tx_cal_event';
+    protected $table = 'tx_cal_event_deviation';
 
     /**
      * @var EventIndexRepository

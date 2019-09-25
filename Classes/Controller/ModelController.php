@@ -88,6 +88,7 @@ class ModelController extends BaseController
         } elseif ($type === 'tx_cal_preview') {
             $type = 'tx_cal_phpicalendar';
             $showHiddenEvents = true;
+            $getAllInstances = true;
         }
         $event = $this->find(
             'cal_event_model',

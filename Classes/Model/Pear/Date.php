@@ -316,7 +316,7 @@ class Date
                 return $this->format($format);
                 break;
             case DATE_FORMAT_TIMESTAMP:
-                return $this->format('%Y%m%d%H%M%S');
+                return $this->format('YmdHis');
                 break;
             case DATE_FORMAT_UNIXTIME:
                 return mktime($this->hour, $this->minute, $this->second, $this->month, $this->day, $this->year);

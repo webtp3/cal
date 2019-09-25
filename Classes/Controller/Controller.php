@@ -1168,10 +1168,11 @@ class Controller extends AbstractPlugin
             $uid =  (int)$cal_preview['uid'];
             $type =   'tx_cal_preview';
             $pid = GeneralUtility::_GP('id');
+            $GLOBALS['TSFE']->sys_page->versioningPreview = true;
         }
         else{
             $uid =  $this->conf ['uid'];
-        $type =  GeneralUtility::_GP('type') == 1480321830 ? 'tx_cal_preview' : $this->conf ['type'];
+            $type =  GeneralUtility::_GP('type') == 1480321830 ? 'tx_cal_preview' : $this->conf ['type'];
 
         }
         $pidList = $this->conf ['pidList'];

@@ -60,7 +60,7 @@ class SubscriptionRepository extends DoctrineRepository
             ->from($this->table)
             ->where(
                 $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($eventUid, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('tablenames', 'fe_groups')
+                $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter('fe_groups'))
             )
             ->execute()
             ->fetchAll();
@@ -74,11 +74,11 @@ class SubscriptionRepository extends DoctrineRepository
     {
         $queryBuilder = $this->getQueryBuilder();
         return $queryBuilder
-            ->select('fe_users.*')
+            ->select('*')
             ->from($this->table, 'mm')
             ->where(
                 $queryBuilder->expr()->eq('mm.uid_local', $queryBuilder->createNamedParameter($eventUid, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('mm.tablenames', 'fe_users')
+                $queryBuilder->expr()->eq('mm.tablenames', $queryBuilder->createNamedParameter('fe_users'))
             )
             ->join('mm', 'fe_users', 'users', 'mm.uid_foreign = users.uid')
             ->execute()
@@ -93,11 +93,11 @@ class SubscriptionRepository extends DoctrineRepository
     {
         $queryBuilder = $this->getQueryBuilder();
         return $queryBuilder
-            ->select('tx_cal_unknown_users.*')
+            ->select('users.*')
             ->from($this->table, 'mm')
             ->where(
                 $queryBuilder->expr()->eq('mm.uid_local', $queryBuilder->createNamedParameter($eventUid, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('mm.tablenames', 'tx_cal_unknown_users')
+                $queryBuilder->expr()->eq('mm.tablenames', $queryBuilder->createNamedParameter('tx_cal_unknown_users'))
             )
             ->join('mm', 'tx_cal_unknown_users', 'users', 'mm.uid_foreign = users.uid')
             ->execute()

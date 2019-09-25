@@ -26,7 +26,7 @@ use TYPO3\CMS\Cal\Utility\Functions;
 /**
  * A concrete model for the calendar.
  */
-class EventRecDeviationModel extends EventModel
+class EventDeviationModel extends EventModel
 {
     /**
      * @var CalendarDateTime
@@ -34,7 +34,7 @@ class EventRecDeviationModel extends EventModel
     private $origStartDate;
 
     /**
-     * EventRecDeviationModel constructor.
+     * EventDeviationModel constructor.
      * @param EventModel $event
      * @param $row
      * @param $start

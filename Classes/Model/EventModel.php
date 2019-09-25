@@ -2574,7 +2574,7 @@ class EventModel extends Model
                 $eventEnd = $this->getEnd();
                 $offset = Functions::strtotimeOffset($eventEnd->format('U'));
                 $eventEnd->subtractSeconds($offset);
-                $rruleConfiguration['UNTIL'] = 'UNTIL=' . $until->format('YmdT') . $eventEnd->format('HisZ');
+                $rruleConfiguration['UNTIL'] = 'UNTIL=' . $until->format('Ymd\T') . $eventEnd->format('HisZ');
                 $eventEnd->addSeconds($offset);
             }
             $rrule = implode(';', $rruleConfiguration);

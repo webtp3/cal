@@ -22,6 +22,7 @@ namespace TYPO3\CMS\Cal\Backend\TCA;
  */
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Cal\Model\CalendarDateTime;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class Labels
@@ -148,9 +149,9 @@ class Labels
         $label = $GLOBALS['LANG']->sL('LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.deviation') . ': ';
 
         if ($rec['orig_start_date']) {
-            $dateObj = new CalendarDateTime($rec['orig_start_date'] . '000000');
-            $dateObj->setTZbyID('UTC');
-
+//            $dateObj = new CalendarDateTime($rec['orig_start_date'] . '000000');
+//            $dateObj->setTZbyID('UTC');
+            $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $rec['orig_start_date'])->setTimezone(new \DateTimeZone(date('T')));
             $format = str_replace([
                 'd',
                 'm',

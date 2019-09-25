@@ -35,7 +35,7 @@ class EventIndexRepository extends DoctrineRepository
      * @param CalDate $endtime
      * @return array
      */
-    public function findRecurringEvents(CalDate $starttime, CalDate $endtime): array
+    public function findRecurringEvents(CalendarDateTime $starttime, CalendarDateTime $endtime): array
     {
         $queryBuilder = $this->getQueryBuilder();
         return $queryBuilder
@@ -44,16 +44,16 @@ class EventIndexRepository extends DoctrineRepository
             ->where(
                 $queryBuilder->expr()->orX(
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->gte('start_datetime', $starttime->format('%Y%m%d%H%M%S')),
-                        $queryBuilder->expr()->lte('start_datetime', $endtime->format('%Y%m%d%H%M%S'))
+                        $queryBuilder->expr()->gte('start_datetime', $starttime->format('YmdHis')),
+                        $queryBuilder->expr()->lte('start_datetime', $endtime->format('YmdHis'))
                     ),
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->lt('start_datetime', $starttime->format('%Y%m%d%H%M%S')),
-                        $queryBuilder->expr()->gt('end_datetime', $starttime->format('%Y%m%d%H%M%S'))
+                        $queryBuilder->expr()->lt('start_datetime', $starttime->format('YmdHis')),
+                        $queryBuilder->expr()->gt('end_datetime', $starttime->format('YmdHis'))
                     ),
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->lt('start_datetime', $endtime->format('%Y%m%d%H%M%S')),
-                        $queryBuilder->expr()->gt('end_datetime', $endtime->format('%Y%m%d%H%M%S'))
+                        $queryBuilder->expr()->lt('start_datetime', $endtime->format('YmdHis')),
+                        $queryBuilder->expr()->gt('end_datetime', $endtime->format('YmdHis'))
                     )
                 )
             )

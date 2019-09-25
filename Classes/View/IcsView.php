@@ -24,7 +24,7 @@ use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Model\CalendarModel;
 use TYPO3\CMS\Cal\Model\CategoryModel;
 use TYPO3\CMS\Cal\Model\EventModel;
-use TYPO3\CMS\Cal\Model\EventRecDeviationModel;
+use TYPO3\CMS\Cal\Model\EventDeviationModel;
 use TYPO3\CMS\Cal\Model\Model;
 use TYPO3\CMS\Cal\Utility\Functions;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -203,7 +203,7 @@ END:VCALENDAR
                                     $end->setMinute(substr($deviationRow['end_datetime'], 10, 2));
                                     $end->setTZbyID('UTC');
                                     unset($deviationRow['start_datetime'], $deviationRow['end_datetime']);
-                                    $new_event = new EventRecDeviationModel(
+                                    $new_event = new EventDeviationModel(
                                         $event,
                                         $deviationRow,
                                         $start,
