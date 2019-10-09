@@ -259,17 +259,17 @@ class TceMainProcessdatamap
 
                         $GLOBALS ['TSFE']->tmpl->getFileName_backPath = $oldBackPath;
                     }
-
-                    /** @var RecurrenceGenerator $rgc */
-                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
-                    $rgc->generateIndexForUid($event ['uid'], $table);
-
-                    if ($table === 'tx_cal_event' && $tx_cal_api->conf ['view.'] ['event.'] ['remind']) {
-                        /* Schedule reminders for new and changed events */
-                        $reminderService = &Functions::getReminderService();
-                        $reminderService->scheduleReminder($event ['uid']);
-                    }
                 }
+                /** @var RecurrenceGenerator $rgc */
+                $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
+                $rgc->generateIndexForUid($event ['uid'], $table);
+
+                if ($table === 'tx_cal_event' && isset($tx_cal_api) && $tx_cal_api->conf ['view.'] ['event.'] ['remind']) {
+                    /* Schedule reminders for new and changed events */
+                    $reminderService = &Functions::getReminderService();
+                    $reminderService->scheduleReminder($event ['uid']);
+                }
+
             }
         }
 

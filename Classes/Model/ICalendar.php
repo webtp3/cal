@@ -56,7 +56,6 @@ define('TX_MODEL_CALICALENDAR_ERROR_FB_NOT_FOUND', 1);
 class ICalendar
 {
     public $_calscale = '';
-
     /**
      * The parent (containing) iCalendar object.
      *

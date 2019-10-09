@@ -933,7 +933,7 @@ class ModelController extends BaseController
             while (is_object($service = GeneralUtility::makeInstanceService($serviceName, $subtype, $serviceChain))) {
                 $serviceChain .= ',' . $service->getServiceKey();
                 /* Gets all events from the current model as an array */
-                $eventsFromService = $service->findAllWithin(new CalendarDateTime($startDateObject->format('Y-m-d H:i:s')), new CalendarDateTime($endDateObject->format('Y-m-d H:i:s')), $pidList, $eventType, $additionalWhere);
+                $eventsFromService = $service->findAllWithin(new CalendarDateTime($startDateObject->format('Y-m-d H:i')), new CalendarDateTime($endDateObject->format('Y-m-d H:i')), $pidList, $eventType, $additionalWhere);
 
                 if (!empty($eventsFromService)) {
                     if (empty($events)) {

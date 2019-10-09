@@ -139,13 +139,13 @@ class NewDayView extends NewTimeView
             $eventKeys = array_keys($this->events[$timeKey]);
             foreach ($eventKeys as $eventKey) {
                 if (!$this->events[$timeKey][$eventKey]->isAllday() && ($this->events[$timeKey][$eventKey]->getStart()->format('Ymd') === $this->events[$timeKey][$eventKey]->getEnd()->format('Ymd'))) {
-                    $eventMappingKey = $this->events[$timeKey][$eventKey]->getType() . '_' . $this->events[$timeKey][$eventKey]->getUid() . '_' . $this->events[$timeKey][$eventKey]->getStart()->format('YmdHis');
+                    $eventMappingKey = $this->events[$timeKey][$eventKey]->getType() . '_' . $this->events[$timeKey][$eventKey]->getUid() . '_' . $this->events[$timeKey][$eventKey]->getStart()->format('YmdHi');
                     $eventArray[$eventMappingKey] = &$this->events[$timeKey][$eventKey];
 
                     $i->copy($this->events[$timeKey][$eventKey]->getStart());
                     $time = $i->format('U');
                     $time -= ($time % ($gridLength * 60));
-                    $i = new CalendarDateTime(date('Y-m-d H:i:s', $time));
+                    $i = new CalendarDateTime(date('Y-m-d H:i', $time));
                     if ($i->before($d_start)) {
                         $i->copy($d_start);
                     }
@@ -193,7 +193,7 @@ class NewDayView extends NewTimeView
                 foreach ($viewArray[$this->getYmd()][$i_formatted] as $eventKey) {
                     $event = &$eventArray[$eventKey];
                     $eventStart = $event->getStart();
-                    $eventMappingKey = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHis');
+                    $eventMappingKey = $event->getType() . '_' . $event->getUid() . '_' . $eventStart->format('YmdHi');
                     if (array_key_exists($eventMappingKey, $pos_array)) {
                         $eventEnd = $event->getEnd();
                         $eventEnd->subtractSeconds(($eventEnd->getMinute() % $gridLength) * 60);

@@ -100,7 +100,7 @@ class CalIndexer extends BaseScriptClass
     public function __construct()
     {
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->getLanguageService()->includeLLFile('EXT:cal/Resources/Private/Language/locallang_indexer.xlt');
+        $this->getLanguageService()->includeLLFile('EXT:cal/Resources/Private/Language/locallang_indexer.xlf');
         $this->MCONF = [
             'name' => $this->moduleName,
         ];

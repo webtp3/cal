@@ -127,10 +127,10 @@ class ReminderView extends NotificationView
             $startDateTimeObject = new CalendarDateTime($eventRecord['start_date'] . '000000');
             $startDateTimeObject->setTZbyID('UTC');
             $startDateTimeObject->addSeconds($eventRecord['start_time']);
-            $start_datetime = $startDateTimeObject->format('YmdHis');
+            $start_datetime = $startDateTimeObject->format('YmdHi');
             $select2 = '*';
             $table2 = 'tx_cal_index';
-            $where2 = 'start_datetime >= ' . $now->format('YmdHis') . ' AND event_uid = ' . $calEventUID;
+            $where2 = 'start_datetime >= ' . $now->format('YmdHi') . ' AND event_uid = ' . $calEventUID;
             $orderby2 = 'start_datetime asc';
             $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select2, $table2, $where2, $orderby2);
             if ($result) {

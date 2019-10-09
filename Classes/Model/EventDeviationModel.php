@@ -54,11 +54,46 @@ class EventDeviationModel extends EventModel
             $row['deleted'],
             $row['hidden'],
             $row['starttime'],
-            $row['endtime']
+            $row['endtime'],
+            $row['calendar_id']
         );
         // storing allday in a temp var, in case it is set from 1 to 0
         $allday = $row['allday'];
         $row = array_merge($event->row, array_filter($row));
+        // remove to save
+        unset(
+            $row['calendar_id'],
+            $row['freq'],
+            $row['category_id'],
+            $row['byday'],
+            $row['until'],
+            $row['cnt'],
+            $row['bymonthday'],
+            $row['bymonth'],
+            $row['deviation'],
+            $row['monitor_cnt'],
+            $row['exception_cnt'],
+            $row['fe_cruser_id'],
+            $row['fe_crgroup_id'],
+            $row['shared_user_cnt'],
+            $row['type'],
+            $row['page'],
+            $row['ext_url'],
+            $row['send_invitation'],
+            $row['attendee'],
+            $row['status'],
+            $row['priority'],
+            $row['completed'],
+            $row['l10n_state'],
+            $row['seo_title'],
+            $row['seo_description'],
+            $row['tx_yoastseo_focuskeyword'],
+            $row['l10n_diffsource'],
+            $row['deviationId'],
+            $row['intrval'],
+            $row['rdate_type'],
+            $row['rdate']
+        );
         $row['allday'] = $allday;
         $row['deviationId'] = $deviationId;
         $this->createEvent($row, false);

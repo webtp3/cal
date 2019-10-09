@@ -58,6 +58,8 @@ class ICalendarService extends BaseService
 
     /** @var Date  */
     public $date;
+    /** @var DateTimeZone  */
+    public $timezone;
 
     /**
      * Looks for an external calendar with a given uid on a certain pid-list
@@ -326,7 +328,7 @@ class ICalendarService extends BaseService
             foreach ($contentArray as $contents) {
                 /* Parse the contents into ICS data structure */
                 $iCalendar = $this->getiCalendarFromIcsFile($contents);
-
+                $this->timezone = $iCalendar->getAttribute('X-WR-TIMEZONE');
                 /* Create new events belonging to the specified calendar */
                 $notInUids = array_merge(
                     $notInUids,
@@ -760,7 +762,14 @@ class ICalendarService extends BaseService
     {
         return $this->getDateValue($component, 'DTSTART');
     }
-
+    /**
+     * @param $component
+     * @return CalDate|null
+     */
+    private function isAllday($component)
+    {
+        return $this->getValue($component, 'DTSTART');
+    }
     /**
      * @param $component
      * @return CalDate|null
@@ -793,16 +802,19 @@ class ICalendarService extends BaseService
             $timezone = $params['TZID'];
             if (!$timezone) {
                 // $dateTime->setTimezone(new \DateTimeZone($timezone));
-                $timezone = date('T');
+                $timezone = $this->timezone;
             }
             if (is_array($value)) {
-                $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('Ymd', $value['year'] . $value['month'] . $value['mday']);
-            // $dateTime ->setTimezone(new \DateTimeZone($timezone));
+              //  $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('Ymd', $value['year'] . $value['month'] . $value['mday']);
+                $offset = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('Ymd', $value['year'] . $value['month'] . $value['mday'])->setTimezone(new \DateTimeZone($timezone))->getOffset();
+                $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('Ymd', $value['year'] . $value['month'] . $value['mday'])->setTimezone(new \DateTimeZone($timezone))->add(new \DateInterval('PT' . $offset . 'S'));
             } else {
-                $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $value);
+             //   $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $value);
+                $offset = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $value)->setTimezone(new \DateTimeZone($timezone))->getOffset();
+                $dateTime = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $value)->setTimezone(new \DateTimeZone($timezone))->add(new \DateInterval('PT' . $offset . 'S'));
             }
             if (!is_bool($dateTime)) {
-                $dateTime->setTimezone(new \DateTimeZone($timezone));
+                $dateTime->setTimezone(new \DateTimeZone('UTC'));
             } else {
                 return null;
             }
@@ -810,7 +822,21 @@ class ICalendarService extends BaseService
         }
         return null;
     }
+    /**
+     * @param $component
+     * @param $attribute
+     * @return CalDate|null
+     */
+    private function getValue($component, $attribute)
+    {
+        if ($component->getAttribute($attribute)) {
+            $value = $component->getAttribute($attribute);
+            $params = $component->getAttributeParameters($attribute);
 
+            return [$value,$params];
+        }
+        return null;
+    }
     /**
      * @param $component
      * @param $insertFields
@@ -953,7 +979,7 @@ class ICalendarService extends BaseService
 
         $indexEntry = BackendUtilityReplacementUtility::getRawRecord(
             'tx_cal_index',
-            'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('YmdHis') . '"'
+            'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('YmdHi') . '"'
         );
 
         if ($indexEntry) {
@@ -1441,7 +1467,8 @@ class ICalendarService extends BaseService
                     // a Todo does not need a start, but an event
                     continue;
                 }
-
+                $allday = $this->isAllday($component);
+                if(!empty($allday[1]["VALUE"]) && $allday[1]["VALUE"] == "DATE")$insertFields['allday'] = 1;
                 $insertFields['icsUid'] = $component->getAttribute('UID');
 
                 $eventRow = BackendUtilityReplacementUtility::getRawRecord('tx_cal_event', 'icsUid="' . $insertFields['icsUid'] . '"');

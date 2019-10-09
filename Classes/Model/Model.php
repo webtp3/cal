@@ -544,7 +544,7 @@ abstract class Model extends BaseModel
      */
     public function getLocation(): string
     {
-        return $this->location;
+        return $this->location ?? $this->parentEvent->location;
     }
 
     /**
@@ -594,7 +594,7 @@ abstract class Model extends BaseModel
      */
     public function getLocationPage(): int
     {
-        return $this->locationPage;
+        return $this->locationPage ?? $this->parentEvent->locationPage;// $this->locationPage;
     }
 
     /**
@@ -631,7 +631,7 @@ abstract class Model extends BaseModel
         $this->start = new CalendarDateTime();
         $this->start->copy($start);
         $this->row['start_date'] = $start->format('Ymd');
-        $this->row['start_time'] = $start->getHour() * 3600 + $start->getMinute() * 60;
+        $this->row['start_time'] = (int)$start->format('H') * 3600 + (int)$start->format('i')  * 60;
     }
 
     /**
@@ -644,7 +644,7 @@ abstract class Model extends BaseModel
         $this->end = new CalendarDateTime();
         $this->end->copy($end);
         $this->row['end_date'] = $end->format('Ymd');
-        $this->row['end_time'] = $end->getHour() * 3600 + $end->getMinute() * 60;
+        $this->row['end_time'] = (int)$end->format('H') * 3600 + (int)$end->format('H') * 60;
     }
 
     /**
@@ -679,7 +679,7 @@ abstract class Model extends BaseModel
      */
     public function getCalNumber(): string
     {
-        return $this->calnumber;
+        return $this->calnumber ?? $this->parentEvent->calnumber;//$this->calnumber;
     }
 
     /**
@@ -699,7 +699,7 @@ abstract class Model extends BaseModel
      */
     public function getCalendarId(): int
     {
-        return $this->calendar_id;
+        return $this->calendar_id ?? $this->parentEvent->calendar_id;//$this->calendar_id;
     }
 
     /**
@@ -734,7 +734,7 @@ abstract class Model extends BaseModel
      */
     public function getCalName(): string
     {
-        return $this->calname;
+        return $this->calname ?? $this->parentEvent->calname;//$this->calname;
     }
 
     /**
@@ -828,7 +828,7 @@ abstract class Model extends BaseModel
      */
     public function isAllDay(): int
     {
-        return $this->allday;
+        return $this->allday ?? $this->parentEvent->allday;//$this->allday;
     }
 
     /**
@@ -836,7 +836,7 @@ abstract class Model extends BaseModel
      */
     public function getAllDay(): int
     {
-        return $this->allday;
+        return $this->allday ?? $this->parentEvent->allday;//$this->allday;
     }
 
     /**
@@ -852,7 +852,7 @@ abstract class Model extends BaseModel
      */
     public function getUrl()
     {
-        return $this->url;
+        return $this->url ?? $this->parentEvent->url;//$this->url;
     }
 
     /**
@@ -900,7 +900,7 @@ abstract class Model extends BaseModel
      */
     public function getByMonth(): array
     {
-        return $this->bymonth;
+        return $this->bymonth ?? $this->parentEvent->bymonth;//$this->bymonth;
     }
 
     /**
@@ -934,7 +934,7 @@ abstract class Model extends BaseModel
      */
     public function getByDay(): array
     {
-        return $this->byday;
+        return $this->byday ?? $this->parentEvent->byday;//$this->byday;
     }
 
     /**
@@ -1018,7 +1018,7 @@ abstract class Model extends BaseModel
      */
     public function getByWeekDay(): array
     {
-        return $this->byweekday;
+        return $this->byweekday ?? $this->parentEvent->byweekday;//$this->byweekday;
     }
 
     /**
@@ -1034,7 +1034,7 @@ abstract class Model extends BaseModel
      */
     public function getByWeekNo(): array
     {
-        return $this->byweekno;
+        return $this->byweekno ?? $this->parentEvent->byweekno;//$this->byweekno;
     }
 
     /**
@@ -1050,7 +1050,7 @@ abstract class Model extends BaseModel
      */
     public function getByMinute(): array
     {
-        return $this->byminute;
+        return $this->byminute ?? $this->parentEvent->byminute;//$ $this->byminute;
     }
 
     /**
@@ -1146,7 +1146,7 @@ abstract class Model extends BaseModel
      */
     public function getInterval(): int
     {
-        return $this->intrval;
+        return $this->intrval ?? $this->parentEvent->intrval;// $this->intrval;
     }
 
     /**
@@ -1162,7 +1162,7 @@ abstract class Model extends BaseModel
      */
     public function getSummary()
     {
-        return $this->summary;
+        return $this->summary ?? $this->parentEvent->summary;//  $this->summary;
     }
 
     /**
@@ -1226,7 +1226,7 @@ abstract class Model extends BaseModel
      */
     public function getDescription()
     {
-        return $this->description;
+        return $this->description ?? $this->parentEvent->description;// $this->description;
     }
 
     /**
@@ -1244,7 +1244,7 @@ abstract class Model extends BaseModel
      */
     public function getUntil(): CalendarDateTime
     {
-        return $this->until;
+        return $this->until ?? $this->parentEvent->until;// $this->until;
     }
 
     /**
@@ -1262,7 +1262,7 @@ abstract class Model extends BaseModel
      */
     public function getFreq(): string
     {
-        return $this->freq;
+        return $this->freq ?? $this->parentEvent->freq;
     }
 
     /**
@@ -1279,7 +1279,7 @@ abstract class Model extends BaseModel
      */
     public function getCount(): int
     {
-        return $this->cnt;
+        return $this->cnt ?? $this->parentEvent->cnt;// $this->cnt;
     }
 
     /**
@@ -1299,7 +1299,7 @@ abstract class Model extends BaseModel
      */
     public function getRdate(): string
     {
-        return $this->rdate;
+        return $this->rdate ?? $this->parentEvent->rdate;// $this->rdate;
     }
 
     /**
@@ -1339,7 +1339,7 @@ abstract class Model extends BaseModel
      */
     public function getRdateType(): string
     {
-        return $this->rdateType;
+        return $this->rdateType ?? $this->parentEvent->rdateType;//  $this->rdateType;
     }
 
     /**
@@ -1376,7 +1376,7 @@ abstract class Model extends BaseModel
      */
     public function getCategories(): array
     {
-        return $this->categories;
+        return $this->categories ?? $this->parentEvent->categories;// $this->categories;
     }
 
     /**
@@ -1416,7 +1416,7 @@ abstract class Model extends BaseModel
      */
     public function getExceptionEvents(): array
     {
-        return $this->exceptionEvents;
+        return $this->exceptionEvents ?? $this->parentEvent->exceptionEvents;// $this->exceptionEvents;
     }
 
     /**
@@ -1452,7 +1452,7 @@ abstract class Model extends BaseModel
      */
     public function getOrganizerId(): int
     {
-        return $this->organizer_id;
+        return $this->organizer_id ?? $this->parentEvent->organizer_id;// $this->organizer_id;
     }
 
     /**
@@ -1491,7 +1491,7 @@ abstract class Model extends BaseModel
      */
     public function getOrganizerLink($view = ''): string
     {
-        return $this->organizer_link;
+        return $this->organizer_link ?? $this->parentEvent->organizer_link;// $this->organizer_link;
     }
 
     /**
@@ -1499,7 +1499,7 @@ abstract class Model extends BaseModel
      */
     public function getOrganizerPid(): int
     {
-        return $this->organizer_pid;
+        return $this->organizer_pid ?? $this->parentEvent->organizer_pid;//  $this->organizer_pid;
     }
 
     /**
@@ -1527,7 +1527,7 @@ abstract class Model extends BaseModel
      */
     public function getLocationId(): int
     {
-        return $this->location_id;
+        return $this->location_id ?? $this->parentEvent->location_id;// $this->location_id;
     }
 
     /**
@@ -1740,7 +1740,7 @@ abstract class Model extends BaseModel
      */
     public function getPage()
     {
-        return $this->page;
+        return $this->page ?? $this->parentEvent->page;// $this->page;
     }
 
     /**
@@ -1749,6 +1749,14 @@ abstract class Model extends BaseModel
     public function setExtUrl($t)
     {
         $this->ext_url = $t;
+    }
+
+    /**
+     * @return $ext_url string
+     */
+    public function getExtUrl()
+    {
+        return $this->ext_url;
     }
 
     /**
@@ -1788,7 +1796,7 @@ abstract class Model extends BaseModel
      */
     public function getEventOwner()
     {
-        return $this->eventOwner;
+        return $this->eventOwner ?? $this->parentEvent->eventOwner;// $this->eventOwner;
     }
 
     /**

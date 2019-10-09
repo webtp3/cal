@@ -72,8 +72,8 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     // @override
     public function equals($compareDate) :bool
     {
-        $a = floatval($compareDate->format('YmdHis'));
-        $b = floatval($this->format('YmdHis'));
+        $a = floatval($compareDate->format('YmdHi'));
+        $b = floatval($this->format('YmdHi'));
         if ($a == $b) {
             return true;
         }
@@ -83,8 +83,8 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     // @override
     public function before($compareDate) :bool
     {
-        $a = floatval($compareDate->format('YmdHis'));
-        $b = floatval($this->format('YmdHis'));
+        $a = floatval($compareDate->format('YmdHi'));
+        $b = floatval($this->format('YmdHi'));
         if ($a > $b) {
             return true;
         }
@@ -94,8 +94,8 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     // @override
     public function after($compareDate) :bool
     {
-        $a = floatval($compareDate->format('YmdHis'));
-        $b = floatval($this->format('YmdHis'));
+        $a = floatval($compareDate->format('YmdHi'));
+        $b = floatval($this->format('YmdHi'));
         if ($a < $b) {
             return true;
         }
@@ -105,8 +105,8 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
     // @override
     public function compare($compareDateA, $compareDateB) :int
     {
-        $a = floatval($compareDateA->format('YmdHis'));
-        $b = floatval($compareDateB->format('YmdHis'));
+        $a = floatval($compareDateA->format('YmdHi'));
+        $b = floatval($compareDateB->format('YmdHi'));
         if ($a == $b) {
             return 0;
         }
@@ -233,7 +233,7 @@ class CalDate extends \TYPO3\CMS\Cal\Model\Pear\Date
 
         if ($format == '%Y%m%d') {
             return $this->year . sprintf('%02d%02d', $this->month, $this->day);
-        } elseif ($format == 'YmdHis') {
+        } elseif ($format == 'YmdHi') {
             return $this->year . sprintf('%02d%02d%02d%02d%02d', $this->month, $this->day, $this->hour, $this->minute, $this->second);
         }
 

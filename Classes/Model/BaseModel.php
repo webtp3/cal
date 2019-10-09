@@ -248,6 +248,13 @@ abstract class BaseModel extends AbstractModel
     }
 
     /**
+     * @var array
+     */
+    public function getRow(): array {
+        return $this->row;
+    }
+
+    /**
      * Returns the current values as merged array.
      * This method should be adapted in every model to contain all needed values.
      * In short - every get-method (except the getXYMarker) should be in there.

@@ -73,7 +73,7 @@ class RecurrenceGenerator
         $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-
+#todo check dates
         $this->pageIDForPlugin = $pageIDForPlugin;
         if ($starttime == null) {
             $starttime = GeneralUtility::makeInstance(CalendarDateTime::class)

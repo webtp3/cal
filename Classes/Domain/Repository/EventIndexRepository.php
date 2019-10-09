@@ -31,11 +31,11 @@ class EventIndexRepository extends DoctrineRepository
     protected $table = 'tx_cal_index';
 
     /**
-     * @param CalDate $starttime
-     * @param CalDate $endtime
+     * @param CalendarDateTime $starttime
+     * @param CalendarDateTime $endtime
      * @return array
      */
-    public function findRecurringEvents(CalendarDateTime $starttime, CalendarDateTime $endtime): array
+    public function findRecurringEvents( $starttime, $endtime): array
     {
         $queryBuilder = $this->getQueryBuilder();
         return $queryBuilder
@@ -44,16 +44,16 @@ class EventIndexRepository extends DoctrineRepository
             ->where(
                 $queryBuilder->expr()->orX(
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->gte('start_datetime', $starttime->format('YmdHis')),
-                        $queryBuilder->expr()->lte('start_datetime', $endtime->format('YmdHis'))
+                        $queryBuilder->expr()->gte('start_datetime', $starttime->format('YmdHi')),
+                        $queryBuilder->expr()->lte('start_datetime', $endtime->format('YmdHi'))
                     ),
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->lt('start_datetime', $starttime->format('YmdHis')),
-                        $queryBuilder->expr()->gt('end_datetime', $starttime->format('YmdHis'))
+                        $queryBuilder->expr()->lt('start_datetime', $starttime->format('YmdHi')),
+                        $queryBuilder->expr()->gt('end_datetime', $starttime->format('YmdHi'))
                     ),
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->lt('start_datetime', $endtime->format('YmdHis')),
-                        $queryBuilder->expr()->gt('end_datetime', $endtime->format('YmdHis'))
+                        $queryBuilder->expr()->lt('start_datetime', $endtime->format('YmdHi')),
+                        $queryBuilder->expr()->gt('end_datetime', $endtime->format('YmdHi'))
                     )
                 )
             )

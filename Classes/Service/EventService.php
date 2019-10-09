@@ -41,6 +41,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Cal\Domain\Repository\EventDeviationRepository;
 
 /**
  * Class EventService
@@ -78,6 +79,11 @@ class EventService extends BaseService
      * @var EventSharedUserMMRepository
      */
     protected $eventSharedUserMMRepository;
+
+    /**
+     * @var EventDeviationRepository
+     */
+    protected $eventdeviationRepository;
 
     /**
      * @var SubscriptionRepository
@@ -169,26 +175,14 @@ class EventService extends BaseService
         $recurringClause = '';
         // only include the recurring clause if we don't use the new recurring model or a view not needing recurring events.
         if ($includeRecurring) {
-            // get the uids of recurring events from index
-            $select = 'event_uid';
-            $table = 'tx_cal_index';
-            $where = '(start_datetime >= ' . $this->starttime->format('YmdHis') . ' AND start_datetime <= ' . $this->endtime->format('YmdHis') . ') OR (start_datetime < ' . $this->starttime->format('YmdHis') . ' AND end_datetime > ' . $this->starttime->format('YmdHis') . ')  OR (start_datetime < ' . $this->endtime->format('YmdHis') . ' AND end_datetime > ' . $this->endtime->format('YmdHis') . ')';
-            $group = 'event_uid';
-            $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $group);
-            $tmpUids = [];
-            if ($result) {
-                while ($tmp = $GLOBALS['TYPO3_DB']->sql_fetch_row($result)) {
-                    $tmpUids[] = $tmp[0];
-                }
-                $GLOBALS['TYPO3_DB']->sql_free_result($result);
-            }
+            $tmpUids = $this->eventRepository->findUidsOfRecurringEvents($start_date, $end_date);
             if (count($tmpUids)) {
                 $recurringClause = ' OR (tx_cal_event.uid IN (' . implode(',', $tmpUids) . ')) ';
             }
         }
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -247,11 +241,13 @@ class EventService extends BaseService
         $eventType = '0,1,2,3'
     ): array {
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
+
         $events = [];
 
         $select = 'tx_cal_calendar.uid AS calendar_uid, ' . 'tx_cal_calendar.owner AS calendar_owner, ' . 'tx_cal_calendar.headerstyle AS calendar_headerstyle, ' . 'tx_cal_calendar.bodystyle AS calendar_bodystyle, ' . 'tx_cal_event.*';
         $table = 'tx_cal_event LEFT JOIN tx_cal_calendar ON tx_cal_calendar.uid = tx_cal_event.calendar_id ';
+      //  $table .= 'left JOIN tx_cal_index  ON tx_cal_event.uid = tx_cal_index.event_uid ';
         if ($GLOBALS['TSFE']->sys_language_content > 0 ?? 0 === strpos($this->conf['view'], 'search')) {
             $select .= implode(
                 ',tx_cal_event_l18n.',
@@ -259,7 +255,8 @@ class EventService extends BaseService
             );
             $table .= 'LEFT JOIN tx_cal_event as tx_cal_event_l18n ON tx_cal_event.uid = tx_cal_event_l18n.l18n_parent ';
         }
-        $where = '1=1 ' . $additionalWhere;
+        //AND tx_cal_index.tablename = "tx_cal_event"
+        $where = '1=1  ' . $additionalWhere;
         $orderBy = ' tx_cal_event.start_date ASC, tx_cal_event.start_time ASC';
         $groupBy = 'tx_cal_event.uid';
 
@@ -317,40 +314,40 @@ class EventService extends BaseService
         $categoryService->conf['view.']['allowedCategory'] = false;
         $categoryService->getCategoryArray($this->conf['pidList'], $categoriesArray);
         $selectFields = $GLOBALS['TYPO3_DB']->admin_get_fields('tx_cal_event');
-
+        //$rows =[];
         $eventUids = [];
         if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+            while ($rows = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($GLOBALS['TSFE']->sys_page->versioningPreview) {
-                    $interRow = array_intersect_key($row, $selectFields);
+                    $interRow = array_intersect_key($rows, $selectFields);
                     $GLOBALS['TSFE']->sys_page->versionOL('tx_cal_event', $interRow);
                     $GLOBALS['TSFE']->sys_page->fixVersioningPid('tx_cal_event', $interRow);
-                    $row = array_merge($row, $interRow);
+                    $rows = array_merge($rows, $interRow);
                 }
 
                 if ($GLOBALS['TSFE']->sys_language_content) {
-                    $row = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
+                    $rows = $GLOBALS['TSFE']->sys_page->getRecordOverlay(
                         'tx_cal_event',
-                        $row,
+                        $rows,
                         $GLOBALS['TSFE']->sys_language_content,
                         $GLOBALS['TSFE']->sys_language_contentOL
                     );
                 }
-                if (!$row['uid']) {
+                if (!$rows['uid']) {
                     continue;
                 }
 
                 // collect event uids for optimized queries. f.e. for exception events etc.
-                $eventUids[] = $uid = $row['uid'];
+                $uid = $rows['uid'];
 
                 // prepare category_uid
-                $resultRows[$uid] = $row;
+                $resultRows[$uid] = $rows;
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+            //$GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
 
         static $exceptionEventCache = [];
-
+        // bug in php cache -> $row turns to false from while breaks call
         foreach ($resultRows as $row) {
             $row['event_owner'] = &$eventOwnerArray[$row['calendar_uid']];
             if ($row['end_date'] === 0) {
@@ -440,11 +437,11 @@ class EventService extends BaseService
                         $ex_events_group[] = $exceptionEventCache[$row4['uid']];
                     }
                 }
-                $GLOBALS['TYPO3_DB']->sql_free_result($result4);
+               // $GLOBALS['TYPO3_DB']->sql_free_result($result4);
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result3);
+            //$GLOBALS['TYPO3_DB']->sql_free_result($result3);
 
-            $where = 'AND tx_cal_event.uid = ' . $event->getUid() . ' AND tx_cal_exception_event_mm.tablenames="tx_cal_exception_event" ' . $this->cObj->enableFields('tx_cal_exception_event');
+            $where = 'AND tx_cal_event.uid = ' . $row['uid'] . ' AND tx_cal_exception_event_mm.tablenames="tx_cal_exception_event" ' . $this->cObj->enableFields('tx_cal_exception_event');
             $orderBy = ''; // 'tx_cal_exception_event.start_time ASC';
             $groupBy = '';
             $limit = '';
@@ -473,7 +470,7 @@ class EventService extends BaseService
                     $ex_events_group[] = $exceptionEventCache[$row2['uid']];
                 }
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result2);
+            //$GLOBALS['TYPO3_DB']->sql_free_result($result2);
 
             if (!$includeRecurring) {
                 $this->starttime->copy($tmp_starttime);
@@ -515,8 +512,10 @@ class EventService extends BaseService
 
             if (!empty($events)) {
                 $this->mergeEvents($events, $events_tmp);
+            } else if (!empty($events_tmp)) {
+                $this->mergeEvents($events, $events_tmp);
             } else {
-                $events = $events_tmp;
+                $events[$event->getStart()->format('Ymd')][$event->isAllday() ? '-1' : $event->getStart()->format('Hi')][$event->getUid()] = $event;
             }
         }
 
@@ -599,7 +598,7 @@ class EventService extends BaseService
         $formattedEndtime = $this->endtime->format('Ymd');
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -650,7 +649,7 @@ class EventService extends BaseService
     protected function getTimeParsed($timeString): CalendarDateTime
     {
         /** @var DateParser $dp */
-        $dp = GeneralUtility::makeInstance(DateParser::class);
+        $dp = $this->objectManager->get(DateParser::class);
         $dp->parse($timeString, 0, '');
         return $dp->getDateObjectFromStack();
     }
@@ -688,7 +687,7 @@ class EventService extends BaseService
         $disableCategorySearchString = false,
         $eventType = '0,1,2,3'
     ): EventModel {
-        $uid = intval($uid);
+        $uid = (int)$uid;
         if ($getAllInstances) {
             $start_date = new CalendarDateTime($this->conf['view.'][$this->conf['view'] . '.']['minDate'] . '000000');
             $start_date->setTZbyID('UTC');
@@ -712,7 +711,7 @@ class EventService extends BaseService
 
         $categories = [];
 
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $categoryService->getCategoryArray($pidList, $categories);
 
@@ -732,7 +731,7 @@ class EventService extends BaseService
 
         // putting everything together
 
-        $additionalWhere = $calendarSearchString . ' AND tx_cal_event.uid=' . $uid;
+        $additionalWhere = $calendarSearchString . ' AND tx_cal_event.uid=' . $uid  ;
         if (!$showHiddenEvents) {
             $additionalWhere .= ' AND tx_cal_event.hidden = 0';
         }
@@ -854,7 +853,7 @@ class EventService extends BaseService
         self::_scheduleReminder($uid);
 
         /** @var RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
+        $rgc = $this->objectManager->get(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
         $rgc->generateIndexForUid($uid, 'tx_cal_event');
 
         // Hook: saveEvent
@@ -885,15 +884,28 @@ class EventService extends BaseService
 
         // Creating DB records
         $table = 'tx_cal_event';
-        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
+        $connection = $this->connectionPool->getConnectionForTable($table);
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+//        $result = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $eventData);
+        $result =  $queryBuilder->insert($table,$eventData)
+            ->execute();
         if (false === $result) {
             throw new RuntimeException(
-                'Could not write event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                'Could not write event record to database: ' . debug($queryBuilder->getSQL()),
                 1431458130
             );
         }
 
-        $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+        $uid =  $connection->lastInsertId($table);
 
         if ($this->rightsObj->isAllowedTo('create', 'event', 'image')) {
             $this->checkOnNewOrDeletableFiles('tx_cal_event', 'image', $eventData, $uid);
@@ -1107,7 +1119,7 @@ class EventService extends BaseService
                     $attendeeValues['status'] = $attendee->getStatus();
                     $attendeeValues['cruser_id'] = $insertFields['cruser_id'];
                     $attendeeService->_saveAttendee($attendeeValues);
-                    $attendeeUids[] = $GLOBALS['TYPO3_DB']->sql_insert_id();
+                    $attendeeUids[] =  $connection->lastInsertId($table);
                 }
             }
             $insertFields['attendee'] = count($attendeeUids);
@@ -1182,7 +1194,7 @@ class EventService extends BaseService
         $this->unsetPiVars();
 
         /** @var RecurrenceGenerator $rgc */
-        $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
+        $rgc = $this->objectManager->get(RecurrenceGenerator::class, $GLOBALS['TSFE']->id);
         $rgc->generateIndexForUid($uid, 'tx_cal_event');
 
         // Hook: updateEvent
@@ -1214,11 +1226,22 @@ class EventService extends BaseService
 
         // Creating DB records
         $table = 'tx_cal_event';
-        $where = 'uid = ' . $uid;
-        $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $eventData);
+        $where = ['uid' =>  $uid];
+        $connection = $this->connectionPool->getConnectionForTable($table);
+
+        $queryBuilder = $connection->createQueryBuilder();
+        if (TYPO3_MODE == 'BE') {
+            $queryBuilder
+                ->getRestrictions()
+                ->removeAll()
+                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        } else {
+            $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+        }
+        $result = $queryBuilder->update($table, $where, $eventData);
         if (false === $result) {
             throw new RuntimeException(
-                'Could not write event record to database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                'Could not write event record to database: ' . debug($queryBuilder->getSQL()),
                 1431458130
             );
         }
@@ -1349,8 +1372,19 @@ class EventService extends BaseService
 
         if ($tempValues['exception_ids'] !== null && $tempValues['exception_ids'] !== '' && $this->rightsObj->isAllowedToEditEventException()) {
             $table = 'tx_cal_exception_event_mm';
-            $where = 'uid_local = ' . $uid;
-            $GLOBALS['TYPO3_DB']->exec_DELETEquery($table, $where);
+            $where = ['uid_local' => $uid];
+            $connection = $this->connectionPool->getConnectionForTable($table);
+
+            $queryBuilder = $connection->createQueryBuilder();
+            if (TYPO3_MODE == 'BE') {
+                $queryBuilder
+                    ->getRestrictions()
+                    ->removeAll()
+                    ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            } else {
+                $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+            }
+            $queryBuilder->delete($table, $where);
             $user = [];
             $group = [];
             self::splitUserAndGroupIds(explode(',', strip_tags($tempValues['exception_ids'])), $user, $group);
@@ -1444,14 +1478,29 @@ class EventService extends BaseService
                     $attendeeValues['attendance'] = $attendee->getAttendance();
                     $attendeeValues['status'] = $attendee->getStatus();
                     $attendeeService->_saveAttendee($attendeeValues);
-                    $attendeeUids[] = $GLOBALS['TYPO3_DB']->sql_insert_id();
+                    $attendeeUids[] =  $connection->lastInsertId($table);
                 }
             }
             $uidsToBeDeleted = array_diff($oldAttendeeUids[$servKey], $attendeeUids);
             if (!empty($uidsToBeDeleted)) {
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery(
-                    'tx_cal_attendee',
-                    'uid in (' . implode(',', $uidsToBeDeleted) . ')'
+               $table = 'tx_cal_attendee';
+               $connection = $this->connectionPool->getConnectionForTable($table);
+
+                $queryBuilder = $connection->createQueryBuilder();
+                if (TYPO3_MODE == 'BE') {
+                    $queryBuilder
+                        ->getRestrictions()
+                        ->removeAll()
+                        ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+                } else {
+                    $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+                }
+                $queryBuilder->delete('tx_cal_attendee')->where(
+                   //
+                // 'uid in (' . implode(',', $uidsToBeDeleted) . ')'
+                    $queryBuilder->expr()->in(
+                        'uid',implode(',', $uidsToBeDeleted)
+                    )
                 );
             }
             $eventData['attendee'] = count($attendeeUids);
@@ -1479,7 +1528,7 @@ class EventService extends BaseService
             $result = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, $where, $updateFields);
             if (false === $result) {
                 throw new RuntimeException(
-                    'Could not delete event record from database: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                    'Could not delete event record from database: ' . debug($queryBuilder->getSQL()),
                     1431458133
                 );
             }
@@ -1492,7 +1541,7 @@ class EventService extends BaseService
             self::stopReminder($uid);
 
             /** @var RecurrenceGenerator $rgc */
-            $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);
+            $rgc = $this->objectManager->get(RecurrenceGenerator::class);
             $rgc->cleanIndexTableOfUid($uid, $table);
 
             // Hook: removeEvent
@@ -1758,7 +1807,7 @@ class EventService extends BaseService
         $includePublic = 1;
 
         $calendarService = &$this->modelObj->getServiceObjByKey('cal_calendar_model', 'calendar', 'tx_cal_calendar');
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         $calendarSearchString = $calendarService->getCalendarSearchString(
             $pidList,
@@ -1811,7 +1860,7 @@ class EventService extends BaseService
      * @param EventModel $event object
      * @return array
      */
-    public function recurringEvent($event): array
+    public function recurringEvent(EventModel $event): array
     {
         $deviations = [];
         $select = '*';
@@ -1841,38 +1890,27 @@ class EventService extends BaseService
             )
             ->execute();
        // $deviationResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
-        if ($deviationResult) {
+        if ($deviationResult->rowCount()>0) {
             while ($deviationRow = $deviationResult->fetch(\PDO::FETCH_ASSOC)) {
                 if ($deviationRow['deleted']) {
                     continue;
                 }
                 $origStartDate = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $deviationRow['orig_start_date']);
                 $origStartDate->add(new \DateInterval('PT' . $deviationRow['orig_start_time'] . 'S'));
-                $deviations[$origStartDate->format('YmdHis')] = $deviationRow;
+                $deviations[$origStartDate->format('YmdHi')] = $deviationRow;
             }
           //  $GLOBALS['TYPO3_DB']->sql_free_result($deviationResult);
         }
-        else{
-            $new_event = new EventDeviationModel(
-                $event,
-                $event,
-                $event->getStart(),
-                $event->getEnd()
-            );
-//            // ?Insert
-//            //uid, tablename, start_datetime, end_datetime, event_uid, event_deviation_uid
-//            $index = 'tx_cal_index';
-//            $insertFields['event_uid'] = $event->getUid();
-//            $insertFields['start_datetime'] = $event->getUid();
-//            $insertFields['end_datetime'] = $event->getUid();
-//            $insertFields['event_uid'] = $event->getUid();
-//            $insertFields['event_deviation_uid'] = $event->getUid();
-//            $insertFields['tablename'] = $table;
+//        else{
+//            $new_event_deviation = new EventDeviationModel(
+//                $event,
+//                $event->getRow(),
+//                $nextOccuranceTime,
+//                $currentUntil
+//            );
 //
-//
-//            $result = $queryBuilder->insert($index)->values($event)->execute();
-
-        }
+//            $queryBuilder->insert($table)->values($new_event_deviation->getRow())->execute();
+//        }
         #todo geneerate deviations if not found
         $event->setDeviationDates($deviations);
 
@@ -1880,8 +1918,8 @@ class EventService extends BaseService
         $this->checkRecurringSettings($event);
 
         $master_array = [];
-        $until = new CalendarDateTime();
-        $until->copy($event->getUntil());
+        //$until = new CalendarDateTime();
+        $until = $event->getUntil();
         $until->addSeconds(86399);
         $count = intval($event->getCount());
 
@@ -1889,13 +1927,13 @@ class EventService extends BaseService
             $until->copy($this->endtime);
         }
         $byyear = [];
-        $eventStart = new CalendarDateTime();
-        $eventStart->copy($event->getStart());
+   //     $eventStart = new CalendarDateTime();
+        $eventStart = $event->getStart();
         $i = $eventStart->getYear();
         if ($event->getFreq() === 'year') {
             $i = intval($this->starttime->getYear()) - (($this->starttime->getYear() - $eventStart->getYear()) % $event->getInterval());
         }
-        else if ($event->getFreq()){
+        else if ($event->getFreq() != "none"){
             $until->setYear($this->endtime->getYear());
             $i = intval($this->starttime->getYear()) - (($this->starttime->getYear() - $eventStart->getYear()) % $event->getInterval());
         }
@@ -1957,11 +1995,24 @@ class EventService extends BaseService
                 $minute = $eventStart->format('i');
                 // 2007, 2008...
                 // walk thru years to index (not event)
+                $table = 'tx_cal_event_deviation';
+                $connection = $this->connectionPool->getConnectionForTable($table);
+                $queryBuilder = $connection->createQueryBuilder();
+                if (TYPO3_MODE == 'BE') {
+
+                    $queryBuilder
+                        ->getRestrictions()
+                        ->removeAll()
+                        ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+                } else {
+                    $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
+                }
+
                 foreach ($byyear as $year) {
                     if ($counter < $count && $until->after($nextOccuranceTime) && $added < $maxRecurringEvents) {
                         // 1,2,3,4,5,6,7,8,9,10,11,12
                         foreach ($bymonth as $month) {
-                            if ($counter < $count && $until->after($nextOccuranceTime) && intval(str_pad(
+                            if ($counter < $count && $until->after($nextOccuranceTime) && (int)str_pad(
                                 $year,
                                 2,
                                 '0',
@@ -1971,10 +2022,11 @@ class EventService extends BaseService
                                         2,
                                         '0',
                                         STR_PAD_LEFT
-                                    )) >= intval($nextOccuranceTime->format('Y') . $nextOccuranceTime->format('m')) && $added < $maxRecurringEvents) {
-                                $bymonthday =  cal_days_in_month(CAL_GREGORIAN, $month, $year);//$this->getMonthDaysAccordingly($event, $month, $year);
+                                    ) >= (int)$nextOccuranceTime->format('Y') . $nextOccuranceTime->format('m') && $added < $maxRecurringEvents) {
+
+                                $bymonthday =  $this->getMonthDaysAccordingly($event, $month, $year);
                                 // 1,2,3,4....31
-                                for ($day = 1; $day < $bymonthday ; $day++) {
+                                foreach ($bymonthday as $day) {
                                     $nextOccuranceTime->setHour($hour);
                                     $nextOccuranceTime->setMinute($minute);
                                     $nextOccuranceTime->setSecond(0);
@@ -1990,12 +2042,8 @@ class EventService extends BaseService
 
                                         //# todo insert records
 
-//                                            $new_event = new EventDeviationModel(
-//                                                $event,
-//                                                $event,
-//                                                $nextOccuranceTime,
-//                                                $currentUntil
-//                                            );
+
+                                           // $this->eventdeviationRepository->add($new_event_deviation);
                                             $this->findDailyWithin(
                                                 $master_array,
                                                 $event,
@@ -2008,6 +2056,16 @@ class EventService extends BaseService
                                                 $added,
                                                 $maxRecurringEvents
                                             );
+//                                            $new_event_deviation = new EventDeviationModel(
+//                                                $event,
+//                                                $event->getRow(),
+//                                                $nextOccuranceTime,
+//                                                $currentUntil
+//                                            );
+////
+//
+//
+//                                            $queryBuilder->insert($table)->values($new_event_deviation->getRow())->execute();
                                         } else {
                                             continue;
                                         }
@@ -2031,10 +2089,10 @@ class EventService extends BaseService
      * @param array $ex_event_dates
      * @return array
      */
-    public function getRecurringEventsFromIndex($event, $ex_event_dates = []): array
+    public function getRecurringEventsFromIndex(EventModel $event, $ex_event_dates = []): array
     {
         $maxRecurringEvents = (int)$this->conf['view.'][$this->conf['view'] . '.']['maxRecurringEvents'];
-        $maxRecurringEvents = !empty($maxRecurringEvents) ? $maxRecurringEvents : 99999;
+        $maxRecurringEvents = !empty($maxRecurringEvents) ? $maxRecurringEvents : 999;
 
         $master_array = [];
         $startDate = $event->getStart();
@@ -2059,38 +2117,40 @@ class EventService extends BaseService
         $added = 0;
         // if the 'parent' event is still in future, set $added to 1, because we already have one instance of this event
         $now = new CalendarDateTime();
-        if (intval($now->format('YmdHis')) < intval($event->getStart()->format('YmdHis'))) {
+        if ((int)$now->format('YmdHi') < (int)$event->getStart()->format('YmdHi')) {
             $added = 1;
         }
         $select = '*';
         $table = 'tx_cal_index';
-        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('YmdHis') . ' AND start_datetime <= ' . $this->endtime->format('YmdHis') . ' AND tablename = "' . ($event->getType() === 'tx_cal_phpicalendar' ? ($event->isException ? 'tx_cal_exception_event' : 'tx_cal_event') : $event->getType()) . '"';
+        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' .$event->getStart()->format('YmdHi') . ' AND start_datetime <= ' . $event->getEnd()->format('YmdHi') . ' AND tablename = "' . ($event->getType() === 'tx_cal_phpicalendar' ? ($event->isException ? 'tx_cal_exception_event' : 'tx_cal_event') : $event->getType()) . '"';
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, '', 'start_datetime');
         if ($result) {
-            while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+            while ($r = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
                 if ($added < $maxRecurringEvents) {
-                    $nextOccuranceTime = new CalendarDateTime($row['start_datetime']);
-                    $nextOccuranceEndTime = new CalendarDateTime($row['end_datetime']);
+                    $nextOccuranceTime = new CalendarDateTime($r['start_datetime']);
+                    $nextOccuranceEndTime = new CalendarDateTime($r['end_datetime']);
                     $new_event = null;
-                    if ($row['event_deviation_uid'] > 0) {
+                    if ($r['event_deviation_uid'] > 0) {
                         $result2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
                             '*',
                             'tx_cal_event_deviation',
-                            'uid=' . $row['event_deviation_uid'] . $this->cObj->enableFields('tx_cal_event_deviation')
+                            'uid=' . $r['event_deviation_uid'] . $this->cObj->enableFields('tx_cal_event_deviation')
                         );
                         if ($result2) {
-                            while ($row2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2)) {
+                            while ($r2 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result2)) {
                                 $new_event = new EventDeviationModel(
                                     $event,
-                                    $row2,
+                                    $r2,
                                     $nextOccuranceTime,
                                     $nextOccuranceEndTime
                                 );
                             }
                         }
                     } else {
-                        $new_event = new EventRecModel(
+                        $new_event = new EventModel(
                             $event,
+                            'false',
+                            'tx_cal_phpicalendar',
                             $nextOccuranceTime,
                             $nextOccuranceEndTime
                         );
@@ -2135,7 +2195,7 @@ class EventService extends BaseService
                     }
                 }
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($result);
+          //  $GLOBALS['TYPO3_DB']->sql_free_result($result);
         }
         return $master_array;
     }
@@ -2305,8 +2365,8 @@ class EventService extends BaseService
                     if ($end->after($this->starttime) && $start->before($this->endtime)) {
                         $table = 'tx_cal_index';
                         $eventData = [
-                            'start_datetime' => $start->format('YmdHis'),
-                            'end_datetime' => $end->format('YmdHis'),
+                            'start_datetime' => $start->format('YmdHi'),
+                            'end_datetime' => $end->format('YmdHi'),
                             'event_uid' => $event->getUid(),
                             'tablename' => $event->isException ? 'tx_cal_exception_event' : 'tx_cal_event'
                         ];
@@ -2825,7 +2885,7 @@ class EventService extends BaseService
         }
 
         while ($currentCount < $maxCount && ($nextOccuranceTime->before($endRange) || $nextOccuranceTime->equals($endRange)) && $addedCount < $maxRecurringEvents) {
-            if (!$nextOccuranceTime->equals($event->getStart())) {
+            if ($nextOccuranceTime->after($event->getStart()) && !$nextOccuranceTime->equals($event->getStart())) {
                 if (($totalCount % $event->getInterval()) === 0) {
                     $nextOccuranceEndTime = new CalendarDateTime();
                     $nextOccuranceEndTime->copy($nextOccuranceTime);
@@ -2841,8 +2901,8 @@ class EventService extends BaseService
                             ];
                         } else {
                             $eventData = [
-                                'start_datetime' => $nextOccuranceTime->format('Ymd') . $nextOccuranceTime->format('His'),
-                                'end_datetime' => $nextOccuranceEndTime->format('Ymd') . $nextOccuranceEndTime->format('His'),
+                                'start_datetime' => $nextOccuranceTime->format('Ymd') . $event->getStart()->format('Hi'),
+                                'end_datetime' => $nextOccuranceEndTime->format('Ymd') . $event->getEnd()->format('Hi'),
                                 'event_uid' => $event->getUid(),
                                 'tablename' => $event->getType() === 'tx_cal_phpicalendar' ? ('tx_cal_event') : $event->getType()
                             ];
@@ -2898,6 +2958,9 @@ class EventService extends BaseService
             $eventData['start_datetime'] = $startDate->format('Ymd') . $startDate->format('His');
             $eventData['end_datetime'] = $endDate->format('Ymd') . $endDate->format('His');
         }
+        else{
+            return false;
+        }
     }
 
     /**
@@ -2908,10 +2971,105 @@ class EventService extends BaseService
      */
     public function getMonthDaysAccordingly(&$event, $month, $year): array
     {
-        $resultDays=[];
-        for($days = 1; cal_days_in_month(CAL_GREGORIAN, $month, $year); $days++){
-            $resultDays[] = $days;
+        $byDayArray = $event->getByDay();
+        $byMonthDays = $event->getByMonthDay();
+        $resultDays = [];
+        if (count($byDayArray) === 0) {
+            $resultDays = [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31
+            ];
+            return $resultDays;
         }
+        foreach ($byDayArray as $i => $iValue) {
+            if (preg_match('/([-\+]{0,1})?([0-9]{1})?([A-Z]{2})/', $byDayArray[$i], $byDaySplit)) {
+                $dayOfWeekday = Calendar::two2threeCharDays($byDaySplit[3], false);
+                $monthStartTime = new  CalendarDateTime($year . '-' . sprintf(
+                    '%02d',
+                    $month
+                    ) . '-01 00:00:00');
+                $monthStartTime->setTZbyID('UTC');
+                $monthEndTime = Calendar::calculateEndMonthTime($monthStartTime);
+                if ($byDaySplit[2] > 0) {
+                    if ($byDaySplit[1] === '-') {
+                        $monthTime = new  CalendarDateTime(Calc::prevDayOfWeek(
+                            $dayOfWeekday,
+                            $monthEndTime->getDay(),
+                            $monthEndTime->getMonth(),
+                            $monthEndTime->getYear(),
+                            '%Y%m%d',
+                            true
+                        ));
+                        $monthTime->setTZbyID('UTC');
+                        $monthTime->subtractSeconds(($byDaySplit[2] - 1) * 604800);
+                    } else {
+                        $monthTime = new  CalendarDateTime(Calc::nextDayOfWeek(
+                            $dayOfWeekday,
+                            $monthStartTime->getDay(),
+                            $monthStartTime->getMonth(),
+                            $monthStartTime->getYear(),
+                            '%Y%m%d',
+                            true
+                        ));
+                        $monthTime->setTZbyID('UTC');
+                        $monthTime->addSeconds(($byDaySplit[2] - 1) * 604800);
+                    }
+                    if (($monthTime->getMonth() === $month) && in_array($monthTime->getDay(), $byMonthDays, true)) {
+                        $resultDays[] = $monthTime->getDay();
+                    }
+                } else {
+                    $monthTime = new  CalendarDateTime(Calc::prevDayOfWeek(
+                        $dayOfWeekday,
+                        $monthStartTime->getDay(),
+                        $monthStartTime->getMonth(),
+                        $monthStartTime->getYear(),
+                        '%Y%m%d',
+                        true
+                    ));
+                    $monthTime->setTZbyID('UTC');
+                    if ($monthTime->before($monthStartTime)) {
+                        $monthTime->addSeconds(604800);
+                    }
+                    while ($monthTime->before($monthEndTime)) {
+                        $resultDays[] = $monthTime->getDay();
+                        $monthTime->addSeconds(604800);
+                    }
+                }
+            }
+        }
+
+        $resultDays = array_intersect($resultDays, $event->getByMonthDay());
+        sort($resultDays);
+
         return $resultDays;
     }
 
@@ -2988,7 +3146,7 @@ class EventService extends BaseService
                 'calendar',
                 'tx_cal_calendar'
             );
-            $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+            $categoryService = $this->objectManager->get(SysCategoryService::class);
 
             $calendarSearchString = $calendarService->getCalendarSearchString(
                 $pidList,
@@ -3148,7 +3306,7 @@ class EventService extends BaseService
      */
     public function findAllWithAdditionalWhere($where = ''): array
     {
-        $categoryService = GeneralUtility::makeInstance(SysCategoryService::class);
+        $categoryService = $this->objectManager->get(SysCategoryService::class);
 
         // putting everything together
         //

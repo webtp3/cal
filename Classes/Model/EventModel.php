@@ -21,6 +21,7 @@ namespace TYPO3\CMS\Cal\Model;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Controller\Controller;
+use TYPO3\CMS\Cal\Domain\Repository\EventDeviationRepository;
 use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
 use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
 use TYPO3\CMS\Cal\Service\RightsService;
@@ -36,6 +37,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class EventModel extends Model
 {
+    /**
+     * @var EventModel
+     */
+    public $parentEvent;
+
     /**
      * @var LocationModel
      */
@@ -96,21 +102,35 @@ class EventModel extends Model
      */
     protected $subscriptionRepository;
 
+//    /**
+//     * @var EventDeviationRepository
+//     */
+//    protected $eventdeviationRepository;
     /**
      * EventModel constructor.
      * @param $row
      * @param $isException
      * @param $serviceKey
      */
-    public function __construct($row, $isException, $serviceKey)
+    public function __construct($row, $isException, $serviceKey, $start = null, $end = null)
     {
+
         parent::__construct($serviceKey);
         $this->setObjectType('event');
         $this->eventSharedUserMMRepository = GeneralUtility::makeInstance(EventSharedUserMMRepository::class);
         $this->subscriptionRepository = GeneralUtility::makeInstance(SubscriptionRepository::class);
+        //$this->eventdeviationRepository = GeneralUtility::makeInstance(EventDeviationRepository::class);
+
         if (is_array($row)) {
+           if($row['timezone']) $this->timezone = $row['timezone'];
             $this->createEvent($row, $isException);
         }
+        elseif (is_object($row)){
+            if($row->imezone) $this->timezone = $row->timezone;
+            $this->createParentEvent($row);
+        }
+        if(!is_null($start))$this->setStart($start);
+        if(!is_null($end))$this->setEnd($end);
 
         $this->isException = $isException;
         $this->setType($serviceKey);
@@ -513,10 +533,7 @@ class EventModel extends Model
         $this->setCreateUserId($row['cruser_id']);
         $this->setHidden($row['hidden']);
         $this->setTstamp($row['tstamp']);
-
         $this->setCalendarId($row['calendar_id']);
-
-        $this->setTimezone($row['timezone']);
 
         if ($row['allday']) {
             $row['start_time'] = 0;
@@ -524,21 +541,28 @@ class EventModel extends Model
         } elseif ($row['start_time'] === 0 && $row['end_time'] === 0) {
             $row['allday'] = 1;
         }
-        $tempDate = new CalendarDateTime($row['start_date'] > 0 ? $row['start_date'] . '000000' :'');
-        $tempDate->setTZbyID('UTC');
-        $tempDate->addSeconds($row['start_time']);
+        if(!$row['timezone'] || $row['timezone'] == 'UTC'){
+            $row['timezone'] = date('T');
+        }
+        $this->setTimezone($row['timezone']);
+        $offset = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('Ymd', $row['start_date'])->setTimezone(new \DateTimeZone($row['timezone']))->getOffset();
+        $tempDate = GeneralUtility::makeInstance(CalendarDateTime::class, $row['start_date'] > 0 ? $row['start_date'] . '000000' :'');
+        $tempDate->setTZbyID($row['timezone']);
+        if (!$row['allday']) $tempDate->add(new \DateInterval('PT' . ((int)$row['start_time'] + $offset)  . 'S'));//addSeconds($row['start_time']);
+        else $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));
         $this->setStart($tempDate);
-        $tempDate = new CalendarDateTime($row['end_date'] >  0 ? $row['end_date'] . '000000': '');
-        $tempDate->setTZbyID('UTC');
-        $tempDate->addSeconds($row['end_time']);
-        $this->setEnd($tempDate);
 
+        $tempDate = GeneralUtility::makeInstance(CalendarDateTime::class,$row['end_date'] >  0 ? $row['end_date'] . '000000': '');
+        $tempDate->setTZbyID($row['timezone']);
+        if (!$row['allday'])  $tempDate->add(new \DateInterval('PT' .((int)$row['end_time'] + $offset). 'S'));//($row['end_time']);
+        else $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));
+        $this->setEnd($tempDate);
         $this->setAllDay($row['allday']);
         $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
         if ($eventStart->after($this->getEnd()) || !$this->isAllDay() && $eventStart->equals($this->getEnd())) {
             $tempDate = new CalendarDateTime($row['start_date']);
-            $tempDate->setTZbyID('UTC');
+           // $tempDate->setTZbyID('UTC');
             $tempDate->addSeconds($row['start_time'] + $this->conf['view.']['event.']['event.']['defaultEventLength']);
             $this->setEnd($tempDate);
         }
@@ -556,8 +580,8 @@ class EventModel extends Model
         $this->setByMonthDay($row['bymonthday']);
         $this->setByMonth($row['bymonth']);
 
-        $tempDate = new CalendarDateTime($row['until'] ?: '000000' . '000000');
-        $tempDate->setTZbyID('UTC');
+        $tempDate = new CalendarDateTime($row['until'] ? $row['until'].'000000':  '');
+        //$tempDate->setTZbyID('UTC');
         $this->setUntil($tempDate);
 
         $cnt = $row['cnt'];
@@ -650,6 +674,127 @@ class EventModel extends Model
                 $this->addNotifyGroup($event['uid_foreign'] . '|' . $event['offset']);
             }
         }
+    }
+
+    /**
+     * @param $row
+     * @param $isException
+     */
+    public function createParentEvent(&$row)
+    {
+
+        $this->parentEvent = &$row;
+        $this->setType($this->serviceKey);
+        $this->setUid($row->getUid());
+        $this->setPid($row->getPid());
+        $this->setCrdate($row->getCrdate());
+        $this->setCreateUserId($row->getCreateUserId());
+        $this->setHidden($row->getHidden());
+        $this->setTstamp($row->getTstamp());
+
+        $this->setCalendarId($row->getCalendarId());
+
+        $this->setTimezone($row->getTimezone());
+        $this->setAllDay($row->isAllday());
+
+        $this->setTitle($row->getTitle());
+        $this->setCategories($row->getCategories());
+
+        $this->setFreq($row->getFreq());
+     //   $this->setByDay($row->getByDay());
+       // $this->setByMonthDay($row->getByMonthDay());
+     //   $this->setByMonth($row->getByMonth());
+
+
+        $this->setUntil($row->getUntil());
+
+
+      // $this->setCount($cnt);
+
+        $this->setInterval($row->getInterval());
+
+        $this->setRdateType($row->getRdateType());
+        $this->setRdate($row->getRdate());
+
+        /* new */
+       // $this->setEventType($row['type']);
+
+//        if ($row['type'] === 3) { // meeting
+//            $modelObj = &Registry::Registry('basic', 'modelcontroller');
+//            $this->setAttendees($modelObj->findEventAttendees($this->getUid()));
+//        }
+        // ics cal event
+//        if ($row['type'] === 1) { // meeting
+//            $this->setIcsUid($row['icsUid']);
+//        }
+        $this->setPage($row->getPage());
+        $this->setExtUrl($row->getExtUrl());
+        /* new */
+
+      //  $this->setImage(GeneralUtility::trimExplode(',', $row['image'], 1));
+
+//        if ($row['attachment']) {
+//            $fileArr = explode(',', $row['attachment']);
+//            foreach ($fileArr as $key => $val) {
+//                // fills the marker ###FILE_LINK### with the links to the attached files
+//                $this->addAttachment($val);
+//            }
+//        }
+//
+//        if ($row['exception_single_ids']) {
+//            $ids = explode(',', $row['exception_single_ids']);
+//            foreach ($ids as $id) {
+//                $this->addExceptionSingleId($id);
+//            }
+//        }
+//        if ($row['exceptionGroupIds']) {
+//            $ids = explode(',', $row['exceptionGroupIds']);
+//            foreach ($ids as $id) {
+//                $this->addExceptionGroupId($id);
+//            }
+//        }
+//        if ($row['calendar_headerstyle'] !== '') {
+//            $this->setHeaderStyle($row['calendar_headerstyle']);
+//        }
+//
+//        if ($row['calendar_bodystyle'] !== '') {
+//            $this->setBodyStyle($row['calendar_bodystyle']);
+//        }
+//
+//        $this->setEventOwner($row['event_owner']);
+//
+//        if (!$isException) {
+//            $this->setTeaser($row['teaser']);
+//            $this->setDescription($row['description']);
+//
+//            $this->setLocationId($row['location_id']);
+//            $this->setLocation($row['location']);
+//            $this->setLocationPage($row['location_pid']);
+//            $this->setLocationLinkUrl($row['location_link']);
+//
+//            $this->setOrganizerId($row['organizer_id']);
+//            $this->setOrganizer($row['organizer']);
+//            $this->setOrganizerPid($row['organizer_pid']);
+//            $this->setOrganizerLink($row['organizer_link']);
+//        }
+//
+//        $sharedUids = $this->eventSharedUserMMRepository->findSharedUidsByEventUid($this->getUid());
+//        foreach ($sharedUids as $sharedUid) {
+//            if ($sharedUid['tablenames'] === 'fe_users') {
+//                $this->addSharedUser($sharedUid['uid_foreign']);
+//            } elseif ($sharedUid['tablenames'] === 'fe_groups') {
+//                $this->addSharedGroup($sharedUid['uid_foreign']);
+//            }
+//        }
+//
+//        $events = $this->subscriptionRepository->findSubscribingUsersAndGroupsByEventUid($this->getUid());
+//        foreach ($events as $event) {
+//            if ($event['tablenames'] === 'fe_users') {
+//                $this->addNotifyUser($event['uid_foreign'] . '|' . $event['offset']);
+//            } elseif ($event['tablenames'] === 'fe_groups') {
+//                $this->addNotifyGroup($event['uid_foreign'] . '|' . $event['offset']);
+//            }
+//        }
     }
 
     /**

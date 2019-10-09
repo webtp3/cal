@@ -626,7 +626,7 @@ class ListView extends BaseView
         $eventStart = $event->getStart();
         $eventEnd = $event->getEnd();
 
-        if ($eventEnd->before(new CalendarDateTime($this->starttime->format('Y-m-d H:i:s'))) || $eventStart->after(new CalendarDateTime($this->endtime->format('Y-m-d H:i:s')))) {
+        if ($eventEnd->before(new CalendarDateTime($this->starttime->format('Y-m-d H:i'))) || $eventStart->after(new CalendarDateTime($this->endtime->format('Y-m-d H:i')))) {
             return false;
         }
 

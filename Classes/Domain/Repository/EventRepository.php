@@ -40,7 +40,7 @@ class EventRepository extends DoctrineRepository
      * @param CalendarDateTime $endtime
      * @return array
      */
-    public function findUidsOfRecurringEvents(CalendarDateTime $starttime, CalendarDateTime $endtime): array
+    public function findUidsOfRecurringEvents($starttime, $endtime): array
     {
         $eventUidArray = [];
         $recurringEvents = $this->eventIndexRepository->findRecurringEvents($starttime, $endtime);

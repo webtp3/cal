@@ -947,7 +947,7 @@ class TodoService extends EventService
         $master_array[$startDate->format('Ymd')][$event->isAllDay() ? '-1' : $startDate->format('Hi')][$event->getUid()] = &$event;
         $select = '*';
         $table = 'tx_cal_index';
-        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('YmdHis') . ' AND start_datetime <= ' . $this->endtime->format('YmdHis');
+        $where = 'event_uid = ' . $event->getUid() . ' AND start_datetime >= ' . $this->starttime->format('YmdHi') . ' AND start_datetime <= ' . $this->endtime->format('YmdHi');
         $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where);
         if ($result) {
             while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {

@@ -204,7 +204,7 @@ class Date
 
         $this->tz = TimeZone::getDefault();
         if ($date === null) {
-            $this->setDate(date('Y-m-d H:i:s'));
+            $this->setDate(date('Y-m-d H:i'));
         } elseif (is_a($date, 'TYPO3\CMS\Cal\Model\Pear\Date\Date')) {
             $this->copy($date);
         } else {
@@ -259,7 +259,7 @@ class Date
             }
         } elseif (is_numeric($date)) {
             // UNIXTIME
-            $this->setDate(date('Y-m-d H:i:s', $date));
+            $this->setDate(date('Y-m-d H:i', $date));
         } else {
             // unknown format
             $this->year = 0;
@@ -316,7 +316,7 @@ class Date
                 return $this->format($format);
                 break;
             case DATE_FORMAT_TIMESTAMP:
-                return $this->format('YmdHis');
+                return $this->format('YmdHi');
                 break;
             case DATE_FORMAT_UNIXTIME:
                 return mktime($this->hour, $this->minute, $this->second, $this->month, $this->day, $this->year);

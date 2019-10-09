@@ -67,7 +67,7 @@
 		"bin-dir": ".Build/bin"
 	},
 	"scripts": {
-		"analyze:php": "phpstan analyse --ansi --no-progress --configuration=phpstan.neon --level=5 .Build/Web/typo3conf/ext/",
+		"analyze:php": "phpstan analyse --ansi --no-progress --configuration=phpstan.neon --level=5 .Build/web/typo3conf/ext/",
 		"typo3-cms-scripts": [
 			"typo3cms install:fixfolderstructure",
 			"typo3cms install:generatepackagestates"

@@ -17,7 +17,9 @@
 	text-align: center;
 	float: right;
 }
-
+.tx-cal-controller .row {
+	padding-bottom: 20px;
+}
 .tx-cal-controller .header-buttons div a {
 	line-height: 29px;
 	font-size: xx-small;

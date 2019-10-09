@@ -99,14 +99,15 @@ class CalendarDateTime extends \DateTime
     private $getMonthAbbrnameLength = 3;
     private $conf;
 
+
     /**
      * @param CalendarDateTime $compareDate
      * @return bool
      */
     public function equals(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHis'));
-        $b = floatval($this->format('YmdHis'));
+        $a = floatval($compareDate->format('YmdHi'));
+        $b = floatval($this->format('YmdHi'));
         return $a === $b;
     }
 
@@ -116,8 +117,8 @@ class CalendarDateTime extends \DateTime
      */
     public function before(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHis'));
-        $b = floatval($this->format('YmdHis'));
+        $a = floatval($compareDate->format('YmdHi'));
+        $b = floatval($this->format('YmdHi'));
         return $a > $b;
     }
 
@@ -127,8 +128,8 @@ class CalendarDateTime extends \DateTime
      */
     public function after(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHis'));
-        $b = floatval($this->format('YmdHis'));
+        $a = floatval($compareDate->format('YmdHi'));
+        $b = floatval($this->format('YmdHi'));
         return $a < $b;
     }
 
@@ -139,8 +140,8 @@ class CalendarDateTime extends \DateTime
      */
     public function compare(self $compareDateA, self $compareDateB): int
     {
-        $a = floatval($compareDateA->format('YmdHis'));
-        $b = floatval($compareDateB->format('YmdHis'));
+        $a = floatval($compareDateA->format('YmdHi'));
+        $b = floatval($compareDateB->format('YmdHi'));
         if ($a === $b) {
             return 0;
         }
@@ -282,7 +283,7 @@ class CalendarDateTime extends \DateTime
      */
     public function setTZbyID($id)
     {
-        //$this->setTimezone(new \DateTimeZone($id));
+        $this->setTimezone(new \DateTimeZone($id));
     }
 
     /**
@@ -315,7 +316,7 @@ class CalendarDateTime extends \DateTime
         $this->setHour($date->format('H'));
         $this->setMinute($date->format('i'));
         $this->setSecond($date->format('s'));
-        $this->setTimezone(new \DateTimeZone('UTC'));
+       // $this->setTimezone(new \DateTimeZone($date->format('T')));
     }
 
     /**

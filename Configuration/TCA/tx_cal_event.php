@@ -20,21 +20,6 @@ $sPid = '###CURRENT_PID###'; // storage pid????
 $useLocationStructure = $configuration['useLocationStructure'] ?: 'tx_cal_location';
 $useOrganizerStructure = $configuration['useOrganizerStructure'] ?: 'tx_cal_organizer';
 
-ExtensionManagementUtility::makeCategorizable(
-    'cal',
-    'tx_cal_event',
-    'category_id',
-    [
-        'label' => 'LLL:EXT:cal/Resources/Private/Language/locallang_db.xlf:tx_cal_event.category',
-        'exclude' => false,
-        'fieldConfiguration' => [
-            'foreign_table_where' => ' AND sys_category.sys_language_uid IN (-1, 0) ORDER BY sys_category.title ASC',
-        ],
-        'l10n_mode' => 'exclude',
-        'l10n_display' => 'hideDiff',
-    ]
-);
-
 switch ($useLocationStructure) {
     case 'tx_tt_address':
         $useLocationStructure = 'tt_address';
