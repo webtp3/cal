@@ -11,6 +11,7 @@ namespace TYPO3\CMS\Cal\Utility;
 use TYPO3\CMS\Cal\Backend\Modul\CalIndexer;
 use TYPO3\CMS\Cal\Controller\Api;
 use TYPO3\CMS\Cal\Controller\DateParser;
+use TYPO3\CMS\Cal\Controller\ModelController;
 use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Service\EventService;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -62,6 +63,11 @@ class RecurrenceGenerator
      * @var array
      */
     public $extConf;
+
+    /**
+     * @var array
+     */
+    public $eventService = null;
 
     /**
      * @param null $pageIDForPlugin
@@ -403,33 +409,32 @@ class RecurrenceGenerator
      * @return EventService
      * @throws Exception
      */
-    public function getEventService(): EventService
+    public function getEventService() : EventService
     {
-        static $eventService = null;
-        if (is_object($eventService)) {
-            return $eventService;
+        if (is_object($this->eventService)) {
+            return $this->eventService;
         }
 
         try {
-            $modelObj = &Registry::Registry('basic', 'modelcontroller');
+            $modelObj = $this->objectManager->get(ModelController::class);//&Registry::Registry('basic', 'modelcontroller');
             if (!$modelObj) {
                 /** @var Api $calAPI */
                 $calAPI = GeneralUtility::makeInstance(Api::class);
                 $calAPI = &$calAPI->tx_cal_api_without($this->pageIDForPlugin);
                 $modelObj = $calAPI->modelObj;
             }
-            $eventService = $modelObj->getServiceObjByKey('cal_event_model', 'event', 'tx_cal_phpicalendar');
+            $this->eventService = $modelObj->getServiceObjByKey('cal_event_model', 'event', 'tx_cal_phpicalendar');
         } catch (\Exception $e) {
             $this->info = CalIndexer::getMessage($e, FlashMessage::ERROR);
         }
 
-        if (!is_object($eventService)) {
+        if (!is_object($this->eventService)) {
             $this->info = CalIndexer::getMessage(
                 'Could not fetch the event service! Please make sure the page id is correct!',
                 FlashMessage::ERROR
             );
         }
-        return $eventService;
+        return $this->eventService;
     }
 
     /**

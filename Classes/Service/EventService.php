@@ -2955,8 +2955,8 @@ class EventService extends BaseService
             }
 
             $eventData['event_deviation_uid'] = $deviationDates[$eventData['start_datetime']]['uid'];
-            $eventData['start_datetime'] = $startDate->format('Ymd') . $startDate->format('His');
-            $eventData['end_datetime'] = $endDate->format('Ymd') . $endDate->format('His');
+            $eventData['start_datetime'] = $startDate->format('Ymd') . $startDate->format('Hi');
+            $eventData['end_datetime'] = $endDate->format('Ymd') . $endDate->format('Hi');
         }
         else{
             return false;
