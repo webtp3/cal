@@ -177,7 +177,7 @@ abstract class BaseModel extends AbstractModel
     /**
      * @var array
      */
-    protected $row = [];
+    public $row = [];
 
     /**
      * @var ObjectStorage
