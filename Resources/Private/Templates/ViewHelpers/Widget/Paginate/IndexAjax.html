@@ -1,7 +1,8 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-	  xmlns:n="http://typo3.org/ns/GeorgRinger/News/ViewHelpers"
-	  xmlns:t="http://typo3.org/ns/Helhum/TyposcriptRendering/ViewHelpers"
-	  data-namespace-typo3-fluid="true">
+	    xmlns:n="http://typo3.org/ns/GeorgRinger/News/ViewHelpers"
+			xmlns:cal="http://typo3.org/ns/TYPO3/CMS/Cal/ViewHelpers"
+			xmlns:t="http://typo3.org/ns/Helhum/TyposcriptRendering/ViewHelpers"
+	  	data-namespace-typo3-fluid="true">
 
 <f:if condition="{configuration.insertAbove}">
 	<f:render section="paginator" arguments="{pagination: pagination,configuration:configuration,recordId:recordId}" />
@@ -13,7 +14,7 @@
 </f:if>
 
 <f:section name="paginator">
-	<n:extensionLoaded extensionKey="typoscript_rendering">
+	<cal:extensionLoaded extensionKey="typoscript_rendering">
 		<f:then>
 			<f:if condition="{pagination.numberOfPages} > 1">
 				<f:if condition="{settings.list.paginate}">
@@ -111,6 +112,6 @@
 		<f:else>
 			<div class="alert alert-danger">The extension <code>typoscript_rendering</code> must be installed!</div>
 		</f:else>
-	</n:extensionLoaded>
+	</cal:extensionLoaded>
 </f:section>
 </html>

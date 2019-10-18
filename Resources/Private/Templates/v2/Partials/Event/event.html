@@ -1,6 +1,6 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-			xmlns:n="http://typo3.org/ns/GeorgRinger/News/ViewHelpers"
 			xmlns:bk2k="http://typo3.org/ns/BK2K/BootstrapPackage/ViewHelpers"
+			xmlns:cal="http://typo3.org/ns/TYPO3/CMS/Cal/ViewHelpers"
 			xmlns:rx="http://typo3.org/ns/Reelworx/RxShariff/ViewHelper"
 			xmlns:ttaddr="http://typo3.org/ns/FriendsOfTYPO3/TtAddress/ViewHelper"
 			data-namespace-typo3-fluid="true">
@@ -99,9 +99,9 @@
 		<h3 class="organizerObject">
 			<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_organizer"/>
 		</h3>
-		<n:extensionLoaded extensionKey="tt_address">
+		<cal:extensionLoaded extensionKey="tt_address">
 				<f:render partial="Event/Maps" section="leaflet" arguments="{address:event.organizerObject, settings:settings}" />
-		</n:extensionLoaded>
+		</cal:extensionLoaded>
 		</div>
 	</f:then>
 	<f:else>
@@ -121,9 +121,9 @@
 		<h3 class="locationObject">
 			<f:translate key="LLL:EXT:cal/Resources/Private/Language/locallang.xlf:l_event_location"/>
 		</h3>
-		<n:extensionLoaded extensionKey="tt_address">
+		<cal:extensionLoaded extensionKey="tt_address">
 				<f:render partial="Event/Maps" section="leaflet" arguments="{address:event.locationObject, settings:settings}" />
-		</n:extensionLoaded>
+		</cal:extensionLoaded>
 			</div>
 	</f:then>
 	<f:else>
@@ -148,9 +148,9 @@
 		</f:for>
 	</ul>
 </f:if>
-<n:extensionLoaded extensionKey="rx_shariff">
+<cal:extensionLoaded extensionKey="rx_shariff">
 	<f:render partial="Event/Shariff" />
-</n:extensionLoaded>
+</cal:extensionLoaded>
 <f:if condition="{settings.view.ics.showIcsLinks} == 1">
 	<br/>
 	<f:link.page pageType="{settings.view.ics.typeNum}"
