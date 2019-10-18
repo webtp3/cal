@@ -40,7 +40,7 @@ class EventRepository extends DoctrineRepository
      * @param CalendarDateTime $endtime
      * @return array
      */
-    public function findUidsOfRecurringEvents($starttime, $endtime): array
+    public function findUidsOfRecurringEvents(CalendarDateTime $starttime, CalendarDateTime $endtime): array
     {
         $eventUidArray = [];
         $recurringEvents = $this->eventIndexRepository->findRecurringEvents($starttime, $endtime);
@@ -50,6 +50,50 @@ class EventRepository extends DoctrineRepository
         return $eventUidArray;
     }
 
+    /**
+     * @param CalendarDateTime $starttime
+     * @param CalendarDateTime $endtime
+     * @return array
+     */
+    public function findRecurringEvents(CalendarDateTime $starttime, CalendarDateTime $endtime, $settings = []): array
+    {
+        #todo include deviations
+        $recurringEvents = $this->eventIndexRepository->findIndexEvents($starttime, $endtime);
+//        foreach ($recurringEvents as $recurringEvent) {
+//            $eventUidArray[] = $recurringEvent['event_uid'];
+//        }
+        return $recurringEvents;
+    }
+    /**
+     * @param CalendarDateTime $starttime
+     * @param CalendarDateTime $endtime
+     * @return array
+     */
+    public function findAllWithin($starttime, $endtime): array
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        return $queryBuilder
+            ->select('*')
+            ->from($this->table)
+            ->where(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->gte('start_date', $starttime->format('Ymd')),
+                        $queryBuilder->expr()->lte('start_date', $endtime->format('Ymd'))
+                    ),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->lt('start_date', $starttime->format('Ymd')),
+                        $queryBuilder->expr()->gt('end_date', $starttime->format('Ymd'))
+                    ),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->lt('start_date', $endtime->format('Ymd')),
+                        $queryBuilder->expr()->gt('end_date', $endtime->format('Ymd'))
+                    )
+                )
+            )
+            ->execute()
+            ->fetchAll();
+    }
     /**
      * @param EventIndexRepository $eventIndexRepository
      */

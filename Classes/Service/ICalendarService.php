@@ -979,7 +979,7 @@ class ICalendarService extends BaseService
 
         $indexEntry = BackendUtilityReplacementUtility::getRawRecord(
             'tx_cal_index',
-            'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('YmdHi') . '"'
+            'event_uid="' . $eventUid . '" AND start_datetime="' . $recurrenceIdStart->format('YmdHis') . '"'
         );
 
         if ($indexEntry) {
@@ -1047,7 +1047,7 @@ class ICalendarService extends BaseService
                         $event->getEnd()
                     );
 //                    $insertFields['event_uid'] = $event->getUid();
-//                    $insertFields['start_datetime'] =$nextOccuranceTime->format('Ymd').$nextOccuranceTime->format('Hi');
+//                    $insertFields['start_datetime'] =$nextOccuranceTime->format('Ymd').$nextOccuranceTime->format('His');
 //                    $insertFields['end_datetime'] = $event->getUid();
 //                    $insertFields['event_uid'] = $event->getUid();
 //                    $insertFields['event_deviation_uid'] = $event->getUid();

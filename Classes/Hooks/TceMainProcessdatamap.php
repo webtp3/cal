@@ -259,17 +259,17 @@ class TceMainProcessdatamap
 
                         $GLOBALS ['TSFE']->tmpl->getFileName_backPath = $oldBackPath;
                     }
-                }
-                /** @var RecurrenceGenerator $rgc */
-                $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
-                $rgc->generateIndexForUid($event ['uid'], $table);
 
-                if ($table === 'tx_cal_event' && isset($tx_cal_api) && $tx_cal_api->conf ['view.'] ['event.'] ['remind']) {
-                    /* Schedule reminders for new and changed events */
-                    $reminderService = &Functions::getReminderService();
-                    $reminderService->scheduleReminder($event ['uid']);
-                }
+                    /** @var RecurrenceGenerator $rgc */
+                    $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class, $pageIDForPlugin);
+                    $rgc->generateIndexForUid($event ['uid'], $table);
 
+                    if ($table === 'tx_cal_event' && isset($tx_cal_api) && $tx_cal_api->conf ['view.'] ['event.'] ['remind']) {
+                        /* Schedule reminders for new and changed events */
+                        $reminderService = &Functions::getReminderService();
+                        $reminderService->scheduleReminder($event ['uid']);
+                    }
+                }
             }
         }
 
@@ -279,15 +279,19 @@ class TceMainProcessdatamap
             if (is_array($deviationRow)) {
                 $startDate = null;
                 if ($deviationRow['start_date']) {
-                    $startDate = CalendarDateTime::createFromFormat('Ymd', $deviationRow ['start_date'])->setTimezone(new \DateTimeZone(date('T')));//new CalendarDateTime($deviationRow['start_date']);
+                    $startDate = self::convertBackendDateToPear( $deviationRow ['start_date']);
+                    // $startDate->setTimezone(new \DateTimeZone(date('T')));//new CalendarDateTime($deviationRow['start_date']);
                 } else {
-                    $startDate = CalendarDateTime::createFromFormat('Ymd', $deviationRow ['orig_start_date'])->setTimezone(new \DateTimeZone(date('T')));//new CalendarDateTime($deviationRow['orig_start_date']);
+                    $startDate =self::convertBackendDateToPear( $deviationRow ['orig_start_date']);
+                    //->setTimezone(new \DateTimeZone(date('T')));//new CalendarDateTime($deviationRow['orig_start_date']);
                 }
                 $endDate = null;
                 if ($deviationRow['end_date']) {
-                    $endDate = CalendarDateTime::createFromFormat('Ymd', $deviationRow ['end_date'])->setTimezone(new \DateTimeZone(date('T')));//new CalendarDateTime($deviationRow['end_date']);
+                    $endDate = self::convertBackendDateToPear($deviationRow ['end_date']);
+                    //->setTimezone(new \DateTimeZone(date('T')));//new CalendarDateTime($deviationRow['end_date']);
                 } else {
-                    $endDate = CalendarDateTime::createFromFormat('Ymd', $deviationRow ['orig_end_date'])->setTimezone(new \DateTimeZone(date('T')));//new CalendarDateTime($deviationRow['orig_end_date']);
+                    $endDate = self::convertBackendDateToPear($deviationRow ['orig_end_date']);
+                    //->setTimezone(new \DateTimeZone(date('T')));//new CalendarDateTime($deviationRow['orig_end_date']);
                 }
 
                 if (! $deviationRow['allday']) {
@@ -415,9 +419,9 @@ class TceMainProcessdatamap
         }
 
         if ($table === 'tx_cal_category' && array_key_exists('calendar_id', $incomingFieldArray) && false === strpos(
-            $id,
-            'NEW'
-        )) {
+                $id,
+                'NEW'
+            )) {
             $category = BackendUtility::getRecord('tx_cal_category', $id);
             if ($incomingFieldArray ['calendar_id'] !== $category ['calendar_id']) {
                 $incomingFieldArray ['parent_category'] = 0;
@@ -426,9 +430,9 @@ class TceMainProcessdatamap
 
         /* If an existing calendar is updated */
         if ($table === 'tx_cal_calendar' && array_key_exists('type', $incomingFieldArray) && false === strpos(
-            $id,
-            'NEW'
-        )) {
+                $id,
+                'NEW'
+            )) {
             /* Get the calendar info from the db */
             $calendar = BackendUtility::getRecord('tx_cal_calendar', $id);
 
@@ -476,23 +480,23 @@ class TceMainProcessdatamap
 
         if ($table === 'tx_cal_attendee') {
             $incomingFieldArray ['fe_user_id'] = str_replace([
-                    ',',
-                    'fe_users_'
+                ',',
+                'fe_users_'
             ], [
-                    '',
-                    ''
+                '',
+                ''
             ], $incomingFieldArray ['fe_user_id']);
             $incomingFieldArray ['fe_group_id'] = str_replace([
-                    ',',
-                    'fe_groups_'
+                ',',
+                'fe_groups_'
             ], [
-                    '',
-                    ''
+                '',
+                ''
             ], $incomingFieldArray ['fe_group_id']);
             if ($incomingFieldArray ['fe_group_id'] > 0) {
                 $subType = 'getGroupsFE';
                 $groups = [
-                        0
+                    0
                 ];
                 $serviceObj = GeneralUtility::makeInstanceService('auth', $subType);
                 if ($serviceObj === null) {
@@ -597,8 +601,8 @@ class TceMainProcessdatamap
     public static function getWeekdayOccurrence($date): array
     {
         return [
-                ceil($date->getDay() / 7),
-                $date->getDayName()
+            ceil($date->getDay() / 7),
+            $date->getDayName()
         ];
     }
 
@@ -627,12 +631,12 @@ class TceMainProcessdatamap
     public static function convertBackendDateToYMD($dateString): string
     {
         $src_format = 'U';
-         if(!is_int($dateString)){
-             $dateString = strtotime($dateString);
-         }
-         else if(is_int($dateString) && strlen($dateString) == 8){
-             $src_format = 'Ymd';
-         }
+        if(!is_int($dateString) && strlen($dateString) != 8){
+            $dateString = strtotime($dateString);
+        }
+        else if(is_int($dateString) && strlen($dateString) == 8){
+            $src_format = 'Ymd';
+        }
         $offset = CalendarDateTime::createFromFormat($src_format, $dateString)->setTimezone(new \DateTimeZone(date('T')))->getOffset();
         $date = CalendarDateTime::createFromFormat($src_format, $dateString)->setTimezone(new \DateTimeZone(date('T')))->add(new \DateInterval('PT' . $offset . 'S'));
 

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * This file is part of the web-tp3/cal.
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace TYPO3\CMS\Cal\Model;
 
 /**
@@ -20,6 +14,7 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+
 use TYPO3\CMS\Cal\Controller\ModelController;
 use TYPO3\CMS\Cal\Model\Pear\Date\Calc;
 use TYPO3\CMS\Cal\Utility\Registry;
@@ -50,7 +45,7 @@ abstract class Model extends BaseModel
     /**
      * @var string
      */
-    protected $timezone = '';
+    protected $timezone = 'UTC';
 
     /**
      * @var string
@@ -94,7 +89,7 @@ abstract class Model extends BaseModel
     /**
      * @var
      */
-    public $location;
+    public $location = '';
 
     /**
      * @var
@@ -269,7 +264,7 @@ abstract class Model extends BaseModel
     /**
      * @var
      */
-    public $locationLink;
+    public $locationLink = '';
 
     /**
      * @var
@@ -277,7 +272,7 @@ abstract class Model extends BaseModel
     public $locationPage;
 
     /**
-     * @var
+     * @var LocationModel
      */
     public $locationObject;
 
@@ -542,9 +537,9 @@ abstract class Model extends BaseModel
      *
      * @return string location.
      */
-    public function getLocation(): string
+    public function getLocation()
     {
-        return $this->location ?? $this->parentEvent->location;
+        return $this->location;
     }
 
     /**
@@ -604,7 +599,7 @@ abstract class Model extends BaseModel
      */
     public function getStart(): CalendarDateTime
     {
-        return $this->start;
+        return $this->start ?? new CalendarDateTime();
     }
 
     /**
@@ -639,7 +634,7 @@ abstract class Model extends BaseModel
      *
      * @param CalendarDateTime $end
      */
-    public function setEnd($end)
+    public function setEnd(CalendarDateTime $end)
     {
         $this->end = new CalendarDateTime();
         $this->end->copy($end);
@@ -697,9 +692,9 @@ abstract class Model extends BaseModel
      *
      * @return int calendar uid
      */
-    public function getCalendarId(): int
+    public function getCalendarId()// avoid if no cal found: int
     {
-        return $this->calendar_id ?? $this->parentEvent->calendar_id;//$this->calendar_id;
+        return $this->calendar_id;//$this->calendar_id;
     }
 
     /**
@@ -766,9 +761,9 @@ abstract class Model extends BaseModel
     /**
      * @return string
      */
-    public function getTimezone(): string
+    public function getTimezone()
     {
-        return $this->timezone;
+        return $this->timezone ?? $this->parentEvent->timezone;
     }
 
     /**
@@ -1066,7 +1061,7 @@ abstract class Model extends BaseModel
      */
     public function getByHour(): array
     {
-        return $this->byhour;
+        return $this->byhour ?? $this->parentEvent->byhour;
     }
 
     /**
@@ -1082,7 +1077,7 @@ abstract class Model extends BaseModel
      */
     public function getBySecond(): array
     {
-        return $this->bysecond;
+        return $this->bysecond ?? $this->parentEvent->bysecond;
     }
 
     /**

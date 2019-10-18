@@ -17,8 +17,8 @@ $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'
 
 $sPid = '###CURRENT_PID###'; // storage pid????
 
-$useLocationStructure = $configuration['useLocationStructure'] ?: 'tx_cal_location';
-$useOrganizerStructure = $configuration['useOrganizerStructure'] ?: 'tx_cal_organizer';
+$useLocationStructure = $configuration['useLocationStructure'] ?: 'tx_tt_address';
+$useOrganizerStructure = $configuration['useOrganizerStructure'] ?: 'tx_tt_address';
 
 switch ($useLocationStructure) {
     case 'tx_tt_address':

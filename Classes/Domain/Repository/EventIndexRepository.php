@@ -8,8 +8,7 @@ declare(strict_types = 1);
  */
 
 namespace TYPO3\CMS\Cal\Domain\Repository;
-
-use TYPO3\CMS\Cal\Model\CalDate;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 
 /**
  * This file is part of the TYPO3 extension Calendar Base (cal).
@@ -35,7 +34,7 @@ class EventIndexRepository extends DoctrineRepository
      * @param CalendarDateTime $endtime
      * @return array
      */
-    public function findRecurringEvents( $starttime, $endtime): array
+    public function findRecurringEvents(CalendarDateTime $starttime, CalendarDateTime $endtime): array
     {
         $queryBuilder = $this->getQueryBuilder();
         return $queryBuilder
@@ -44,20 +43,50 @@ class EventIndexRepository extends DoctrineRepository
             ->where(
                 $queryBuilder->expr()->orX(
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->gte('start_datetime', $starttime->format('YmdHi')),
-                        $queryBuilder->expr()->lte('start_datetime', $endtime->format('YmdHi'))
+                        $queryBuilder->expr()->gte('start_datetime', $starttime->format('YmdHis')),
+                        $queryBuilder->expr()->lte('start_datetime', $endtime->format('YmdHis'))
                     ),
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->lt('start_datetime', $starttime->format('YmdHi')),
-                        $queryBuilder->expr()->gt('end_datetime', $starttime->format('YmdHi'))
+                        $queryBuilder->expr()->lt('start_datetime', $starttime->format('YmdHis')),
+                        $queryBuilder->expr()->gt('end_datetime', $starttime->format('YmdHis'))
                     ),
                     $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->lt('start_datetime', $endtime->format('YmdHi')),
-                        $queryBuilder->expr()->gt('end_datetime', $endtime->format('YmdHi'))
+                        $queryBuilder->expr()->lt('start_datetime', $endtime->format('YmdHis')),
+                        $queryBuilder->expr()->gt('end_datetime', $endtime->format('YmdHis'))
                     )
                 )
             )
             ->groupBy('event_uid')
+            ->execute()
+            ->fetchAll();
+    }
+    /**
+     * @param CalendarDateTime $starttime
+     * @param CalendarDateTime $endtime
+     * @return array
+     */
+    public function findIndexEvents(CalendarDateTime $starttime, CalendarDateTime $endtime): array
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        return $queryBuilder
+            ->select('*')
+            ->from($this->table)
+            ->where(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->gte('start_datetime', $starttime->format('YmdHis')),
+                        $queryBuilder->expr()->lte('start_datetime', $endtime->format('YmdHis'))
+                    ),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->lt('start_datetime', $starttime->format('YmdHis')),
+                        $queryBuilder->expr()->gt('end_datetime', $starttime->format('YmdHis'))
+                    ),
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->lt('start_datetime', $endtime->format('YmdHis')),
+                        $queryBuilder->expr()->gt('end_datetime', $endtime->format('YmdHis'))
+                    )
+                )
+            )
             ->execute()
             ->fetchAll();
     }

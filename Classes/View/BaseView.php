@@ -2108,7 +2108,7 @@ class BaseView extends BaseService
                             foreach ($eventKeys as $eventKey) {
                                 /** @var EventModel $event */
                                 $event = &$arrayOfEvents[$eventKey];
-                                $eventReferenceKey = $dateKey . '_' . $event->getType() . '_' . $event->getUid() . '_' . $event->getStart()->format('YmdHi');
+                                $eventReferenceKey = $dateKey . '_' . $event->getType() . '_' . $event->getUid() . '_' . $event->getStart()->format('YmdHis');
                                 $this->eventArray[$eventReferenceKey] = &$event;
                                 $starttime = new CalendarDateTime();
                                 $starttime->copy($event->getStart());

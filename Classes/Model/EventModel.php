@@ -20,8 +20,8 @@ namespace TYPO3\CMS\Cal\Model;
  *
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
+
 use TYPO3\CMS\Cal\Controller\Controller;
-use TYPO3\CMS\Cal\Domain\Repository\EventDeviationRepository;
 use TYPO3\CMS\Cal\Domain\Repository\EventSharedUserMMRepository;
 use TYPO3\CMS\Cal\Domain\Repository\SubscriptionRepository;
 use TYPO3\CMS\Cal\Service\RightsService;
@@ -102,6 +102,10 @@ class EventModel extends Model
      */
     protected $subscriptionRepository;
 
+    /** TimeZone
+     * @var  $offset
+     */
+    protected $offset;
 //    /**
 //     * @var EventDeviationRepository
 //     */
@@ -114,19 +118,16 @@ class EventModel extends Model
      */
     public function __construct($row, $isException, $serviceKey, $start = null, $end = null)
     {
-
-        parent::__construct($serviceKey);
-        $this->setObjectType('event');
+        #todo add error event
+        if($serviceKey != "error")parent::__construct($serviceKey);
         $this->eventSharedUserMMRepository = GeneralUtility::makeInstance(EventSharedUserMMRepository::class);
         $this->subscriptionRepository = GeneralUtility::makeInstance(SubscriptionRepository::class);
-        //$this->eventdeviationRepository = GeneralUtility::makeInstance(EventDeviationRepository::class);
-
         if (is_array($row)) {
            if($row['timezone']) $this->timezone = $row['timezone'];
             $this->createEvent($row, $isException);
         }
         elseif (is_object($row)){
-            if($row->imezone) $this->timezone = $row->timezone;
+            if($row->imezone) $this->timezone = $row->imezone;
             $this->createParentEvent($row);
         }
         if(!is_null($start))$this->setStart($start);
@@ -223,7 +224,7 @@ class EventModel extends Model
                         $start = new CalendarDateTime(Functions::getYmdFromDateString(
                             $this->conf,
                             strip_tags($piVars['startdate'] ?: $piVars['getdate'])
-                        ) . '000000');
+                            ) . '000000');
                         if (strlen($piVars['starttime']) === 4) {
                             $tempArray = [];
                             preg_match('/([0-9]{2})([0-9]{2})/', $piVars['starttime'], $tempArray);
@@ -256,7 +257,7 @@ class EventModel extends Model
                         $end = new CalendarDateTime(Functions::getYmdFromDateString(
                             $this->conf,
                             strip_tags($piVars['enddate'] ?: $piVars['getdate'])
-                        ) . '000000');
+                            ) . '000000');
                         if (strlen($piVars['endtime']) === 4) {
                             $tempArray = [];
                             preg_match('/([0-9]{2})([0-9]{2})/', $piVars['endtime'], $tempArray);
@@ -348,7 +349,7 @@ class EventModel extends Model
                         $until = new CalendarDateTime(Functions::getYmdFromDateString(
                             $this->conf,
                             strip_tags($piVars['until'])
-                        ) . '000000');
+                            ) . '000000');
                     } else {
                         $until = new CalendarDateTime('00000000000000');
                     }
@@ -533,7 +534,10 @@ class EventModel extends Model
         $this->setCreateUserId($row['cruser_id']);
         $this->setHidden($row['hidden']);
         $this->setTstamp($row['tstamp']);
+
         $this->setCalendarId($row['calendar_id']);
+
+        $this->setTimezone($row['timezone']);
 
         if ($row['allday']) {
             $row['start_time'] = 0;
@@ -541,28 +545,27 @@ class EventModel extends Model
         } elseif ($row['start_time'] === 0 && $row['end_time'] === 0) {
             $row['allday'] = 1;
         }
-        if(!$row['timezone'] || $row['timezone'] == 'UTC'){
-            $row['timezone'] = date('T');
-        }
-        $this->setTimezone($row['timezone']);
-        $offset = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('Ymd', $row['start_date'])->setTimezone(new \DateTimeZone($row['timezone']))->getOffset();
-        $tempDate = GeneralUtility::makeInstance(CalendarDateTime::class, $row['start_date'] > 0 ? $row['start_date'] . '000000' :'');
-        $tempDate->setTZbyID($row['timezone']);
-        if (!$row['allday']) $tempDate->add(new \DateInterval('PT' . ((int)$row['start_time'] + $offset)  . 'S'));//addSeconds($row['start_time']);
-        else $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));
-        $this->setStart($tempDate);
+        $offset = CalendarDateTime::createFromFormat('U', $row['start_date'])->setTimezone(new \DateTimeZone(date('T')))->getOffset();
 
-        $tempDate = GeneralUtility::makeInstance(CalendarDateTime::class,$row['end_date'] >  0 ? $row['end_date'] . '000000': '');
-        $tempDate->setTZbyID($row['timezone']);
-        if (!$row['allday'])  $tempDate->add(new \DateInterval('PT' .((int)$row['end_time'] + $offset). 'S'));//($row['end_time']);
-        else $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));
+        $tempDate = new CalendarDateTime($row['start_date'] > 0 ? $row['start_date'] . '000000' :'');
+       // $tempDate->setTZbyID('UTC');
+        $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
+        $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
+        $tempDate->addSeconds($row['start_time']);
+        $this->setStart($tempDate);
+        $tempDate = new CalendarDateTime($row['end_date'] >  0 ? $row['end_date'] . '000000': '');
+        //$tempDate->setTZbyID('UTC');
+        $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
+        $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
+        $tempDate->addSeconds($row['end_time']);
         $this->setEnd($tempDate);
+
         $this->setAllDay($row['allday']);
         $eventStart = $this->getStart();
         $eventEnd = $this->getEnd();
         if ($eventStart->after($this->getEnd()) || !$this->isAllDay() && $eventStart->equals($this->getEnd())) {
             $tempDate = new CalendarDateTime($row['start_date']);
-           // $tempDate->setTZbyID('UTC');
+            $tempDate->setTZbyID('UTC');
             $tempDate->addSeconds($row['start_time'] + $this->conf['view.']['event.']['event.']['defaultEventLength']);
             $this->setEnd($tempDate);
         }
@@ -581,7 +584,7 @@ class EventModel extends Model
         $this->setByMonth($row['bymonth']);
 
         $tempDate = new CalendarDateTime($row['until'] ? $row['until'].'000000':  '');
-        //$tempDate->setTZbyID('UTC');
+        $tempDate->setTZbyID('UTC');
         $this->setUntil($tempDate);
 
         $cnt = $row['cnt'];
@@ -763,20 +766,18 @@ class EventModel extends Model
 //
 //        $this->setEventOwner($row['event_owner']);
 //
-//        if (!$isException) {
-//            $this->setTeaser($row['teaser']);
-//            $this->setDescription($row['description']);
-//
-//            $this->setLocationId($row['location_id']);
-//            $this->setLocation($row['location']);
-//            $this->setLocationPage($row['location_pid']);
-//            $this->setLocationLinkUrl($row['location_link']);
-//
-//            $this->setOrganizerId($row['organizer_id']);
-//            $this->setOrganizer($row['organizer']);
-//            $this->setOrganizerPid($row['organizer_pid']);
-//            $this->setOrganizerLink($row['organizer_link']);
-//        }
+      //  if (!$isException) {
+            $this->setTeaser($row->getTeaser());
+            $this->setDescription($row->getDescription());
+
+            $this->setLocationId($row->getLocationId());
+            $this->setLocation($row->getLocation());
+
+//            $this->setOrganizerId($row->organizer_id());
+//            $this->setOrganizer($row->organizer());
+//            $this->setOrganizerPid($row->organizer_pid());
+//            $this->setOrganizerLink($row->organizer_link());
+    //    }
 //
 //        $sharedUids = $this->eventSharedUserMMRepository->findSharedUidsByEventUid($this->getUid());
 //        foreach ($sharedUids as $sharedUid) {
@@ -809,6 +810,7 @@ class EventModel extends Model
         $event->setIsClone(true);
         return $event;
     }
+
     /**
      * Gets the teaser of the event.
      *
@@ -1106,7 +1108,7 @@ class EventModel extends Model
         if (substr(
             $viewType,
             -6
-        ) !== 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('Ymd') !== $this->getEnd()->format('Ymd'))) {
+            ) !== 'ALLDAY' && ($this->isAllday() || $this->getStart()->format('Ymd') !== $this->getEnd()->format('Ymd'))) {
             $subpartSuffix .= 'ALLDAY';
         }
         $hookObjectsArr = Functions::getHookObjectsArray(
@@ -1143,7 +1145,7 @@ class EventModel extends Model
                 '###',
                 '',
                 $subpartMarker
-            ) . '< subpart-marker in ' . $templatePath;
+                ) . '< subpart-marker in ' . $templatePath;
         }
         $rems = [];
         $sims = [];
@@ -1284,7 +1286,7 @@ class EventModel extends Model
                                                 'tx_cal_controller[uid]' => $this->getUid(),
                                                 'tx_cal_controller[sid]' => md5($this->getUid() . $email . $this->getCrdate())
                                             ]
-                                    );
+                                        );
 
                                     $local_switch['###EVENT_LINK###'] = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $this->controller->pi_getPageLink(
                                         $this->conf['view.']['event.']['eventViewPid'],
@@ -1295,7 +1297,7 @@ class EventModel extends Model
                                                 'tx_cal_controller[type]' => $this->getType(),
                                                 'tx_cal_controller[getdate]' => $this->getStart()->format('Ymd')
                                             ]
-                                    );
+                                        );
                                     $htmlTemplate = Functions::substituteMarkerArrayNotCached(
                                         $htmlTemplate,
                                         $local_switch,
@@ -1398,7 +1400,7 @@ class EventModel extends Model
                                                 'tx_cal_controller[uid]' => $this->getUid(),
                                                 'tx_cal_controller[sid]' => md5($this->getUid() . $email . $crdate)
                                             ]
-                                    );
+                                        );
                                     $htmlTemplate = Functions::substituteMarkerArrayNotCached(
                                         $htmlTemplate,
                                         $local_switch,
@@ -1426,7 +1428,7 @@ class EventModel extends Model
                                                 'tx_cal_controller[uid]' => $this->getUid(),
                                                 'tx_cal_controller[sid]' => md5($this->getUid() . $email . $crdate)
                                             ]
-                                    );
+                                        );
                                     $plainTemplate = Functions::substituteMarkerArrayNotCached(
                                         $plainTemplate,
                                         $local_switch,
@@ -2583,7 +2585,7 @@ class EventModel extends Model
         $sims['###DTSTAMP###'] = 'DTSTAMP:' . gmdate('Ymd', $this->getCrdate()) . 'T' . gmdate(
             'His',
             $this->getCrdate()
-        );
+            );
     }
 
     /**
@@ -2957,7 +2959,7 @@ class EventModel extends Model
         $sims['###CREATED###'] = 'CREATED:' . gmdate('Ymd', $this->getCrdate()) . 'T' . gmdate(
             'His',
             $this->getCrdate()
-        ) . 'Z';
+            ) . 'Z';
     }
 
     /**
@@ -2972,7 +2974,7 @@ class EventModel extends Model
         $sims['###LAST_MODIFIED###'] = 'LAST_MODIFIED:' . gmdate('Ymd', $this->getTstamp()) . 'T' . gmdate(
             'His',
             $this->getTstamp()
-        ) . 'Z';
+            ) . 'Z';
     }
 
     /**

@@ -25,7 +25,7 @@ use TYPO3\CMS\Cal\Utility\Functions;
 /**
  * Class TodoRecModel
  */
-class TodoRecModel extends EventRecModel
+class TodoRecModel extends EventModel
 {
     /**
      * TodoRecModel constructor.

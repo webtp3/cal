@@ -933,7 +933,8 @@ class ModelController extends BaseController
             while (is_object($service = GeneralUtility::makeInstanceService($serviceName, $subtype, $serviceChain))) {
                 $serviceChain .= ',' . $service->getServiceKey();
                 /* Gets all events from the current model as an array */
-                $eventsFromService = $service->findAllWithin(new CalendarDateTime($startDateObject->format('Y-m-d H:i')), new CalendarDateTime($endDateObject->format('Y-m-d H:i')), $pidList, $eventType, $additionalWhere);
+                $eventsFromService = $service->findAllWithin(new CalendarDateTime($startDateObject->format('Y-m-d H:i:s')), new CalendarDateTime($endDateObject->format('Y-m-d H:i:s')), $pidList, $eventType, $additionalWhere);
+                // $service->eventRepository->findAllWithin($startDateObject, $endDateObject);
 
                 if (!empty($eventsFromService)) {
                     if (empty($events)) {
@@ -1217,10 +1218,11 @@ class ModelController extends BaseController
     ): EventModel {
         $service = $this->getServiceObjByKey($serviceName, $subtype, $type);
         if (!is_object($service)) {
-            return Functions::createErrorMessage(
-                'Missing or wrong parameter. The object you are looking for could not be found.',
-                'Please verify your URL parameters: tx_cal_controller[type] and tx_cal_controller[uid].'
-            );
+            return new EventModel('NEW', 0, 'tx_cal_phpicalendar');
+//                Functions::createErrorMessage(
+//                'Missing or wrong parameter. The object you are looking for could not be found.',
+//                'Please verify your URL parameters: tx_cal_controller[type] and tx_cal_controller[uid].'
+//            );
         }
 
         $event = $service->find($uid, $pidList, $showHiddenEvents, $showDeletedEvents, $getAllInstances, $disableCalendarSearchString, $disableCategorySearchString, $eventType);

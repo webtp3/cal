@@ -43,10 +43,14 @@ class Labels
 
         // Get complete record
         $rec = BackendUtility::getRecordWSOL($params['table'], $params['row']['uid']);
-        $dateObj = new CalendarDateTime($rec['start_date'] ?: date('Ymd') . '000000');
-        $dateObj->setTZbyID('UTC');
+//        $dateObj = new CalendarDateTime($rec['start_date'] ? $rec['start_date'] : date('Ymd') . '000000');
+       // $dateObj->setTZbyID('UTC');
 
+        $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class, $rec['start_date'] ??  date('Ymd') . '000000');
+           // ->setTimezone(new \DateTimeZone(date('T')));
         $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'];
+
+
         if ($rec['allday'] || $params['table'] === 'tx_cal_exception_event') {
             /* If we have an all day event, only show the date */
             $datetime = $dateObj->format($format);
@@ -55,16 +59,34 @@ class Labels
             /* For normal events, show both the date and time */
             // gmdate is ok, as long as $rec['start_time'] just holds information about 24h.
             $datetime = $dateObj->format($format);
-
             $params['start_date'] = $datetime;
-
             $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
-            if ($extConf['showTimes'] == 1) {
-                $datetime .= ' ' . gmdate($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $rec['start_time']);
+            if(!empty($params['end_date']) && $params['start_date'] != $params['end_date'] ){
+                $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class, $rec['end_date'] ??  date('Ymd') . '000000');
+                // ->setTimezone(new \DateTimeZone(date('T')));
+                $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'];
+                $datetime = $dateObj->format($format);
+                $params['end_date'] = $datetime;
             }
+            if ($extConf['showTimes'] == 1) {
+                $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'];
+                $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class)
+                    ->createFromFormat('U', $rec['start_time'])
+                    ->setTimezone(new \DateTimeZone('UTC'));
+                $datetime .= ' '.$dateObj->format($format);
+               // $datetime .= ' ' . gmdate($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $rec['start_time']);
+
+                if ($rec['end_time']) {
+                    $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class)
+                        ->createFromFormat('U', $rec['end_time'])
+                        ->setTimezone(new \DateTimeZone('UTC'));
+                    $datetime .= '-'.$dateObj->format($format);
+                }
+            }
+
         }
         // Assemble the label
-        $label = $datetime . ': ' . $rec['title'];
+        $label = $datetime . ' / ' . $rec['title'];
 
         // Write to the label
         $params['title'] = $label;
@@ -152,19 +174,14 @@ class Labels
 //            $dateObj = new CalendarDateTime($rec['orig_start_date'] . '000000');
 //            $dateObj->setTZbyID('UTC');
             $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $rec['orig_start_date'])->setTimezone(new \DateTimeZone(date('T')));
-            $format = str_replace([
-                'd',
-                'm',
-                'y',
-                'Y'
-            ], [
-                '%d',
-                '%m',
-                '%y',
-                '%Y'
-            ], $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy']);
-
+            $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'];
             $datetime = $dateObj->format($format);
+            if ($rec['orig_end_date']) {
+                $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class)->createFromFormat('U', $rec['orig_end_date'])->setTimezone(new \DateTimeZone(date('T')));
+                $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'];
+                $datetime .= $dateObj->format($format);
+
+            }
             $label .= $datetime;
         }
 

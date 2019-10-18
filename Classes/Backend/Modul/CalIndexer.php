@@ -29,6 +29,7 @@ use TYPO3\CMS\Cal\Controller\DateParser;
 use TYPO3\CMS\Cal\Model\CalendarDateTime;
 use TYPO3\CMS\Cal\Utility\RecurrenceGenerator;
 use TYPO3\CMS\Core\Exception;
+use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -395,5 +396,20 @@ class CalIndexer extends BaseScriptClass
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
         return $defaultFlashMessageQueue->renderFlashMessages();
+    }
+    /**
+     * Get a CSRF token
+     *
+     * @param bool $tokenOnly Set it to TRUE to get only the token, otherwise including the &moduleToken= as prefix
+     * @return string
+     */
+    protected function getToken($tokenOnly = false)
+    {
+        $token = FormProtectionFactory::get()->generateToken('tools_txcalM1', 'index');
+        if ($tokenOnly) {
+            return $token;
+        } else {
+            return '&moduleToken=' . $token;
+        }
     }
 }

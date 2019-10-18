@@ -94,7 +94,7 @@ class FnbEventService extends EventService
             // get the uids of recurring events from index
             $select = 'event_uid';
             $table = 'tx_cal_index';
-            $where = 'start_datetime >= ' . $this->starttime->format('YmdHi') . ' AND start_datetime <= ' . $this->endtime->format('YmdHi');
+            $where = 'start_datetime >= ' . $this->starttime->format('YmdHis') . ' AND start_datetime <= ' . $this->endtime->format('YmdHis');
             $group = 'event_uid';
             $result = $GLOBALS['TYPO3_DB']->exec_SELECTquery($select, $table, $where, $group);
             $tmpUids = [];

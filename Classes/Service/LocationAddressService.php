@@ -81,9 +81,10 @@ class LocationAddressService extends BaseService
     public function getLocationFromTable($pidList, $additionalWhere = ''): array
     {
         $locations = [];
-        if ($pidList !== '') {
-            $additionalWhere .= ' AND ' . $this->tableId . '.pid IN (' . $pidList . ')';
-        }
+        // address must not be in lselected Pid
+//        if ($pidList !== '') {
+//            $additionalWhere .= ' AND ' . $this->tableId . '.pid IN (' . $pidList . ')';
+//        }
         $additionalWhere .= $this->getAdditionalWhereForLocalizationAndVersioning($this->tableId);
         $select = '*';
         $table = $this->tableId;

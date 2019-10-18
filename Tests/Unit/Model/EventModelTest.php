@@ -41,7 +41,7 @@ class EventModelTest extends UnitTestCase
          * @param $isException
          * @param $serviceKey
          */
-        $this->eventModelInstance = new EventModel('', 0, 'tx_cal_event');
+        $this->eventModelInstance = new EventModel('NEW', 0, 'tx_cal_phpicalendar');
     }
 
     /**
@@ -97,7 +97,7 @@ class EventModelTest extends UnitTestCase
      */
     public function canSetLocation()
     {
-        $title = 'Cal title';
+        $title = 1;
         $this->eventModelInstance->setLocation($title);
         $this->assertEquals($title, $this->eventModelInstance->getLocation());
     }
@@ -108,7 +108,7 @@ class EventModelTest extends UnitTestCase
      */
     public function canSetLocationLinkUrl()
     {
-        $title = 'Cal title';
+        $title = 'http://location.url';
         $this->eventModelInstance->setLocationLinkUrl($title);
         $this->assertEquals($title, $this->eventModelInstance->getLocationLinkUrl());
     }
@@ -123,9 +123,26 @@ class EventModelTest extends UnitTestCase
         $this->eventModelInstance->setLocationPage($title);
         $this->assertEquals($title, $this->eventModelInstance->getLocationPage());
     }
-//
-//    public function setStart($start)
-//    public function setEnd($end)
+    /**
+     * Test setStart
+     *
+     * @test
+     */
+    public function canSetStart() {
+        $title = new CalendarDateTime();
+        $this->eventModelInstance->setStart($title);
+        $this->assertEquals($title, $this->eventModelInstance->getStart());
+    }
+    /**
+     * Test setEnd
+     *
+     * @test
+     */
+    public function canSetEnd() {
+        $title = new CalendarDateTime();
+        $this->eventModelInstance->setEnd($title);
+        $this->assertEquals($title, $this->eventModelInstance->getEnd());
+    }
 //    public function setCalNumber($calnumber)
 //    public function setCalendarUid($uid)
 //    public function setCalName($calname)

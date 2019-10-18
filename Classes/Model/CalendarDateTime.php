@@ -106,8 +106,8 @@ class CalendarDateTime extends \DateTime
      */
     public function equals(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHi'));
-        $b = floatval($this->format('YmdHi'));
+        $a = floatval($compareDate->format('YmdHis'));
+        $b = floatval($this->format('YmdHis'));
         return $a === $b;
     }
 
@@ -117,8 +117,8 @@ class CalendarDateTime extends \DateTime
      */
     public function before(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHi'));
-        $b = floatval($this->format('YmdHi'));
+        $a = floatval($compareDate->format('YmdHis'));
+        $b = floatval($this->format('YmdHis'));
         return $a > $b;
     }
 
@@ -128,8 +128,8 @@ class CalendarDateTime extends \DateTime
      */
     public function after(self $compareDate): bool
     {
-        $a = floatval($compareDate->format('YmdHi'));
-        $b = floatval($this->format('YmdHi'));
+        $a = floatval($compareDate->format('YmdHis'));
+        $b = floatval($this->format('YmdHis'));
         return $a < $b;
     }
 
@@ -140,8 +140,8 @@ class CalendarDateTime extends \DateTime
      */
     public function compare(self $compareDateA, self $compareDateB): int
     {
-        $a = floatval($compareDateA->format('YmdHi'));
-        $b = floatval($compareDateB->format('YmdHi'));
+        $a = floatval($compareDateA->format('YmdHis'));
+        $b = floatval($compareDateB->format('YmdHis'));
         if ($a === $b) {
             return 0;
         }
@@ -316,7 +316,7 @@ class CalendarDateTime extends \DateTime
         $this->setHour($date->format('H'));
         $this->setMinute($date->format('i'));
         $this->setSecond($date->format('s'));
-       // $this->setTimezone(new \DateTimeZone($date->format('T')));
+        $this->setTimezone(new \DateTimeZone('UTC'));
     }
 
     /**

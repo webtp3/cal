@@ -1167,12 +1167,12 @@ class Controller extends AbstractPlugin
             $cal_preview = GeneralUtility::_GP('tx_cal_controller');
             $uid =  (int)$cal_preview['uid'];
             $type =   'tx_cal_preview';
-            $pid = GeneralUtility::_GP('id');
+            $pid = (int)GeneralUtility::_GP('id');
             $GLOBALS['TSFE']->sys_page->versioningPreview = true;
         }
         else{
             $uid =  $this->conf ['uid'];
-            $type =  GeneralUtility::_GP('type') == 1480321830 ? 'tx_cal_preview' : $this->conf ['type'];
+            $type = $this->conf ['type'];
 
         }
         $pidList = $this->conf ['pidList'];
@@ -1192,10 +1192,11 @@ class Controller extends AbstractPlugin
             if (is_string($event)) {
                 return $event;
             }
-            return Functions::createErrorMessage(
+            return new EventModel();
+                /*Functions::createErrorMessage(
                 'Missing or wrong parameter. The event you are looking for could not be found.',
                 'Please verify your URL parameter: tx_cal_controller[uid]'
-            );
+            );*/
         }
 
         $categoryArray = implode(',', $event->getCategoryUidsAsArray());

@@ -594,7 +594,7 @@ abstract class BaseService extends AbstractService
                     $removeUids[] = $orgUid;
                 }
             }
-            $GLOBALS['TYPO3_DB']->sql_free_result($tmpWSRes);
+           // $GLOBALS['TYPO3_DB']->sql_free_result($tmpWSRes);
 
             $removeUidList = implode(',', array_unique($removeUids));
 

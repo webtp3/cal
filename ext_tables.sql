@@ -468,7 +468,8 @@ CREATE TABLE tt_address (
 	tx_cal_controller_latitude VARCHAR(255) DEFAULT '' NOT NULL,
 	tx_cal_controller_longitude VARCHAR(255) DEFAULT '' NOT NULL,
 	sys_language_uid int(11) DEFAULT '0' NOT NULL,
-	l18n_parent int(11) DEFAULT '0' NOT NULL
+	l18n_parent int(11) DEFAULT '0' NOT NULL,
+	l18n_diffsource VARCHAR(255) DEFAULT '' NOT NULL,
 );
 
 CREATE TABLE be_users (
