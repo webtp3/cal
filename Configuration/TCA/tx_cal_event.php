@@ -13,7 +13,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 defined('TYPO3_MODE') or die();
 
-$configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+$configuration =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 
 $sPid = '###CURRENT_PID###'; // storage pid????
 

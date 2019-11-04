@@ -31,7 +31,7 @@ class RightsService extends BaseService
     public function __construct()
     {
         parent::__construct();
-        $this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $this->confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
     }
 
     /**

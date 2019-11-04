@@ -109,6 +109,32 @@ abstract class LocationModel extends BaseModel
     public $eventLinks = [];
 
     /**
+     * cid google id
+     * @var string
+     */
+    protected $cid;
+
+    /**
+     * sets the cid attribute
+     *
+     * @param string $cid
+     */
+    public function setCid($cid)
+    {
+        $this->cid = $cid;
+    }
+
+    /**
+     * returns the cid attribute (google id)
+     *
+     * @return string
+     */
+    public function getCid()
+    {
+        return $this->cid;
+    }
+
+    /**
      * @return string
      */
     public function getName(): string

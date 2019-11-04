@@ -1456,7 +1456,7 @@ abstract class Model extends BaseModel
     public function getOrganizerObject()
     {
         if (!$this->organizerObject) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             $useOrganizerStructure = ($confArr['useOrganizerStructure'] ?: 'tx_cal_organizer');
             $modelObj = GeneralUtility::makeInstance(ModelController::class);//&Registry::Registry('basic', 'modelcontroller');
             $this->organizerObject = $modelObj->findOrganizer(
@@ -1531,7 +1531,7 @@ abstract class Model extends BaseModel
     public function getLocationObject()
     {
         if (!$this->locationObject) {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
             $modelObj =  GeneralUtility::makeInstance(ModelController::class);//&Registry::Registry('basic', 'modelcontroller');
             $this->locationObject = $modelObj->findLocation(

@@ -58,7 +58,7 @@ class ListView extends BaseView
     public function initTemplate(&$page)
     {
         if ($page === '') {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             if ($confArr['useTeaser']) {
                 $page = Functions::getContent($this->conf['view.']['list.']['listWithTeaserTemplate']);
             } else {
@@ -85,7 +85,7 @@ class ListView extends BaseView
     {
         $listTemplate = $this->markerBasedTemplateService->getSubpart($page, '###LIST_TEMPLATE###');
         if ($listTemplate === '') {
-            $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             if ($confArr['useTeaser']) {
                 $page = Functions::getContent($this->conf['view.']['list.']['listWithTeaserTemplate']);
             } else {

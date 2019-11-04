@@ -525,7 +525,7 @@ class LocationService extends BaseService
      */
     public function isAllowedService(): bool
     {
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $useLocationStructure = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
         return $useLocationStructure === $this->keyId;
     }

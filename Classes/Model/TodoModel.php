@@ -134,7 +134,7 @@ class TodoModel extends EventModel
      */
     public function fillTemplate($subpartMarker): string
     {
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         if ($confArr['todoSubtype'] === 'event') {
             $resourcePath = $this->conf['view.']['todo.']['todoInlineModelTemplate'];
         } else {

@@ -264,7 +264,7 @@ class CalIndexer extends BaseScriptClass
                         $content .= $rgc->getInfo();
                     }
                 } else {
-                    $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+                    $extConf =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 
                     /** @var RecurrenceGenerator $rgc */
                     $rgc = GeneralUtility::makeInstance(RecurrenceGenerator::class);

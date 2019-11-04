@@ -145,7 +145,7 @@ class BaseView extends BaseService
     public function getTodoMarker(&$page, &$sims, &$rems, &$wrapped)
     {
         $rems['###TODO###'] = '';
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         if ($confArr['todoSubtype'] === 'todo' && $this->rightsObj->isViewEnabled('todo')) {
             $dateObject = new CalendarDateTime($this->conf['getdate']);
             $pidList = $this->conf['pidList'];

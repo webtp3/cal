@@ -304,7 +304,7 @@ class AdminView extends BaseView
 
         // EVENT
 
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $locationModel = ($confArr['useLocationStructure'] ?: 'tx_cal_location');
         $organizerModel = ($confArr['useOrganizerStructure'] ?: 'tx_cal_organizer');
 

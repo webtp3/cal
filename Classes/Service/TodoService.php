@@ -114,7 +114,7 @@ class TodoService extends EventService
      */
     public function findCurrentTodos($disableCalendarSearchString = false, $disableCategorySearchString = false): array
     {
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->starttime = new CalendarDateTime($confArr['recurrenceStart']);
         $this->endtime = new CalendarDateTime($confArr['recurrenceEnd']);
         $categories = &$this->modelObj->findAllCategories('cal_category_model', '', $this->conf['pidList']);

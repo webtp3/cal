@@ -361,7 +361,7 @@ class ConfirmEventView extends FeEditingBaseView
     {
         $sims['###TEASER###'] = '';
 
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         if ($confArr['useTeaser'] && $this->isAllowed('teaser')) {
             $sims['###TEASER###'] = $this->applyStdWrap($this->object->getTeaser(), 'teaser_stdWrap');
             $sims['###TEASER_VALUE###'] = htmlspecialchars($this->object->getTeaser());

@@ -2,6 +2,7 @@
 	"name": "web-tp3/cal",
 	"description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
 	"type": "typo3-cms-extension",
+	"version": "2.5.9",
 	"license": [
 		"GPL-2.0-or-later"
 	],
@@ -23,7 +24,9 @@
 		}
 	],
 	"require": {
-		"typo3/cms-core": "^8.7.13 || ^9.5.0",
+		"symfony/config":"*",
+		"helhum/typoscript-rendering":"^2.1",
+		"typo3/cms-core": "^8.7.13 || ^10.5.0",
 		"sjbr/static-info-tables": "^6.7"
 	},
 	"require-dev": {
@@ -95,6 +98,11 @@
 			"Package": {
 				"partOfMinimalUsableSystem": true
 			}
+		},
+		"helhum/dotenv-connector": {
+			"cache-dir": "var/cache",
+			"allow-overrides": true,
+			"env-file": ".env"
 		}
 
 	}

@@ -550,13 +550,11 @@ class EventModel extends Model
         $tempDate = new CalendarDateTime($row['start_date'] > 0 ? $row['start_date'] . '000000' :'');
        // $tempDate->setTZbyID('UTC');
         $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
-        $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
         $tempDate->addSeconds($row['start_time']);
         $this->setStart($tempDate);
         $tempDate = new CalendarDateTime($row['end_date'] >  0 ? $row['end_date'] . '000000': '');
         //$tempDate->setTZbyID('UTC');
-        $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
-        $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
+        $tempDate->add(new \DateInterval('PT' . $offset  . 'S'));
         $tempDate->addSeconds($row['end_time']);
         $this->setEnd($tempDate);
 
@@ -1739,7 +1737,7 @@ class EventModel extends Model
      */
     public function getTeaserMarker(& $template, & $sims, & $rems, & $wrapped, $view)
     {
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         if ($confArr['useTeaser']) {
             $this->initLocalCObject();
             $this->local_cObj->setCurrentVal($this->getTeaser());

@@ -333,7 +333,7 @@ class OrganizerFeUserService extends BaseService
      */
     public function isAllowedService(): bool
     {
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $useOrganizerStructure = ($confArr['useOrganizerStructure'] ?: 'tx_cal_location');
         return $useOrganizerStructure === $this->keyId;
     }

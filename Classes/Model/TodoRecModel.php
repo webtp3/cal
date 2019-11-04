@@ -88,7 +88,7 @@ class TodoRecModel extends EventModel
      */
     public function fillTemplate($subpartMarker): string
     {
-        $confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $modelTemplate = $confArr['todoSubtype'] === 'event' ? 'todoInlineModelTemplate' : 'todoSeparateModelTemplate';
 
         $page = Functions::getContent($this->parentEvent->conf['view.']['todo.'][$modelTemplate]);

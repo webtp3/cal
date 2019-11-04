@@ -140,7 +140,7 @@ abstract class BaseService extends AbstractService
         // $this->modelObj = &Registry::Registry('basic', 'modelcontroller');
         $this->modelObj =  $this->objectManager->get(ModelController::class);
 
-        $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+        $this->extConf =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
         $this->extConf['categoryService'] = 'sys_category';
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $this->calDate = GeneralUtility::makeInstance(CalDate::class);

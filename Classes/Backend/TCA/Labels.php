@@ -60,7 +60,7 @@ class Labels
             // gmdate is ok, as long as $rec['start_time'] just holds information about 24h.
             $datetime = $dateObj->format($format);
             $params['start_date'] = $datetime;
-            $extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+            $extConf =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
             if(!empty($params['end_date']) && $params['start_date'] != $params['end_date'] ){
                 $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class, $rec['end_date'] ??  date('Ymd') . '000000');
                 // ->setTimezone(new \DateTimeZone(date('T')));

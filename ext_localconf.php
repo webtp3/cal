@@ -155,7 +155,7 @@ ExtensionManagementUtility::addService(
 );
 
 // get extension confArr
-$confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
+$confArr =  is_array($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']) ? $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal'] : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['cal']);
 
 /* Cal Todo Model */
 ExtensionManagementUtility::addService(
@@ -1243,8 +1243,8 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_event_im
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_location_images'] = LocationImagesUpdateWizard::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_organizer_images'] = OrganizerImagesUpdateWizard::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['cal_sys_template'] = TypoScriptUpdateWizard::class;
-
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'][MigrateCalCategoriesToSysCategoriesUpdateWizard::class] = MigrateCalCategoriesToSysCategoriesUpdateWizard::class;
+//
+//$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'][MigrateCalCategoriesToSysCategoriesUpdateWizard::class] = MigrateCalCategoriesToSysCategoriesUpdateWizard::class;
 
 ExtensionManagementUtility::addPageTSConfig('
 mod.wizards.newContentElement.wizardItems.plugins.elements.tx_cal {
