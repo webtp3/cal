@@ -310,13 +310,16 @@ class CalendarDateTime extends \DateTime
         if ($date == '') {
             $date= new self();
         }
+        $this->setTimezone(new \DateTimeZone(date('T')));
         $this->setYear($date->format('Y'));
         $this->setMonth($date->format('m'));
         $this->setDay($date->format('d'));
         $this->setHour($date->format('H'));
         $this->setMinute($date->format('i'));
         $this->setSecond($date->format('s'));
-        $this->setTimezone(new \DateTimeZone('UTC'));
+        $offset = $this->getOffset();
+        $this->sub(new \DateInterval('PT' . $offset  . 'S'));//addSeconds($row['start_time']);
+
     }
 
     /**

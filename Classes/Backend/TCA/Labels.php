@@ -71,14 +71,14 @@ class Labels
             if ($extConf['showTimes'] == 1) {
                 $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'];
                 $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class)
-                    ->createFromFormat('U', $rec['start_time'])
+                    ->createFromFormat('U', $rec['start_time'] ?:date('U') )
                     ->setTimezone(new \DateTimeZone('UTC'));
                 $datetime .= ' '.$dateObj->format($format);
                // $datetime .= ' ' . gmdate($GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'], $rec['start_time']);
 
                 if ($rec['end_time']) {
                     $dateObj = GeneralUtility::makeInstance(CalendarDateTime::class)
-                        ->createFromFormat('U', $rec['end_time'])
+                        ->createFromFormat('U', $rec['end_time'] ?:date('U'))
                         ->setTimezone(new \DateTimeZone('UTC'));
                     $datetime .= '-'.$dateObj->format($format);
                 }

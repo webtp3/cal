@@ -2,7 +2,7 @@
 	"name": "web-tp3/cal",
 	"description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
 	"type": "typo3-cms-extension",
-	"version": "2.5.9",
+	"version": "2.5.10",
 	"license": [
 		"GPL-2.0-or-later"
 	],
@@ -26,21 +26,16 @@
 	"require": {
 		"symfony/config":"*",
 		"helhum/typoscript-rendering":"^2.1",
-		"typo3/cms-core": "^8.7.13 || ^10.5.0",
+		"typo3/cms-core": "^8.7.13 || ^9.5 || ^10.1",
 		"sjbr/static-info-tables": "^6.7"
 	},
 	"require-dev": {
-		"editorconfig-checker/editorconfig-checker": "^8.0",
-		"friendsofphp/php-cs-fixer": "^2.13",
-		"web-tp3/cag_tests": "^1.2",
-		"phpunit/phpunit": "*",
-		"web-tp3/chromedriver": "^2",
 		"helhum/dotenv-connector": "^2.0",
-		"typo3/testing-framework": "*",
+		"typo3/testing-framework": "^2",
+		"web-tp3/chromedriver": "*",
 		"nimut/testing-framework": "*",
-		"roave/security-advisories": "@dev",
-		"helhum/typo3-console": "^5"
-
+		"web-tp3/cag_tests":"^1.2",
+		"facebook/webdriver":"^1"
 	},
 	"suggest": {
 		"friendsoftypo3/typo3db-legacy": "^1.1",
@@ -71,10 +66,7 @@
 	},
 	"scripts": {
 		"analyze:php": "phpstan analyse --ansi --no-progress --configuration=phpstan.neon --level=5 .Build/web/typo3conf/ext/",
-		"typo3-cms-scripts": [
-			"typo3cms install:fixfolderstructure",
-			"typo3cms install:generatepackagestates"
-		],
+
 		"post-autoload-dump": [
 			"@typo3-cms-scripts",
 			"mkdir -p .Build/web/typo3conf/ext/",
