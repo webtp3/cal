@@ -21,11 +21,12 @@ namespace TYPO3\CMS\Cal\Tests\Functional\Service;
  * The TYPO3 extension Calendar Base (cal) project - inspiring people to share!
  */
 use TYPO3\CMS\Cal\Service\EventService;
+use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
  * Class EventServiceTest
  */
-class EventServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class EventServiceTest extends FunctionalTestCase
 {
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */

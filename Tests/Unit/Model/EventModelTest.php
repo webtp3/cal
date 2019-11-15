@@ -73,7 +73,7 @@ class EventModelTest extends UnitTestCase
      */
     public function canSetTstamp()
     {
-        $ts = time();
+        $ts = date('U');
         $this->eventModelInstance->setTstamp($ts);
         $this->assertEquals($ts, $this->eventModelInstance->getTstamp());
     }
@@ -132,7 +132,7 @@ class EventModelTest extends UnitTestCase
     public function canSetStart() {
         $start = new CalendarDateTime();
         $this->eventModelInstance->setStart($start);
-        $this->assertEquals($title, $this->eventModelInstance->getStart());
+        $this->assertEquals($start->format('YmdHis'), $this->eventModelInstance->getStart()->format('YmdHis'));
     }
     /**
      * Test setEnd
@@ -142,7 +142,7 @@ class EventModelTest extends UnitTestCase
     public function canSetEnd() {
         $end = new CalendarDateTime();
         $this->eventModelInstance->setEnd($end);
-        $this->assertEquals($title, $this->eventModelInstance->getEnd());
+        $this->assertEquals($end->format('YmdHis'), $this->eventModelInstance->getEnd()->format('YmdHis'));
     }
 //    public function setCalNumber($calnumber)
 //    public function setCalendarUid($uid)

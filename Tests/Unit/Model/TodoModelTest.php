@@ -60,7 +60,7 @@ class TodoModelTest extends UnitTestCase
      */
     public function canSetTstamp()
     {
-        $title = 'News title';
+        $title = date('U');
         $this->calModelInstance->setTstamp($title);
         $this->assertEquals($title, $this->calModelInstance->getTstamp());
     }

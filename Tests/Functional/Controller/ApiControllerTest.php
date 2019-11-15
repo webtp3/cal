@@ -25,7 +25,7 @@ use TYPO3\CMS\Cal\Controller\Api;
 /**
  * API for calendar base (cal)
  */
-class ApiControllerTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class ApiControllerTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
 {
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */

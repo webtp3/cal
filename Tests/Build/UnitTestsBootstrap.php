@@ -1,9 +1,15 @@
 <?php
-
 /*
- * This file is part of the web-tp3/cal.
+ * This file is part of the TYPO3 CMS project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
  * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
  */
 
 /**
@@ -21,7 +27,7 @@
  *     typo3/sysext/core/Tests/Unit/DataHandling/DataHandlerTest.php
  */
 call_user_func(function () {
-    $testbase = new \CAG\CagTests\Core\Testbase();
+    $testbase = new \TYPO3\TestingFramework\Core\Testbase();
     $testbase->enableDisplayErrors();
     $testbase->defineBaseConstants();
     $testbase->defineSitePath();
@@ -38,27 +44,11 @@ call_user_func(function () {
     define('TYPO3_DLOG', false);
 
     // Retrieve an instance of class loader and inject to core bootstrap
-    // selftest
-    if (file_exists($classLoaderFilepath = dirname(PATH_site) . '/Build/vendor/autoload.php')) {
-        // Console is root package, thus vendor folder is .Build/vendor
-        $classLoader = require $classLoaderFilepath;
-    } elseif (file_exists($classLoaderFilepath = dirname(PATH_site) . '/.Build/vendor/autoload.php')) {
-        // Console is root package, thus vendor folder is .Build/vendor
-        $classLoader = require $classLoaderFilepath;
-    } elseif (file_exists($vendorAutoLoadFile = dirname(dirname(dirname(__DIR__))) . '/autoload.php')) {
-        // Console is a dependency, thus located in vendor/helhum/typo3-console
-        $classLoader = require $vendorAutoLoadFile;
-    } elseif (file_exists($typo3AutoLoadFile = $_SERVER['PWD'] . '/.Build/vendor/autoload.php')) {
-        // Console is extension CAG
-        $classLoader = require $typo3AutoLoadFile;
-    } else {
-        echo 'Could not find autoload.php file. TYPO3 Console needs to be installed with composer' . PHP_EOL;
-        exit(1);
-    }
+    $classLoaderFilepath = TYPO3_PATH_PACKAGES . 'autoload.php';
     if (!file_exists($classLoaderFilepath)) {
         die('ClassLoader can\'t be loaded. Please check your path or set an environment variable \'TYPO3_PATH_ROOT\' to your root path.');
     }
-    // $classLoader = require $classLoaderFilepath;
+    $classLoader = require $classLoaderFilepath;
     \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
         ->initializeClassLoader($classLoader)
         ->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI)

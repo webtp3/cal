@@ -83,7 +83,7 @@ databaseData:
       option: '--site-name'
       type: string
       default: 'New TYPO3 Console site'
-      value: '%env(TYPO3_INSTALL_SITE_NAME)%'
+      value: '%env(HOST_TITLE)%'
 
 defaultConfiguration:
   type: install

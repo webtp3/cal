@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 namespace TYPO3\CMS\Cal\Tests\Functional\Utility;
 
-use  CAG\CagTests\Core\Functional\FunctionalTestCase;
+use  TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 use TYPO3\CMS\Cal\Utility\Functions;
 
 /**

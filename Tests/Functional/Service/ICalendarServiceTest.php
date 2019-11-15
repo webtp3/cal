@@ -27,7 +27,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class ICalendarServiceTest
  */
-class ICalendarServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class ICalendarServiceTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
 {
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */

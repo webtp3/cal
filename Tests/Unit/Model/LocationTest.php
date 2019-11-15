@@ -15,6 +15,7 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Model;
  * LICENSE.txt file that was distributed with this source code.
  */
 use Nimut\TestingFramework\TestCase\UnitTestCase;
+use TYPO3\CMS\Cal\Model\EventModel;
 use TYPO3\CMS\Cal\Model\Location;
 
 /**
@@ -25,7 +26,7 @@ class LocationTest extends UnitTestCase
 {
 
     /**
-     * @var News
+     * @var Location
      */
     protected $calModelInstance;
 
@@ -36,7 +37,7 @@ class LocationTest extends UnitTestCase
     protected function setUp()
     {
         // * @param string $serviceKey Service key, must be prefixed "tx_", "Tx_" or "user_"
-        $this->calModelInstance = new Location('tx_cal_location');
+        $this->calModelInstance = new Location([],'0');
     }
 
     /**
@@ -46,9 +47,9 @@ class LocationTest extends UnitTestCase
      */
     public function titleCanBeSet()
     {
-        $title = 'News title';
-        $this->calModelInstance->setTitle($title);
-        $this->assertEquals($title, $this->calModelInstance->getTitle());
+        $name = 'Cal Location Name';
+        $this->calModelInstance->setName($name);
+        $this->assertEquals($name, $this->calModelInstance->getName());
     }
 
     /**
@@ -58,138 +59,34 @@ class LocationTest extends UnitTestCase
      */
     public function canSetTstamp()
     {
-        $title = 'News title';
-        $this->calModelInstance->setTstamp($title);
-        $this->assertEquals($title, $this->calModelInstance->getTstamp());
-    }
-    /**
-     * Test setSequence
-     *
-     * @test
-     */
-    public function canSetSequence()
-    {
-        //    * @param $sequence Array
-
-        $title = [];
-        $this->calModelInstance->setSequence($title);
-        $this->assertEquals($title, $this->calModelInstance->getSequence());
-    }
-    /**
-     * Test setOrganizer
-     *
-     * @test
-     */
-    public function canSetOrganizer()
-    {
-        //  * @param $organizer String
-        $title = 'News title';
-        $this->calModelInstance->setOrganizer($title);
-        $this->assertEquals($title, $this->calModelInstance->getOrganizer());
+        $date = date('U');
+        $this->calModelInstance->setTstamp($date);
+        $this->assertEquals($date, $this->calModelInstance->getTstamp());
     }
 
-    /**
-     * Test setCreationDate
-     *
-     * @test
-     */
-    public function caSetCreationDate()
-    {
-        //    * @param $sequence Array
-        $title = 'News title';
-        $this->calModelInstance->setCreationDate($title);
-        $this->assertEquals($title, $this->calModelInstance->getCreationDate());
-    }
-    /**
-     * Test setLocation
-     *
-     * @test
-     */
-    public function CanSetLocation()
-    {
-        $title = 'News title';
-        $this->calModelInstance->setLocation($title);
-        $this->assertEquals($title, $this->calModelInstance->getLocation());
-    }
-    /**
-     * Test setLocationLinkUrl
-     *
-     * @test
-     */
-    public function canSetLocationLinkUrl()
-    {
-        $title = 'News title';
-        $this->calModelInstance->setLocationLinkUrl($title);
-        $this->assertEquals($title, $this->calModelInstance->getLocationLinkUrl());
-    }
-    /**
-     * Test setLocationPage
-     *
-     * @test
-     */
-    public function setLocationPage()
-    {
-        $title = 'News title';
-        $this->calModelInstance->setLocationPage($title);
-        $this->assertEquals($title, $this->calModelInstance->getLocationPage());
-    }
+//    /**
+//     * Test Create
+//     *
+//     * @test
+//     */
+//    public function canCreateLocation()
+//    {
+////        $this->setUid($row['uid']);
+////        $this->setName($row['name']);
+////        $this->setDescription($row['description']);
+////        $this->setStreet($row['street']);
+////        $this->setZip($row['zip']);
+////        $this->setCity($row['city']);
+////        $this->setCountryZone($row['country_zone']);
+////        $this->setCountry($row['country']);
+////        $this->setPhone($row['phone']);
+////        $this->setEmail($row['email']);
+////        $this->setImage(GeneralUtility::trimExplode(',', $row['image'], 1));
+////        $this->setLink($row['link']);
+////        $this->setLatitude($row['latitude']);
+////        $this->setLongitude($row['longitude']);
+////        $this->assertEquals($row, $this->calModelInstance->getTstamp());
 //
-//    public function setStart($start)
-//    public function setEnd($end)
-//    public function setCalNumber($calnumber)
-//    public function setCalendarUid($uid)
-//    public function setCalName($calname)
-//    public function setOverlap($overlap)
-//    public function setTimezone($timezone)
-//    public function setAllday($boolean)
-//    public function setRecur($recur = [])
-//    public function setUrl($url)
-//    public function setVAlarmDescription($alarmdescription)
-//    public function setIsClone($boolean)
-//    public function setByMonth($bymonth)
-//    public function setByDay($byday)
-//    public function setByMonthday($bymonthday)
-//    public function setByWeekDay($byweekday)
-//    public function setByWeekNo($byweekno)
-//    public function setByMinute($byminute)
-//    public function setByHour($byhour)
-//    public function setBySecond($bysecond)
-//    public function setByYearDay($byyearday)
-//    public function setBySetPos($bysetpos)
-//    public function setWkst($wkst)
-//    public function setInterval($interval)
-//    public function setSummary($summary)
-//    public function setClass($class)
-//    public function setDisplayEnd($displayend)
-//    public function setContent($t)
-//    public function setDescription($description)
-//    public function setUntil($until)
-//    public function setFreq($freq)
-//    public function setCount($count)
-//    public function setRdate($rdate)
-//    public function setRdateValues($rdateArray)
-//    public function setRdateType($rdateType)
-//    public function setSpansDay($spansday)
-//    public function setCategories($categories)
-//    public function setExceptionEvents($ex_events)
-//    public function setEditable($editable)
-//    public function setOrganizerId($id)
-//    public function setOrganizerLinkUrl($id)
-//    public function setOrganizerPage($pid)
-//    public function setLocationId($id)
-//    public function setExceptionSingleIds($idArray)
-//    public function setExceptionGroupIds($idArray)
-//    public function setHeaderStyle($style)
-//    public function setBodyStyle($style)
-//    public function setPage($t)
-//    public function setExtUrl($t)
-//    public function setEventType($t)
-//    public function setSharedUsers($userIds)
-//    public function setSharedGroups($groupIds)
-//    public function setEventOwner($owner)
-//    public function setAttendees(&$attendees)
-//    public function setStatus($status)
-//    public function setPriority($priority)
-//    public function setCompleted($completed)
-//    public function setDeviationDates($deviationDates)
+//    }
+
 }

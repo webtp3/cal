@@ -25,7 +25,7 @@ use TYPO3\CMS\Cal\Service\RightsService;
 /**
  * Class RightsServiceTest
  */
-class RightsServiceTest extends \CAG\CagTests\Core\Functional\FunctionalTestCase
+class RightsServiceTest extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
 {
 
     /** @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface The object manager */

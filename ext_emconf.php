@@ -17,7 +17,7 @@ $EM_CONF['cal'] = [
     'author_email' => 'cal@typo3.helke.de, mario@matzullas.de',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.7.13 - 9.5.99',
+            'typo3' => '8.7.13 - 10.99.99',
             'static_info_tables' => '6.7.0 - 6.7.99',
             'tt_address' => '^4',
 
