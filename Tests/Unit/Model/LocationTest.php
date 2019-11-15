@@ -15,13 +15,13 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Model;
  * LICENSE.txt file that was distributed with this source code.
  */
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Cal\Model\Model;
+use TYPO3\CMS\Cal\Model\Location;
 
 /**
  * Tests for domains model News
  *
  */
-class ModelTest extends UnitTestCase
+class LocationTest extends UnitTestCase
 {
 
     /**
@@ -36,7 +36,7 @@ class ModelTest extends UnitTestCase
     protected function setUp()
     {
         // * @param string $serviceKey Service key, must be prefixed "tx_", "Tx_" or "user_"
-        $this->calModelInstance = new Model('tx_cal_event');
+        $this->calModelInstance = new Location('tx_cal_location');
     }
 
     /**

@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Model;
  */
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Cal\Model\TodoModel;
+use TYPO3\CMS\Cal\Model\EventModel;
 
 /**
  * Tests for domains model News
@@ -36,7 +37,8 @@ class TodoModelTest extends UnitTestCase
     protected function setUp()
     {
         // * @param string $serviceKey Service key, must be prefixed "tx_", "Tx_" or "user_"
-        $this->calModelInstance = new TodoModel('tx_cal_todo');
+        $evt =  new EventModel('NEW', 0, 'tx_cal_phpicalendar');
+        $this->calModelInstance = new TodoModel($evt,'tx_cal_todo');
     }
 
     /**
@@ -62,77 +64,77 @@ class TodoModelTest extends UnitTestCase
         $this->calModelInstance->setTstamp($title);
         $this->assertEquals($title, $this->calModelInstance->getTstamp());
     }
-    /**
-     * Test setSequence
-     *
-     * @test
-     */
-    public function canSetSequence()
-    {
-        //    * @param $sequence Array
+//    /**
+//     * Test setSequence
+//     *
+//     * @test
+//     */
+//    public function canSetSequence()
+//    {
+//        //    * @param $sequence Array
+//
+//        $title = [];
+//        $this->calModelInstance->setSequence($title);
+//        $this->assertEquals($title, $this->calModelInstance->getSequence());
+//    }
+//    /**
+//     * Test setOrganizer
+//     *
+//     * @test
+//     */
+//    public function canSetOrganizer()
+//    {
+//        //  * @param $organizer String
+//        $title = 'News title';
+//        $this->calModelInstance->setOrganizer($title);
+//        $this->assertEquals($title, $this->calModelInstance->getOrganizer());
+//    }
 
-        $title = [];
-        $this->calModelInstance->setSequence($title);
-        $this->assertEquals($title, $this->calModelInstance->getSequence());
-    }
-    /**
-     * Test setOrganizer
-     *
-     * @test
-     */
-    public function canSetOrganizer()
-    {
-        //  * @param $organizer String
-        $title = 'News title';
-        $this->calModelInstance->setOrganizer($title);
-        $this->assertEquals($title, $this->calModelInstance->getOrganizer());
-    }
-
-    /**
-     * Test setCreationDate
-     *
-     * @test
-     */
-    public function caSetCreationDate()
-    {
-        //    * @param $sequence Array
-        $title = 'News title';
-        $this->calModelInstance->setCreationDate($title);
-        $this->assertEquals($title, $this->calModelInstance->getCreationDate());
-    }
-    /**
-     * Test setLocation
-     *
-     * @test
-     */
-    public function CanSetLocation()
-    {
-        $title = 'News title';
-        $this->calModelInstance->setLocation($title);
-        $this->assertEquals($title, $this->calModelInstance->getLocation());
-    }
-    /**
-     * Test setLocationLinkUrl
-     *
-     * @test
-     */
-    public function canSetLocationLinkUrl()
-    {
-        $url = 'https://www.test.url';
-        $this->calModelInstance->setLocationLinkUrl($url);
-        $this->assertEquals($url, $this->calModelInstance->getLocationLinkUrl());
-    }
-    /**
-     * Test setLocationPage
-     *
-     * @test
-     */
-    public function setLocationPage()
-    {
-        $page = 1;
-        $this->calModelInstance->setLocationPage($page);
-        $this->assertEquals($page, $this->calModelInstance->getLocationPage());
-    }
+//    /**
+//     * Test setCreationDate
+//     *
+//     * @test
+//     */
+//    public function caSetCreationDate()
+//    {
+//        //    * @param $sequence Array
+//        $title = 'News title';
+//        $this->calModelInstance->setCreationDate($title);
+//        $this->assertEquals($title, $this->calModelInstance->getCreationDate());
+//    }
+//    /**
+//     * Test setLocation
+//     *
+//     * @test
+//     */
+//    public function CanSetLocation()
+//    {
+//        $title = 'News title';
+//        $this->calModelInstance->setLocation($title);
+//        $this->assertEquals($title, $this->calModelInstance->getLocation());
+//    }
+//    /**
+//     * Test setLocationLinkUrl
+//     *
+//     * @test
+//     */
+//    public function canSetLocationLinkUrl()
+//    {
+//        $url = 'https://www.test.de';
+//        $this->calModelInstance->setLocationLinkUrl($url);
+//        $this->assertEquals($url, $this->calModelInstance->getLocationLinkUrl());
+//    }
+//    /**
+//     * Test setLocationPage
+//     *
+//     * @test
+//     */
+//    public function setLocationPage()
+//    {
+//        $page = 1;
+//        $this->calModelInstance->setLocationPage($page);
+//        $this->assertEquals($page, $this->calModelInstance->getLocationPage());
+//    }
 //
 //    public function setStart($start)
 //    public function setEnd($end)

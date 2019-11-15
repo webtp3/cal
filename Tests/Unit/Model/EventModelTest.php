@@ -16,6 +16,7 @@ namespace TYPO3\CMS\Cal\Tests\Unit\Model;
  */
 use  CAG\CagTests\Core\Unit\UnitTestCase;
 use TYPO3\CMS\Cal\Model\EventModel;
+use TYPO3\CMS\Cal\Model\CalendarDateTime;
 
 /**
  * Tests for domains model EventModel
@@ -129,8 +130,8 @@ class EventModelTest extends UnitTestCase
      * @test
      */
     public function canSetStart() {
-        $title = new CalendarDateTime();
-        $this->eventModelInstance->setStart($title);
+        $start = new CalendarDateTime();
+        $this->eventModelInstance->setStart($start);
         $this->assertEquals($title, $this->eventModelInstance->getStart());
     }
     /**
@@ -139,8 +140,8 @@ class EventModelTest extends UnitTestCase
      * @test
      */
     public function canSetEnd() {
-        $title = new CalendarDateTime();
-        $this->eventModelInstance->setEnd($title);
+        $end = new CalendarDateTime();
+        $this->eventModelInstance->setEnd($end);
         $this->assertEquals($title, $this->eventModelInstance->getEnd());
     }
 //    public function setCalNumber($calnumber)

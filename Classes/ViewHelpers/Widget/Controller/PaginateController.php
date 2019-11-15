@@ -152,7 +152,7 @@ class PaginateController extends \TYPO3\CMS\Fluid\Core\Widget\AbstractWidgetCont
                                 }
 
                                 if ($event->getEnd()->before($this->starttime) || $event->getStart()->after($this->endtime)) {
-                                   // unset($objects[$cal_time][$event_times][$a_keys]);
+                                    unset($objects[$cal_time][$event_times]);
                                     continue;
                                 }
                                 $count++;

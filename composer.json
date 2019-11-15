@@ -27,7 +27,9 @@
 		"symfony/config":"*",
 		"helhum/typoscript-rendering":"^2.1",
 		"typo3/cms-core": "^8.7.13 || ^9.5 || ^10.1",
-		"sjbr/static-info-tables": "^6.7"
+		"sjbr/static-info-tables": "^6.7",
+		"friendsoftypo3/tt-address": "^4"
+
 	},
 	"require-dev": {
 		"helhum/dotenv-connector": "^2.0",
@@ -35,7 +37,22 @@
 		"web-tp3/chromedriver": "*",
 		"nimut/testing-framework": "*",
 		"web-tp3/cag_tests":"^1.2",
-		"facebook/webdriver":"^1"
+		"facebook/webdriver":"^1",
+		"typo3-console/php-server-command": "*",
+		"typo3-console/composer-auto-commands": "*",
+		"typo3-console/composer-typo3-auto-install": "^0.2",
+		"deployer/deployer": "^6.4",
+		"deployer/recipes" : "*",
+		"consolidation/robo": "^1.4",
+		"codeception/codeception":"*",
+		"phpstan/phpstan": "0.11.1",
+		"squizlabs/php_codesniffer": "^3.4",
+		"fiunchinho/phpunit-randomizer": "*",
+		"phpunit/phpunit": "*",
+		"nimut/testing-framework": "*",
+		"evoweb/ew-llxml2xliff":"^2",
+		"phpspec/phpspec":"^1",
+		"phpmd/phpmd": "*"
 	},
 	"suggest": {
 		"friendsoftypo3/typo3db-legacy": "^1.1",
@@ -66,11 +83,15 @@
 	},
 	"scripts": {
 		"analyze:php": "phpstan analyse --ansi --no-progress --configuration=phpstan.neon --level=5 .Build/web/typo3conf/ext/",
-
+		"typo3-cms-scripts": [
+			"typo3cms install:fixfolderstructure",
+			"typo3cms install:generatepackagestates"
+		],
 		"post-autoload-dump": [
-			"@typo3-cms-scripts",
 			"mkdir -p .Build/web/typo3conf/ext/",
-			"[ -L .Build/web/typo3conf/ext/cal ] || ln -snvf ../../../../. .Build/web/typo3conf/ext/cal"
+			"[ -L .Build/web/typo3conf/ext/cal ] || ln -snvf ../../../../. .Build/web/typo3conf/ext/cal",
+			"@typo3-cms-scripts"
+
 		],
 		"test:php:unit": [
 			"@php -v",

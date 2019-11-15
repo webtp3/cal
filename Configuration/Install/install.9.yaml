@@ -1,0 +1,108 @@
+prepareInstall:
+  type: prepareInstall
+  description: 'Prepare installation'
+
+environmentAndFolders:
+  type: install
+  description: 'Check environment and create folders'
+
+databaseConnect:
+  type: install
+  description: 'Set up database connection'
+  arguments:
+    databaseUserName:
+      description: 'User name for database server'
+      option: '--database-user-name'
+      type: string
+      value: '%env(typo3DatabaseUsername)%'
+      default: ''
+
+    databaseUserPassword:
+      description: 'User password for database server'
+      option: '--database-user-password'
+      type: hidden
+      value: '%env(typo3DatabasePassword)%'
+      default: ''
+
+    databaseHostName:
+      description: 'Host name of database server'
+      option: '--database-host-name'
+      type: string
+      value: '%env(typo3DatabaseHost)%'
+      default: '127.0.0.1'
+
+    databasePort:
+      description: 'TCP Port of database server'
+      option: '--database-port'
+      type: int
+      value: '%env(typo3DatabasePort)%'
+      default: 3306
+
+    databaseSocket:
+      description: 'Unix Socket to connect to'
+      option: '--database-socket'
+      type: string
+      value: '%env(typo3DatabaseSocket)%'
+      default: ''
+
+databaseSelect:
+  type: install
+  description: 'Select database'
+  arguments:
+    useExistingDatabase:
+      description: 'Use already existing database?'
+      option: '--use-existing-database'
+      type: bool
+      value: false
+      default: false
+
+    databaseName:
+      description: 'Name of the database'
+      option: '--database-name'
+      type: string
+      value: '%env(typo3DatabaseName)%'
+
+databaseData:
+  type: install
+  description: 'Set up database'
+  arguments:
+    adminUserName:
+      description: 'Username of to be created administrative user account'
+      option: '--admin-user-name'
+      type: string
+      value: '%env(typo3InstallAdminUser)%'
+
+    adminPassword:
+      description: 'Password of to be created administrative user account'
+      option: '--admin-password'
+      type: hidden
+      value: '%env(typo3InstallAdminPass)%'
+
+    siteName:
+      description: 'Name of the TYPO3 site'
+      option: '--site-name'
+      type: string
+      default: 'New TYPO3 Console site'
+      value: '%env(TYPO3_INSTALL_SITE_NAME)%'
+
+defaultConfiguration:
+  type: install
+  description: 'Set up configuration'
+  arguments:
+    siteSetupType:
+      description: 'Specify the site setup type'
+      option: '--site-setup-type'
+      type: select
+      values:
+        'no': 'Do nothing'
+        site: 'Create root page'
+      value: 'no'
+      default: 'no'
+
+extensionSetup:
+  type: extensionSetup
+  description: 'Set up extensions'
+  commands:
+    - command: 'install:generatepackagestates'
+    - command: 'database:updateschema'
+    - command: 'extension:setupactive'

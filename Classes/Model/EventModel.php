@@ -127,7 +127,7 @@ class EventModel extends Model
             $this->createEvent($row, $isException);
         }
         elseif (is_object($row)){
-            if($row->imezone) $this->timezone = $row->imezone;
+            if($row->timezone) $this->timezone = $row->timezone;
             $this->createParentEvent($row);
         }
         if(!is_null($start))$this->setStart($start);

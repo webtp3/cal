@@ -139,7 +139,7 @@ abstract class Model extends BaseModel
     /**
      * @var CalendarDateTime
      */
-    public $until;
+    public $until = 0;
 
     /**
      * @var string
@@ -587,7 +587,7 @@ abstract class Model extends BaseModel
      *
      * @return int pid to link the location to
      */
-    public function getLocationPage(): int
+    public function getLocationPage()
     {
         return $this->locationPage ?? $this->parentEvent->locationPage;// $this->locationPage;
     }
@@ -597,7 +597,7 @@ abstract class Model extends BaseModel
      *
      * @return CalendarDateTime startdate timeObject
      */
-    public function getStart(): CalendarDateTime
+    public function getStart()
     {
         return $this->start ?? new CalendarDateTime();
     }
@@ -607,7 +607,7 @@ abstract class Model extends BaseModel
      *
      * @return CalendarDateTime enddate timeObject
      */
-    public function getEnd(): CalendarDateTime
+    public function getEnd()
     {
         if (!$this->end) {
             $this->setEnd($this->getStart());
@@ -1237,7 +1237,7 @@ abstract class Model extends BaseModel
     /**
      * Returns the until date object
      */
-    public function getUntil(): CalendarDateTime
+    public function getUntil()
     {
         return $this->until ?? $this->parentEvent->until;// $this->until;
     }
