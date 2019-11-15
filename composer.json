@@ -2,7 +2,7 @@
 	"name": "web-tp3/cal",
 	"description": "A calendar combining all the functions of the existing calendar extensions plus adding some new features. It is based on the ical standard",
 	"type": "typo3-cms-extension",
-	"version": "2.5.10",
+	"version": "2.5.11",
 	"license": [
 		"GPL-2.0-or-later"
 	],
